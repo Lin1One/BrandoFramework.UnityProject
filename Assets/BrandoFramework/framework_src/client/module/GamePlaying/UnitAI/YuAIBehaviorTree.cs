@@ -17,7 +17,7 @@ namespace Client.GamePlaying.AI
     public class YuAIBehaviorTree 
     {
         //起始行为
-        private YuAIBehaviorBase m_rootBehavior;
+        public YuAIBehaviorBase m_rootBehavior;
 
         public YuAIBehaviorTree(YuAIBehaviorBase root)
         {

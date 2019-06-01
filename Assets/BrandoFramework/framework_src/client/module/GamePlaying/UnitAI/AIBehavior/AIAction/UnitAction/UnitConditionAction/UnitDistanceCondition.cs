@@ -12,6 +12,7 @@
 
 #endregion
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Client.GamePlaying.AI

@@ -1,11 +1,13 @@
+using Client.GamePlaying.AI;
 using Common.DataStruct;
+using Common.EditorWindow;
 using Common.ScriptCreate;
 using DraftBorad;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;
 using UnityEditor;
 
-namespace Common.EditorWindow
+namespace Client.Core.Editor
 {
     [YuEditorWindowTitle("编辑器功能窗口")]
     [YuEditorWindowSize(500, 400)]
@@ -21,6 +23,9 @@ namespace Common.EditorWindow
 
             tree.Add("测试面板", new MethedInvokeBorad(),
                 EditorIcons.SingleUser);
+
+            tree.Add("行为树", BehaviorTreeVisualization.Instance,
+                EditorIcons.Tree);
             //tree.Add("核心配置", YuU3dCoreSettingDati.GetSingleDati(),
             //    EditorIcons.SettingsCog, YuMenuItemSetting.CommonMenuItemSetting);
 

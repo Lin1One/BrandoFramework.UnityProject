@@ -30,6 +30,11 @@ namespace Client.GamePlaying.AI
             childendBehaviors.Add(child);
         }
 
+        public override List<YuAIBehaviorBase> GetChildren()
+        {
+            return childendBehaviors;
+        }
+
         /// <summary>
         /// 移除一个指定的子行为
         /// </summary>

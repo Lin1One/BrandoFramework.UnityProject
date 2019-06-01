@@ -13,6 +13,7 @@
 #endregion
 
 using Client.GamePlaying.Unit;
+using System.Collections.Generic;
 
 namespace Client.GamePlaying.AI
 {
@@ -35,6 +36,11 @@ namespace Client.GamePlaying.AI
 #if UNITY_EDITOR
             UnityEngine.Debug.LogWarning("这是一个AI条件，不具备子节点：YuAIActionPatrol");
 #endif
+        }
+
+        public override List<YuAIBehaviorBase> GetChildren()
+        {
+            return null;
         }
 
         public abstract void Init(object param);

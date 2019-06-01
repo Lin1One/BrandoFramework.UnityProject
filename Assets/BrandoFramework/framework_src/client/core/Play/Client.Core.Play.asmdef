@@ -1,0 +1,15 @@
+{
+    "name": "Client.Core.Play",
+    "references": [
+        "OdinPlay",
+        "Framework.Common"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

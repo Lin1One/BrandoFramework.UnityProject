@@ -37,38 +37,38 @@ namespace Common.EditorWindow
 
         #region 功能菜单设置
 
-        [HorizontalGroup("功能菜单项操作按钮")]
-        [Button("读取菜单项配置", ButtonSizes.Medium)]
-        private void InitBuilderDescs()
-        {
-            PriorityItems.Clear();
-            builders = YuMenuItemBuilderFactory.GetBuilders(typeof(EditorFunctionMenuWindow));
-            foreach (var builder in builders)
-            {
-                var cache = YuMenuItemBuilderFactory.GetItemDescCache(builder);
-                var Item = new YuMenuItemPriorityItem(cache.Desc, builder.TypeId())
-                {
-                    ItemUpAction = SetMenuPriorityUp,
-                    isLoadDefault = Convert.ToBoolean(
-                        PlayerPrefs.GetString(builder.TypeId() + "IsLoadIn" + typeof(EditorFunctionMenuWindow), "true"))
-                };
-                PriorityItems.Add(Item);
-            }
-        }
+        //[HorizontalGroup("功能菜单项操作按钮")]
+        //[Button("读取菜单项配置", ButtonSizes.Medium)]
+        //private void InitBuilderDescs()
+        //{
+        //    PriorityItems.Clear();
+        //    builders = YuMenuItemBuilderFactory.GetBuilders(typeof(EditorFunctionMenuWindow));
+        //    foreach (var builder in builders)
+        //    {
+        //        var cache = YuMenuItemBuilderFactory.GetItemDescCache(builder);
+        //        var Item = new YuMenuItemPriorityItem(cache.Desc, builder.TypeId())
+        //        {
+        //            ItemUpAction = SetMenuPriorityUp,
+        //            isLoadDefault = Convert.ToBoolean(
+        //                PlayerPrefs.GetString(builder.TypeId() + "IsLoadIn" + typeof(EditorFunctionMenuWindow), "true"))
+        //        };
+        //        PriorityItems.Add(Item);
+        //    }
+        //}
 
-        [HorizontalGroup("功能菜单项操作按钮")]
-        [Button("保存菜单项配置", ButtonSizes.Medium)]
-        private void SaveBuildPriorityPrefs()
-        {
-            for (int index = 0; index < PriorityItems.Count; index++)
-            {
-                var menuItem = PriorityItems[index];
-                PlayerPrefs.SetInt(menuItem.BuilderId, index);
-                PlayerPrefs.SetString(
-                    menuItem.BuilderId + "IsLoadIn" + typeof(EditorFunctionMenuWindow),menuItem.isLoadDefault.ToString());
-            }
-            //YuEditorAPIInvoker.DisplayTip("功能中心的菜单项优先级设置已更新！");
-        }
+        //[HorizontalGroup("功能菜单项操作按钮")]
+        //[Button("保存菜单项配置", ButtonSizes.Medium)]
+        //private void SaveBuildPriorityPrefs()
+        //{
+        //    for (int index = 0; index < PriorityItems.Count; index++)
+        //    {
+        //        var menuItem = PriorityItems[index];
+        //        PlayerPrefs.SetInt(menuItem.BuilderId, index);
+        //        PlayerPrefs.SetString(
+        //            menuItem.BuilderId + "IsLoadIn" + typeof(EditorFunctionMenuWindow),menuItem.isLoadDefault.ToString());
+        //    }
+        //    //YuEditorAPIInvoker.DisplayTip("功能中心的菜单项优先级设置已更新！");
+        //}
 
         #endregion
     }

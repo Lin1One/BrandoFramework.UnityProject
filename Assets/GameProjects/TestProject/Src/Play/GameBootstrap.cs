@@ -68,29 +68,36 @@ namespace Client
         {
             var unitModule = Injector.Instance.Get<UnitModule>();
             unitModule.RegistUintType<UnitEntityTest>();
-            var unit = unitModule.CreateUnit<UnitEntityTest>(null, 1,
-                                        UnitType.Monster, "abao_model", (newUnit) =>
-                                        {
-                                            newUnit.AnimaControl.InitAnimator();
-                                            //newUnit.AnimaControl.LoadAnima(animaControlId, newUnit.U3DData.Trans.GetComponent<Animator>());
-                                            YuAIBehaviorTreeBuilder builder = new YuAIBehaviorTreeBuilder();
-                                            builder.SetAISubject(newUnit);
-                                            newUnit.AIControl.ResetBehaviorTree(
-                                                builder.
-                                                Repeat().
-                                                    ActiveSelector().                           //主动选择
-                                                    Sequence().                             //顺序器
-                                                        Condition<UnitDistanceCondition>(new Vector2(0, 2), false).           //条件：看到掉落物品
-                                                            Back().
-                                                        Action<UnitPatrolMoveAction>(1).                     //捡取掉落物
-                                                            Back().
-                                                        Back().
-                                                    Action<UnitUseSkillAction>(2).
-                                                        Back().
-                                               Back().
-                                            End());
-                                            GameObject.Find("Main Camera").transform.SetParent(newUnit.U3DData.Trans);
-                                        }, true);
+            var unit = unitModule.CreateUnit<UnitEntityTest>(
+                null, 1, UnitType.Monster, "abao_model", 
+                (newUnit) =>
+                {
+                    newUnit.AnimaControl.InitAnimator();
+                    YuAIBehaviorTreeBuilder builder = new YuAIBehaviorTreeBuilder();
+                    builder.SetAISubject(newUnit);
+
+
+                    var unitBehaviourTree =
+                    builder.
+                    Repeat().
+                        Selector().                           //主动选择
+                        Sequence().                             //顺序器
+                            Condition<UnitDistanceCondition>(new Vector2(0, 2), false).
+                                Back().
+                            Action<UnitPatrolMoveAction>(1).
+                                Back().
+                            Back().
+                        Action<UnitUseSkillAction>(2).
+                            Back().
+                   Back().
+                End();
+                    newUnit.AIControl.ResetBehaviorTree(unitBehaviourTree);
+
+                    BehaviorTreeVisualization.Instance.BindBehaviourTree(unitBehaviourTree.m_rootBehavior, 
+                        BehaviorTreeVisualization.Instance.m_rootBehavior);
+                    GameObject.Find("Main Camera").transform.SetParent(newUnit.U3DData.Trans);
+                },
+                true);
 
         }
 

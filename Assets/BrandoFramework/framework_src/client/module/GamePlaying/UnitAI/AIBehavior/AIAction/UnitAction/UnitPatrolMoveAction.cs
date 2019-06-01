@@ -13,6 +13,7 @@
 #endregion
 
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Client.GamePlaying.AI
@@ -29,6 +30,11 @@ namespace Client.GamePlaying.AI
 
         public override void AddChild(YuAIBehaviorBase child)
         {
+        }
+
+        public override List<YuAIBehaviorBase> GetChildren()
+        {
+            return null;
         }
 
         public override void Release()
@@ -75,6 +81,8 @@ namespace Client.GamePlaying.AI
             //    EffectMoveTrans.position = m_curPos3D;
             //}
         }
+
+
     }
 }
 

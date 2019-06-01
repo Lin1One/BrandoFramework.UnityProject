@@ -12,6 +12,8 @@
 
 #endregion
 
+using System.Collections.Generic;
+
 namespace Client.GamePlaying.AI
 {
     /// <summary>
@@ -29,6 +31,11 @@ namespace Client.GamePlaying.AI
         public override void AddChild(YuAIBehaviorBase child)
         {
             this.child = child;
+        }
+
+        public override List<YuAIBehaviorBase> GetChildren()
+        {
+            return new List<YuAIBehaviorBase> { this.child };
         }
 
         public override void Release()

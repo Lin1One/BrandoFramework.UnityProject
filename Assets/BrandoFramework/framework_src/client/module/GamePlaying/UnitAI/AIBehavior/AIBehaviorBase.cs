@@ -12,6 +12,9 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
+
 namespace Client.GamePlaying.AI
 {
     /// <summary>
@@ -26,7 +29,14 @@ namespace Client.GamePlaying.AI
         public AIBehaviorState CurState
         {
             get { return curState; }
+            set
+            {
+                    curState = value;
+                    OnStateChange?.Invoke(curState);
+            }
         }
+
+        public Action<AIBehaviorState> OnStateChange;
 
         public YuAIBehaviorBase()
         {
@@ -45,16 +55,16 @@ namespace Client.GamePlaying.AI
         /// <returns></returns>
         public AIBehaviorState Tick()
         {
-            if(curState != AIBehaviorState.Running)
+            if(CurState != AIBehaviorState.Running)
             {
                 Enter();
             }
-            curState = Update();
-            if(curState != AIBehaviorState.Running)
+            CurState = Update();
+            if(CurState != AIBehaviorState.Running)
             {
                 Exit();
             }
-            return curState;
+            return CurState;
         }
 
         /// <summary>
@@ -72,7 +82,7 @@ namespace Client.GamePlaying.AI
         {
             if (curState == AIBehaviorState.Running)
             {
-                curState = AIBehaviorState.Aborted;
+                CurState = AIBehaviorState.Aborted;
                 Exit();
             }
         }
@@ -83,6 +93,13 @@ namespace Client.GamePlaying.AI
         /// </summary>
         /// <param name="child"></param>
         public abstract void AddChild(YuAIBehaviorBase child);
+
+        /// <summary>
+        /// 如果此行为是保护子行为的，则添加一个子行为
+        /// (只能有一个子行为，则覆盖)
+        /// </summary>
+        /// <param name="child"></param>
+        public abstract List<YuAIBehaviorBase> GetChildren();
 
         /// <summary>
         /// 是否已结束（成功、失败、终止）
