@@ -1,0 +1,16 @@
+{
+    "name": "Framework.Common",
+    "references": [
+        "OdinEditor",
+        "OdinPlay",
+        "TestBorad"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

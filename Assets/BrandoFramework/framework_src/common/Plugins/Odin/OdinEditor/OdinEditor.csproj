@@ -1,0 +1,822 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DE04968B-CD7B-441F-9A0F-8D3775784673}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OdinEditor</RootNamespace>
+    <AssemblyName>OdinEditor</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\..\XTwo\Assets\_Yu\YuDLL\Editor\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\.YuDllRef\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEditor">
+      <HintPath>..\..\.YuDllRef\UnityEditor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\.YuDllRef\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.AnimationModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.AssetBundleModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.AudioModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>..\..\.YuDllRef\UnityEngine.Networking.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\.YuDllRef\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\AOTGenerationConfig.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\ColorPalettes\ColorPalette.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\ColorPalettes\ColorPaletteManager.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\DrawerOverview.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\EditorOnlyModeConfig.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\Editors\OdinEditorDefinitions.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\GeneralDrawerConfig.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\ImportSettingsConfig.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\InspectorConfig.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\InspectorDefaultEditors.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\InspectorTypeDrawingConfig.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\InspectorTypeDrawingConfigDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\OdinInspectorVersion.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\OdinTrialVersion.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\TypeDrawerPair.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Config\UnityEditorEventUtility.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Context\PropertyContext.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Context\PropertyContextContainer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Drawer Chains\BakedDrawerChain.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Drawer Chains\DefaultDrawerChainResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Drawer Chains\DrawerChain.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Drawer Chains\DrawerChainResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Drawer Chains\EnumeratedDrawerChain.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Drawer Chains\ListDrawerChain.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\IDefinesGenericMenuItems.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Infos\AliasGetterSetter.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Infos\GetterSetter.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Infos\InspectorPropertyInfo.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Infos\InspectorPropertyInfoUtility.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\InspectorProperty.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\PrefabModificationHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\PropertyChildren.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\PropertyTree.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\PropertyType.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\PropertyValueCategory.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\PropertyValueState.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Attribute Processors\InheritAttributeAttributesAttributeProcessor.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Attribute Processors\MemberDefinedAttributeProcessor.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Attribute Processors\OdinAttributeProcessor.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Attribute Processors\TypeDefinitionAttributeProcessor.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Locators\DefaultOdinAttributeProcessorLocator.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Locators\DefaultOdinPropertyResolverLocator.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Locators\OdinAttributeResolverLocator.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Locators\OdinPropertyProcessorLocator.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Locators\OdinPropertyResolverLocator.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\ContainsOdinResolversAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\DontRegisterResolverAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\IApplyableResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\ICollectionResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\IHasSpecialPropertyPaths.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\IKeyValueMapResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\IMaySupportPrefabModifications.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\IOrderedCollectionResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\IPathRedirector.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\IRefreshableResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Misc\ResolverUtilities.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\AtomAndEnumPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\BaseCollectionResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\BaseKeyValueMapResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\BaseOrderedCollectionResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\ButtonParameterPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\CollectionResolverUtilities.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\EditableKeyValuePairResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\EmptyPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\GroupPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\HashSetResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\MemberPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\OdinPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\Property Processors\OdinPropertyProcessor.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\Property Processors\ProcessedMemberPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\Property Processors\ProcessedMemberPropertyResolverExtensions.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\Property Processors\TypeInfoBoxAttributePropertyProcessorProcessor.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\QueueResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\RectPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\StackResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\StaticRootPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\StrongCollectionResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\StrongDictionaryPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\StrongListPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\UnityObjectPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Resolvers\Property Resolvers\WeakListPropertyResolver.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\SerializationBackend.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\DictionaryHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\EditableKeyValuePair.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\IDictionaryHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\IPropertyValueCollection.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\IPropertyValueEntry.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\IValueEntryActualValueSetter.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\PropertyListValueEntryChanger.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\PropertyStrongListValueEntryChanger.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\PropertyValueCollection.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\PropertyValueCollectionAlias.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\PropertyValueEntry.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\PropertyValueEntryAlias.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\PropertyWeakListValueEntryChanger.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\TempKeyValuePair.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Core\Value Entries\UnityPropertyGetterSetter.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\AssetListAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\AssetListAttributeOnSingleObjectDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\AssetsOnlyAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ColorPaletteAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ColorUsage32AttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ColorUsageAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\CustomContextMenuAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\CustomValueDrawerAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DelayedAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DelayedPropertyAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DetailedInfoBoxAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisableIfAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisableInEditorModeAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisableInInlineEditorsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisableInNonPrefabsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisableInPlayModeAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisableInPrefabAssetsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisableInPrefabInstancesAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisableInPrefabsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DisplayAsStringAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\DrawWithUnityAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\EnableGUIAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\EnableIfAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\EnumPagingAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\EnumToggleButtonsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\FilePathAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\FolderPathAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\GUIColorAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HeaderAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideIfAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideInEditorModeAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideInInlineEditorsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideInInspectorAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideInNonPrefabsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideInPlayModeAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideInPrefabAssetsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideInPrefabInstancesAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideInPrefabsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\HideLabelAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\IndentAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\InfoBoxAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\InlineButtonAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\InlineEditorAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\InlinePropertyAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\LabelTextAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\LabelWidthAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\MaxValueAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\MinMaxSliderAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\MinValueAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\MultiLineAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\MultiLinePropertyAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\NonSerializedShowInInspectorWarningAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\OdinSerializeAttributeWarningDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\OnInspectorGUIAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\OnValueChangedAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\PreviewFieldAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ProgressBarAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\PropertyRangeAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\PropertySpaceAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\RangeAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\RequiredAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\SceneObjectsOnlyAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ShowDrawerChainAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ShowIfAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ShowInInlineEditorsAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ShowPropertyResolverAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\SpaceAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\SuffixLabelAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\SyncVarAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\TagSelectorAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\TextAreaDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\TitleAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ToggleAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ToggleLeftAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\TooltipAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\TypeFilterAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\UnityDecoratorAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ValidateInputAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\ValueDropdownAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Attribute Drawers\WrapAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\BoxGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\ButtonGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\FoldoutGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\HorizontalGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\ResponsiveButtonGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\TabGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\TitleGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\ToggleGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Group Drawers\VerticalGroupAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\MethodDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\DefaultMethodDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\FixUnityNullDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\HideSerializableJsonDictionaryFromEditorWindowsInUnity2017Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\InvalidAttributeNotificationDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\NullableReferenceDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\PrimitiveValueConflictDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\PropertyContextMenuDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\ReferenceDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\ReferencePathConflictDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Misc Drawers\ReferenceValueConflictDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\OdinAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\OdinDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\OdinDrawerExtensions.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\OdinEditor.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\OdinGroupDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\OdinValueDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\AbstractTypeUnityPropertyDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\AnimationCurveDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\BooleanDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\ByteDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\CharDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\CollectionDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\Color32Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\ColorDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\ColorPaletteDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\CompositeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\DecimalDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\DelegateDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\DictionaryDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\DoubleDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\DrawWithUnityBaseDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\EnumDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\GradientDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\GuidDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\GUIStyleStateDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\Int16Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\Int32Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\Int64Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\LayerMaskDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\NullableDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\PrimitiveCompositeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\QuaternionDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\SByteDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\SingleDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\StringDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\SyncListDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\TableListAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\TwoDimensionalArrayDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\TypeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\UInt16Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\UInt32Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\UInt64Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\UnityEventDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\UnityObjectDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\UnityPropertyAttributeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\UnityPropertyDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\UnityPropertyHandlerUtility.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\Vector2Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\Vector3Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Drawers\Value Drawers\Vector4Drawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\AttributeExampleAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\AttributeExampleDescriptionAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\AttributeExampleInfo.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\AssetListExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\AttributesOnClassesExample.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\BoxGroupExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ButtonExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ButtonGroupExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ButtonWithParametersExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ChangingEditorToolExample.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ColorPaletteExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\CombineGroupAttributeExample1.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\CombineGroupAttributeExample2.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\CombineGroupAttributeExample3.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\CustomContextMenuExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\CustomValueDrawerExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DebugSerializationExample.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DefaultDrawerChanges.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DelegateExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DictionaryExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DisableContextMenuExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DisableIfExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DisableInEditorModeExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DisableInPlayModeExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DisplayAsStringExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\DrawWithUnityExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\EnableIfExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\EnumPagingExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\EnumToggleButtonsExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\FilePathExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\FolderPathExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\FoldoutGroupAttributeExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\GUIColorExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\HideInEditorModeExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\HideInPlayModeExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\HideLabelExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\HideReferenceObjectPickerExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\HorizontalGroupAttributeExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\IncorrectUseOfOdinSerializeAttributeExamples1.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\IncorrectUseOfOdinSerializeAttributeExamples2.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\IndentExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\InfoBoxExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\InlineButtonExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\InlineEditorExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\InlinePropertyExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\LabelTextExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ListExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\MinMaxSliderExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\MinMaxValueValueExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\MultiLinePropertyExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\NoBoilerplate.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\OnInspectorGUIExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\OnValueChangedExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\PrefabRelatedAttributesExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\PreviewFieldsExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ProgressBarExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\PropertyOrderExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\PropertyTooltipExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ReadOnlyExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\RequiredExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ResponsiveButtonGroupExample.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\SceneAndAssetsOnlyExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\SerializeAnything.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ShowAndHideIfExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ShowDrawerChainExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ShowInInspectorExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ShowPropertiesInTheInspectorExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\StaticInspectorsExample.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\SuffixLabelExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\TabGroupExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\TableListExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\TableMatrixExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\TitleExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\TitleGroupExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ToggleExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ToggleLeftExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\TwoDimensionalArrayExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\TypeFilterExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ValidateInputExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\ValueDropdownExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\VerticalGroupExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\Attributes\WrapExamples.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\AttributeUtilities.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Examples\InternalAttributeExampleInfoMap.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\AllowGUIEnabledForReadonlyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\AnimationCurveAtomHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\AtomContainerAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\AtomHandlerAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\AtomHandlerLocator.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\BaseAtomHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\ColorAtomHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\EquatableStructAtomHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\GradientAtomHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Atoms\IAtomHandler.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\AttributeListExtensions.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\DoesNotSupportPrefabModifications.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\DrawerInfo.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\DrawerLocator.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\DrawerPriority.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\DrawerPriorityAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\DrawerPriorityLevel.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\DrawerUtilities.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\EditorCompilation.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\EmittedAnimationCurveContainer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\EmittedGradientContainer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\EmittedMonoBehaviour.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\EmittedScriptableObject.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\FastMemberComparer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\FastTypeComparer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\FixUnityAboutWindowBeforeEmit.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\FixUnityAssemblyVersionResolution.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\FixUnityScriptableObjectDirtying.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\GUICallType.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\InspectorPropertyValueGetter.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\InspectorUtilities.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\ITemporaryContext.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\IValueGetterSetter.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\OdinDontRegisterAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\OdinDrawerAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\OmitFromPrefabModificationPathsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\ResolverPriorityAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\SerializedPropertyUtilities.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\SirenixPreferencesWindow.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\StringMemberHelper.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Type Search\DefaultIndexingRules.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Type Search\DefaultMatchRules.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Type Search\TypeMatchIndexingRule.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Type Search\TypeMatchRule.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Type Search\TypeSearchIndex.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Type Search\TypeSearchInfo.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\Type Search\TypeSearchResult.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\UniqueDrawerKey.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Misc\UnityPropertyEmitter.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinEditorWindow.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinMenuEditorWindow.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinMenuItem.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinMenuStyle.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinMenuTree.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinMenuTreeDrawer.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinMenuTreeDrawingConfig.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinMenuTreeExtensions.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinEditorWindow\OdinMenuTreeSelection.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinSelectors\EnumSelector.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinSelectors\GenericSelector.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinSelectors\GenericSelectorItem.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinSelectors\OdinSelector.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\OdinSelectors\TypeSelector.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Utilities\CustomEditorLoader.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Utilities\CustomEditorUtility.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Utilities\EditorPrefsUtilities.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Utilities\OdinPrefabUtility.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Utilities\PersistentContext\GlobalPersistentContext.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Utilities\PersistentContext\LocalPersistentContext.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Utilities\PersistentContext\PersistentContext.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Utilities\PersistentContext\PersistentContextCache.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\EditorIconsOverview.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\GettingStarted\OdinGettingStartedWindow.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\GettingStarted\OdinGettingStartedWindowData.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\OdinInspectorAboutWindow.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\OdinSceneValidatorWindow.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\OdinUnityContextMenuItems.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\SerializationDebugger\MemberSerializationInfo.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\SerializationDebugger\SerializationDebuggerWindow.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\SerializationDebugger\SerializationInfoMenuItem.cs" />
+    <Compile Include="Sirenix.OdinInspector.Editor\Windows\StaticInspectorWindow.cs" />
+    <Compile Include="Sirenix.Serialization.Config\CustomLogger.cs" />
+    <Compile Include="Sirenix.Serialization.Config\DataFormat.cs" />
+    <Compile Include="Sirenix.Serialization.Config\DefaultLoggers.cs" />
+    <Compile Include="Sirenix.Serialization.Config\ErrorHandlingPolicy.cs" />
+    <Compile Include="Sirenix.Serialization.Config\GlobalSerializationConfig.cs" />
+    <Compile Include="Sirenix.Serialization.Config\ILogger.cs" />
+    <Compile Include="Sirenix.Serialization.Config\LoggingPolicy.cs" />
+    <Compile Include="Sirenix.Serialization\Config\AssemblyBuildInfo.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\BaseDataReader.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\BaseDataReaderWriter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\BaseDataWriter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\Binary\BinaryDataReader.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\Binary\BinaryDataWriter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\Binary\BinaryEntryType.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\IDataReader.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\IDataWriter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\Json\JsonConfig.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\Json\JsonDataReader.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\Json\JsonDataWriter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\Json\JsonTextReader.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\SerializationNodes\SerializationNode.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\SerializationNodes\SerializationNodeDataReader.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\SerializationNodes\SerializationNodeDataReaderWriterConfig.cs" />
+    <Compile Include="Sirenix.Serialization\Core\DataReaderWriters\SerializationNodes\SerializationNodeDataWriter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\FormatterLocators\ArrayFormatterLocator.cs" />
+    <Compile Include="Sirenix.Serialization\Core\FormatterLocators\DelegateFormatterLocator.cs" />
+    <Compile Include="Sirenix.Serialization\Core\FormatterLocators\FormatterLocator.cs" />
+    <Compile Include="Sirenix.Serialization\Core\FormatterLocators\GenericCollectionFormatterLocator.cs" />
+    <Compile Include="Sirenix.Serialization\Core\FormatterLocators\IFormatterLocator.cs" />
+    <Compile Include="Sirenix.Serialization\Core\FormatterLocators\ISerializableFormatterLocator.cs" />
+    <Compile Include="Sirenix.Serialization\Core\FormatterLocators\SelfFormatterLocator.cs" />
+    <Compile Include="Sirenix.Serialization\Core\FormatterLocators\TypeFormatterLocator.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\ArrayFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\ArrayListFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\BaseFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\DateTimeFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\DateTimeOffsetFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\DelegateFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\DerivedDictionaryFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\DictionaryFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\DoubleLookupDictionaryFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\EasyBaseFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\EmittedFormatterAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\EmptyTypeFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\FormatterEmitter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\GenericCollectionFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\HashSetFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\IFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\KeyValuePairFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\ListFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\MinimalBaseFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\MultiDimensionalArrayFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\NullableFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\PrimitiveArrayFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\QueueFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\ReflectionFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\SelfFormatterFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\SerializableFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\StackFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\TimeSpanFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Formatters\TypeFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\AlwaysFormatsSelfAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\Buffer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\CachedMemoryStream.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\CustomFormatterAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\CustomGenericFormatterAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\CustomSerializationPolicy.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\DefaultSerializationBinder.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\DeserializationContext.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\EmittedAssemblyAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\EntryType.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\ExcludeDataFromInspectorAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\FormatterLocationStep.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\FormatterUtilities.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\IAskIfCanFormatTypes.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\IExternalGuidReferenceResolver.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\IExternalIndexReferenceResolver.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\IExternalStringReferenceResolver.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\ISelfFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\ISerializationPolicy.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\NodeInfo.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\OdinSerializeAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\PrefabModification.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\PrefabModificationType.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\PreviouslySerializedAsAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\ProperBitConverter.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\RegisterFormatterAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\RegisterFormatterLocatorAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\SerializationAbortException.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\SerializationConfig.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\SerializationContext.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\SerializationPolicies.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\SerializationUtility.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Misc\TwoWaySerializationBinder.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\BooleanSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\ByteSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\CharSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\ComplexTypeSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\DecimalSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\DoubleSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\EnumSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\GuidSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\Int16Serializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\Int32Serializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\Int64Serializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\IntPtrSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\SByteSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\Serializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\SingleSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\StringSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\UInt16Serializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\UInt32Serializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\UInt64Serializer.cs" />
+    <Compile Include="Sirenix.Serialization\Core\Serializers\UIntPtrSerializer.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\AOTSupportScanner.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\AOTSupportUtilities.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\DictionaryKeySupport\BaseDictionaryKeyPathProvider.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\DictionaryKeySupport\DictionaryKeyUtility.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\DictionaryKeySupport\IDictionaryKeyPathProvider.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\DictionaryKeySupport\RegisterDictionaryKeyPathProviderAttribute.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\DictionaryKeySupport\Vector2DictionaryKeyPathProvider.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\DictionaryKeySupport\Vector3DictionaryKeyPathProvider.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\DictionaryKeySupport\Vector4DictionaryKeyPathProvider.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\AnimationCurveFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\BoundsFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\Color32Formatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\ColorBlockFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\ColorFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\CoroutineFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\GradientAlphaKeyFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\GradientColorKeyFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\GradientFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\KeyframeFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\LayerMaskFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\QuaternionFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\RectFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\UnityEventFormatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\Vector2Formatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\Vector3Formatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\Formatters\Vector4Formatter.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\OdinPrefabSerializationEditorUtility.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\EditorOnlyModeConfigUtility.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\IOverridesSerializationFormat.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\ISupportsPrefabSerialization.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\SerializationData.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\SerializedBehaviour.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\SerializedComponent.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\SerializedMonoBehaviour.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\SerializedNetworkBehaviour.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\SerializedScriptableObject.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\SerializedStateMachineBehaviour.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\SerializedUnityObjects\SerializedUnityObject.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\UnityReferenceResolver.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\UnitySerializationInitializer.cs" />
+    <Compile Include="Sirenix.Serialization\Unity Integration\UnitySerializationUtility.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\FieldInfoExtensions.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\GarbageFreeIterators.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\LinqExtensions.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\MemberInfoExtensions.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\MethodInfoExtensions.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\Operator.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\PathUtilities.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\PropertyInfoExtensions.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\StringExtensions.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\TypeExtensions.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Extensions\UnityExtensions.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\AssemblyImportSettingsUtilities.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\AssemblyTypeFlags.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\AssemblyUtilities.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\Cache.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\DoubleLookupDictionary.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\EmitUtilities.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\Flags.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\ICacheNotificationReceiver.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\ImmutableList.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\MemberAliasFieldInfo.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\MemberAliasMethodInfo.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\MemberAliasPropertyInfo.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\ReferenceEqualityComparer.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\UnityVersion.cs" />
+    <Compile Include="Sirenix.Serialization\Utilities\Misc\UnsafeUtilities.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\AssemblyUtils\PersistentAssemblyGuidUpdater.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Code Generation\AccessModifier.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Code Generation\AssemblyGenerator.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Code Generation\CodeGenerationUtilities.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Code Generation\CodeGeneratorExtensions.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Code Generation\CodeWriter.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Code Generation\TypeDeclaration.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Code Generation\UserAssemblyType.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\EditorIcons\EditorIcon.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\EditorIcons\EditorIcons.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\EditorIcons\LazyEditorIcon.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\AsyncProgressBar.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\DelayedGUIPainter.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\DragAndDrop\DragAndDropManager.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\DragAndDrop\DragAndDropMethods.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\DragAndDrop\DragAndDropUtilities.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\DragAndDrop\DragHandle.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\DragAndDrop\DropEvents.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\DragAndDrop\DropZoneHandle.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\DragAndDrop\OnDragFinnished.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\EventExtensions.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GenericMenuExtensions.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUIClipInfo.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUIConfig\GUIConfigCache.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUIConfig\GUIContext.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUIHelper.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUIPagingHelper.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUIScopeStack.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUITabGroup.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUITable.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUITableCell.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUITableColumn.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUITableFactory.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUITableRowLayoutGroup.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUITableUtilities.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\GUITabPage.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\IControlContext.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\ObjectFieldAlignment.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\OdinInspectorValidationChecker.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\PageSlideNavigationHelper.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\ProgressBarConfig.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\QuaternionDrawMode.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\SirenixEditorFields.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\SirenixEditorGUI.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\GUI\SirenixGUIStyles.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\InstanceResolver\InstanceCreatorWindow.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\InstanceResolver\ObjectPicker.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Misc\AssetUtilities.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Misc\Clipboard.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Misc\EditorTime.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Misc\FuzzySearch.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Misc\GUIFrameCounter.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Misc\IHideObjectMembers.cs" />
+    <Compile Include="Sirenix.Utilities.Editor\Misc\TextureUtilities.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\ColorExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\DelegateExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\FieldInfoExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\GarbageFreeIterators.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\LinqExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\ListExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\MemberInfoExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\MethodInfoExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\Operator.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\PathUtilities.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\PropertyInfoExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\RectExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\StringExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\TypeExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Extensions\UnityExtensions.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\ArrayUtilities.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\AssemblyTypeFlags.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\AssemblyUtilities.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\AssetScriptGuidUtility.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\Cache.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\DeepReflection.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\DoubleLookupDictionary.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\EditorGlobalConfigAttribute.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\EmitUtilities.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\Flags.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\GlobalConfig.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\GlobalConfigAttribute.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\GUILayoutOptions.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\ICacheNotificationReceiver.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\ImmutableHashSet.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\ImmutableList.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\IndexedDictionary.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\MathUtilities.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\MemberAliasFieldInfo.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\MemberAliasMethodInfo.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\MemberAliasPropertyInfo.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\MemberFinder.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\MultiDimArrayUtilities.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\PersistentAssemblyAttribute.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\ProjectPathFinder.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\ReferenceEqualityComparer.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\SirenixAssetPaths.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\SirenixBuildNameAttribute.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\SirenixEditorConfigAttribute.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\SirenixGlobalConfigAttribute.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\SirenixInternalStuff.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\StringUtilities.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\UnityVersion.cs" />
+    <Compile Include="Sirenix.Utilities\Misc\UnsafeUtilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OdinPlay\OdinPlay.csproj">
+      <Project>{50094c52-1746-445d-a008-1a23be51b753}</Project>
+      <Name>OdinPlay</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>rmdir /S /Q "$(ProjectDir)obj\Debug\TempPE\"
+rmdir /S /Q "$(ProjectDir)obj\Debug\"
+rmdir /S /Q "$(ProjectDir)obj\Release\TempPE\"
+rmdir /S /Q "$(ProjectDir)obj\Release\"
+rmdir /S /Q "$(ProjectDir)obj\"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{50094C52-1746-445D-A008-1A23BE51B753}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OdinPlay</RootNamespace>
+    <AssemblyName>OdinPlay</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\..\XTwo\Assets\_Yu\YuDLL\Play\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\AssetListAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\AssetsOnlyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\BoxGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ButtonAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ButtonGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ButtonStyle.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ColorPaletteAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\CustomContextMenuAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\CustomValueDrawerAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DelayedPropertyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DetailedInfoBoxAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DictionaryDrawerSettings.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableContextMenuAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableIfAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableInEditorModeAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableInInlineEditorsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableInNonPrefabsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableInPlayModeAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableInPrefabAssetsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableInPrefabInstancesAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisableInPrefabsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DisplayAsStringAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DontApplyToListElementsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\DrawWithUnityAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\EnableForPrefabOnlyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\EnableGUIAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\EnableIfAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\EnumPagingAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\EnumToggleButtonsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\FilePathAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\FolderPathAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\FoldoutGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\GUIColorAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideIfAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideInEditorModeAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideInInlineEditorsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideInNonPrefabsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideInPlayModeAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideInPrefabAssetsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideInPrefabInstancesAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideInPrefabsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideInTablesAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideLabelAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideMonoScriptAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideNetworkBehaviourFieldsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HideReferenceObjectPickerAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\HorizontalGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\IndentAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\InfoBoxAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\InlineButtonAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\InlineEditorAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\InlinePropertyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\LabelTextAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\LabelWidthAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ListDrawerSettingsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\MaxValueAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\MinMaxSliderAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\MinValueAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\MultiLinePropertyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\OnInspectorGUIAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\OnValueChangedAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\PreviewFieldAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ProgressBarAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\PropertyGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\PropertyOrderAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\PropertyRangeAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\PropertySpaceAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\PropertyTooltipAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ReadOnlyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\RequiredAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ResponsiveButtonGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\SceneObjectsOnlyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ShowDrawerChainAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ShowForPrefabOnlyAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ShowIfAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ShowInInlineEditorsAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ShowInInspectorAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ShowOdinSerializedPropertiesInInspectorAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ShowPropertyResolverAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\SuffixLabelAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\SuppressInvalidAttributeErrorAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TabGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TableColumnWidthAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TableListAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TableMatrixAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TagSelectorAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TitleAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TitleGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ToggleAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ToggleGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ToggleLeftAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TypeFilterAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\TypeInfoBoxAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ValidateInputAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\ValueDropdownAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\VerticalGroupAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Attributes\WrapAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\AttributeRegistry.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\AttributeTargetFlags.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\ButtonSizes.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\DictionaryDisplayOptions.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\IncludeMyAttributesAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\InfoMessageType.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\InlineEditorModes.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\InlineEditorObjectFieldModes.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\ISubGroupProviderAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\ObjectFieldAlignment.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\RegisterAttributeAttribute.cs" />
+    <Compile Include="Sirenix.OdinInspector.Attributes\Misc\TitleAlignments.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>rmdir /S /Q "$(ProjectDir)obj\Debug\TempPE\"
+rmdir /S /Q "$(ProjectDir)obj\Debug\"
+rmdir /S /Q "$(ProjectDir)obj\Release\TempPE\"
+rmdir /S /Q "$(ProjectDir)obj\Release\"
+rmdir /S /Q "$(ProjectDir)obj\"</PostBuildEvent>
+  </PropertyGroup>
+</Project>
