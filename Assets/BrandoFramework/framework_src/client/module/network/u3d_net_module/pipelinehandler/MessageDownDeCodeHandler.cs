@@ -43,6 +43,7 @@ namespace client_module_network
             HeadLength();
             SetIsBigPoint(true);
 
+            //内容少于表示长度的字节数
             if (byteBuf.ReadbleCount < messageHeadLength)
             {
                 return null;
@@ -52,6 +53,8 @@ namespace client_module_network
 
             // 前四个字节为消息长度
             var messageLength = BitConverter.ToInt32(headBytes, 0);
+
+            //不足长度
             if (messageLength > byteBuf.ReadbleCount)
             {
                 byteBuf.MoveReadIndex(-messageHeadLength);

@@ -77,24 +77,24 @@ namespace Client
                     builder.SetAISubject(newUnit);
 
 
-                    var unitBehaviourTree =
-                    builder.
-                    Repeat().
-                        Selector().                           //主动选择
-                        Sequence().                             //顺序器
-                            Condition<UnitDistanceCondition>(new Vector2(0, 2), false).
-                                Back().
-                            Action<UnitPatrolMoveAction>(1).
-                                Back().
-                            Back().
-                        Action<UnitUseSkillAction>(2).
-                            Back().
-                   Back().
-                End();
+                    var unitBehaviourTree = BehaviorTreeVisualization.Instance.LoadCurrentHaviourTree("");
+                //    builder.
+                //    Repeat().
+                //        Selector().                           //主动选择
+                //        Sequence().                             //顺序器
+                //            Condition<UnitDistanceCondition>(new Vector2(0, 2), false).
+                //                Back().
+                //            Action<UnitPatrolMoveAction>(1).
+                //                Back().
+                //            Back().
+                //        Action<UnitUseSkillAction>(2).
+                //            Back().
+                //   Back().
+                //End();
                     newUnit.AIControl.ResetBehaviorTree(unitBehaviourTree);
 
-                    BehaviorTreeVisualization.Instance.BindBehaviourTree(unitBehaviourTree.m_rootBehavior, 
-                        BehaviorTreeVisualization.Instance.m_rootBehavior);
+                    //BehaviorTreeVisualization.Instance.BindBehaviourTree(unitBehaviourTree.m_rootBehavior, 
+                    //    BehaviorTreeVisualization.Instance.m_rootBehavior);
                     GameObject.Find("Main Camera").transform.SetParent(newUnit.U3DData.Trans);
                 },
                 true);
