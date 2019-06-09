@@ -23,24 +23,38 @@ namespace Client.GamePlaying.AI
     public class BehaviorTreeBaseNode
     {
         /// <summary>
-        /// 当前状态
+        /// 节点类型
         /// </summary>
-        [HorizontalGroup]
-        [LabelText("状态")]
-        [LabelWidth(40)]
-        public AIBehaviorState CurState;
+        [BoxGroup("节点", CenterLabel = false)]
+        [ReadOnly]
+        [LabelText("节点类型")]
+        [LabelWidth(50)]
+        public string NodeType;
 
-
-        [HorizontalGroup]
+        [BoxGroup("节点", CenterLabel = false)]
+        [ReadOnly]
         [LabelText("描述")]
-        [LabelWidth(40)]
+        [LabelWidth(50)]
         public string StateStr;
 
+        /// <summary>
+        /// 当前状态
+        /// </summary>
+        [BoxGroup("节点", CenterLabel = false)]
+        [LabelText("状态")]
+        [LabelWidth(50)]
+        public AIBehaviorState CurState;
+
+        [BoxGroup("节点", centerLabel: false)]
         [LabelText("子节点")]
         public List<BehaviorTreeBaseNode> childNodes = new List<BehaviorTreeBaseNode>();
 
+        public YuAIBehaviorBase BindingBehaviour;
+
         public void BindBehaviour(YuAIBehaviorBase behaviour)
         {
+            BindingBehaviour = behaviour;
+            NodeType = behaviour.BehaviourDes;
             CurState = behaviour.CurState;
             behaviour.OnStateChange = SetState;
         }
@@ -54,7 +68,7 @@ namespace Client.GamePlaying.AI
             }
             else
             {
-                stateCount = (stateCount + 1 ) % 3;
+                stateCount = (stateCount + 1) % 3;
             }
             switch (CurState)
             {
@@ -78,7 +92,18 @@ namespace Client.GamePlaying.AI
         private const string Running = "正在运行";    //运行
         private const string Aborted = "终止";    //终止
 
-        private string[] dot = {".","..","..." };
+        private string[] dot = { ".", "..", "..." };
+
+        #endregion
+
+
+        #region Editor
+        [BoxGroup("节点", centerLabel: false)]
+        [Button("设置为当前节点")]
+        public void SetCurrentEditorNode()
+        {
+            BehaviorTreeVisualization.Instance.currentBehaviourNode = this;
+        }
 
         #endregion
     }

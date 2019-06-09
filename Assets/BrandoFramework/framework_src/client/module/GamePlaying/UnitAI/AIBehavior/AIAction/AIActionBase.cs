@@ -13,6 +13,7 @@
 #endregion
 
 using Client.GamePlaying.Unit;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,13 +22,14 @@ namespace Client.GamePlaying.AI
     /// <summary>
     /// 游戏实体AI行为
     /// </summary>
+    [Serializable]
     public abstract class YuAIActionBase : YuAIBehaviorBase
     {
-        protected UnitEntityBase unit;    //行为主体
+        //protected UnitEntityBase unit;    //行为主体
 
         public void SetRole(UnitEntityBase unitEntity)
         {
-            unit = unitEntity;
+            //unit = unitEntity;
         }
 
         public abstract void Init(object param);

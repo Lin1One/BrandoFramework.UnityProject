@@ -46,7 +46,7 @@ namespace Client.GamePlaying.AI
         protected override AIBehaviorState Update()
         {
             //unit.U3DData.Trans.localPosition = (testPosition[index]);
-            unit.AnimaControl.PlayAnima("skill");
+            //unit.AnimaControl.PlayAnima("skill");
             //unit.U3DData.Position2D +=  unit.U3DData.TargetDir * 5 * Time.deltaTime;
             //unit.U3DData.Trans.position = new Vector3(unit.U3DData.Position2D.x, unit.U3DData.Trans.position.y, unit.U3DData.Position2D.y) ;
                //缓存目标地点
@@ -69,7 +69,7 @@ namespace Client.GamePlaying.AI
         //生效U3D对象位移,参数填入目的地世界坐标
         protected virtual void EffectiveMove(Vector2 pos)
         {
-            unit.U3DData.Trans.Translate(new Vector3(pos.x, unit.U3DData.Trans.position.y, pos.y));
+            //unit.U3DData.Trans.Translate(new Vector3(pos.x, unit.U3DData.Trans.position.y, pos.y));
             //if (EffectMoveTrans != null)
             //{
             //    EffectMoveTrans.position = m_curPos3D;

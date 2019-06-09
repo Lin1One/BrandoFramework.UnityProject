@@ -12,6 +12,7 @@
 
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 namespace Client.GamePlaying.AI
@@ -19,6 +20,7 @@ namespace Client.GamePlaying.AI
     /// <summary>
     /// AI行为装饰器基类
     /// </summary>
+    [Serializable]
     public abstract class YuAIDecoratorBase : YuAIBehaviorBase
     {
         protected YuAIBehaviorBase child;

@@ -12,13 +12,18 @@
 
 #endregion
 
+using System;
+
 namespace Client.GamePlaying.AI
 {
     /// <summary>
     /// AI行为，装饰器，重复执行
     /// </summary>
+    [Serializable]
     public class YuAIRepeat : YuAIDecoratorBase
     {
+        public override string BehaviourDes => "重复器";
+
         protected int repeatTime;    //重复次数(0为无限重复)
         protected int m_count;
 

@@ -20,8 +20,11 @@ namespace Client.GamePlaying.AI
     /// <summary>
     /// AI行为基类
     /// </summary>
+    [Serializable]
     public abstract class YuAIBehaviorBase
     {
+        public virtual string BehaviourDes { get; }
+
         private AIBehaviorState curState;
         /// <summary>
         /// 当前状态

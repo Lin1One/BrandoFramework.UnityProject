@@ -62,7 +62,7 @@ namespace Client.GamePlaying.AI
         protected override AIBehaviorState Update()
         {
             //unit.U3DData.Trans.localPosition = (testPosition[index]);
-            unit.AnimaControl.PlayAnima("run");
+            //unit.AnimaControl.PlayAnima("run");
             //index = (index + 1) % 4;
             Debug.Log("当前行为完成");
             return AIBehaviorState.Success;
