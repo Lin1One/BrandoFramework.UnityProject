@@ -2,7 +2,6 @@ using System;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -414,7 +413,7 @@ namespace Client.UI
             if (!canvasRenderer.cull && (m_VertsDirty || m_MaterialDirty))
             {
                 /// When we were culled, we potentially skipped calls to <c>Rebuild</c>.
-                CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
+                BrandoCanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
             }
         }
         #endregion
@@ -646,7 +645,7 @@ namespace Client.UI
             if (IsActive())
             {
                 m_VertsDirty = true;
-                CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
+                BrandoCanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
                 m_OnDirtyVertsCallback?.Invoke();
             }
         }
@@ -664,7 +663,7 @@ namespace Client.UI
             if (IsActive())
             {
                 m_MaterialDirty = true;
-                CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
+                BrandoCanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
                 m_OnDirtyMaterialCallback?.Invoke();
             }
         }
@@ -905,8 +904,8 @@ namespace Client.UI
 #if UNITY_EDITOR
             ////GraphicRebuildTracker.UnTrackGraphic(this);
 #endif
-           //// GraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
-            CanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
+            ////GraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
+            BrandoCanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
 
             if (canvasRenderer != null)
                 canvasRenderer.Clear();

@@ -1,4 +1,7 @@
-namespace UnityEngine.EventSystems
+
+using UnityEngine;
+
+namespace Client.UI
 {
     /// <summary>
     /// Base behaviour that has protected implementations of Unity lifecycle functions.
