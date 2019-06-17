@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
-using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.UI;
+using Client.UI.EventSystem;
 
 namespace Client.UI
 {
@@ -14,7 +14,7 @@ namespace Client.UI
     /// <summary>
     /// 可选择对象
     /// </summary>
-    public class BrandoUISelectable : UIBehaviour,
+    public class BrandoUISelectable : BrandoUIBehaviour,
         IMoveHandler,
         IPointerDownHandler, 
         IPointerUpHandler,
@@ -79,8 +79,8 @@ namespace Client.UI
             // OnSetProperty potentially access Animator or Graphics. (case 618186)
             if (isActiveAndEnabled)
             {
-                if (!interactable && EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
-                    EventSystem.current.SetSelectedGameObject(null);
+                if (!interactable && BrandoEventSystem.current != null && BrandoEventSystem.current.currentSelectedGameObject == gameObject)
+                    BrandoEventSystem.current.SetSelectedGameObject(null);
                 // Need to clear out the override image on the target...
                 DoSpriteSwap(null);
 
@@ -657,8 +657,8 @@ namespace Client.UI
             {
                 if (SetPropertyUtility.SetStruct(ref m_Interactable, value))
                 {
-                    if (!m_Interactable && EventSystem.current != null && EventSystem.current.currentSelectedGameObject == gameObject)
-                        EventSystem.current.SetSelectedGameObject(null);
+                    if (!m_Interactable && BrandoEventSystem.current != null && BrandoEventSystem.current.currentSelectedGameObject == gameObject)
+                        BrandoEventSystem.current.SetSelectedGameObject(null);
                     if (m_Interactable)
                         UpdateSelectionState(null);
                     OnSetProperty();
@@ -877,8 +877,8 @@ namespace Client.UI
                 return;
 
             // Selection tracking
-            if (IsInteractable() && navigation.mode != BrandoUINavigation.Mode.None && EventSystem.current != null)
-                EventSystem.current.SetSelectedGameObject(gameObject, eventData);
+            if (IsInteractable() && navigation.mode != BrandoUINavigation.Mode.None && BrandoEventSystem.current != null)
+                BrandoEventSystem.current.SetSelectedGameObject(gameObject, eventData);
 
             isPointerDown = true;
             EvaluateAndTransitionToSelectionState(eventData);
@@ -1047,10 +1047,10 @@ namespace Client.UI
         /// </example>
         public virtual void Select()
         {
-            if (EventSystem.current == null || EventSystem.current.alreadySelecting)
+            if (BrandoEventSystem.current == null || BrandoEventSystem.current.alreadySelecting)
                 return;
 
-            EventSystem.current.SetSelectedGameObject(gameObject);
+            BrandoEventSystem.current.SetSelectedGameObject(gameObject);
         }
 
         #endregion 
