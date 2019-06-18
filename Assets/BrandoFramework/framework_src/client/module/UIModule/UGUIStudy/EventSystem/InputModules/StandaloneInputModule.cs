@@ -144,8 +144,11 @@ namespace Client.UI.EventSystem
             ClearSelection();
         }
 
+        #region 处理输入
+
         public override void Process()
         {
+            //处理选中物体的 Update 事件
             bool usedEvent = SendUpdateEventToSelectedObject();
 
             if (eventSystem.sendNavigationEvents)
@@ -156,10 +159,11 @@ namespace Client.UI.EventSystem
                 if (!usedEvent)
                     SendSubmitEventToSelectedObject();
             }
-
+            //处理鼠标事件
             ProcessMouseEvent();
         }
 
+        #endregion
         /// <summary>
         /// Process submit keys.
         /// </summary>
@@ -241,16 +245,20 @@ namespace Client.UI.EventSystem
             return axisEventData.used;
         }
 
+        /// <summary>
+        /// 处理鼠标事件
+        /// </summary>
         protected void ProcessMouseEvent()
         {
             ProcessMouseEvent(0);
         }
 
         /// <summary>
-        /// Process all mouse events.
+        /// 处理鼠标事件
         /// </summary>
         protected void ProcessMouseEvent(int id)
         {
+            //获取鼠标指针事件信息
             var mouseData = GetMousePointerEventData(id);
             var leftButtonData = mouseData.GetButtonState(PointerEventData.InputButton.Left).eventData;
 
@@ -272,11 +280,16 @@ namespace Client.UI.EventSystem
             }
         }
 
+        /// <summary>
+        /// 处理选中物体的 Update 事件
+        /// </summary>
+        /// <returns></returns>
         protected bool SendUpdateEventToSelectedObject()
         {
             if (eventSystem.currentSelectedGameObject == null)
+            {
                 return false;
-
+            }
             var data = GetBaseEventData();
             ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.updateSelectedHandler);
             return data.used;
@@ -284,6 +297,7 @@ namespace Client.UI.EventSystem
 
         /// <summary>
         /// Process the current mouse press.
+        /// 处理当前鼠标按键（按下，抬起）输入
         /// </summary>
         protected void ProcessMousePress(MouseButtonEventData data)
         {

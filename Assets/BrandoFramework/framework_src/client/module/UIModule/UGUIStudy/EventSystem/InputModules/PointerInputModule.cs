@@ -9,105 +9,12 @@ namespace Client.UI.EventSystem
     /// </summary>
     public abstract class PointerInputModule : BaseInputModule
     {
-        public const int kMouseLeftId = -1;
-        public const int kMouseRightId = -2;
-        public const int kMouseMiddleId = -3;
-        public const int kFakeTouchesId = -4;
-
-        protected Dictionary<int, PointerEventData> m_PointerData = new Dictionary<int, PointerEventData>();
-
-        protected bool GetPointerData(int id, out PointerEventData data, bool create)
-        {
-            if (!m_PointerData.TryGetValue(id, out data) && create)
-            {
-                data = new PointerEventData(eventSystem)
-                {
-                    pointerId = id,
-                };
-                m_PointerData.Add(id, data);
-                return true;
-            }
-            return false;
-        }
-
-        protected void RemovePointerData(PointerEventData data)
-        {
-            m_PointerData.Remove(data.pointerId);
-        }
-
-        protected PointerEventData GetTouchPointerEventData(Touch input, out bool pressed, out bool released)
-        {
-            PointerEventData pointerData;
-            var created = GetPointerData(input.fingerId, out pointerData, true);
-
-            pointerData.Reset();
-
-            pressed = created || (input.phase == TouchPhase.Began);
-            released = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
-
-            if (created)
-                pointerData.position = input.position;
-
-            if (pressed)
-                pointerData.delta = Vector2.zero;
-            else
-                pointerData.delta = input.position - pointerData.position;
-
-            pointerData.position = input.position;
-
-            pointerData.button = PointerEventData.InputButton.Left;
-
-            eventSystem.RaycastAll(pointerData, m_RaycastResultCache);
-
-            var raycast = FindFirstRaycast(m_RaycastResultCache);
-            pointerData.pointerCurrentRaycast = raycast;
-            m_RaycastResultCache.Clear();
-            return pointerData;
-        }
-
-        protected void CopyFromTo(PointerEventData @from, PointerEventData @to)
-        {
-            @to.position = @from.position;
-            @to.delta = @from.delta;
-            @to.scrollDelta = @from.scrollDelta;
-            @to.pointerCurrentRaycast = @from.pointerCurrentRaycast;
-            @to.pointerEnter = @from.pointerEnter;
-        }
-
-        protected static PointerEventData.FramePressState StateForMouseButton(int buttonId)
-        {
-            var pressed = Input.GetMouseButtonDown(buttonId);
-            var released = Input.GetMouseButtonUp(buttonId);
-            if (pressed && released)
-                return PointerEventData.FramePressState.PressedAndReleased;
-            if (pressed)
-                return PointerEventData.FramePressState.Pressed;
-            if (released)
-                return PointerEventData.FramePressState.Released;
-            return PointerEventData.FramePressState.NotChanged;
-        }
-
-        protected class ButtonState
-        {
-            private PointerEventData.InputButton m_Button = PointerEventData.InputButton.Left;
-
-            public MouseButtonEventData eventData
-            {
-                get { return m_EventData; }
-                set { m_EventData = value; }
-            }
-
-            public PointerEventData.InputButton button
-            {
-                get { return m_Button; }
-                set { m_Button = value; }
-            }
-
-            private MouseButtonEventData m_EventData;
-        }
-
+        /// <summary>
+        /// 鼠标状态
+        /// </summary>
         protected class MouseState
         {
+            //监听的按键
             private List<ButtonState> m_TrackedButtons = new List<ButtonState>();
 
             public bool AnyPressesThisFrame()
@@ -157,7 +64,28 @@ namespace Client.UI.EventSystem
                 toModify.eventData.buttonData = data;
             }
         }
+        //按键状态
+        protected class ButtonState
+        {
+            private MouseButtonEventData m_EventData;
+            public MouseButtonEventData eventData
+            {
+                get { return m_EventData; }
+                set { m_EventData = value; }
+            }
 
+            private PointerEventData.InputButton m_Button = PointerEventData.InputButton.Left;
+            public PointerEventData.InputButton button
+            {
+                get { return m_Button; }
+                set { m_Button = value; }
+            }
+
+        }
+
+        /// <summary>
+        /// 鼠标按键事件信息
+        /// </summary>
         public class MouseButtonEventData
         {
             public PointerEventData.FramePressState buttonState;
@@ -174,6 +102,110 @@ namespace Client.UI.EventSystem
             }
         }
 
+        public const int kMouseLeftId = -1;
+        public const int kMouseRightId = -2;
+        public const int kMouseMiddleId = -3;
+        public const int kFakeTouchesId = -4;
+
+        protected Dictionary<int, PointerEventData> m_PointerData = new Dictionary<int, PointerEventData>();
+
+        /// <summary>
+        /// 获取指针数据
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="data"></param>
+        /// <param name="create"></param>
+        /// <returns></returns>
+        protected bool GetPointerData(int id, out PointerEventData data, bool create)
+        {
+            if (!m_PointerData.TryGetValue(id, out data) && create)
+            {
+                data = new PointerEventData(eventSystem)
+                {
+                    pointerId = id,
+                };
+                m_PointerData.Add(id, data);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 删除指针数据
+        /// </summary>
+        protected void RemovePointerData(PointerEventData data)
+        {
+            m_PointerData.Remove(data.pointerId);
+        }
+
+        /// <summary>
+        /// 获取触摸事件数据
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="pressed"></param>
+        /// <param name="released"></param>
+        /// <returns></returns>
+        protected PointerEventData GetTouchPointerEventData(Touch input, out bool pressed, out bool released)
+        {
+            PointerEventData pointerData;
+            var created = GetPointerData(input.fingerId, out pointerData, true);
+
+            pointerData.Reset();
+
+            pressed = created || (input.phase == TouchPhase.Began);
+            released = (input.phase == TouchPhase.Canceled) || (input.phase == TouchPhase.Ended);
+
+            if (created)
+                pointerData.position = input.position;
+
+            if (pressed)
+                pointerData.delta = Vector2.zero;
+            else
+                pointerData.delta = input.position - pointerData.position;
+
+            pointerData.position = input.position;
+
+            pointerData.button = PointerEventData.InputButton.Left;
+
+            eventSystem.RaycastAll(pointerData, m_RaycastResultCache);
+
+            var raycast = FindFirstRaycast(m_RaycastResultCache);
+            pointerData.pointerCurrentRaycast = raycast;
+            m_RaycastResultCache.Clear();
+            return pointerData;
+        }
+
+        /// <summary>
+        /// 复制指针信息
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        protected void CopyFromTo(PointerEventData @from, PointerEventData @to)
+        {
+            @to.position = @from.position;
+            @to.delta = @from.delta;
+            @to.scrollDelta = @from.scrollDelta;
+            @to.pointerCurrentRaycast = @from.pointerCurrentRaycast;
+            @to.pointerEnter = @from.pointerEnter;
+        }
+
+        protected static PointerEventData.FramePressState StateForMouseButton(int buttonId)
+        {
+            var pressed = Input.GetMouseButtonDown(buttonId);
+            var released = Input.GetMouseButtonUp(buttonId);
+            if (pressed && released)
+                return PointerEventData.FramePressState.PressedAndReleased;
+            if (pressed)
+                return PointerEventData.FramePressState.Pressed;
+            if (released)
+                return PointerEventData.FramePressState.Released;
+            return PointerEventData.FramePressState.NotChanged;
+        }
+
+
+        /// <summary>
+        /// 鼠标指针状态信息
+        /// </summary>
         private readonly MouseState m_MouseState = new MouseState();
 
         protected virtual MouseState GetMousePointerEventData()
@@ -181,22 +213,32 @@ namespace Client.UI.EventSystem
             return GetMousePointerEventData(0);
         }
 
+        /// <summary>
+        /// 获取鼠标指针事件信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         protected virtual MouseState GetMousePointerEventData(int id)
         {
             // Populate the left button...
+            //左键
             PointerEventData leftData;
             var created = GetPointerData(kMouseLeftId, out leftData, true);
-
+            //重置为未使用
             leftData.Reset();
 
+            //新建初始化
             if (created)
+            {
                 leftData.position = Input.mousePosition;
+            }
 
             Vector2 pos = Input.mousePosition;
             leftData.delta = pos - leftData.position;
             leftData.position = pos;
             leftData.scrollDelta = Input.mouseScrollDelta;
             leftData.button = PointerEventData.InputButton.Left;
+
             eventSystem.RaycastAll(leftData, m_RaycastResultCache);
             var raycast = FindFirstRaycast(m_RaycastResultCache);
             leftData.pointerCurrentRaycast = raycast;
@@ -213,6 +255,7 @@ namespace Client.UI.EventSystem
             CopyFromTo(leftData, middleData);
             middleData.button = PointerEventData.InputButton.Middle;
 
+            //设置按键状态（按下，抬起等）
             m_MouseState.SetButtonState(PointerEventData.InputButton.Left, StateForMouseButton(0), leftData);
             m_MouseState.SetButtonState(PointerEventData.InputButton.Right, StateForMouseButton(1), rightData);
             m_MouseState.SetButtonState(PointerEventData.InputButton.Middle, StateForMouseButton(2), middleData);
@@ -292,6 +335,16 @@ namespace Client.UI.EventSystem
             eventSystem.SetSelectedGameObject(null, baseEventData);
         }
 
+        protected void DeselectIfSelectionChanged(GameObject currentOverGo, BaseEventData pointerEvent)
+        {
+            // Selection tracking
+            var selectHandlerGO = ExecuteEvents.GetEventHandler<ISelectHandler>(currentOverGo);
+            // if we have clicked something new, deselect the old thing
+            // leave 'selection handling' up to the press event though.
+            if (selectHandlerGO != eventSystem.currentSelectedGameObject)
+                eventSystem.SetSelectedGameObject(null, pointerEvent);
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder("<b>Pointer Input Module of type: </b>" + GetType());
@@ -304,16 +357,6 @@ namespace Client.UI.EventSystem
                 sb.AppendLine(pointer.Value.ToString());
             }
             return sb.ToString();
-        }
-
-        protected void DeselectIfSelectionChanged(GameObject currentOverGo, BaseEventData pointerEvent)
-        {
-            // Selection tracking
-            var selectHandlerGO = ExecuteEvents.GetEventHandler<ISelectHandler>(currentOverGo);
-            // if we have clicked something new, deselect the old thing
-            // leave 'selection handling' up to the press event though.
-            if (selectHandlerGO != eventSystem.currentSelectedGameObject)
-                eventSystem.SetSelectedGameObject(null, pointerEvent);
         }
     }
 }

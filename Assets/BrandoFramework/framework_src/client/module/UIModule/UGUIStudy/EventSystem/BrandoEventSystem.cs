@@ -270,6 +270,12 @@ namespace Client.UI.EventSystem
 
         #region Raycast
 
+        /// <summary>
+        /// ≈≈–Ú∑Ω Ω
+        /// </summary>
+        /// <param name="lhs"></param>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         private static int RaycastComparer(RaycastResult lhs, RaycastResult rhs)
         {
             if (lhs.module != rhs.module)
@@ -318,15 +324,15 @@ namespace Client.UI.EventSystem
         public void RaycastAll(PointerEventData eventData, List<RaycastResult> raycastResults)
         {
             raycastResults.Clear();
-            //var modules = RaycasterManager.GetRaycasters();
-            //for (int i = 0; i < modules.Count; ++i)
-            //{
-            //    var module = modules[i];
-            //    if (module == null || !module.IsActive())
-            //        continue;
+            var modules = RaycasterManager.GetRaycasters();
+            for (int i = 0; i < modules.Count; ++i)
+            {
+                var module = modules[i];
+                if (module == null || !module.IsActive())
+                    continue;
 
-            //    module.Raycast(eventData, raycastResults);
-            //}
+                module.Raycast(eventData, raycastResults);
+            }
             raycastResults.Sort(s_RaycastComparer);
         }
 
