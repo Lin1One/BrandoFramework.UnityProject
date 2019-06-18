@@ -53,6 +53,7 @@ namespace Client.UI.EventSystem
             }
             TickModules();
 
+            //切换当前输入模块，每帧处理一个输入模块的信息
             bool changedModule = false;
             for (var i = 0; i < m_SystemInputModules.Count; i++)
             {
@@ -68,7 +69,6 @@ namespace Client.UI.EventSystem
                 }
             }
 
-            // no event module set... set the first valid one...
             if (m_CurrentInputModule == null)
             {
                 for (var i = 0; i < m_SystemInputModules.Count; i++)
@@ -83,10 +83,14 @@ namespace Client.UI.EventSystem
                 }
             }
 
+            //输入监听
             if (!changedModule && m_CurrentInputModule != null)
+            {
                 m_CurrentInputModule.Process();
+            } 
         }
 
+        //输入模块每帧更新
         private void TickModules()
         {
             for (var i = 0; i < m_SystemInputModules.Count; i++)
@@ -99,6 +103,10 @@ namespace Client.UI.EventSystem
             }
         }
 
+        /// <summary>
+        /// 切换当前输入模块
+        /// </summary>
+        /// <param name="module"></param>
         private void ChangeEventModule(BaseInputModule module)
         {
             if (m_CurrentInputModule == module)
@@ -155,41 +163,6 @@ namespace Client.UI.EventSystem
             }
         }
 
-        #endregion
-
-        #region Navigation
-
-        [SerializeField]
-        [FormerlySerializedAs("m_Selected")]
-        private GameObject m_FirstSelected;
-
-        private GameObject m_CurrentSelected;
-
-        /// <summary>
-        /// Only one object can be selected at a time. Think: controller-selected button.
-        /// </summary>
-        public GameObject firstSelectedGameObject
-        {
-            get { return m_FirstSelected; }
-            set { m_FirstSelected = value; }
-        }
-
-        public GameObject currentSelectedGameObject
-        {
-            get { return m_CurrentSelected; }
-        }
-
-
-
-        [SerializeField]
-        private bool m_sendNavigationEvents = true;
-
-        public bool sendNavigationEvents
-        {
-            get { return m_sendNavigationEvents; }
-            set { m_sendNavigationEvents = value; }
-        }
-        #endregion
 
         [SerializeField]
         private int m_DragThreshold = 5;
@@ -203,7 +176,7 @@ namespace Client.UI.EventSystem
             set { m_DragThreshold = value; }
         }
 
-
+        #endregion
 
         #region Select Func
 
@@ -338,7 +311,39 @@ namespace Client.UI.EventSystem
 
 
         #endregion
+
+        #region Navigation
+
+        [SerializeField]
+        [FormerlySerializedAs("m_Selected")]
+        private GameObject m_FirstSelected;
+
+        private GameObject m_CurrentSelected;
+
+        /// <summary>
+        /// Only one object can be selected at a time. Think: controller-selected button.
+        /// </summary>
+        public GameObject firstSelectedGameObject
+        {
+            get { return m_FirstSelected; }
+            set { m_FirstSelected = value; }
+        }
+
+        public GameObject currentSelectedGameObject
+        {
+            get { return m_CurrentSelected; }
+        }
+
+
+
+        [SerializeField]
+        private bool m_sendNavigationEvents = true;
+
+        public bool sendNavigationEvents
+        {
+            get { return m_sendNavigationEvents; }
+            set { m_sendNavigationEvents = value; }
+        }
+        #endregion
     }
-
-
 }

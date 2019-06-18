@@ -10,36 +10,67 @@ namespace Client.UI.EventSystem
     /// </summary>
     public class StandaloneInputModule : PointerInputModule
     {
+        //上一个动作时间
         private float m_PrevActionTime;
+
+        //上一个动作方向
         Vector2 m_LastMoveVector;
+
+        //连续移动计数
         int m_ConsecutiveMoveCount = 0;
 
         private Vector2 m_LastMousePosition;
+
         private Vector2 m_MousePosition;
 
-        protected StandaloneInputModule()
-        {}
+        protected StandaloneInputModule(){}
 
+        #region Movement Name
         [SerializeField]
         private string m_HorizontalAxis = "Horizontal";
+        /// <summary>
+        /// Name of the horizontal axis for movement (if axis events are used).
+        /// </summary>
+        public string horizontalAxis
+        {
+            get { return m_HorizontalAxis; }
+            set { m_HorizontalAxis = value; }
+        }
 
         /// <summary>
         /// Name of the vertical axis for movement (if axis events are used).
         /// </summary>
         [SerializeField]
         private string m_VerticalAxis = "Vertical";
+        public string verticalAxis
+        {
+            get { return m_VerticalAxis; }
+            set { m_VerticalAxis = value; }
+        }
 
         /// <summary>
         /// Name of the submit button.
         /// </summary>
         [SerializeField]
         private string m_SubmitButton = "Submit";
+        public string submitButton
+        {
+            get { return m_SubmitButton; }
+            set { m_SubmitButton = value; }
+        }
 
         /// <summary>
         /// Name of the submit button.
         /// </summary>
         [SerializeField]
         private string m_CancelButton = "Cancel";
+        public string cancelButton
+        {
+            get { return m_CancelButton; }
+            set { m_CancelButton = value; }
+        }
+
+        #endregion
 
         [SerializeField]
         private float m_InputActionsPerSecond = 10;
@@ -49,6 +80,7 @@ namespace Client.UI.EventSystem
             set { m_InputActionsPerSecond = value; }
         }
 
+        //重复延迟
         [SerializeField]
         private float m_RepeatDelay = 0.5f;
         public float repeatDelay
@@ -66,50 +98,28 @@ namespace Client.UI.EventSystem
             set { m_ForceModuleActive = value; }
         }
 
-        /// <summary>
-        /// Name of the horizontal axis for movement (if axis events are used).
-        /// </summary>
-        public string horizontalAxis
-        {
-            get { return m_HorizontalAxis; }
-            set { m_HorizontalAxis = value; }
-        }
-
-        /// <summary>
-        /// Name of the vertical axis for movement (if axis events are used).
-        /// </summary>
-        public string verticalAxis
-        {
-            get { return m_VerticalAxis; }
-            set { m_VerticalAxis = value; }
-        }
-
-        public string submitButton
-        {
-            get { return m_SubmitButton; }
-            set { m_SubmitButton = value; }
-        }
-
-        public string cancelButton
-        {
-            get { return m_CancelButton; }
-            set { m_CancelButton = value; }
-        }
-
         public override void UpdateModule()
         {
+            //更新鼠标位置
             m_LastMousePosition = m_MousePosition;
             m_MousePosition = Input.mousePosition;
         }
 
         public override bool IsModuleSupported()
         {
+            // 检查鼠标是否存在，而不是是否支持触摸，
+            // 因为你可以将鼠标连接到平板电脑，在这种情况下我们想要
+            // 将StandaloneInputModule用于非触摸输入事件。
+
             // Check for mouse presence instead of whether touch is supported,
             // as you can connect mouse to a tablet and in that case we'd want
             // to use StandaloneInputModule for non-touch input events.
             return m_ForceModuleActive || Input.mousePresent;
         }
 
+        /// <summary>
+        /// 是否该模块处于活跃状态
+        /// </summary>
         public override bool ShouldActivateModule()
         {
             if (!base.ShouldActivateModule())
@@ -163,24 +173,89 @@ namespace Client.UI.EventSystem
             ProcessMouseEvent();
         }
 
-        #endregion
         /// <summary>
-        /// Process submit keys.
+        /// 处理当前选中物体的 Update 事件
         /// </summary>
-        protected bool SendSubmitEventToSelectedObject()
+        /// <returns></returns>
+        protected bool SendUpdateEventToSelectedObject()
         {
             if (eventSystem.currentSelectedGameObject == null)
+            {
                 return false;
-
+            }
             var data = GetBaseEventData();
-            if (Input.GetButtonDown(m_SubmitButton))
-                ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.submitHandler);
-
-            if (Input.GetButtonDown(m_CancelButton))
-                ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.cancelHandler);
+            ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.updateSelectedHandler);
             return data.used;
         }
 
+        /// <summary>
+        /// 处理 Move 事件
+        /// </summary>
+        protected bool SendMoveEventToSelectedObject()
+        {
+            float time = Time.unscaledTime;
+
+            Vector2 movement = GetRawMoveVector();
+            //x，y约为 0 时，不处理
+            if (Mathf.Approximately(movement.x, 0f) && Mathf.Approximately(movement.y, 0f))
+            {
+                m_ConsecutiveMoveCount = 0;
+                return false;
+            }
+
+            // If user pressed key again, always allow event
+            bool allow = Input.GetButtonDown(m_HorizontalAxis) ||
+                Input.GetButtonDown(m_VerticalAxis);
+
+            //点乘求是否为相同方向
+            bool similarDir = (Vector2.Dot(movement, m_LastMoveVector) > 0);
+
+            if (!allow)
+            {
+                // Otherwise, user held down key or axis.
+                // If direction didn't change at least 90 degrees,如果方向没有改变超过 90 度
+                // wait for delay before allowing consequtive event. 
+                if (similarDir && m_ConsecutiveMoveCount == 1)
+                {
+                    allow = (time > m_PrevActionTime + m_RepeatDelay);
+                }
+                // If direction changed at least 90 degree, 
+                // or we already had the delay, repeat at repeat rate.
+                else
+                {
+                    allow = (time > m_PrevActionTime + 1f / m_InputActionsPerSecond);
+                }
+            }
+            if (!allow)
+            {
+                return false;
+            }
+
+            //轴数据
+            var axisEventData = GetAxisEventData(movement.x, movement.y, 0.6f);
+
+            ExecuteEvents.Execute(eventSystem.currentSelectedGameObject,
+                axisEventData,
+                ExecuteEvents.moveHandler);
+
+            if (!similarDir)
+            {
+                m_ConsecutiveMoveCount = 0;
+            }
+
+            m_ConsecutiveMoveCount++;
+            m_PrevActionTime = time;
+            m_LastMoveVector = movement;
+            return axisEventData.used;
+        }
+
+        /// <summary>
+        /// 获取水平竖直方向的输入向量
+        /// (-1,-1) (-1,0) (-1,1)
+        /// (0,-1) (0,0) (0,1)
+        /// (1,-1) (1,0) (1,1)
+        /// </summary>
+        /// <returns></returns>
         private Vector2 GetRawMoveVector()
         {
             Vector2 move = Vector2.zero;
@@ -205,44 +280,20 @@ namespace Client.UI.EventSystem
         }
 
         /// <summary>
-        /// Process keyboard events.
+        /// Process submit keys.
         /// </summary>
-        protected bool SendMoveEventToSelectedObject()
+        protected bool SendSubmitEventToSelectedObject()
         {
-            float time = Time.unscaledTime;
-
-            Vector2 movement = GetRawMoveVector();
-            if (Mathf.Approximately(movement.x, 0f) && Mathf.Approximately(movement.y, 0f))
-            {
-                m_ConsecutiveMoveCount = 0;
-                return false;
-            }
-
-            // If user pressed key again, always allow event
-            bool allow = Input.GetButtonDown(m_HorizontalAxis) || Input.GetButtonDown(m_VerticalAxis);
-            bool similarDir = (Vector2.Dot(movement, m_LastMoveVector) > 0);
-            if (!allow)
-            {
-                // Otherwise, user held down key or axis.
-                // If direction didn't change at least 90 degrees, wait for delay before allowing consequtive event.
-                if (similarDir && m_ConsecutiveMoveCount == 1)
-                    allow = (time > m_PrevActionTime + m_RepeatDelay);
-                // If direction changed at least 90 degree, or we already had the delay, repeat at repeat rate.
-                else
-                    allow = (time > m_PrevActionTime + 1f / m_InputActionsPerSecond);
-            }
-            if (!allow)
+            if (eventSystem.currentSelectedGameObject == null)
                 return false;
 
-            // Debug.Log(m_ProcessingEvent.rawType + " axis:" + m_AllowAxisEvents + " value:" + "(" + x + "," + y + ")");
-            var axisEventData = GetAxisEventData(movement.x, movement.y, 0.6f);
-            ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, axisEventData, ExecuteEvents.moveHandler);
-            if (!similarDir)
-                m_ConsecutiveMoveCount = 0;
-            m_ConsecutiveMoveCount++;
-            m_PrevActionTime = time;
-            m_LastMoveVector = movement;
-            return axisEventData.used;
+            var data = GetBaseEventData();
+            if (Input.GetButtonDown(m_SubmitButton))
+                ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.submitHandler);
+
+            if (Input.GetButtonDown(m_CancelButton))
+                ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.cancelHandler);
+            return data.used;
         }
 
         /// <summary>
@@ -260,39 +311,28 @@ namespace Client.UI.EventSystem
         {
             //获取鼠标指针事件信息
             var mouseData = GetMousePointerEventData(id);
-            var leftButtonData = mouseData.GetButtonState(PointerEventData.InputButton.Left).eventData;
 
-            // Process the first mouse button fully
+            //左键
+            var leftButtonData = mouseData.GetButtonState(PointerEventData.InputButton.Left).eventData;
             ProcessMousePress(leftButtonData);
             ProcessMove(leftButtonData.buttonData);
             ProcessDrag(leftButtonData.buttonData);
 
-            // Now process right / middle clicks
+            //右键，中键
             ProcessMousePress(mouseData.GetButtonState(PointerEventData.InputButton.Right).eventData);
             ProcessDrag(mouseData.GetButtonState(PointerEventData.InputButton.Right).eventData.buttonData);
             ProcessMousePress(mouseData.GetButtonState(PointerEventData.InputButton.Middle).eventData);
             ProcessDrag(mouseData.GetButtonState(PointerEventData.InputButton.Middle).eventData.buttonData);
 
+            //滚轮
             if (!Mathf.Approximately(leftButtonData.buttonData.scrollDelta.sqrMagnitude, 0.0f))
             {
-                var scrollHandler = ExecuteEvents.GetEventHandler<IScrollHandler>(leftButtonData.buttonData.pointerCurrentRaycast.gameObject);
-                ExecuteEvents.ExecuteHierarchy(scrollHandler, leftButtonData.buttonData, ExecuteEvents.scrollHandler);
+                var scrollHandler = ExecuteEvents.GetEventHandler<IScrollHandler>(
+                    leftButtonData.buttonData.pointerCurrentRaycast.gameObject);
+                ExecuteEvents.ExecuteHierarchy(scrollHandler, 
+                    leftButtonData.buttonData, 
+                    ExecuteEvents.scrollHandler);
             }
-        }
-
-        /// <summary>
-        /// 处理选中物体的 Update 事件
-        /// </summary>
-        /// <returns></returns>
-        protected bool SendUpdateEventToSelectedObject()
-        {
-            if (eventSystem.currentSelectedGameObject == null)
-            {
-                return false;
-            }
-            var data = GetBaseEventData();
-            ExecuteEvents.Execute(eventSystem.currentSelectedGameObject, data, ExecuteEvents.updateSelectedHandler);
-            return data.used;
         }
 
         /// <summary>
@@ -319,16 +359,16 @@ namespace Client.UI.EventSystem
                 // search for the control that will receive the press
                 // if we can't find a press handler set the press
                 // handler to be what would receive a click.
-                var newPressed = ExecuteEvents.ExecuteHierarchy(currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
+                var newPressed = ExecuteEvents.ExecuteHierarchy(
+                    currentOverGo, pointerEvent, ExecuteEvents.pointerDownHandler);
 
                 // didnt find a press handler... search for a click handler
                 if (newPressed == null)
                     newPressed = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
 
-                // Debug.Log("Pressed: " + newPressed);
-
                 float time = Time.unscaledTime;
 
+                //点击同一物体
                 if (newPressed == pointerEvent.lastPress)
                 {
                     var diffTime = time - pointerEvent.clickTime;
@@ -349,20 +389,19 @@ namespace Client.UI.EventSystem
 
                 pointerEvent.clickTime = time;
 
-                // Save the drag handler as well
+                // Save the drag handler as well 拖动
                 pointerEvent.pointerDrag = ExecuteEvents.GetEventHandler<IDragHandler>(currentOverGo);
-
                 if (pointerEvent.pointerDrag != null)
-                    ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.initializePotentialDrag);
+                    ExecuteEvents.Execute(pointerEvent.pointerDrag, 
+                        pointerEvent, ExecuteEvents.initializePotentialDrag);
             }
 
             // PointerUp notification
             if (data.ReleasedThisFrame())
             {
-                // Debug.Log("Executing pressup on: " + pointer.pointerPress);
-                ExecuteEvents.Execute(pointerEvent.pointerPress, pointerEvent, ExecuteEvents.pointerUpHandler);
-
-                // Debug.Log("KeyCode: " + pointer.eventData.keyCode);
+                ExecuteEvents.Execute(pointerEvent.pointerPress, 
+                    pointerEvent, 
+                    ExecuteEvents.pointerUpHandler);
 
                 // see if we mouse up on the same element that we clicked on...
                 var pointerUpHandler = ExecuteEvents.GetEventHandler<IPointerClickHandler>(currentOverGo);
@@ -382,8 +421,10 @@ namespace Client.UI.EventSystem
                 pointerEvent.rawPointerPress = null;
 
                 if (pointerEvent.pointerDrag != null && pointerEvent.dragging)
+                {
                     ExecuteEvents.Execute(pointerEvent.pointerDrag, pointerEvent, ExecuteEvents.endDragHandler);
-
+                }
+                    
                 pointerEvent.dragging = false;
                 pointerEvent.pointerDrag = null;
 
@@ -398,5 +439,16 @@ namespace Client.UI.EventSystem
                 }
             }
         }
+        #endregion
+
+
+
+
+
+
+
+
+
+
     }
 }

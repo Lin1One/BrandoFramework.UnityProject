@@ -9,6 +9,7 @@ namespace Client.UI.EventSystem
     /// </summary>
     public abstract class BaseRaycaster : BrandoUIBehaviour
     {
+        //Õ∂…‰
         public abstract void Raycast(PointerEventData eventData, List<RaycastResult> resultAppendList);
         public abstract Camera eventCamera { get; }
 

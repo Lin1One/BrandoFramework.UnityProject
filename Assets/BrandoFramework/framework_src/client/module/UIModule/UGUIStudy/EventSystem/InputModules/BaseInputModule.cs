@@ -222,6 +222,10 @@ namespace Client.UI.EventSystem
             return false;
         }
 
+        /// <summary>
+        /// 是否该模块处于活跃状态
+        /// </summary>
+        /// <returns></returns>
         public virtual bool ShouldActivateModule()
         {
             return enabled && gameObject.activeInHierarchy;
@@ -236,6 +240,10 @@ namespace Client.UI.EventSystem
         public virtual void UpdateModule()
         {}
 
+        /// <summary>
+        /// 是否当前环境支持该输入模块
+        /// </summary>
+        /// <returns></returns>
         public virtual bool IsModuleSupported()
         {
             return true;

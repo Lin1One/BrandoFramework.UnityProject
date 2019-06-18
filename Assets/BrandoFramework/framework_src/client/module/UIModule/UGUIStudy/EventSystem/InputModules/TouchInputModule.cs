@@ -33,6 +33,7 @@ namespace Client.UI.EventSystem
 
         public override void UpdateModule()
         {
+            //更新鼠标位置
             m_LastMousePosition = m_MousePosition;
             m_MousePosition = Input.mousePosition;
         }

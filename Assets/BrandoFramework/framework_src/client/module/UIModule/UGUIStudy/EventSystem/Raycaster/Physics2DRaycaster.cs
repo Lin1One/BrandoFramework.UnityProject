@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace UnityEngine.EventSystems
+namespace Client.UI.EventSystem
 {
     /// <summary>
     /// Simple event system using physics raycasts.

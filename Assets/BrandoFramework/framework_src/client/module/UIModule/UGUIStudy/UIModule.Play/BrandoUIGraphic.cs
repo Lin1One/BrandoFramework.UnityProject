@@ -3,7 +3,6 @@ using System.Reflection;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
-using UnityEngine.UI;
 
 namespace Client.UI
 {
@@ -173,28 +172,37 @@ namespace Client.UI
             {
                 return false;
             }
+
             var t = transform;
             var components = ListPool<Component>.Get();
 
             bool ignoreParentGroups = false;
+            //继续遍历
             bool continueTraversal = true;
 
             while (t != null)
             {
+                ///遍历该物体的所有组件
                 t.GetComponents(components);
                 for (var i = 0; i < components.Count; i++)
                 {
+                    //遇到子 Canvas 停止遍历
                     var canvas = components[i] as Canvas;
                     if (canvas != null && canvas.overrideSorting)
+                    {
                         continueTraversal = false;
+                    }
 
+                    //射线接收过滤器组件
                     var filter = components[i] as ICanvasRaycastFilter;
-
                     if (filter == null)
+                    {
                         continue;
+                    }
 
                     var raycastValid = true;
 
+                    //Canvas 组
                     var group = components[i] as CanvasGroup;
                     if (group != null)
                     {
@@ -208,11 +216,14 @@ namespace Client.UI
                     }
                     else
                     {
+                        //射线有效性
                         raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
                     }
 
+                    
                     if (!raycastValid)
                     {
+                        //射线被过滤，阻断，不再穿透至下一物体
                         ListPool<Component>.Release(components);
                         return false;
                     }
@@ -259,7 +270,7 @@ namespace Client.UI
             if (gameObject.activeInHierarchy)
             {
                 // prevent double dirtying...
-                if (CanvasUpdateRegistry.IsRebuildingLayout())
+                if (BrandoCanvasUpdateRegistry.IsRebuildingLayout())
                 {
                     SetVerticesDirty();
                 }
@@ -273,7 +284,7 @@ namespace Client.UI
 
         protected override void OnBeforeTransformParentChanged()
         {
-            ////GraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
+            BrandoUIGraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
             LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
         }
 
@@ -885,7 +896,7 @@ namespace Client.UI
         {
             base.OnEnable();
             CacheCanvas();
-            ////GraphicRegistry.RegisterGraphicForCanvas(canvas, this);
+            BrandoUIGraphicRegistry.RegisterGraphicForCanvas(canvas, this);
 
 #if UNITY_EDITOR
             ////GraphicRebuildTracker.TrackGraphic(this);

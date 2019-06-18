@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace Client.UI.EventSystem
 {
+    /// <summary>
+    /// 射线发射器管理类
+    /// </summary>
     internal static class RaycasterManager
     {
         private static readonly List<BaseRaycaster> s_Raycasters = new List<BaseRaycaster>();
@@ -10,7 +13,6 @@ namespace Client.UI.EventSystem
         {
             if (s_Raycasters.Contains(baseRaycaster))
                 return;
-
             s_Raycasters.Add(baseRaycaster);
         }
 
