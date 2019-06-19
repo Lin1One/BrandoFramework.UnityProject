@@ -21,7 +21,137 @@ namespace Client.UI
             useLegacyMeshGeneration = true;
         }
 
-        protected static Texture2D s_WhiteTexture = null;
+        #region  Transform
+
+        [NonSerialized]
+        private RectTransform m_RectTransform;
+        /// <summary>
+        /// The RectTransform component used by the Graphic. Cached for speed.
+        /// </summary>
+        public RectTransform rectTransform
+        {
+            get
+            {
+                // The RectTransform is a required component that must not be destroyed. Based on this assumption, a
+                // null-reference check is sufficient.
+                if (ReferenceEquals(m_RectTransform, null))
+                {
+                    m_RectTransform = GetComponent<RectTransform>();
+                }
+                return m_RectTransform;
+            }
+        }
+
+        /// <summary>
+        /// Make the Graphic have the native size of its content.
+        /// </summary>
+        public virtual void SetNativeSize() { }
+
+        #endregion
+
+        #region MonoBehavior 生命周期
+        /// <summary>
+        /// Mark the Graphic and the canvas as having been changed.
+        /// </summary>
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            CacheCanvas();
+            BrandoUIGraphicRegistry.RegisterGraphicForCanvas(canvas, this); //注册至 Canvas
+
+#if UNITY_EDITOR
+            BrandoGraphicRebuildTracker.TrackGraphic(this);
+#endif
+            if (s_WhiteTexture == null)
+            {
+                s_WhiteTexture = Texture2D.whiteTexture;
+            }
+            SetAllDirty();  //设置为脏，等待渲染
+        }
+
+        /// <summary>
+        /// Clear references.
+        /// </summary>
+        protected override void OnDisable()
+        {
+#if UNITY_EDITOR
+            BrandoGraphicRebuildTracker.UnTrackGraphic(this);
+#endif
+            BrandoUIGraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
+            BrandoCanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
+
+            if (canvasRenderer != null)
+                canvasRenderer.Clear();
+
+            LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
+            base.OnDisable();
+        }
+
+        /// <summary>
+        /// Trans外观尺寸变化
+        /// </summary>
+        protected override void OnRectTransformDimensionsChange()
+        {
+            if (gameObject.activeInHierarchy)
+            {
+                // prevent double dirtying...
+                if (BrandoCanvasUpdateRegistry.IsRebuildingLayout())
+                {
+                    SetVerticesDirty();
+                }
+                else
+                {
+                    SetVerticesDirty();
+                    SetLayoutDirty();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 父物体改变前调
+        /// </summary>
+        protected override void OnBeforeTransformParentChanged()
+        {
+            BrandoUIGraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
+            LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
+        }
+
+        /// <summary>
+        /// 父物体改变
+        /// </summary>
+        protected override void OnTransformParentChanged()
+        {
+            base.OnTransformParentChanged();
+
+            m_Canvas = null;
+
+            if (!IsActive())
+            {
+                return;
+            }
+            CacheCanvas();
+            BrandoUIGraphicRegistry.RegisterGraphicForCanvas(canvas, this);
+            SetAllDirty();
+        }
+
+        protected override void Reset()
+        {
+            SetAllDirty();
+        }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            SetAllDirty();
+        }
+
+#endif
+
+        #endregion
+
+        #region 材质
+
         protected static Material s_DefaultUI = null;
         /// <summary>
         /// 静态默认材质
@@ -38,10 +168,6 @@ namespace Client.UI
             }
         }
 
-        #region 材质
-        /// <summary>
-        /// Returns the default material for the graphic.
-        /// </summary>
         public virtual Material defaultMaterial
         {
             get { return defaultGraphicMaterial; }
@@ -83,9 +209,9 @@ namespace Client.UI
         {
             get
             {
+                //调用物体的材质修改组件对基础材质进行处理
                 var components = ListPool<Component>.Get();
                 GetComponents(typeof(IMaterialModifier), components);
-
                 var currentMat = material;
                 for (var i = 0; i < components.Count; i++)
                 {
@@ -97,6 +223,11 @@ namespace Client.UI
             }
         }
 
+        #endregion
+
+        #region Texture
+
+        protected static Texture2D s_WhiteTexture = null;
         /// <summary>
         /// The graphic's texture. (只读).
         /// </summary>
@@ -119,26 +250,10 @@ namespace Client.UI
             }
         }
 
-        [SerializeField]
-        private Color m_Color = Color.white;
-        public virtual Color color
-        {
-            get
-            {
-                return m_Color;
-            }
-            set
-            {
-                if (SetPropertyUtility.SetColor(ref m_Color, value))
-                {
-                    SetVerticesDirty();
-                }
-            }
-        }
-
         #endregion
 
         #region Raycast
+
         [SerializeField]
         private bool m_RaycastTarget = true;
         /// <summary>
@@ -157,15 +272,14 @@ namespace Client.UI
         }
 
         /// <summary>
-        /// When a GraphicRaycaster is raycasting into the scene 
-        /// it does two things. 
-        /// First it filters the elements using their RectTransform rect. 
-        /// Then it uses this Raycast function to determine the elements hit by the raycast.
-        /// 
+        /// 当图像射线发射器发射射线至场景中，
+        /// 用各 UI 元素其 RectTransform Rect 判断是否有对其进行操作，进行具体的交互操作
         /// </summary>
         /// <param name="sp">Screen point being tested</param>
         /// <param name="eventCamera">Camera that is being used for the testing.</param>
-        /// <returns>True if the provided point is a valid location for GraphicRaycaster raycasts.</returns>
+        /// <returns>True if the provided point is a valid location for GraphicRaycaster raycasts. 
+        /// 返回传入的位置是否有效位置 
+        /// </returns>
         public virtual bool Raycast(Vector2 sp, Camera eventCamera)
         {
             if (!isActiveAndEnabled)
@@ -177,7 +291,7 @@ namespace Client.UI
             var components = ListPool<Component>.Get();
 
             bool ignoreParentGroups = false;
-            //继续遍历
+            //是否继续遍历
             bool continueTraversal = true;
 
             while (t != null)
@@ -236,74 +350,28 @@ namespace Client.UI
 
         #endregion
 
-        #region  Transform
+        #region Canvas
 
         [NonSerialized]
-        private RectTransform m_RectTransform;
+        private Canvas m_Canvas;
         /// <summary>
-        /// The RectTransform component used by the Graphic. Cached for speed.
+        /// 该图像渲染到的 Canvas 
         /// </summary>
-        public RectTransform rectTransform
+        /// <remarks>
+        /// In the situation where the Graphic is used in a hierarchy with multiple Canvases, 
+        /// the Canvas closest to the root will be used.
+        /// </remarks>
+        public Canvas canvas
         {
             get
             {
-                // The RectTransform is a required component that must not be destroyed. Based on this assumption, a
-                // null-reference check is sufficient.
-                if (ReferenceEquals(m_RectTransform, null))
+                if (m_Canvas == null)
                 {
-                    m_RectTransform = GetComponent<RectTransform>();
+                    CacheCanvas();
                 }
-                return m_RectTransform;
+                return m_Canvas;
             }
         }
-
-        /// <summary>
-        /// Make the Graphic have the native size of its content.
-        /// </summary>
-        public virtual void SetNativeSize() { }
-
-        /// <summary>
-        /// Trans外观尺寸变化
-        /// </summary>
-        protected override void OnRectTransformDimensionsChange()
-        {
-            if (gameObject.activeInHierarchy)
-            {
-                // prevent double dirtying...
-                if (BrandoCanvasUpdateRegistry.IsRebuildingLayout())
-                {
-                    SetVerticesDirty();
-                }
-                else
-                {
-                    SetVerticesDirty();
-                    SetLayoutDirty();
-                }
-            }
-        }
-
-        protected override void OnBeforeTransformParentChanged()
-        {
-            BrandoUIGraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
-            LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
-        }
-
-        protected override void OnTransformParentChanged()
-        {
-            base.OnTransformParentChanged();
-
-            m_Canvas = null;
-
-            if (!IsActive())
-                return;
-
-            CacheCanvas();
-            //GraphicRegistry.RegisterGraphicForCanvas(canvas, this);
-            SetAllDirty();
-        }
-        #endregion
-
-        #region Canvas
 
         [NonSerialized]
         private CanvasRenderer m_CanvasRenderer;
@@ -319,25 +387,9 @@ namespace Client.UI
             }
         }
 
-        [NonSerialized]
-        private Canvas m_Canvas;
-
         /// <summary>
-        /// A reference to the Canvas this Graphic is rendering to.
+        /// 缓存自身所在 Canvas
         /// </summary>
-        /// <remarks>
-        /// In the situation where the Graphic is used in a hierarchy with multiple Canvases, the Canvas closest to the root will be used.
-        /// </remarks>
-        public Canvas canvas
-        {
-            get
-            {
-                if (m_Canvas == null)
-                    CacheCanvas();
-                return m_Canvas;
-            }
-        }
-
         private void CacheCanvas()
         {
             var list = ListPool<Canvas>.Get();
@@ -398,7 +450,7 @@ namespace Client.UI
 
             if (currentCanvas != m_Canvas)
             {
-                ////GraphicRegistry.UnregisterGraphicForCanvas(currentCanvas, this);
+                BrandoUIGraphicRegistry.UnregisterGraphicForCanvas(currentCanvas, this);
 
                 // Only register if we are active and enabled as OnCanvasHierarchyChanged can get called
                 // during object destruction and we dont want to register ourself and then become null.
@@ -406,7 +458,7 @@ namespace Client.UI
                 {
 
                 }
-                   //// GraphicRegistry.RegisterGraphicForCanvas(canvas, this);
+                BrandoUIGraphicRegistry.RegisterGraphicForCanvas(canvas, this);
             }
         }
 
@@ -427,17 +479,23 @@ namespace Client.UI
                 BrandoCanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
             }
         }
+
         #endregion
 
         #region 几何信息
+
+        #region 网格信息
+
         [NonSerialized]
         protected static Mesh s_Mesh;
 
+        /// <summary>
+        /// 生效网格
+        /// </summary>
         protected static Mesh workerMesh
         {
             get
             {
-
                 if (s_Mesh == null)
                 {
                     s_Mesh = new Mesh();
@@ -448,25 +506,31 @@ namespace Client.UI
             }
         }
 
+        /// <summary>
+        /// 顶点助手
+        /// </summary>
         [NonSerialized]
         private static readonly VertexHelper s_VertexHelper = new VertexHelper();
 
         /// <summary>
-        /// 使用传统网格生成
+        /// 是否使用传统网格生成
         /// </summary>
         protected bool useLegacyMeshGeneration { get; set; }
 
         [Obsolete("Use OnPopulateMesh(VertexHelper vh) instead.", false)]
         /// <summary>
-        /// Callback function when a UI element needs to generate vertices. Fills the vertex buffer data.
+        /// Callback function when a UI element needs to generate vertices. 
+        /// Fills the vertex buffer data.
+        /// 当 UI 元素需生成顶点信息时回调，填充顶点 buffer 数据
         /// </summary>
         /// <param name="m">Mesh to populate with UI data.</param>
         /// <remarks>
         /// Used by Text, UI.Image, and RawImage for example to generate vertices specific to their use case.
+        /// Text，Image，RawImage
         /// </remarks>
         protected virtual void OnPopulateMesh(Mesh m)
         {
-            OnPopulateMesh(s_VertexHelper);
+            OnPopulateMesh(s_VertexHelper); //将顶点信息保存至 VertexHelper
             s_VertexHelper.FillMesh(m);
         }
 
@@ -475,10 +539,6 @@ namespace Client.UI
         /// Fills the vertex buffer data.
         /// 填充网格
         /// </summary>
-        /// <param name="vh">VertexHelper utility.</param>
-        /// <remarks>
-        /// Used by Text, UI.Image, and RawImage for example to generate vertices specific to their use case.
-        /// </remarks>
         protected virtual void OnPopulateMesh(VertexHelper vh)
         {
             var r = GetPixelAdjustedRect();
@@ -495,41 +555,27 @@ namespace Client.UI
             vh.AddTriangle(2, 3, 0);
         }
 
-        /// <summary>
-        /// Returns a pixel perfect Rect closest to the Graphic RectTransform.
-        /// 获取相对于图形 RectTransform 像素精确的矩形
-        /// </summary>
-        /// <remarks>
-        /// Note: This is only accurate if the Graphic root Canvas is in Screen Space.
-        /// 仅当 Canvas is in Screen Space 情况生效
-        /// </remarks>
-        /// <returns>A Pixel perfect Rect.</returns>
-        public Rect GetPixelAdjustedRect()
-        {
-            if (!canvas ||
-                canvas.renderMode == RenderMode.WorldSpace ||
-                canvas.scaleFactor == 0.0f ||
-                !canvas.pixelPerfect)
-                return rectTransform.rect;
-            else
-                return RectTransformUtility.PixelAdjustRect(rectTransform, canvas);
-        }
+        #endregion
 
-        ///<summary>
-        ///Adjusts the given pixel to be pixel perfect.
-        ///</summary>
-        ///<param name="point">Local space point.</param>
-        ///<returns>Pixel perfect adjusted point.</returns>
-        ///<remarks>
-        ///Note: This is only accurate if the Graphic root Canvas is in Screen Space.
-        ///</remarks>
-        public Vector2 PixelAdjustPoint(Vector2 point)
+        #region 颜色处理
+
+        [SerializeField]
+        private Color m_Color = Color.white;
+        /// <summary>
+        /// 图像基础颜色
+        /// </summary>
+        public virtual Color color
         {
-            if (!canvas || canvas.renderMode == RenderMode.WorldSpace || canvas.scaleFactor == 0.0f || !canvas.pixelPerfect)
-                return point;
-            else
+            get
             {
-                return RectTransformUtility.PixelAdjustPoint(point, transform, canvas);
+                return m_Color;
+            }
+            set
+            {
+                if (SetPropertyUtility.SetColor(ref m_Color, value))
+                {
+                    SetVerticesDirty();
+                }
             }
         }
 
@@ -560,12 +606,12 @@ namespace Client.UI
             if (canvasRenderer == null || (!useRGB && !useAlpha))
                 return;
 
-            //Color currentColor = canvasRenderer.GetColor();
-            //if (currentColor.Equals(targetColor))
-            //{
-            //    m_ColorTweenRunner.StopTween();
-            //    return;
-            //}
+            Color currentColor = canvasRenderer.GetColor();
+            if (currentColor.Equals(targetColor))
+            {
+                ////m_ColorTweenRunner.StopTween();
+                return;
+            }
 
             //ColorTween.ColorTweenMode mode = (useRGB && useAlpha ?
             //    ColorTween.ColorTweenMode.All :
@@ -595,6 +641,50 @@ namespace Client.UI
         {
             CrossFadeColor(CreateColorFromAlpha(alpha), duration, ignoreTimeScale, true, false);
         }
+
+        #endregion
+
+        /// <summary>
+        /// Returns a pixel perfect Rect closest to the Graphic RectTransform.
+        /// 获取相对于图形 RectTransform 像素精确的矩形
+        /// </summary>
+        /// <remarks>
+        /// 仅当 Canvas is in Screen Space 情况生效
+        /// </remarks>
+        public Rect GetPixelAdjustedRect()
+        {
+            if (!canvas ||
+                canvas.renderMode == RenderMode.WorldSpace ||
+                canvas.scaleFactor == 0.0f ||
+                !canvas.pixelPerfect)
+                return rectTransform.rect;
+            else
+                //返回已调整像素的 Rect
+                return RectTransformUtility.PixelAdjustRect(rectTransform, canvas);
+        }
+
+        ///<summary>
+        ///Adjusts the given pixel to be pixel perfect.
+        ///调整像素点至精确
+        ///</summary>
+        ///<param name="point">Local space point.</param>
+        ///<returns>Pixel perfect adjusted point.</returns>
+        ///<remarks>
+        ///Note: This is only accurate if the Graphic root Canvas is in Screen Space.
+        ///</remarks>
+        public Vector2 PixelAdjustPoint(Vector2 point)
+        {
+            if (!canvas || 
+                canvas.renderMode == RenderMode.WorldSpace || 
+                canvas.scaleFactor == 0.0f || 
+                !canvas.pixelPerfect)
+                return point;
+            else
+            {
+                return RectTransformUtility.PixelAdjustPoint(point, transform, canvas);
+            }
+        }
+
         #endregion
 
         #region 脏渲染
@@ -610,12 +700,21 @@ namespace Client.UI
         [NonSerialized]
         private bool m_MaterialDirty;
 
+        /// <summary>
+        ///  Layout 修改回调
+        /// </summary>
         [NonSerialized]
         protected UnityAction m_OnDirtyLayoutCallback;
 
+        /// <summary>
+        /// 顶点修改回调
+        /// </summary>
         [NonSerialized]
         protected UnityAction m_OnDirtyVertsCallback;
 
+        /// <summary>
+        /// 材质修改回调
+        /// </summary>
         [NonSerialized]
         protected UnityAction m_OnDirtyMaterialCallback;
 
@@ -627,7 +726,6 @@ namespace Client.UI
         }
 
         /// <summary>
-        /// Mark the layout as dirty and needing rebuilt.
         /// 标记 Layout 为脏，将重建
         /// </summary>
         /// <remarks>
@@ -644,7 +742,6 @@ namespace Client.UI
         }
 
         /// <summary>
-        /// Mark the vertices as dirty and needing rebuilt.
         /// 标记顶点为脏，将重建
         /// </summary>
         /// <remarks>
@@ -818,19 +915,7 @@ namespace Client.UI
             }
         }
 
-        protected override void Reset()
-        {
-            SetAllDirty();
-        }
 
-#if UNITY_EDITOR
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            SetAllDirty();
-        }
-
-#endif
 
         /// <summary>
         /// Add a listener to receive notification when the graphics layout is dirtied.
@@ -888,50 +973,11 @@ namespace Client.UI
 #endif
         #endregion
 
-        #region MonoBehavior 生命周期
-        /// <summary>
-        /// Mark the Graphic and the canvas as having been changed.
-        /// </summary>
-        protected override void OnEnable()
-        {
-            base.OnEnable();
-            CacheCanvas();
-            BrandoUIGraphicRegistry.RegisterGraphicForCanvas(canvas, this);
-
-#if UNITY_EDITOR
-            ////GraphicRebuildTracker.TrackGraphic(this);
-#endif
-            if (s_WhiteTexture == null)
-                s_WhiteTexture = Texture2D.whiteTexture;
-
-            SetAllDirty();
-        }
-
-        /// <summary>
-        /// Clear references.
-        /// </summary>
-        protected override void OnDisable()
-        {
-#if UNITY_EDITOR
-            ////GraphicRebuildTracker.UnTrackGraphic(this);
-#endif
-            ////GraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
-            BrandoCanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
-
-            if (canvasRenderer != null)
-                canvasRenderer.Clear();
-
-            LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
-
-            base.OnDisable();
-        }
-
-
-        #endregion
-
         #region UIAnimation
 
-        // Call from unity if animation properties have changed
+        /// <summary>
+        /// Animation Properties 修改
+        /// </summary>
         protected override void OnDidApplyAnimationProperties()
         {
             SetAllDirty();

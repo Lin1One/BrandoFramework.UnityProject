@@ -6,6 +6,9 @@ using UnityEngine.UI;
 
 namespace Client.UI
 {
+    /// <summary>
+    ///  Canvas更新注册处
+    /// </summary>
     public class BrandoCanvasUpdateRegistry
     {
         private static BrandoCanvasUpdateRegistry s_Instance;
@@ -27,9 +30,9 @@ namespace Client.UI
             Canvas.willRenderCanvases += PerformUpdate;
         }
 
-        //处理布局更新
+        //是否处理布局更新
         private bool m_PerformingLayoutUpdate;
-        //处理图像更新
+        //是否处理图像更新
         private bool m_PerformingGraphicUpdate;
 
         public static bool IsRebuildingLayout()
