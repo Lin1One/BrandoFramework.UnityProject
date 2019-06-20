@@ -150,108 +150,6 @@ namespace Client.UI
 
         #endregion
 
-        #region 材质
-
-        protected static Material s_DefaultUI = null;
-        /// <summary>
-        /// 静态默认材质
-        /// </summary>
-        public static Material defaultGraphicMaterial
-        {
-            get
-            {
-                if (s_DefaultUI == null)
-                {
-                    s_DefaultUI = Canvas.GetDefaultCanvasMaterial();
-                }
-                return s_DefaultUI;
-            }
-        }
-
-        public virtual Material defaultMaterial
-        {
-            get { return defaultGraphicMaterial; }
-        }
-
-        // Cached and saved values
-        [FormerlySerializedAs("当前材质")]
-        [SerializeField]
-        protected Material m_Material;
-        public virtual Material material
-        {
-            get
-            {
-                return (m_Material != null) ? m_Material : defaultMaterial;
-            }
-            set
-            {
-                if (m_Material == value)
-                    return;
-
-                m_Material = value;
-                SetMaterialDirty();
-            }
-        }
-
-        /// <summary>
-        /// The material that will be sent for Rendering (Read only).
-        /// 实际发送至CanvasRenderer渲染的材质
-        /// </summary>
-        /// <remarks>
-        /// This is the material that actually gets sent to the CanvasRenderer.
-        /// By default it's the same as [[Graphic.material]]. 
-        /// When extending Graphic you can override this to send
-        /// a different material to the CanvasRenderer than the one set by Graphic.material. 
-        /// This is useful if you want to modify the user 
-        /// set material in a non destructive manner.
-        /// </remarks>
-        public virtual Material materialForRendering
-        {
-            get
-            {
-                //调用物体的材质修改组件对基础材质进行处理
-                var components = ListPool<Component>.Get();
-                GetComponents(typeof(IMaterialModifier), components);
-                var currentMat = material;
-                for (var i = 0; i < components.Count; i++)
-                {
-                    currentMat = (components[i] as IMaterialModifier).
-                        GetModifiedMaterial(currentMat);
-                } 
-                ListPool<Component>.Release(components);
-                return currentMat;
-            }
-        }
-
-        #endregion
-
-        #region Texture
-
-        protected static Texture2D s_WhiteTexture = null;
-        /// <summary>
-        /// The graphic's texture. (只读).
-        /// </summary>
-        /// <remarks>
-        /// This is the Texture that gets passed to the CanvasRenderer,
-        /// Material and then Shader _MainTex.
-        /// When implementing your own Graphic 
-        /// you can override this to control 
-        /// which texture goes through the UI Rendering pipeline.
-        /// Bear in mind that Unity tries to batch UI elements together 
-        /// to improve performance, 
-        /// so its ideal to work with atlas to 
-        /// reduce the number of draw calls.
-        /// </remarks>
-        public virtual Texture mainTexture
-        {
-            get
-            {
-                return s_WhiteTexture;
-            }
-        }
-
-        #endregion
-
         #region Raycast
 
         [SerializeField]
@@ -346,6 +244,28 @@ namespace Client.UI
             }
             ListPool<Component>.Release(components);
             return true;
+        }
+
+        #endregion
+
+        #region Cull
+
+        /// <summary>
+        /// This method must be called when CanvasRenderer.cull
+        /// is modified.
+        /// 画布渲染器剔除修改回调
+        /// </summary>
+        /// <remarks>
+        /// This can be used to perform operations 
+        /// that were previously skipped because the <c>Graphic</c> was culled.
+        /// </remarks>
+        public virtual void OnCullingChanged()
+        {
+            if (!canvasRenderer.cull && (m_VertsDirty || m_MaterialDirty))
+            {
+                /// When we were culled, we potentially skipped calls to <c>Rebuild</c>.
+                BrandoCanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
+            }
         }
 
         #endregion
@@ -462,23 +382,7 @@ namespace Client.UI
             }
         }
 
-        /// <summary>
-        /// This method must be called when CanvasRenderer.cull
-        /// is modified.
-        /// 画布渲染器剔除修改回调
-        /// </summary>
-        /// <remarks>
-        /// This can be used to perform operations 
-        /// that were previously skipped because the <c>Graphic</c> was culled.
-        /// </remarks>
-        public virtual void OnCullingChanged()
-        {
-            if (!canvasRenderer.cull && (m_VertsDirty || m_MaterialDirty))
-            {
-                /// When we were culled, we potentially skipped calls to <c>Rebuild</c>.
-                BrandoCanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
-            }
-        }
+
 
         #endregion
 
@@ -553,6 +457,81 @@ namespace Client.UI
 
             vh.AddTriangle(0, 1, 2);
             vh.AddTriangle(2, 3, 0);
+        }
+
+        #endregion
+
+        #region 材质
+
+        protected static Material s_DefaultUI = null;
+        /// <summary>
+        /// 静态默认材质
+        /// </summary>
+        public static Material defaultGraphicMaterial
+        {
+            get
+            {
+                if (s_DefaultUI == null)
+                {
+                    s_DefaultUI = Canvas.GetDefaultCanvasMaterial();
+                }
+                return s_DefaultUI;
+            }
+        }
+
+        public virtual Material defaultMaterial
+        {
+            get { return defaultGraphicMaterial; }
+        }
+
+        // Cached and saved values
+        [FormerlySerializedAs("当前材质")]
+        [SerializeField]
+        protected Material m_Material;
+        public virtual Material material
+        {
+            get
+            {
+                return (m_Material != null) ? m_Material : defaultMaterial;
+            }
+            set
+            {
+                if (m_Material == value)
+                    return;
+
+                m_Material = value;
+                SetMaterialDirty();
+            }
+        }
+
+        /// <summary>
+        /// The material that will be sent for Rendering (Read only).
+        /// 实际发送至CanvasRenderer渲染的材质
+        /// </summary>
+        /// <remarks>
+        /// This is the material that actually gets sent to the CanvasRenderer.
+        /// By default it's the same as [[Graphic.material]]. 
+        /// When extending Graphic you can override this to send
+        /// a different material to the CanvasRenderer than the one set by Graphic.material. 
+        /// This is useful if you want to modify the user 
+        /// set material in a non destructive manner.
+        /// </remarks>
+        public virtual Material materialForRendering
+        {
+            get
+            {
+                //调用物体的材质修改组件对基础材质进行处理
+                var components = ListPool<Component>.Get();
+                GetComponents(typeof(IMaterialModifier), components);
+                var currentMat = material;
+                for (var i = 0; i < components.Count; i++)
+                {
+                    currentMat = (components[i] as IMaterialModifier).
+                        GetModifiedMaterial(currentMat);
+                }
+                ListPool<Component>.Release(components);
+                return currentMat;
+            }
         }
 
         #endregion
@@ -644,6 +623,33 @@ namespace Client.UI
 
         #endregion
 
+        #region Texture
+
+        protected static Texture2D s_WhiteTexture = null;
+        /// <summary>
+        /// The graphic's texture. (只读).
+        /// </summary>
+        /// <remarks>
+        /// This is the Texture that gets passed to the CanvasRenderer,
+        /// Material and then Shader _MainTex.
+        /// When implementing your own Graphic 
+        /// you can override this to control 
+        /// which texture goes through the UI Rendering pipeline.
+        /// Bear in mind that Unity tries to batch UI elements together 
+        /// to improve performance, 
+        /// so its ideal to work with atlas to 
+        /// reduce the number of draw calls.
+        /// </remarks>
+        public virtual Texture mainTexture
+        {
+            get
+            {
+                return s_WhiteTexture;
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Returns a pixel perfect Rect closest to the Graphic RectTransform.
         /// 获取相对于图形 RectTransform 像素精确的矩形
@@ -688,6 +694,8 @@ namespace Client.UI
         #endregion
 
         #region 脏渲染
+
+        #region 标记
         /// <summary>
         /// 顶点是否修改
         /// </summary>s
@@ -718,11 +726,52 @@ namespace Client.UI
         [NonSerialized]
         protected UnityAction m_OnDirtyMaterialCallback;
 
-        public virtual void SetAllDirty()
+        /// <summary>
+        /// Add a listener to receive notification when the graphics layout is dirtied.
+        /// </summary>
+        public void RegisterDirtyLayoutCallback(UnityAction action)
         {
-            SetLayoutDirty();
-            SetVerticesDirty();
-            SetMaterialDirty();
+            m_OnDirtyLayoutCallback += action;
+        }
+
+        /// <summary>
+        /// Remove a listener from receiving notifications when the graphics layout are dirtied
+        /// </summary>
+        public void UnregisterDirtyLayoutCallback(UnityAction action)
+        {
+            m_OnDirtyLayoutCallback -= action;
+        }
+
+        /// <summary>
+        /// Add a listener to receive notification when the graphics vertices are dirtied.
+        /// </summary>
+        public void RegisterDirtyVerticesCallback(UnityAction action)
+        {
+            m_OnDirtyVertsCallback += action;
+        }
+
+        /// <summary>
+        /// Remove a listener from receiving notifications when the graphics vertices are dirtied
+        /// </summary>
+        public void UnregisterDirtyVerticesCallback(UnityAction action)
+        {
+            m_OnDirtyVertsCallback -= action;
+        }
+
+        /// <summary>
+        /// Add a listener to receive notification when the graphics material is dirtied.
+        /// </summary>
+        public void RegisterDirtyMaterialCallback(UnityAction action)
+        {
+            m_OnDirtyMaterialCallback += action;
+        }
+
+        /// <summary>
+        /// Remove a listener from receiving notifications when the graphics material are dirtied
+        /// </summary>
+        public void UnregisterDirtyMaterialCallback(UnityAction action)
+        {
+            m_OnDirtyMaterialCallback -= action;
         }
 
         /// <summary>
@@ -776,14 +825,21 @@ namespace Client.UI
             }
         }
 
+        public virtual void SetAllDirty()
+        {
+            SetLayoutDirty();
+            SetVerticesDirty();
+            SetMaterialDirty();
+        }
+
+        #endregion
+
+        #region 重建
         /// <summary>
         /// Rebuilds the graphic geometry and its material on the PreRender cycle.
         /// 重建图形及其材质 （处于 PreRender cycle）
         /// </summary>
         /// <param name="update">The current step of the rendering CanvasUpdate cycle.</param>
-        /// <remarks>
-        /// See CanvasUpdateRegistry for more details on the canvas update cycle.
-        /// </remarks>
         public virtual void Rebuild(CanvasUpdate update)
         {
             if (canvasRenderer.cull)
@@ -890,7 +946,7 @@ namespace Client.UI
             canvasRenderer.SetTexture(mainTexture);
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         /// <summary>
         /// Editor-only callback that is issued by Unity 
         /// if a rebuild of the Graphic is required.
@@ -915,62 +971,14 @@ namespace Client.UI
             }
         }
 
-
-
-        /// <summary>
-        /// Add a listener to receive notification when the graphics layout is dirtied.
-        /// </summary>
-        public void RegisterDirtyLayoutCallback(UnityAction action)
-        {
-            m_OnDirtyLayoutCallback += action;
-        }
-
-        /// <summary>
-        /// Remove a listener from receiving notifications when the graphics layout are dirtied
-        /// </summary>
-        public void UnregisterDirtyLayoutCallback(UnityAction action)
-        {
-            m_OnDirtyLayoutCallback -= action;
-        }
-
-        /// <summary>
-        /// Add a listener to receive notification when the graphics vertices are dirtied.
-        /// </summary>
-        public void RegisterDirtyVerticesCallback(UnityAction action)
-        {
-            m_OnDirtyVertsCallback += action;
-        }
-
-        /// <summary>
-        /// Remove a listener from receiving notifications when the graphics vertices are dirtied
-        /// </summary>
-        public void UnregisterDirtyVerticesCallback(UnityAction action)
-        {
-            m_OnDirtyVertsCallback -= action;
-        }
-
-        /// <summary>
-        /// Add a listener to receive notification when the graphics material is dirtied.
-        /// </summary>
-        public void RegisterDirtyMaterialCallback(UnityAction action)
-        {
-            m_OnDirtyMaterialCallback += action;
-        }
-
-        /// <summary>
-        /// Remove a listener from receiving notifications when the graphics material are dirtied
-        /// </summary>
-        public void UnregisterDirtyMaterialCallback(UnityAction action)
-        {
-            m_OnDirtyMaterialCallback -= action;
-        }
-
         public virtual void LayoutComplete()
         { }
 
         public virtual void GraphicUpdateComplete()
         { }
 #endif
+        #endregion
+
         #endregion
 
         #region UIAnimation

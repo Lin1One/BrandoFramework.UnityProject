@@ -2,15 +2,37 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
-using UnityEngine.UI;
 
 namespace Client.UI
 {
     /// <summary>
     /// A Graphic that is capable of being masked out.
+    /// //可被遮挡的图像基类
     /// </summary>
     public abstract class BrandoUIMaskableGraphic : BrandoUIGraphic, IClippable, IMaskable, IMaterialModifier
     {
+        /// <summary>
+        /// Canvas Rect 四个角
+        /// </summary>
+        readonly Vector3[] m_Corners = new Vector3[4];
+        private Rect rootCanvasRect
+        {
+            get
+            {
+                rectTransform.GetWorldCorners(m_Corners);
+                if (canvas)
+                {
+                    Matrix4x4 mat = canvas.rootCanvas.transform.worldToLocalMatrix;
+                    for (int i = 0; i < 4; ++i)
+                    {
+                        m_Corners[i] = mat.MultiplyPoint(m_Corners[i]);
+                    }
+                }
+
+                return new Rect(m_Corners[0].x, m_Corners[0].y, m_Corners[2].x - m_Corners[0].x, m_Corners[2].y - m_Corners[0].y);
+            }
+        }
+
         /// <summary>
         /// 是否需要重新计算模板
         /// </summary>
@@ -28,14 +50,17 @@ namespace Client.UI
         [Serializable]
         public class CullStateChangedEvent : UnityEvent<bool> { }
 
-        // Event delegates triggered on click.
+        /// <summary>
+        /// 剔除状态
+        /// </summary>
         [SerializeField]
         private CullStateChangedEvent m_OnCullStateChanged = new CullStateChangedEvent();
         /// <summary>
-        /// Callback issued when culling changes.
+        /// Callback issued when culling changes.剔除状态改变事件
         /// </summary>
         /// <remarks>
-        /// Called whene the culling state of this MaskableGraphic either becomes culled or visible. You can use this to control other elements of your UI as culling happens.
+        /// Called whene the culling state of this MaskableGraphic either becomes culled or visible.
+        /// You can use this to control other elements of your UI as culling happens.
         /// </remarks>
         public CullStateChangedEvent onCullStateChanged
         {
@@ -45,34 +70,40 @@ namespace Client.UI
 
         /// <summary>
         /// Interface for elements that can be clipped if they are under an IClipper
+        /// UI 图像元素在 clipper 下将被剔除
         /// </summary>
         public virtual void Cull(Rect clipRect, bool validRect)
         {
             var cull = !validRect || !clipRect.Overlaps(rootCanvasRect, true);
-            UpdateCull(cull);
+            {
+                UpdateCull(cull);
+            }
         }
 
         private void UpdateCull(bool cull)
         {
+            //是否忽略此渲染器发出的几何体。
             if (canvasRenderer.cull != cull)
             {
                 canvasRenderer.cull = cull;
-                //UISystemProfilerApi.AddMarker("MaskableGraphic.cullingChanged", this);
                 m_OnCullStateChanged.Invoke(cull);
                 OnCullingChanged();
             }
         }
 
+        #region Cullable 接口
         public void RecalculateClipping()
         {
             UpdateClipParent();
         }
+
         private void UpdateClipParent()
         {
             var newParent = (maskable && IsActive()) ? MaskUtilities.GetRectMaskForClippable(this) : null;
 
             // if the new parent is different OR is now inactive
-            if (m_ParentMask != null && (newParent != m_ParentMask || !newParent.IsActive()))
+            if (m_ParentMask != null &&
+                (newParent != m_ParentMask || !newParent.IsActive()))
             {
                 m_ParentMask.RemoveClippable(this);
                 UpdateCull(false);
@@ -84,6 +115,7 @@ namespace Client.UI
 
             m_ParentMask = newParent;
         }
+        #endregion
 
         public virtual void SetClipRect(Rect clipRect, bool validRect)
         {
@@ -220,25 +252,7 @@ namespace Client.UI
 #endif
         #endregion
 
-        #region RectTransform
 
-        readonly Vector3[] m_Corners = new Vector3[4];
-        private Rect rootCanvasRect
-        {
-            get
-            {
-                rectTransform.GetWorldCorners(m_Corners);
-
-                if (canvas)
-                {
-                    Matrix4x4 mat = canvas.rootCanvas.transform.worldToLocalMatrix;
-                    for (int i = 0; i < 4; ++i)
-                        m_Corners[i] = mat.MultiplyPoint(m_Corners[i]);
-                }
-
-                return new Rect(m_Corners[0].x, m_Corners[0].y, m_Corners[2].x - m_Corners[0].x, m_Corners[2].y - m_Corners[0].y);
-            }
-        }
 
         protected override void OnTransformParentChanged()
         {
@@ -263,6 +277,5 @@ namespace Client.UI
             UpdateClipParent();
             SetMaterialDirty();
         }
-        #endregion
     }
 }

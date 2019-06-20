@@ -150,7 +150,6 @@ namespace Client.UI
 
             //布局重建
             m_PerformingLayoutUpdate = true;
-
             m_LayoutRebuildQueue.Sort(s_SortLayoutFunction);
             for (int i = 0; i <= (int)CanvasUpdate.PostLayout; i++)
             {
@@ -168,10 +167,10 @@ namespace Client.UI
                     }
                 }
             }
-
             for (int i = 0; i < m_LayoutRebuildQueue.Count; ++i)
+            {
                 m_LayoutRebuildQueue[i].LayoutComplete();
-
+            }
             instance.m_LayoutRebuildQueue.Clear();
             m_PerformingLayoutUpdate = false;
 
@@ -198,8 +197,9 @@ namespace Client.UI
             }
 
             for (int i = 0; i < m_GraphicRebuildQueue.Count; ++i)
+            {
                 m_GraphicRebuildQueue[i].LayoutComplete();
-
+            }
             instance.m_GraphicRebuildQueue.Clear();
             m_PerformingGraphicUpdate = false;
         }
@@ -271,6 +271,14 @@ namespace Client.UI
         //布局排序委托
         private static readonly Comparison<ICanvasElement> s_SortLayoutFunction = SortLayoutList;
 
+        private static int SortLayoutList(ICanvasElement x, ICanvasElement y)
+        {
+            Transform t1 = x.transform;
+            Transform t2 = y.transform;
+
+            return ParentCount(t1) - ParentCount(t2);
+        }
+
         private static int ParentCount(Transform child)
         {
             if (child == null)
@@ -286,20 +294,9 @@ namespace Client.UI
             return count;
         }
 
-        private static int SortLayoutList(ICanvasElement x, ICanvasElement y)
-        {
-            Transform t1 = x.transform;
-            Transform t2 = y.transform;
 
-            return ParentCount(t1) - ParentCount(t2);
-        }
 
         #endregion
-
-
-
-
-
 
 
     }
