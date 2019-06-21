@@ -2,7 +2,6 @@
 using Client.UI.Collections;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Client.UI
 {

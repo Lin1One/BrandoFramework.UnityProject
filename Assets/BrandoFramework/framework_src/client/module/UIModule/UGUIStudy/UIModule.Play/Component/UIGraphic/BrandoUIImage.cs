@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.U2D;
-using UnityEngine.UI;
 
 namespace Client.UI
 {

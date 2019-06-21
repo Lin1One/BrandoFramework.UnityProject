@@ -86,6 +86,7 @@ namespace Client.UI
             return depth;
         }
 
+        //向上遍历父物体获取遮罩组件
         public static RectMask2D GetRectMaskForClippable(IClippable transform)
         {
             var t = transform.rectTransform.parent;

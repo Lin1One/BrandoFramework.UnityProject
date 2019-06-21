@@ -842,6 +842,7 @@ namespace Client.UI
         /// <param name="update">The current step of the rendering CanvasUpdate cycle.</param>
         public virtual void Rebuild(CanvasUpdate update)
         {
+            //如被剔除，则不重建
             if (canvasRenderer.cull)
             {
                 return;
@@ -912,14 +913,15 @@ namespace Client.UI
                 rectTransform.rect.width >= 0 && 
                 rectTransform.rect.height >= 0)
             {
+                //计算初始网格
                 OnPopulateMesh(s_VertexHelper);
             } 
             else
             {
-                // clear the vertex helper so invalid graphics dont draw.
                 s_VertexHelper.Clear(); 
             }
 
+            //网格修改
             var components = ListPool<Component>.Get();
             GetComponents(typeof(IMeshModifier), components);
 

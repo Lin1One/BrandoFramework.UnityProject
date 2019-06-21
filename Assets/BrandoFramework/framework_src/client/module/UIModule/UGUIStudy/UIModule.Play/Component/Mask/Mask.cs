@@ -1,16 +1,14 @@
 using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 
 namespace Client.UI
 {
-    [AddComponentMenu("UI/Mask", 13)]
     [ExecuteInEditMode]
     [RequireComponent(typeof(RectTransform))]
     [DisallowMultipleComponent]
-    public class Mask : UIBehaviour, ICanvasRaycastFilter, IMaterialModifier
+    public class Mask : BrandoUIBehaviour, ICanvasRaycastFilter, IMaterialModifier
     {
         [NonSerialized]
         private RectTransform m_RectTransform;

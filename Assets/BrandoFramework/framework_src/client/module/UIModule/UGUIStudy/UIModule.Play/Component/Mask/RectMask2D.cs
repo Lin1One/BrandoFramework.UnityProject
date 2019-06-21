@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 namespace Client.UI
 {
-    [AddComponentMenu("UI/2D Rect Mask", 13)]
     [ExecuteInEditMode]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]

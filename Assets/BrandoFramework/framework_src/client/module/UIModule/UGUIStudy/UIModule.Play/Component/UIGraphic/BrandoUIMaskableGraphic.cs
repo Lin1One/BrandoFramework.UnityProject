@@ -7,7 +7,7 @@ namespace Client.UI
 {
     /// <summary>
     /// A Graphic that is capable of being masked out.
-    /// //可被遮挡的图像基类
+    /// 可被遮挡的图像基类
     /// </summary>
     public abstract class BrandoUIMaskableGraphic : BrandoUIGraphic, IClippable, IMaskable, IMaterialModifier
     {
@@ -45,7 +45,60 @@ namespace Client.UI
         [NonSerialized]
         protected int m_StencilValue;
 
+        #region 生命周期
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+            m_ShouldRecalculateStencil = true;
+            SetMaterialDirty();
+            UpdateClipParent();
+            StencilMaterial.Remove(m_MaskMaterial);
+            m_MaskMaterial = null;
+
+            if (GetComponent<Mask>() != null)
+            {
+                MaskUtilities.NotifyStencilStateChanged(this);
+            }
+        }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            m_ShouldRecalculateStencil = true;
+            UpdateClipParent();
+            SetMaterialDirty();
+        }
+#endif
+
+        protected override void OnTransformParentChanged()
+        {
+            base.OnTransformParentChanged();
+
+            if (!isActiveAndEnabled)
+                return;
+
+            m_ShouldRecalculateStencil = true;
+            UpdateClipParent();
+            SetMaterialDirty();
+        }
+
+        protected override void OnCanvasHierarchyChanged()
+        {
+            base.OnCanvasHierarchyChanged();
+
+            if (!isActiveAndEnabled)
+                return;
+
+            m_ShouldRecalculateStencil = true;
+            UpdateClipParent();
+            SetMaterialDirty();
+        }
+        #endregion
+
         #region IClippable 接口 裁切
+
+        #region Cull
 
         [Serializable]
         public class CullStateChangedEvent : UnityEvent<bool> { }
@@ -91,7 +144,10 @@ namespace Client.UI
             }
         }
 
-        #region Cullable 接口
+        #endregion
+
+        #region Clip
+        //计算裁切
         public void RecalculateClipping()
         {
             UpdateClipParent();
@@ -99,9 +155,11 @@ namespace Client.UI
 
         private void UpdateClipParent()
         {
-            var newParent = (maskable && IsActive()) ? MaskUtilities.GetRectMaskForClippable(this) : null;
+            var newParent = (maskable && IsActive()) ? 
+                MaskUtilities.GetRectMaskForClippable(this) : null;
 
             // if the new parent is different OR is now inactive
+            // 移出旧遮罩父物体的控制
             if (m_ParentMask != null &&
                 (newParent != m_ParentMask || !newParent.IsActive()))
             {
@@ -109,13 +167,12 @@ namespace Client.UI
                 UpdateCull(false);
             }
 
-            // don't re-add it if the newparent is inactive
             if (newParent != null && newParent.IsActive())
+            {
                 newParent.AddClippable(this);
-
+            }
             m_ParentMask = newParent;
         }
-        #endregion
 
         public virtual void SetClipRect(Rect clipRect, bool validRect)
         {
@@ -127,8 +184,9 @@ namespace Client.UI
             {
                 canvasRenderer.DisableRectClipping();
             }
-                
         }
+
+        #endregion
 
         #endregion
 
@@ -168,7 +226,7 @@ namespace Client.UI
         }
 
         /// <summary>
-        /// See IMaskable.RecalculateMasking
+        /// Recalculate masking for this element and all children elements.
         /// </summary>
         public virtual void RecalculateMasking()
         {
@@ -195,7 +253,7 @@ namespace Client.UI
             if (m_ShouldRecalculateStencil)
             {
                 var rootCanvas = MaskUtilities.FindRootSortOverrideCanvas(transform);
-                m_StencilValue = maskable ? 
+                m_StencilValue = maskable ?
                     MaskUtilities.GetStencilDepth(transform, rootCanvas) : 0;
                 m_ShouldRecalculateStencil = false;
             }
@@ -207,11 +265,11 @@ namespace Client.UI
             if (m_StencilValue > 0 &&
                 (maskComponent == null || !maskComponent.IsActive()))
             {
-                var maskMat = StencilMaterial.Add(toUse, 
-                    (1 << m_StencilValue) - 1, 
-                    StencilOp.Keep, 
+                var maskMat = StencilMaterial.Add(toUse,
+                    (1 << m_StencilValue) - 1,
+                    StencilOp.Keep,
                     CompareFunction.Equal,
-                    ColorWriteMask.All, 
+                    ColorWriteMask.All,
                     (1 << m_StencilValue) - 1,
                     0);
                 StencilMaterial.Remove(m_MaskMaterial);
@@ -223,59 +281,5 @@ namespace Client.UI
 
         #endregion
 
-        #region 生命周期
-
-        protected override void OnDisable()
-        {
-            base.OnDisable();
-            m_ShouldRecalculateStencil = true;
-            SetMaterialDirty();
-            UpdateClipParent();
-            StencilMaterial.Remove(m_MaskMaterial);
-            m_MaskMaterial = null;
-
-            if (GetComponent<Mask>() != null)
-            {
-                MaskUtilities.NotifyStencilStateChanged(this);
-            }
-        }
-
-#if UNITY_EDITOR
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            m_ShouldRecalculateStencil = true;
-            UpdateClipParent();
-            SetMaterialDirty();
-        }
-
-#endif
-        #endregion
-
-
-
-        protected override void OnTransformParentChanged()
-        {
-            base.OnTransformParentChanged();
-
-            if (!isActiveAndEnabled)
-                return;
-
-            m_ShouldRecalculateStencil = true;
-            UpdateClipParent();
-            SetMaterialDirty();
-        }
-
-        protected override void OnCanvasHierarchyChanged()
-        {
-            base.OnCanvasHierarchyChanged();
-
-            if (!isActiveAndEnabled)
-                return;
-
-            m_ShouldRecalculateStencil = true;
-            UpdateClipParent();
-            SetMaterialDirty();
-        }
     }
 }

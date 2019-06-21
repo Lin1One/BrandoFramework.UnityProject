@@ -6,6 +6,7 @@ using UnityEngine.Rendering;
 namespace Client.UI
 {
     /// <summary>
+    /// 动态材质类可以基于每个图形动态创建自定义材质，并且仍然可以正确清理它们。
     /// Dynamic material class makes it possible to create custom materials on the fly on a per-Graphic basis,
     /// and still have them get cleaned up correctly.
     /// </summary>
@@ -14,9 +15,9 @@ namespace Client.UI
         private class MatEntry
         {
             public Material baseMat;
+            //自定义材质
             public Material customMat;
             public int count;
-
             public int stencilId;
             public StencilOp operation = StencilOp.Keep;
             public CompareFunction compareFunction = CompareFunction.Always;
@@ -27,9 +28,6 @@ namespace Client.UI
         }
 
         private static List<MatEntry> m_List = new List<MatEntry>();
-
-        [Obsolete("Use Material.Add instead.", true)]
-        public static Material Add(Material baseMat, int stencilID) { return null; }
 
         /// <summary>
         /// Add a new material using the specified base and stencil ID.
