@@ -13,6 +13,12 @@ namespace Client.UI
         //  - It's possible for the Transform to get nulled from the Native side.
         // We use this struct with the IndexedSet container, which uses a dictionary as part of it's implementation
         // So this struct gets used as a key to a dictionary, so we need to guarantee a constant Hash value.
+        //我们需要从变换中缓存Hash有几个原因：
+        //  - 这是值类型（struct），.Net 从值类型字段计算Hash。
+        //  - Dictionary的键应具有恒定的哈希值。
+        //  - Transform可以从Native端获取。
+        //我们将此结构与IndexedSet容器一起使用，该容器使用字典作为其实现的一部分
+        //所以这个结构被用作字典的键，所以我们需要保证一个恒定的哈希值。
         private int m_CachedHashFromTransform;
 
         static ObjectPool<LayoutRebuilder> s_Rebuilders = new ObjectPool<LayoutRebuilder>(null, x => x.Clear());
@@ -31,6 +37,7 @@ namespace Client.UI
 
         static LayoutRebuilder()
         {
+            //重新应用驱动属性
             RectTransform.reapplyDrivenProperties += ReapplyDrivenProperties;
         }
 
@@ -39,7 +46,13 @@ namespace Client.UI
             MarkLayoutForRebuild(driven);
         }
 
-        public Transform transform { get { return m_ToRebuild; }}
+        public Transform transform
+        {
+            get
+            {
+                return m_ToRebuild;
+            }
+        }
 
         public bool IsDestroyed()
         {
@@ -137,6 +150,10 @@ namespace Client.UI
             ListPool<Component>.Release(components);
         }
 
+        /// <summary>
+        /// 标记 Layout 重建
+        /// </summary>
+        /// <param name="rect"></param>
         public static void MarkLayoutForRebuild(RectTransform rect)
         {
             if (rect == null)

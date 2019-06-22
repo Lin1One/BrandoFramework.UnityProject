@@ -2,10 +2,12 @@
 using Client.UI.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Client.UI
 {
+    /// <summary>
+    /// Í¼ÏñÖØ½¨×·×ÙÆ÷
+    /// </summary>
     public static class BrandoGraphicRebuildTracker
     {
         static IList<BrandoUIGraphic> m_Tracked = new IndexedSet<BrandoUIGraphic>();
@@ -37,4 +39,4 @@ namespace Client.UI
         }
     }
 }
-#endif // if UNITY_EDITOR
+#endif

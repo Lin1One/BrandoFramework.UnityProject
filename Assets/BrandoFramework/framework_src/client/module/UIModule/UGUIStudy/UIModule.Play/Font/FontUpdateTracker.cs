@@ -1,4 +1,4 @@
-using System;
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +12,10 @@ namespace Client.UI
         static Dictionary<Font, List<BrandoUIText>> m_Tracked = 
             new Dictionary<Font, List<BrandoUIText>>();
 
+        /// <summary>
+        /// Font 资源重建调用。FontTexture 有更新
+        /// </summary>
+        /// <param name="f"></param>
         private static void RebuildForFont(Font f)
         {
             List<BrandoUIText> texts;
@@ -44,9 +48,6 @@ namespace Client.UI
             if (!exists.Contains(t))
                 exists.Add(t);
         }
-
-
-
         public static void UntrackText(BrandoUIText t)
         {
             if (t.font == null)
@@ -64,7 +65,8 @@ namespace Client.UI
             {
                 m_Tracked.Remove(t.font);
 
-                // There is a global textureRebuilt event for all fonts, so once the last Text reference goes away, remove our delegate
+                // There is a global textureRebuilt event for all fonts,
+                // so once the last Text reference goes away, remove our delegate
                 if (m_Tracked.Count == 0)
                     Font.textureRebuilt -= RebuildForFont;
             }

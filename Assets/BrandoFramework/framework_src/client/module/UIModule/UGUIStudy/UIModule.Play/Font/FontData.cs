@@ -49,7 +49,7 @@ namespace Client.UI
         private float m_LineSpacing;
 
         /// <summary>
-        /// 默认字体
+        /// 默认字体数据
         /// </summary>
         public static FontData defaultFontData
         {

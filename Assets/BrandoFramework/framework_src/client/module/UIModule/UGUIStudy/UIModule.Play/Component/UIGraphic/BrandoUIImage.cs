@@ -17,6 +17,8 @@ namespace Client.UI
             useLegacyMeshGeneration = false;
         }
 
+        #region 几何信息
+
         #region Material
 
         #region UI默认材质
@@ -151,7 +153,7 @@ namespace Client.UI
         }
 
         /// <summary>
-        /// 渲染贴图
+        /// 渲染材质
         /// </summary>
         public override Texture mainTexture
         {
@@ -269,9 +271,6 @@ namespace Client.UI
 
             return v;
         }
-
-
-
 
         #endregion
 
@@ -1069,6 +1068,7 @@ namespace Client.UI
             }
         }
 
+        #endregion
 
         #endregion
 
