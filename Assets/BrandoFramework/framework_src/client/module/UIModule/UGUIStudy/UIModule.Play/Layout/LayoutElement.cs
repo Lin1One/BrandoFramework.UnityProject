@@ -8,13 +8,20 @@ namespace Client.UI
     [ExecuteInEditMode]
     public class LayoutElement : UIBehaviour, ILayoutElement, ILayoutIgnorer
     {
-        [SerializeField] private bool m_IgnoreLayout = false;
-        [SerializeField] private float m_MinWidth = -1;
-        [SerializeField] private float m_MinHeight = -1;
-        [SerializeField] private float m_PreferredWidth = -1;
-        [SerializeField] private float m_PreferredHeight = -1;
-        [SerializeField] private float m_FlexibleWidth = -1;
-        [SerializeField] private float m_FlexibleHeight = -1;
+        [SerializeField]
+        private bool m_IgnoreLayout = false;
+        [SerializeField]
+        private float m_MinWidth = -1;
+        [SerializeField]
+        private float m_MinHeight = -1;
+        [SerializeField]
+        private float m_PreferredWidth = -1;
+        [SerializeField]
+        private float m_PreferredHeight = -1;
+        [SerializeField]
+        private float m_FlexibleWidth = -1;
+        [SerializeField]
+        private float m_FlexibleHeight = -1;
 
 
         public virtual bool ignoreLayout { get { return m_IgnoreLayout; } set { if (SetPropertyUtility.SetStruct(ref m_IgnoreLayout, value)) SetDirty(); } }

@@ -4,6 +4,9 @@ using UnityEngine.Events;
 
 namespace Client.UI
 {
+    /// <summary>
+    /// 布局重建器
+    /// </summary>
     public class LayoutRebuilder : ICanvasElement
     {
         private RectTransform m_ToRebuild;

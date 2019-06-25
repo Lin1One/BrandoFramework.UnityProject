@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace Client.UI
 {
+    /// <summary>
+    /// ¾ØÐÎ¶¥µã²Ã¼ôÆ÷
+    /// </summary>
     internal class RectangularVertexClipper
     {
         readonly Vector3[] m_WorldCorners = new Vector3[4];

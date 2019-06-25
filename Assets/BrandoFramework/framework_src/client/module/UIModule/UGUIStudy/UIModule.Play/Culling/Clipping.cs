@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Client.UI
 {
+    /// <summary>
+    /// 剪裁方法
+    /// </summary>
     public static class Clipping
     {
         public static Rect FindCullAndClipWorldRect(List<RectMask2D> rectMaskParents, out bool validRect)
@@ -31,6 +33,12 @@ namespace Client.UI
             return new Rect(point1.x, point1.y, point2.x - point1.x, point2.y - point1.y);
         }
 
+        /// <summary>
+        /// 两矩形相交的矩形范围
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
         private static Rect RectIntersect(Rect a, Rect b)
         {
             float xMin = Mathf.Max(a.x, b.x);
@@ -38,7 +46,9 @@ namespace Client.UI
             float yMin = Mathf.Max(a.y, b.y);
             float yMax = Mathf.Min(a.y + a.height, b.y + b.height);
             if (xMax >= xMin && yMax >= yMin)
+            {
                 return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
+            }
             return new Rect(0f, 0f, 0f, 0f);
         }
     }

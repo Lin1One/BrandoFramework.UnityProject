@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Client.UI
 {
     /// <summary>
-    /// ²Ã¼ô×¢²á´¦
+    /// ²Ã¼ôÆ÷×¢²á´¦
     /// </summary>
     public class ClipperRegistry
     {
