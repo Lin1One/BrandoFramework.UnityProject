@@ -1,5 +1,6 @@
 using client_common;
 using Common.Config;
+using Common.Utility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -81,7 +82,7 @@ namespace Client.Assets
             else
             {
                 string path = GetAssetPath(assetId);
-                var asset = YuAssetDatabaseUtility.LoadAssetAtPath<TAsset>(path);
+                var asset = AssetDatabaseUtility.LoadAssetAtPath<TAsset>(path);
                 callback(asset);
             }
 
@@ -216,7 +217,7 @@ namespace Client.Assets
             //    return;
             //}
 
-            var assets = YuAssetDatabaseUtility.LoadAllAssetsAtPath<TAsset>(GetAssetPath(bundleId));
+            var assets = AssetDatabaseUtility.LoadAllAssetsAtPath<TAsset>(GetAssetPath(bundleId));
             callback(assets);
         }
 
@@ -273,7 +274,7 @@ namespace Client.Assets
             //            {
 
             //            }
-            asset = YuAssetDatabaseUtility.LoadAssetAtPath<TAsset>(GetAssetPath(assetId));
+            asset = AssetDatabaseUtility.LoadAssetAtPath<TAsset>(GetAssetPath(assetId));
 
             //Buffer.TryCache(assetId, asset);
             return asset;
@@ -290,7 +291,7 @@ namespace Client.Assets
             //}
             //else
             //{
-            assets = YuAssetDatabaseUtility.LoadAllAssetsAtPath<TAsset>(GetAssetPath(bundleId));
+            assets = AssetDatabaseUtility.LoadAllAssetsAtPath<TAsset>(GetAssetPath(bundleId));
             //}
 
             return assets;

@@ -1,14 +1,8 @@
 #region Head
 
-// Author:            Yu
-// CreateDate:        2019/1/18 22:17:10
-// Email:             35490136@qq.com
-
-/*
- * 修改日期  ：
- * 修改人    ：
- * 修改内容  ：
-*/
+// Author:            LinYuzhou
+// CreateDate:        2019/6/25 17:45:19
+// Email:             836045613@qq.com
 
 #endregion
 
@@ -18,10 +12,13 @@ using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 
-namespace YuU3dPlay
+namespace Common.PrefsData
 {
+    /// <summary>
+    /// 持久化数据抽象类
+    /// </summary>
     [Serializable]
-    public abstract class YuAbsU3dDati : ScriptableObject, IYuU3dDati
+    public abstract class Dati : ScriptableObject, IDati
     {
         #region 可关闭的详细说明
 
@@ -54,20 +51,20 @@ namespace YuU3dPlay
 
         protected void LoadDetailHelp()
         {
-        //    var detailHelperAttr = GetType().GetAttribute<YuDatiDetailHelpDescAttribute>();
-        //    if (detailHelperAttr == null)
-        //    {
-        //        return;
-        //    }
+            var detailHelperAttr = GetType().GetAttribute<YuDatiDetailHelpDescAttribute>();
+            if (detailHelperAttr == null)
+            {
+                return;
+            }
 
-        //    DetailHelp = detailHelperAttr.DetailHelperDesc;
+            DetailHelp = detailHelperAttr.DetailHelperDesc;
         }
 
         #endregion
 
-        public static YuAbsU3dDati CreateDati(Type type)
+        public static Dati CreateDati(Type type)
         {
-            var newScriptInstance = (YuAbsU3dDati)CreateInstance(type);
+            var newScriptInstance = (Dati)CreateInstance(type);
             return newScriptInstance;
         }
 

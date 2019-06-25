@@ -1,12 +1,7 @@
 {
-    "name": "Client.Core.Editor",
+    "name": "Common.Editor",
     "references": [
-        "OdinEditor",
-        "OdinPlay",
-        "Framework.Common",
-        "TestBorad",
-        "Client.Module",
-        "Common.Editor"
+        "Framework.Common"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

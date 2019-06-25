@@ -1,5 +1,6 @@
 using Client.GamePlaying.AI;
 using Common.DataStruct;
+using Common.Editor;
 using Common.EditorWindow;
 using Common.ScriptCreate;
 using DraftBorad;
@@ -18,7 +19,9 @@ namespace Client.Core.Editor
 
         protected override void BuildBeforeMenuItems(OdinMenuTree tree)
         {
-            tree.Add("脚本创建器", YuScriptCreater.Instance,
+            tree.Add("开发者信息", DeveloperInfoDati.GetSingleDati(), EditorIcons.SingleUser);
+
+            tree.Add("脚本创建器", ScriptCreaterDati.GetSingleDati(),
                 EditorIcons.Info);
 
             tree.Add("测试面板", new MethedInvokeBorad(),

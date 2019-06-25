@@ -1,22 +1,19 @@
-﻿using Common.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
-using YuCommon;
 using Object = UnityEngine.Object;
 
-namespace Client.Assets
+namespace Common.Utility
 {
     /// <summary>
     /// AssetDatabase资源数据库工具。
     /// 1. 自动判断路径类型、归属。
     /// 2. 加载资源。
     /// </summary>
-    public static class YuAssetDatabaseUtility
+    public static class AssetDatabaseUtility
     {
         #region 字段
 
@@ -38,7 +35,7 @@ namespace Client.Assets
         /// 静态构造函数。
         /// 静态初始化获取AssetDatabase相关函数的函数信息。
         /// </summary>
-        static YuAssetDatabaseUtility()
+        static AssetDatabaseUtility()
         {
             var editorAssembly = Assembly.Load("UnityEditor");
             var assetDatabaseType = editorAssembly.GetType("UnityEditor.AssetDatabase");
@@ -75,7 +72,7 @@ namespace Client.Assets
 
             var args = new object[] {path, typeof(T)};
             var asset = (T) LoadAssetAtPathMethod.Invoke(null, args);
-             asset = AssetDatabase.LoadAssetAtPath<T>(path);
+             //asset = AssetDatabase.LoadAssetAtPath<T>(path);
             return asset;
         }
 
@@ -88,7 +85,7 @@ namespace Client.Assets
             return assets;
         }
 
-        public static void CreateAsset(UnityEngine.Object asset, string path,
+        public static void CreateAsset(Object asset, string path,
             bool isDeletedExist = false)
         {
             var fullPath = YuUnityIOUtility.GetFullPath(path);

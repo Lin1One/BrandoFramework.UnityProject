@@ -12,6 +12,7 @@
 
 #endregion
 
+using Common.Utility;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -22,11 +23,10 @@ using System.Linq;
 using UnityEngine;
 
 
-namespace YuU3dPlay
+namespace Common.PrefsData
 {
     [Serializable]
-    [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
-    public abstract class YuAbsU3dGenericMultiDati<TActual, TImpl> : YuAbsU3dGenericJsonDati<TActual, TImpl>
+    public abstract class GenericMultiDati<TActual, TImpl> : GenericDatiInJson<TActual, TImpl>
         where TActual : class, new()
         where TImpl : class
     {
@@ -46,7 +46,7 @@ namespace YuU3dPlay
         private static Dictionary<Type, Dictionary<string, object>> Multis =>
             multis ?? (multis = new Dictionary<Type, Dictionary<string, object>>());
 
-        private static string LastMultiId => YuU3dAppUtility.Prefs?.GetStringItem(MultiTypeId)?.Value;
+        //private static string LastMultiId => YuU3dAppUtility.Prefs?.GetStringItem(MultiTypeId)?.Value;
 
         private static string MultiTypeId
         {
@@ -57,9 +57,9 @@ namespace YuU3dPlay
             }
         }
 
-        private static YuAbsU3dGenericMultiDati<TActual, TImpl> currentInstance;
+        private static GenericMultiDati<TActual, TImpl> currentInstance;
 
-        private static YuAbsU3dGenericMultiDati<TActual, TImpl> CurrentInstance
+        private static GenericMultiDati<TActual, TImpl> CurrentInstance
         {
             get
             {
@@ -67,8 +67,8 @@ namespace YuU3dPlay
                 {
                     return currentInstance;
                 }
-                var lastId = LastMultiId;
-                currentInstance = GetMultiAtId(lastId);
+                //var lastId = LastMultiId;
+                //currentInstance = GetMultiAtId(lastId);
 
 #if UNITY_EDITOR
                 if (currentInstance == null)
@@ -87,7 +87,7 @@ namespace YuU3dPlay
         /// </summary>
         public static TActual CurrentActual => CurrentInstance?.ActualSerializableObject;
 
-        public static YuAbsU3dGenericMultiDati<TActual, TImpl> GetMultiAtId(string multiId)
+        public static GenericMultiDati<TActual, TImpl> GetMultiAtId(string multiId)
         {
             if (string.IsNullOrEmpty(multiId))
             {
@@ -100,7 +100,7 @@ namespace YuU3dPlay
                 if (Multis[implType].ContainsKey(multiId))
                 {
                     var multiObjes = Multis[implType];
-                    var multiObj = (YuAbsU3dGenericMultiDati<TActual, TImpl>)multiObjes[multiId];
+                    var multiObj = (GenericMultiDati<TActual, TImpl>)multiObjes[multiId];
                     if (multiObj == null)
                     {
                         Multis[implType].Remove(multiId);
@@ -116,7 +116,7 @@ namespace YuU3dPlay
                 Multis.Add(implType, new Dictionary<string, object>());
             }
 
-            YuAbsU3dGenericMultiDati<TActual, TImpl> multiInstance = null;
+            GenericMultiDati<TActual, TImpl> multiInstance = null;
 
 #if UNITY_EDITOR
 
@@ -134,7 +134,7 @@ namespace YuU3dPlay
             return multiInstance;
         }
 
-        private static YuAbsU3dGenericMultiDati<TActual, TImpl> GetMultiOriginAtPlay(Type implType,
+        private static GenericMultiDati<TActual, TImpl> GetMultiOriginAtPlay(Type implType,
             string id)
         {
             //var newScriptInstance = (YuAbsU3dGenericMultiDati<TActual, TImpl>)CreateInstance(implType);
@@ -147,37 +147,37 @@ namespace YuU3dPlay
             return default;
         }
 
-        public static YuAbsU3dGenericMultiDati<TActual, TImpl> GetMultiOriginAtPlay(Type implType,
+        public static GenericMultiDati<TActual, TImpl> GetMultiOriginAtPlay(Type implType,
     string id,AssetBundle datiassetbundle)
         {
-            var newScriptInstance = (YuAbsU3dGenericMultiDati<TActual, TImpl>)CreateInstance(implType);
+            var newScriptInstance = (GenericMultiDati<TActual, TImpl>)CreateInstance(implType);
             newScriptInstance.multiId = id;
             var datiAssetName = $"{id}_{implType.Name}";
 
             var bytes = datiassetbundle.LoadAsset<TextAsset>(datiAssetName);
-            var actualObj = (TActual)YuJsonUtility.FromJson(bytes.ToString(), typeof(TActual));
+            var actualObj = (TActual)JsonUtility.FromJson(bytes.ToString(), typeof(TActual));
             newScriptInstance.ActualSerializableObject = actualObj;
             return newScriptInstance;
         }
 
 #if UNITY_EDITOR
-        private static YuAbsU3dGenericMultiDati<TActual, TImpl> GetMultiOriginAtEditor(Type implType,
+        private static GenericMultiDati<TActual, TImpl> GetMultiOriginAtEditor(Type implType,
             string id)
         {
-            var scriptPath = YuU3dDatiUtility.GetMultiScriptPath(implType, id);
+            var scriptPath = DatiUtility.GetMultiScriptPath(implType, id);
             if (File.Exists(scriptPath))
             {
-                var scriptAsset = YuAssetDatabaseUtility.LoadAssetAtPath(scriptPath, implType);
-                var multiInstance = (YuAbsU3dGenericMultiDati<TActual, TImpl>)scriptAsset;
-                if(multiInstance!=null)
-                {
-                    return multiInstance;
-                }
+                //var scriptAsset = YuAssetDatabaseUtility.LoadAssetAtPath(scriptPath, implType);
+                //var multiInstance = (YuAbsU3dGenericMultiDati<TActual, TImpl>)scriptAsset;
+                //if(multiInstance!=null)
+                //{
+                //    return multiInstance;
+                //}
             }
 
-            var newScriptInstance = (YuAbsU3dGenericMultiDati<TActual, TImpl>)CreateInstance(implType);
+            var newScriptInstance = (GenericMultiDati<TActual, TImpl>)CreateInstance(implType);
             newScriptInstance.multiId = id;
-            var originPath = YuU3dDatiUtility.GetMultiOriginPath(implType, id);
+            var originPath = DatiUtility.GetMultiOriginPath(implType, id);
 
             if (File.Exists(originPath))
             {
@@ -186,19 +186,19 @@ namespace YuU3dPlay
             }
             else
             {
-                newScriptInstance.ActualSerializableObject = YuDatiFactory.GetActualDataObject<TActual>();
+                ////newScriptInstance.ActualSerializableObject = YuDatiFactory.GetActualDataObject<TActual>();
             }
 
-            YuAssetDatabaseUtility.CreateAsset(newScriptInstance, scriptPath);
+            ////YuAssetDatabaseUtility.CreateAsset(newScriptInstance, scriptPath);
             return newScriptInstance;    
         }
 #endif
         public static void SetMultiDati(string multiId, string datiAssetStr,Type implType)
         {
-            var newScriptInstance = (YuAbsU3dGenericMultiDati<TActual, TImpl>)CreateInstance(implType);
+            var newScriptInstance = (GenericMultiDati<TActual, TImpl>)CreateInstance(implType);
             newScriptInstance.multiId = multiId;
-            var actualObj = (TActual)YuJsonUtility.FromJson(datiAssetStr, typeof(TActual));
-            newScriptInstance.ActualSerializableObject = actualObj;
+            ////var actualObj = (TActual)YuJsonUtility.FromJson(datiAssetStr, typeof(TActual));
+            ////newScriptInstance.ActualSerializableObject = actualObj;
             
             if (Multis.ContainsKey(implType))
             {
@@ -220,9 +220,9 @@ namespace YuU3dPlay
 
 #region 获取所有实际数据和实例
 
-        private static List<YuAbsU3dGenericMultiDati<TActual, TImpl>> allInstance;
+        private static List<GenericMultiDati<TActual, TImpl>> allInstance;
 
-        public static List<YuAbsU3dGenericMultiDati<TActual, TImpl>> AllInstance
+        public static List<GenericMultiDati<TActual, TImpl>> AllInstance
         {
             get
             {
@@ -283,10 +283,10 @@ namespace YuU3dPlay
         }
 
 
-        private static List<YuAbsU3dGenericMultiDati<TActual, TImpl>> GetAllInstanceAtPlay()
+        private static List<GenericMultiDati<TActual, TImpl>> GetAllInstanceAtPlay()
         {
             //var assetBundlePath = YuU3dDatiUtility.GetDatiAssetBundlePath(typeof(TImpl));
-            var instances = new List<YuAbsU3dGenericMultiDati<TActual, TImpl>>();
+            var instances = new List<GenericMultiDati<TActual, TImpl>>();
             //var implType = typeof(TImpl);
             //var bytes = MultiDatiBundle.LoadAllAssets<TextAsset>();
 
@@ -312,17 +312,17 @@ namespace YuU3dPlay
 #if UNITY_EDITOR
        
 
-        private static List<YuAbsU3dGenericMultiDati<TActual, TImpl>> GetAllInstanceAtEditor()
+        private static List<GenericMultiDati<TActual, TImpl>> GetAllInstanceAtEditor()
         {
-            var instances = new List<YuAbsU3dGenericMultiDati<TActual, TImpl>>();
-            var rootDir = YuU3dDatiUtility.GetMultiScriptRootPath(typeof(TImpl));
+            var instances = new List<GenericMultiDati<TActual, TImpl>>();
+            var rootDir = DatiUtility.GetMultiScriptRootPath(typeof(TImpl));
             var paths = YuIOUtility.GetPaths(rootDir).Where(p => p.EndsWith(".asset"))
                 .ToList();
 
             foreach (var p in paths)
             {
-                var instance = (YuAbsU3dGenericMultiDati<TActual, TImpl>)YuAssetDatabaseUtility.LoadAssetAtPath(p, typeof(TImpl));
-                instances.Add(instance);
+                //var instance = (YuAbsU3dGenericMultiDati<TActual, TImpl>)YuAssetDatabaseUtility.LoadAssetAtPath(p, typeof(TImpl));
+                //instances.Add(instance);
             }
             return instances;
         }
@@ -338,14 +338,14 @@ namespace YuU3dPlay
         public override void Save()
         {
             var type = GetType();
-            var originPath = YuU3dDatiUtility.GetMultiOriginPath(type, multiId);
+            var originPath = DatiUtility.GetMultiOriginPath(type, multiId);
 
             Serialize(originPath);
             Debug.Log($"目标路径{originPath}的资料文件已更新！");
-            YuAssetDatabaseUtility.Refresh();
-            var asset = YuAssetDatabaseUtility.LoadAssetAtPath(originPath,
-                typeof(TextAsset));
-            YuEditorAPIInvoker.PingObject(asset);
+            //YuAssetDatabaseUtility.Refresh();
+            //var asset = YuAssetDatabaseUtility.LoadAssetAtPath(originPath,
+            //    typeof(TextAsset));
+            //YuEditorAPIInvoker.PingObject(asset);
         }
 
         [HorizontalGroup("底部按钮")]
@@ -354,9 +354,9 @@ namespace YuU3dPlay
         [DisableIf("CheckIsMulti")]
         protected virtual void SetCurrent()
         {
-            YuU3dAppUtility.Prefs.SetStringItem(MultiTypeId, multiId, null);
-            YuU3dAppUtility.Prefs.Save();
-            YuEditorAPIInvoker.RefreshAsset();
+            //YuU3dAppUtility.Prefs.SetStringItem(MultiTypeId, multiId, null);
+            //YuU3dAppUtility.Prefs.Save();
+            //YuEditorAPIInvoker.RefreshAsset();
             currentInstance = GetMultiAtId(multiId);
             Debug.Log($"资料文件{MultiTypeId}的实例{multiId}已设置为当前实例！");
         }

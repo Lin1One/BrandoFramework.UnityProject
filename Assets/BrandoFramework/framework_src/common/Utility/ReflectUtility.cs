@@ -1,5 +1,4 @@
-﻿using client_common;
-using Common.DataStruct;
+﻿using Common.DataStruct;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ namespace Common.Utility
     /// 反射工具。
     /// 1. 程序集缓存。
     /// </summary>
-    public static class YuReflectUtility
+    public static class ReflectUtility
     {
         /// <summary>
         /// 程序集公开类型缓存字典
@@ -30,8 +29,8 @@ namespace Common.Utility
         /// <returns></returns>
         private static List<Type> TryGetCachedAssemblyTypes(string assemblyName)
         {
-            if (!AssemblyDictionary.ContainsKey(assemblyName)) return null;
-
+            if (!AssemblyDictionary.ContainsKey(assemblyName))
+                return null;
             var result = AssemblyDictionary[assemblyName];
             return result;
         }
@@ -48,14 +47,13 @@ namespace Common.Utility
             {
                 return types;
             }
-
             types = assembly.GetTypes().ToList();
             AssemblyDictionary.Add(assembly.FullName, types);
             return types;
         }
 
         /// <summary>
-        /// 在目标程序集中查找实现了指定类型的所有子类并返回以类型名为Key，类型为值的字典。
+        /// 在目标程序集中查找实现了指定类型的所有子类并返回“以类型名为Key，类型为Value”的字典。
         /// 目标类型不能是接口或者抽象类。
         /// </summary>
         /// <typeparam name="T">目标类型。</typeparam>
@@ -63,14 +61,16 @@ namespace Common.Utility
         /// <param name="whereFunc">类型过滤委托，默认为空。</param>
         /// <returns></returns>
         private static Dictionary<string, Type> GetTypeDictionary<T>(
-            Assembly assembly = null, Func<Type, bool> whereFunc = null)
+            Assembly assembly = null, 
+            Func<Type, bool> whereFunc = null)
         {
+            //目标程序集，传入空则为当前执行的程序集
             var targetAssembly = assembly ?? Assembly.GetExecutingAssembly();
             var asmTypes = GetAllType(targetAssembly);
 
             var result = asmTypes
-                .Where(t => typeof(T).IsAssignableFrom(t))
-                .Where(t => !t.IsInterface && !t.IsAbstract);
+                .Where(t => typeof(T).IsAssignableFrom(t))  //t 直接或间接的实现了 T 类；
+                .Where(t => !t.IsInterface && !t.IsAbstract);//t 不是接口，不是抽象类
             if (whereFunc == null)
             {
                 return result.ToDictionary(t => t.Name);
@@ -97,7 +97,7 @@ namespace Common.Utility
             foreach (var assembly in assemblies)
             {
                 var rightDictionary = GetTypeDictionary<T>(assembly, whereFunc);
-                YuCommonExtend.Combin(typeDictionary, rightDictionary);
+                CollectionsExtend.Combin(typeDictionary, rightDictionary);
             }
 
             return typeDictionary;

@@ -8,6 +8,7 @@
 using Sirenix.OdinInspector;
 using Study.DotNet.System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace DraftBorad
 {
@@ -26,6 +27,21 @@ namespace DraftBorad
                 Debug.Log(i);
             }
         }
+
+        [BoxGroup("UI ≤„¥Œ≤‚ ‘")]
+        [Button]
+        public void LogUIControlDepth()
+        {
+            var canvas = GameObject.Find("DynamicCanvas");
+            canvas.GetComponent<Canvas>().overrideSorting = true;
+            var uiGraphic = canvas.GetComponentsInChildren<Graphic>();
+            foreach (var i in uiGraphic)
+            {
+                Debug.Log(i.gameObject.name + "  " + i.depth);
+            }
+            Debug.Log(canvas.GetComponent<Canvas>().overrideSorting);
+        
+    }
     }
 }
 

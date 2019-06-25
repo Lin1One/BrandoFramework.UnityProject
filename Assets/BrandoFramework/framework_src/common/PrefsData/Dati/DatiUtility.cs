@@ -1,57 +1,71 @@
 #region Head
 
-// Author:            liuruoyu1981
-// CreateDate:        2019/1/24 21:52:16
-// Email:             35490136@qq.com || liuruoyu1981@gmail.com
-
-/*
- * 修改日期  ：
- * 修改人    ：
- * 修改内容  ：
-*/
+// Author:            LinYuzhou
+// CreateDate:        2019/6/25 17:45:19
+// Email:             836045613@qq.com
 
 #endregion
 
+using Common.DataStruct;
+using Common.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Reflection;
 using UnityEngine;
 
 
-namespace YuU3dPlay
+namespace Common.PrefsData
 {
-    public static class YuU3dDatiUtility
+    public static class DatiUtility
     {
-
+        /// <summary>
+        /// 获取资料文件序列化文件后缀
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetSuffix(Type type)
         {
-            var suffixAttr = type.GetAttribute<YuDatiSuffixAttribute>() ?? type.BaseType.GetAttribute<YuDatiSuffixAttribute>();
-
+            var suffixAttr = type.GetAttribute<YuDatiSuffixAttribute>() ?? 
+                type.BaseType.GetAttribute<YuDatiSuffixAttribute>();
             var suffix = suffixAttr == null ? ".bytes" : suffixAttr.Suffix;
             return suffix;
         }
 
-        public static string GetLocDirId(Type type)
+        /// <summary>
+        /// 获取资料文件环境文件类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static string GetDatiEnvironmentDirType(Type type)
         {
-            var hasInEditorAttr = type.HasAttribute<YuDatiInEditorAttribute>();
-            return hasInEditorAttr ? "Editor/" : "Play/";
+            var hasInEditorAttr = type.HasAttribute<DatiInEditorAttribute>();
+            return hasInEditorAttr ? "Editor" : "Play";
         }
 
         public static string GetSaveDir(Type type) =>
-            Application.dataPath + $"/YuDati/{GetLocDirId(type)}/{type.Name}/";
+            Application.dataPath + $"/DatiFile/{GetDatiEnvironmentDirType(type)}/{type.Name}/";
 
+        /// <summary>
+        /// 获取单例配置资料的 Asset 文件
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetSingleScriptObjectPath(Type type)
         {
-            var path = $"Assets/YuDati/{GetLocDirId(type)}{type.Name}" +
+            var path = $"Assets/DatiFile/{GetDatiEnvironmentDirType(type)}/{type.Name}" +
                        $"/{type.Name}_ScriptObjectAsset.asset";
             return path;
         }
 
+        /// <summary>
+        /// 获取单例配置资料的序列化文件（txt，json，byte）
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string GetSingleOriginPath(Type type)
         {
             var suffix = GetSuffix(type);
-            var path = Application.dataPath + $"/YuDati/{GetLocDirId(type)}" +
+            var path = Application.dataPath + $"/DatiFile/{GetDatiEnvironmentDirType(type)}/" +
                        $"{type.Name}/{type.Name}_OriginAsset{suffix}";
             return path;
         }
@@ -62,7 +76,7 @@ namespace YuU3dPlay
 
             if (YuUnityUtility.IsEditorMode)
             {
-                var path = Application.dataPath + $"/YuDati/{GetLocDirId(implType)}" +
+                var path = Application.dataPath + $"/DatiFile/{GetDatiEnvironmentDirType(implType)}/" +
                            $"{implType.Name}/{id}{suffix}";
                 return path;
             }
@@ -86,13 +100,13 @@ namespace YuU3dPlay
         /// <returns></returns>
         public static string GetMultiScriptRootPath(Type implType)
         {
-            var path = $"Assets/YuDati/{GetLocDirId(implType)}{implType.Name}/";
+            var path = $"Assets/DatiFile/{GetDatiEnvironmentDirType(implType)}/{implType.Name}/";
             return path;
         }
 
         public static string GetMultiScriptPath(Type implType, string multiId)
         {
-            var path = $"Assets/YuDati/{GetLocDirId(implType)}{implType.Name}" +
+            var path = $"Assets/DatiFile/{GetDatiEnvironmentDirType(implType)}/{implType.Name}" +
                        $"/{multiId}.asset";
             return path;
         }
@@ -100,7 +114,7 @@ namespace YuU3dPlay
         public static string GetDatiAssetBundlePath(Type implType)
         {
             var streamingBundleDir = Application.streamingAssetsPath
-                + "/AssetBundle/YuDati/datiplay_"
+                + "/AssetBundle/DatiFile/datiplay_"
                 + implType.Name.ToLower()
                 + ".assetbundle";
             return streamingBundleDir;
@@ -108,13 +122,13 @@ namespace YuU3dPlay
 
         public static string GetDatiAssetPathAtPlay(string datiType,string appId)
         {
-            var DatistreamingAssetPath = $"{Application.streamingAssetsPath}/YuDati/Play/{datiType}/{appId}_{datiType}.txt";
+            var DatistreamingAssetPath = $"{Application.streamingAssetsPath}/DatiFile/Play/{datiType}/{appId}_{datiType}.txt";
             return DatistreamingAssetPath;
         }
 
 
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        public static void ReflectSetAppId<TActual, TImpl>(YuAbsU3dGenericDati<TActual, TImpl> dati, string appId)
+        public static void ReflectSetAppId<TActual, TImpl>(GenericDati<TActual, TImpl> dati, string appId)
             where TActual : class, new()
             where TImpl : class
         {

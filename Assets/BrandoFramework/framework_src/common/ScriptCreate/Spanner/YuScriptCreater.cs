@@ -26,18 +26,7 @@ namespace Common.ScriptCreate
     [Serializable]
     public class YuScriptCreater
     {
-        private static YuScriptCreater instance;
-        public static YuScriptCreater Instance
-        {
-            get
-            {
-                if(instance == null)
-                {
-                    instance = new YuScriptCreater();
-                }
-                return instance;
-            }
-        }
+
 
         [FolderPath]
         [LabelText("目标目录")]

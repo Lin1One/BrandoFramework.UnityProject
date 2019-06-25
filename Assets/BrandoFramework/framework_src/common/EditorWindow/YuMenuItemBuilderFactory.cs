@@ -31,7 +31,7 @@ namespace Common.EditorWindow
                         continue;
                     }
 
-                    var builderTypes = YuReflectUtility.GetTypeList<IYuMenuEditorWindowItemBuilder>(
+                    var builderTypes = ReflectUtility.GetTypeList<IYuMenuEditorWindowItemBuilder>(
                          false, false, asm);
                     foreach (var type in builderTypes)
                     {
