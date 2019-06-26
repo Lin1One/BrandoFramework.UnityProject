@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Serialization;
 using UnityEngine;
-using UnityEngine.UI;
 using Client.UI.EventSystem;
 
 namespace Client.UI
 {
-    [AddComponentMenu("UI/Selectable", 70)]
     [ExecuteAlways]
     [SelectionBase]
     [DisallowMultipleComponent]
@@ -38,7 +36,7 @@ namespace Client.UI
         protected override void Awake()
         {
             if (m_TargetGraphic == null)
-                m_TargetGraphic = GetComponent<Graphic>();
+                m_TargetGraphic = GetComponent<BrandoUIGraphic>();
         }
 
         // Select on enable and add to the list.
@@ -95,7 +93,7 @@ namespace Client.UI
 #endif // if UNITY_EDITOR
         protected override void Reset()
         {
-            m_TargetGraphic = GetComponent<Graphic>();
+            m_TargetGraphic = GetComponent<BrandoUIGraphic>();
         }
 
         #endregion
@@ -479,7 +477,7 @@ namespace Client.UI
         [FormerlySerializedAs("highlightGraphic")]
         [FormerlySerializedAs("m_HighlightGraphic")]
         [SerializeField]
-        private Graphic m_TargetGraphic;
+        private BrandoUIGraphic m_TargetGraphic;
 
         /// <summary>
         /// The type of transition that will be applied to the targetGraphic when the state changes.
@@ -532,14 +530,14 @@ namespace Client.UI
         /// <summary>
         /// Graphic that will be transitioned upon.
         /// </summary>
-        public Graphic targetGraphic { get { return m_TargetGraphic; } set { if (SetPropertyUtility.SetClass(ref m_TargetGraphic, value)) OnSetProperty(); } }
+        public BrandoUIGraphic targetGraphic { get { return m_TargetGraphic; } set { if (SetPropertyUtility.SetClass(ref m_TargetGraphic, value)) OnSetProperty(); } }
 
         /// <summary>
         /// Convenience function that converts the referenced Graphic to a Image, if possible.
         /// </summary>
-        public Image image
+        public BrandoUIImage image
         {
-            get { return m_TargetGraphic as Image; }
+            get { return m_TargetGraphic as BrandoUIImage; }
             set { m_TargetGraphic = value; }
         }
 

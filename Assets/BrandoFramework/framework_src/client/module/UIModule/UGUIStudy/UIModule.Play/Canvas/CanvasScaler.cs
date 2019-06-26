@@ -3,17 +3,19 @@ using UnityEngine.EventSystems;
 
 namespace Client.UI
 {
+    /// <summary>
+    /// Canvas 尺寸调节器
+    /// </summary>
     [RequireComponent(typeof(Canvas))]
     [ExecuteInEditMode]
-    [AddComponentMenu("Layout/Canvas Scaler", 101)]
     public class CanvasScaler : UIBehaviour
     {
         protected CanvasScaler() { }
 
         public enum ScaleMode
         {
-            ConstantPixelSize,
-            ScaleWithScreenSize,
+            ConstantPixelSize,  //固定像素尺寸
+            ScaleWithScreenSize,//跟随屏幕尺寸
             ConstantPhysicalSize
         }
 
@@ -183,6 +185,9 @@ namespace Client.UI
             base.OnDisable();
         }
 
+        /// <summary>
+        /// 每帧执行 Canvas 尺寸处理方法
+        /// </summary>
         protected virtual void Update()
         {
             Handle();
@@ -215,6 +220,9 @@ namespace Client.UI
 
         #region Canvas ScaleMode 处理方法
 
+        /// <summary>
+        /// 世界坐标画布
+        /// </summary>
         protected virtual void HandleWorldCanvas()
         {
             SetScaleFactor(m_DynamicPixelsPerUnit);

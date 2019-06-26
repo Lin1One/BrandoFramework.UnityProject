@@ -7,7 +7,7 @@ namespace Client.UI
     /// </summary>
     public interface ICanvasElement
     {
-        void Rebuild(CanvasUpdate executing);
+        void Rebuild(CanvasUpdateStep executing);
 
         Transform transform { get; }
 

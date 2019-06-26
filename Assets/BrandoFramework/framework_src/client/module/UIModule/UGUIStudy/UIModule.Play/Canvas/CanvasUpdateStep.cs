@@ -3,7 +3,7 @@ namespace Client.UI
     /// <summary>
     /// »­²¼äÖÈ¾Á÷³Ì×´Ì¬
     /// </summary>
-    public enum CanvasUpdate
+    public enum CanvasUpdateStep
     {
         Prelayout = 0,
         Layout = 1,

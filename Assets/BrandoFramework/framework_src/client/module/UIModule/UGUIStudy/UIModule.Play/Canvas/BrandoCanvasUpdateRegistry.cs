@@ -29,16 +29,21 @@ namespace Client.UI
             Canvas.willRenderCanvases += PerformUpdate;
         }
 
-        //是否处理布局更新
         private bool m_PerformingLayoutUpdate;
-        //是否处理图像更新
-        private bool m_PerformingGraphicUpdate;
-
+        /// <summary>
+        /// 是否正在处理布局更新
+        /// </summary>
+        /// <returns></returns>
         public static bool IsRebuildingLayout()
         {
             return instance.m_PerformingLayoutUpdate;
         }
 
+        private bool m_PerformingGraphicUpdate;
+        /// <summary>
+        /// 是否正在处理图像更新
+        /// </summary>
+        /// <returns></returns>
         public static bool IsRebuildingGraphics()
         {
             return instance.m_PerformingGraphicUpdate;
@@ -141,7 +146,7 @@ namespace Client.UI
 
         #region Canvas 更新
         /// <summary>
-        /// Canvas 更新
+        /// 处理 Canvas 更新
         /// </summary>
         private void PerformUpdate()
         {
@@ -150,7 +155,7 @@ namespace Client.UI
             //布局重建
             m_PerformingLayoutUpdate = true;
             m_LayoutRebuildQueue.Sort(s_SortLayoutFunction);
-            for (int i = 0; i <= (int)CanvasUpdate.PostLayout; i++)
+            for (int i = 0; i <= (int)CanvasUpdateStep.PostLayout; i++)
             {
                 for (int j = 0; j < m_LayoutRebuildQueue.Count; j++)
                 {
@@ -158,7 +163,7 @@ namespace Client.UI
                     try
                     {
                         if (ObjectValidForUpdate(rebuild))
-                            rebuild.Rebuild((CanvasUpdate)i);
+                            rebuild.Rebuild((CanvasUpdateStep)i);
                     }
                     catch (Exception e)
                     {
@@ -178,7 +183,7 @@ namespace Client.UI
 
             //图像重建
             m_PerformingGraphicUpdate = true;
-            for (var i = (int)CanvasUpdate.PreRender; i < (int)CanvasUpdate.MaxUpdateValue; i++)
+            for (var i = (int)CanvasUpdateStep.PreRender; i < (int)CanvasUpdateStep.MaxUpdateValue; i++)
             {
                 for (var k = 0; k < instance.m_GraphicRebuildQueue.Count; k++)
                 {
@@ -186,7 +191,7 @@ namespace Client.UI
                     {
                         var element = instance.m_GraphicRebuildQueue[k];
                         if (ObjectValidForUpdate(element))
-                            element.Rebuild((CanvasUpdate)i);
+                            element.Rebuild((CanvasUpdateStep)i);
                     }
                     catch (Exception e)
                     {

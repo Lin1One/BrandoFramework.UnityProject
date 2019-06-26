@@ -71,15 +71,15 @@ namespace Client.UI
         {
             var rebuilder = s_Rebuilders.Get();
             rebuilder.Initialize(layoutRoot);
-            rebuilder.Rebuild(CanvasUpdate.Layout);
+            rebuilder.Rebuild(CanvasUpdateStep.Layout);
             s_Rebuilders.Release(rebuilder);
         }
 
-        public void Rebuild(CanvasUpdate executing)
+        public void Rebuild(CanvasUpdateStep executing)
         {
             switch (executing)
             {
-                case CanvasUpdate.Layout:
+                case CanvasUpdateStep.Layout:
                     // It's unfortunate that we'll perform the same GetComponents querys for the tree 2 times,
                     // but each tree have to be fully iterated before going to the next action,
                     // so reusing the results would entail storing results in a Dictionary or similar,

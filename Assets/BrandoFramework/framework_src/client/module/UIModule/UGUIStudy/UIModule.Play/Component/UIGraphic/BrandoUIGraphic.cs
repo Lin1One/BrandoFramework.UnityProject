@@ -840,7 +840,7 @@ namespace Client.UI
         /// 重建图形及其材质 （处于 PreRender cycle）
         /// </summary>
         /// <param name="update">The current step of the rendering CanvasUpdate cycle.</param>
-        public virtual void Rebuild(CanvasUpdate update)
+        public virtual void Rebuild(CanvasUpdateStep update)
         {
             //如被剔除，则不重建
             if (canvasRenderer.cull)
@@ -849,7 +849,7 @@ namespace Client.UI
             }
             switch (update)
             {
-                case CanvasUpdate.PreRender:
+                case CanvasUpdateStep.PreRender:
                     if (m_VertsDirty)
                     {
                         //更新几何信息（顶点，网格）
@@ -858,6 +858,7 @@ namespace Client.UI
                     }
                     if (m_MaterialDirty)
                     {
+                        //更新图像信息（Mat，材质）
                         UpdateMaterial();
                         m_MaterialDirty = false;
                     }
