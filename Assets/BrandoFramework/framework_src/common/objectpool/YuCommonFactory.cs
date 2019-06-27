@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace client_common
+namespace Common
 {
     /// <summary>
     /// 静态通用工厂。

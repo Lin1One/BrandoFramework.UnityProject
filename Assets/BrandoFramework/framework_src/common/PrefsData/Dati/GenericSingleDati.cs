@@ -15,7 +15,6 @@ using UnityEngine;
 namespace Common.PrefsData
 {
     [Serializable]
-    [DatiInEditor]
     public abstract class GenericSingleDati<TActual, TImpl> : GenericDatiInJson<TActual, TImpl>
         where TActual : class, new()
         where TImpl : class
@@ -74,6 +73,12 @@ namespace Common.PrefsData
             instance.LoadDetailHelp();
             return instance;
         }
+
+        public static TActual GetActualInstance()
+        {
+            return GetSingleDati().ActualSerializableObject;
+        }
+
 
         private static GenericSingleDati<TActual, TImpl> LoadSingleOriginAtPlay(Type implType,
             string originPath)

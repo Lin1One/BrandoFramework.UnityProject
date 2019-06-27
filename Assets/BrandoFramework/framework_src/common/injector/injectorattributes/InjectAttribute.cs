@@ -8,7 +8,7 @@
 
 using System;
 
-namespace client_common
+namespace Common
 {
     /// <summary>
     /// 注入特性。

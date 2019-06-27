@@ -1,7 +1,7 @@
 
 using System;
 
-namespace client_common
+namespace Common
 {
 
 

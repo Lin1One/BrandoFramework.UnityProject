@@ -1,5 +1,5 @@
 
-namespace client_common
+namespace Common
 {
     /// <summary>
     /// 字节数据缓存器接口。

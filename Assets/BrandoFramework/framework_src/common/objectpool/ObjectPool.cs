@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace client_common
+namespace Common
 {
     public interface IYuReset
     {

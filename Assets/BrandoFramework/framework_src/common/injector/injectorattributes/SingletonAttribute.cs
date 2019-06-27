@@ -8,7 +8,7 @@
 
 using System;
 
-namespace client_common
+namespace Common
 {
     /// <summary>
     /// 单例特性。

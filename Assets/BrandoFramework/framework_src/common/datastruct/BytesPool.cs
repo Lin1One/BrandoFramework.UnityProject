@@ -14,7 +14,7 @@
 
 using System.Collections.Generic;
 
-namespace client_common
+namespace Common
 {
 
     /// <summary>

@@ -1,6 +1,6 @@
 
 
-namespace client_common
+namespace Common
 {
     /// <summary>
     /// 核心类。

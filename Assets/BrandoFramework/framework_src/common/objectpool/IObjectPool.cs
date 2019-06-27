@@ -1,6 +1,6 @@
 ﻿
 
-namespace client_common
+namespace Common
 {
     /// <summary>
     /// 泛型对象池接口。
