@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace client_common
+namespace Common
 {
     public interface IYuU3dInjector : IInjector
     {

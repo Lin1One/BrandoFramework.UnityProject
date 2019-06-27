@@ -1,4 +1,4 @@
-using client_common;
+using Common;
 using Common.Config;
 using Common.Utility;
 using System;
@@ -49,7 +49,7 @@ namespace Client.Assets
         private void InitAssetInfo()
         {
             var bytes = File.ReadAllBytes(
-                $"{Application.streamingAssetsPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}/Config/AssetInfo.byte");
+                $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/Config/AssetInfo.byte");
 
             _infos = SerializeUtility.DeSerialize<Dictionary<char, Dictionary<string, AssetInfo>>>(bytes);
         }

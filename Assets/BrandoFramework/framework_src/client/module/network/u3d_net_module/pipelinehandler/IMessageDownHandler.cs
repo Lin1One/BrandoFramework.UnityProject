@@ -1,6 +1,6 @@
 
 
-using client_common;
+using Common;
 
 namespace client_module_network
 {

@@ -15,9 +15,9 @@ namespace Client.DataTable.Editor
 {
     public static class YuU3dExcelScriptCreatorFactory
     {
-        private static Dictionary<ScriptType, List<IYuU3dExcelScriptCreator>> creators;
+        private static Dictionary<ScriptType, List<IExcelScriptCreator>> creators;
 
-        private static Dictionary<ScriptType, List<IYuU3dExcelScriptCreator>> Creators
+        private static Dictionary<ScriptType, List<IExcelScriptCreator>> Creators
         {
             get
             {
@@ -26,16 +26,16 @@ namespace Client.DataTable.Editor
                     return creators;
                 }
 
-                creators = new Dictionary<ScriptType, List<IYuU3dExcelScriptCreator>>();
+                creators = new Dictionary<ScriptType, List<IExcelScriptCreator>>();
                 var asm = typeof(IYuExcelFieldHandler).Assembly;
-                var creatorTypes = ReflectUtility.GetTypeList<IYuU3dExcelScriptCreator>(
+                var creatorTypes = ReflectUtility.GetTypeList<IExcelScriptCreator>(
                     false, false, asm);
                 foreach (var creatorType in creatorTypes)
                 {
-                    var creator = (IYuU3dExcelScriptCreator) Activator.CreateInstance(creatorType);
+                    var creator = (IExcelScriptCreator) Activator.CreateInstance(creatorType);
                     if (!creators.ContainsKey(creator.ScriptType))
                     {
-                        creators.Add(creator.ScriptType, new List<IYuU3dExcelScriptCreator>());
+                        creators.Add(creator.ScriptType, new List<IExcelScriptCreator>());
                     }
 
                     var targetCreators = creators[creator.ScriptType];
@@ -46,7 +46,7 @@ namespace Client.DataTable.Editor
             }
         }
 
-        public static List<IYuU3dExcelScriptCreator> GetScriptCreators(ScriptType scriptType)
+        public static List<IExcelScriptCreator> GetScriptCreators(ScriptType scriptType)
         {
             if (!Creators.ContainsKey(scriptType))
             {

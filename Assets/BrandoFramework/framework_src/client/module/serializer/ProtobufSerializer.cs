@@ -2,7 +2,7 @@
 using ProtoBuf;
 using System.IO;
 
-namespace client_common
+namespace Common
 {
     /// <summary>
     /// Protobuf序列号器。

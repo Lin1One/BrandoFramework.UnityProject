@@ -1,6 +1,7 @@
+using Client.DataTable.Editor;
 using Client.GamePlaying.AI;
+using Common.Config;
 using Common.DataStruct;
-using Common.Editor;
 using Common.EditorWindow;
 using Common.ScriptCreate;
 using DraftBorad;
@@ -20,15 +21,11 @@ namespace Client.Core.Editor
         protected override void BuildBeforeMenuItems(OdinMenuTree tree)
         {
             tree.Add("开发者信息", DeveloperInfoDati.GetSingleDati(), EditorIcons.SingleUser);
-
-            tree.Add("脚本创建器", ScriptCreaterDati.GetSingleDati(),
-                EditorIcons.Info);
-
-            tree.Add("测试面板", new MethedInvokeBorad(),
-                EditorIcons.SingleUser);
-
-            tree.Add("行为树", BehaviorTreeVisualization.Instance,
-                EditorIcons.Tree);
+            tree.Add("项目信息", ProjectInfoDati.GetSingleDati(), EditorIcons.UnityLogo);
+            tree.Add("脚本创建器", ScriptCreaterDati.GetSingleDati(),EditorIcons.Info);
+            tree.Add("数据表", DataTableEditorDati.GetSingleDati(),EditorIcons.Table);
+            tree.Add("测试面板", new MethedInvokeBorad(),EditorIcons.SingleUser);
+            tree.Add("行为树", BehaviorTreeVisualization.Instance,EditorIcons.Tree);
             //tree.Add("核心配置", YuU3dCoreSettingDati.GetSingleDati(),
             //    EditorIcons.SettingsCog, YuMenuItemSetting.CommonMenuItemSetting);
 

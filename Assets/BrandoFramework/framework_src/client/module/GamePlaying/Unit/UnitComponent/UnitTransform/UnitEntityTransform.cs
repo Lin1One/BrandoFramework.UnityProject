@@ -13,7 +13,7 @@
 #endregion
 
 using Client.Assets;
-using client_common;
+using Common;
 using Common.DataStruct;
 using System;
 using System.Collections.Generic;

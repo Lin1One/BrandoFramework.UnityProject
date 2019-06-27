@@ -8,7 +8,7 @@
 
 #endregion
 
-using client_common;
+using Common;
 using client_module_event;
 using System.Collections.Generic;
 

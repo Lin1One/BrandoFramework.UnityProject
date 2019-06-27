@@ -13,7 +13,7 @@
 #endregion
 
 using Client.GamePlaying.AI;
-using client_common;
+using Common;
 using client_module_event;
 
 namespace Client.GamePlaying.Unit

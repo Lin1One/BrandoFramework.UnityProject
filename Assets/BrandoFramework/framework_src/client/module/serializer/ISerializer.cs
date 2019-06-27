@@ -1,5 +1,5 @@
 
-namespace client_common
+namespace Common
 {
     /// <summary>
     /// 序列化器。

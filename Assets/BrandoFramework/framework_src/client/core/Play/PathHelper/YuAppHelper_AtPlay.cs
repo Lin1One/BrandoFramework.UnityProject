@@ -19,7 +19,7 @@ namespace Client
                 }
 
                 rootFullPath = Application.dataPath.Replace("Assets", "")
-                               + U3dDevelopConfig.Config.AppRootDir;
+                               + ProjectInfoDati.GetActualInstance().ProjectRootDir;
                 if (!rootFullPath.EndsWith("/"))
                 {
                     rootFullPath += "/";
@@ -31,26 +31,27 @@ namespace Client
 
 
 
-        //public string AtlasInfoSandboxPath => $"{SandboxHotUpdateDir}{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AtlasInfo.bytes";
+        //public string AtlasInfoSandboxPath => $"{SandboxHotUpdateDir}{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AtlasInfo.bytes";
 
-        public string AtlasInfoStreamAssetPath => $"{Application.streamingAssetsPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AtlasInfo.bytes";
+        public string AtlasInfoStreamAssetPath => $"{Application.streamingAssetsPath}/" +
+            $"{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AtlasInfo.bytes";
 
 
-        public string AssetbundleInfoStreamingPlayPath => File.Exists($"{Application.persistentDataPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AssetBundleInfo.bytes") ?
-             $"{Application.persistentDataPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AssetBundleInfo.bytes" :
-             $"{Application.streamingAssetsPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AssetBundleInfo.bytes";
+        public string AssetbundleInfoStreamingPlayPath => File.Exists($"{Application.persistentDataPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AssetBundleInfo.bytes") ?
+             $"{Application.persistentDataPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AssetBundleInfo.bytes" :
+             $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AssetBundleInfo.bytes";
 
-        public string AssetbundleInfoUrl => File.Exists($"{Application.persistentDataPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AssetBundleInfo.bytes") ?
-            $"file://{Application.persistentDataPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AssetBundleInfo.bytes" :
-            $"{Application.streamingAssetsPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AssetBundleInfo.bytes";
+        public string AssetbundleInfoUrl => File.Exists($"{Application.persistentDataPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AssetBundleInfo.bytes") ?
+            $"file://{Application.persistentDataPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AssetBundleInfo.bytes" :
+            $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AssetBundleInfo.bytes";
 
-        public string AtlasInfoPlayPath => File.Exists($"{Application.persistentDataPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AtlasInfo.bytes") ?
-            $"{Application.persistentDataPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName }_AtlasInfo.bytes" :
-            $"{Application.streamingAssetsPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AtlasInfo.bytes";
+        public string AtlasInfoPlayPath => File.Exists($"{Application.persistentDataPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AtlasInfo.bytes") ?
+            $"{Application.persistentDataPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName }_AtlasInfo.bytes" :
+            $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AtlasInfo.bytes";
 
-        public string AtlasInfoUrl => File.Exists($"{Application.persistentDataPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AtlasInfo.bytes") ?
-            $"file://{Application.persistentDataPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName }_AtlasInfo.bytes" :
-            $"{Application.streamingAssetsPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AtlasInfo.bytes";
+        public string AtlasInfoUrl => File.Exists($"{Application.persistentDataPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AtlasInfo.bytes") ?
+            $"file://{Application.persistentDataPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName }_AtlasInfo.bytes" :
+            $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AtlasInfo.bytes";
 
 
         /// <summary>
@@ -59,15 +60,15 @@ namespace Client
         //public string AssetBundleSandboxDir => $"{SandboxHotUpdateDir}AssetBundle/";
 
         public string SandboxHotUpdateDir => //YuUnityUtility.IsEditorMode ?
-        //    $"{YuSetting.LocalHttpDir}{U3dDevelopConfig.Config.CurrentDevelopProjectName}/" :
-            Application.streamingAssetsPath + $"/HotUpdate/{U3dDevelopConfig.Config.CurrentDevelopProjectName}/";
+        //    $"{YuSetting.LocalHttpDir}{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/" :
+            Application.streamingAssetsPath + $"/HotUpdate/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/";
         
         public string ResourcesAssetsDir { get; }
         public string FinalStreamingAssetsDir { get; }
         public string FinalSandboxDir { get; }
         
-       public string AssetInfoSandboxPath => $"{SandboxHotUpdateDir}{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AssetInfo.bytes";
-        //public string AssetInfoEditorPath=>$"{AssetDatabaseDir}{U3dDevelopConfig.Config.CurrentDevelopProjectName}_AssetInfo.bytes";
+       public string AssetInfoSandboxPath => $"{SandboxHotUpdateDir}{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AssetInfo.bytes";
+        //public string AssetInfoEditorPath=>$"{AssetDatabaseDir}{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}_AssetInfo.bytes";
         
         public string FinalAssetBundleDir { get; }
         

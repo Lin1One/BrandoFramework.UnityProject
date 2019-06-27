@@ -7,6 +7,7 @@
 #endregion
 
 using Common;
+using Common.Config;
 using Common.DataStruct;
 using Common.ScriptCreate;
 using NPOI.XSSF.UserModel;
@@ -15,51 +16,54 @@ using System.IO;
 
 namespace Client.DataTable.Editor
 {
-    public abstract class YuAbsU3dExcelScriptCreator : IYuU3dExcelScriptCreator, IDisposable
+    public abstract class ExcelScriptCreatorBase : IExcelScriptCreator, IDisposable
     {
         public abstract ScriptType ScriptType { get; }
         protected ExcelSheetInfo SheetInfo { get; private set; }
-        ////protected YuU3dAppSetting AppSetting { get; private set; }
+        protected ProjectInfo AppSetting { get; private set; }
+
+        protected ExcelScriptExportSetting exportSetting;
         protected YuStringAppender Appender { get; } = new YuStringAppender();
 
-        public void CreateScript(string excelPath)////, YuU3dAppSetting appSetting = null)
+        private const string IGNORE_STR = "Ignore";
+        private const string CLASS_PARAMS_PROPERTYOBJ = "Class=ParamsPropertyObj";
+        private const string CLASS_SIMPLEOBJ = "Class=SimpleObj";
+        private const string ARRAY_STR = "Array";
+
+        public void CreateScript(string excelPath, ExcelScriptExportSetting exportSetting)
         {
-            ////AppSetting = appSetting;
+            this.exportSetting = exportSetting;
             GetSheetInfo(excelPath);
-            //if (AppSetting != null)
-            //{
-            //    Appender.AppendPrecomplie(AppSetting.PlayAsmId);
-            //}
-
+            if (AppSetting != null)
+            {
+                Appender.AppendPrecomplie(AppSetting.ProjectScriptingDefines.Split(','));
+            }
             AppendScript();
-
-            //if (AppSetting != null)
-            //{
-            //    Appender.AppendLine("#endif");
-            //}
-
+            if (AppSetting != null)
+            {
+                Appender.AppendLine("#endif");
+            }
             Dispose();
         }
 
-
-
-        public virtual void Dispose() => Appender.Dispose();
-
-        protected abstract void AppendScript();
-
-        private void GetSheetInfo(string excelPath)
+        /// <summary>
+        /// 获取工作簿，读取表头信息，
+        /// </summary>
+        /// <param name="Excel文件路径"></param>
+        private void GetSheetInfo(string excelFilePath)
         {
-            var globalSetting = YuU3dExcelSpannerDati.GetSingleDati()
-                .ActualSerializableObject.GlobalSetting;
+            var readRule = exportSetting.readRule;
 
-            using (var fs = new FileStream(excelPath, FileMode.Open, FileAccess.ReadWrite))
+            using (var fs = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read))
             {
                 var workBook = new XSSFWorkbook(fs);
                 var firstSheet = workBook.GetSheetAt(0); // 约定只有第一个工作簿为有效导出源
                 SheetInfo = new ExcelSheetInfo(firstSheet);
-                var chineseCommentRow = firstSheet.GetRow(globalSetting.ChineseCommentIndex);
-                var englishCommentRow = firstSheet.GetRow(globalSetting.EnglishCommentIndex);
-                var fieldDefineRow = firstSheet.GetRow(globalSetting.StrcutDefineIndex);
+                var chineseCommentRow = firstSheet.GetRow(readRule.ChineseCommentIndex);
+                var englishCommentRow = firstSheet.GetRow(readRule.EnglishCommentIndex);
+                var fieldDefineRow = firstSheet.GetRow(readRule.StrcutDefineIndex);
+
+                //字段数
                 var fieldCount = chineseCommentRow.PhysicalNumberOfCells;
 
                 for (var index = 0; index < fieldCount; index++)
@@ -69,8 +73,11 @@ namespace Client.DataTable.Editor
                         var chineseComment = chineseCommentRow.GetCell(index).ToString();
                         var englishComment = englishCommentRow.GetCell(index).ToString();
                         var fieldDefineStr = fieldDefineRow.GetCell(index).ToString();
+                        //字段类型
                         var fieldType = GetFieldDefine(fieldDefineStr);
+                        //字段备注
                         var fieldClassDesc = TryGetClassFieldDesc(fieldDefineStr);
+                        //分隔符
                         var arraySplit = TryGetArraySplit(fieldDefineStr);
 
                         var fieldInfo = new ExcelFieldInfo
@@ -83,19 +90,24 @@ namespace Client.DataTable.Editor
                                 SheetInfo.EnglishId,
                                 fieldClassDesc
                             )
-                            {ArraySplit = arraySplit};
+                        { ArraySplit = arraySplit };
 
                         SheetInfo.AddFieldInfo(fieldInfo);
                     }
                     catch (Exception e)
                     {
-                        throw new Exception($"在解析Excel文件{excelPath}的第{index}列时发生异常," +
+                        throw new Exception($"在解析Excel文件{excelFilePath}的第{index}列时发生异常," +
                                             $"异常信息为{e.Message}！");
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// 获取数组分隔符
+        /// </summary>
+        /// <param name="fieldDefineStr"></param>
+        /// <returns></returns>
         private char TryGetArraySplit(string fieldDefineStr)
         {
             if (fieldDefineStr.Contains(ARRAY_STR))
@@ -105,19 +117,10 @@ namespace Client.DataTable.Editor
                 {
                     return ';';
                 }
-
                 return fieldDefineStr[fieldDefineStr.Length - 1];
             }
-
             return ';';
         }
-
-        //private YuU3dAppSetting CurrentAppSetting => YuU3dAppSettingDati.CurrentActual;
-
-        private const string IGNORE_STR = "Ignore";
-        private const string CLASS_PARAMS_PROPERTYOBJ = "Class=ParamsPropertyObj";
-        private const string CLASS_SIMPLEOBJ = "Class=SimpleObj";
-        private const string ARRAY_STR = "Array";
 
         private string TryGetClassFieldDesc(string typeStr)
         {
@@ -136,6 +139,9 @@ namespace Client.DataTable.Editor
             return null;
         }
 
+        /// <summary>
+        /// 字段类型
+        /// </summary>
         private ExcelFieldType GetFieldDefine(string fieldDefineStr)
         {
             if (string.IsNullOrEmpty(fieldDefineStr) || fieldDefineStr == IGNORE_STR)
@@ -162,5 +168,14 @@ namespace Client.DataTable.Editor
             var filedType = fieldDefineStr.AsEnum<ExcelFieldType>();
             return filedType;
         }
+
+        /// <summary>
+        /// 编写脚本
+        /// </summary>
+        protected abstract void AppendScript();
+
+        public virtual void Dispose() => Appender.Dispose();
+
+
     }
 }

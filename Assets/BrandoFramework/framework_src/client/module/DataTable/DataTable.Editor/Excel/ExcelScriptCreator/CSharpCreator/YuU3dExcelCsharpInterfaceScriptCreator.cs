@@ -11,7 +11,7 @@ using Common.ScriptCreate;
 
 namespace Client.DataTable.Editor
 {
-    public class YuU3dExcelCsharpInterfaceScriptCreator : YuAbsU3dExcelScriptCreator
+    public class YuU3dExcelCsharpInterfaceScriptCreator : ExcelScriptCreatorBase
     {
         public override ScriptType ScriptType => ScriptType.Csharp;
 

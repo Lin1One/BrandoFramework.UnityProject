@@ -1,4 +1,4 @@
-﻿using client_common;
+﻿using Common;
 using System.Collections.Generic;
 
 namespace client_module_event

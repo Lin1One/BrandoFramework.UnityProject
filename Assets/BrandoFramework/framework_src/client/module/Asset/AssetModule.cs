@@ -1,4 +1,4 @@
-using client_common;
+using Common;
 using Common.Config;
 using Common.Utility;
 using System;
@@ -46,7 +46,7 @@ namespace Client.Assets
         private string GetAssetPath(string assetId)
         {
             var assetInfo = AssetInfoHelper.GetAssetInfo(assetId);
-            var path = assetInfo.GetEditorPath($"Assets/GameProjects/{U3dDevelopConfig.Config.CurrentDevelopProjectName}/AssetDatabase/");
+            var path = assetInfo.GetEditorPath($"Assets/GameProjects/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/AssetDatabase/");
             return path;
         }
 

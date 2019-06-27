@@ -36,7 +36,7 @@ namespace Client.Assets.Editor
         {
             //var currentApp = YuU3dAppSettingDati.CurrentActual;
             var assetInfos = new Dictionary<char, Dictionary<string, AssetInfo>>();
-            var hotDir = U3dDevelopConfig.Config.CurrentProjectAssetDatabaseDirPath;
+            var hotDir = ProjectInfoDati.GetActualInstance().CurrentProjectAssetDatabaseDirPath;
             var hotPaths = YuIOUtility.GetPathsContainSonDir(hotDir, SelectAssetPath);
 
             foreach (var hotPath in hotPaths)
@@ -76,7 +76,7 @@ namespace Client.Assets.Editor
                 }
             }
 
-            var writePath = $"{Application.streamingAssetsPath}/{U3dDevelopConfig.Config.CurrentDevelopProjectName}/Config/AssetInfo.byte";
+            var writePath = $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/Config/AssetInfo.byte";
             SerializeUtility.SerializeAndWriteTo(assetInfos, writePath);
             Debug.Log("资源数据创建完毕！");
             AssetDatabase.Refresh();

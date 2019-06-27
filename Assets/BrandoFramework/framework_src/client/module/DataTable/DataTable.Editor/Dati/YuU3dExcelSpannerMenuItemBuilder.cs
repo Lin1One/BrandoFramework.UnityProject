@@ -17,7 +17,7 @@ namespace Client.DataTable.Editor
     {
         public void BuildMenuItem(OdinMenuTree tree)
         {
-            tree.Add("Excel工具", YuU3dExcelSpannerDati.GetSingleDati());
+            tree.Add("Excel工具", DataTableEditorDati.GetSingleDati());
         }
     }
 }

@@ -11,11 +11,11 @@ using Common.ScriptCreate;
 
 namespace Client.DataTable.Editor
 {
-    public interface IYuU3dExcelScriptCreator
+    public interface IExcelScriptCreator
     {
         ScriptType ScriptType { get; }
 
-        void CreateScript(string excelPath);//,YuU3dAppSetting appSetting = null);
+        void CreateScript(string excelPath, ExcelScriptExportSetting exportSetting);
 
         ////void CreateScript(string excelPath, YuU3dAppSetting appSetting = null);
     }
