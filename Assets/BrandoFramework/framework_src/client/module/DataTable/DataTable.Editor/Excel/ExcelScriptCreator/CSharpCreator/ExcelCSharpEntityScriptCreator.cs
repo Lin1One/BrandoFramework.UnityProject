@@ -8,6 +8,7 @@
 
 using Common;
 using Common.ScriptCreate;
+using Common.Utility;
 
 namespace Client.DataTable.Editor
 {
@@ -17,8 +18,7 @@ namespace Client.DataTable.Editor
     public class ExcelCSharpEntityScriptCreator : ExcelScriptCreatorBase
     {
         public override ScriptType ScriptType => ScriptType.Csharp;
-        private string ScriptName => ExcelUtility.EntityScriptName( SheetInfo);
-        //private YuU3dCoreSetting CoreSetting => YuU3dCoreSettingDati.GetSingleDati().ActualSerializableObject;
+        public override string ScriptName => ExcelUtility.EntityScriptName(projectInfo, SheetInfo);
         protected override void AppendScript()
         {
             AppendHead();
@@ -30,6 +30,7 @@ namespace Client.DataTable.Editor
             AppendCsInitEntitys();
             AppendCsToTxt();
             AppendCsDeepCopy();
+            AppendFooter();
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace Client.DataTable.Editor
                 typeof(ExcelFieldType).Namespace,
                 "System.Collections.Generic",
                 "System.Linq",
-                typeof(IInjector).Namespace,
+                typeof(SerializeUtility).Namespace,
                 "Sirenix.OdinInspector",
                 "UnityEngine"
             );
@@ -68,7 +69,7 @@ namespace Client.DataTable.Editor
 
         private void AppendCsClassHead()
         {
-            Appender.AppendLine($"namespace {AppSetting.ProjectRuntimeScriptDefines}");
+            Appender.AppendLine($"namespace {projectInfo.ProjectRuntimeScriptDefines}");
             Appender.AppendLeftBracketsAndToRight();
             Appender.AppendCsComment("Excel数据表_" + SheetInfo.ChineseId);
             Appender.AppendLine("[Serializable]");
@@ -83,12 +84,9 @@ namespace Client.DataTable.Editor
                     break;
             }
             Appender.AppendLine($"public class {ScriptName}");
-            var interfaceName = ExcelUtility.EntityInterfaceName(SheetInfo);
+            var interfaceName = ExcelUtility.EntityInterfaceName(projectInfo,SheetInfo);
             Appender.AppendLine($"    : {interfaceName}, IYuExcelEntity<{ScriptName}>");
             Appender.AppendLeftBracketsAndToRight();
-
-
-
         }
 
         /// <summary>
@@ -172,7 +170,7 @@ namespace Client.DataTable.Editor
             Appender.AppendLine("for (; i < rows.Count; i++)");
             Appender.AppendLine("{");
             Appender.ToRight();
-            Appender.AppendLine("var strList = rows[i].Split(YuExcelConstant.Separator,");
+            Appender.AppendLine("var strList = rows[i].Split(ExcelDataConstant.Separator,");
             Appender.AppendLine("    StringSplitOptions.None).ToList();");
             Appender.AppendLine($"var entity = new {ScriptName}();");
             Appender.AppendLine("entity.InitEntity(strList);");
@@ -180,7 +178,6 @@ namespace Client.DataTable.Editor
             Appender.ToLeft();
             Appender.AppendLine("}");
             Appender.ToLeft();
-            Appender.AppendLine("}");
             Appender.AppendLine("}");
             Appender.AppendLine("catch");
             Appender.AppendLine("{");
@@ -228,25 +225,16 @@ namespace Client.DataTable.Editor
             Appender.AppendLine($"public {ScriptName} DeepCopy()");
             Appender.AppendLine("{");
             Appender.ToRight();
-            Appender.AppendLine("var buff = YuSerializeUtility.Serialize(this);");
-            Appender.AppendLine($"var entity = YuSerializeUtility.DeSerialize<{ScriptName}>(buff);");
+            Appender.AppendLine("var buff = SerializeUtility.Serialize(this);");
+            Appender.AppendLine($"var entity = SerializeUtility.DeSerialize<{ScriptName}>(buff);");
             Appender.AppendLine("return entity;");
             Appender.ToLeft();
             Appender.AppendLine("}");
         }
 
-
-
-
-
-
-
-
-
-
-
- 
-
-
+        private void AppendFooter()
+        {
+            Appender.AppendCsFooter();
+        }
     }
 }

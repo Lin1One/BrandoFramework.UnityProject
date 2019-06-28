@@ -14,7 +14,7 @@ namespace Client.DataTable.Editor
     public class YuU3dExcelCsharpInterfaceScriptCreator : ExcelScriptCreatorBase
     {
         public override ScriptType ScriptType => ScriptType.Csharp;
-
+        public override string ScriptName => ExcelUtility.EntityInterfaceName(projectInfo, SheetInfo);
         protected override void AppendScript()
         {
             AppendHead();
@@ -24,9 +24,27 @@ namespace Client.DataTable.Editor
             AppendFooter();
         }
 
-        private void AppendFooter()
+        private void AppendHead()
         {
-            Appender.AppendCsFooter();
+            ////Appender.AppendCsHeadComment();
+        }
+
+        private void AppendUsingNameSpace()
+        {
+            Appender.AppendUsingNamespace(
+                "System",
+                "System.Collections.Generic"
+            );
+        }
+
+        private void AppendInterfaceHead()
+        {
+            Appender.AppendLine($"namespace {projectInfo.ProjectRuntimeScriptDefines}");
+            Appender.AppendLeftBracketsAndToRight();
+            Appender.AppendCsComment("Excel数据表_" + SheetInfo.ChineseId);
+            var interfaceName = ExcelUtility.EntityInterfaceName(projectInfo, SheetInfo);
+            Appender.AppendLine("public interface " + interfaceName);
+            Appender.AppendLeftBracketsAndToRight();
         }
 
         private void AppendPropertyDeclare()
@@ -39,7 +57,7 @@ namespace Client.DataTable.Editor
                 {
                     continue;
                 }
-                
+
                 Appender.AppendCsComment(fieldInfo.ChineseName);
                 Appender.AppendLine($"{fieldInfo.CsType} " +
                                     $"{fieldInfo.EnglishName} " + "{ get; }");
@@ -47,28 +65,17 @@ namespace Client.DataTable.Editor
             }
         }
 
-        private void AppendInterfaceHead()
+        private void AppendFooter()
         {
-            //Appender.AppendLine($"namespace {AppSetting.PlayAsmId}");
-            Appender.AppendLeftBracketsAndToRight();
-            Appender.AppendCsComment("Excel数据表_" + SheetInfo.ChineseId);
-            //var interfaceName = ExcelUtility.EntityInterfaceName(AppSetting, SheetInfo);
-            var interfaceName = ExcelUtility.EntityInterfaceName(/*AppSetting*/SheetInfo);
-            Appender.AppendLine("public interface " + interfaceName);
-            //Appender.AppendLeftBracketsAndToRight();
+            Appender.AppendCsFooter();
         }
 
-        private void AppendUsingNameSpace()
-        {
-            Appender.AppendUsingNamespace(
-                "System",
-                "System.Collections.Generic"
-            );
-        }
 
-        private void AppendHead()
-        {
-            ////Appender.AppendCsHeadComment();
-        }
+
+
+
+
+
+
     }
 }

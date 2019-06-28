@@ -6,6 +6,7 @@
 
 #endregion
 
+using Common.Config;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
@@ -23,23 +24,21 @@ namespace Client.DataTable.Editor
 
         public static string EntityScriptName
         (
-            //YuU3dAppSetting u3DAppSetting,
+            ProjectInfo u3DAppSetting,
             ExcelSheetInfo sheetInfo
         )
         {
-            ////var scriptName = u3DAppSetting.LocAppId + "_"ExcelEntity_" + sheetInfo.EnglishId;
-            var scriptName = "ExcelEntity_" + sheetInfo.EnglishId;
+            var scriptName = $"{u3DAppSetting.CurrentDevelopProjectName}_ExcelEntity_{sheetInfo.EnglishId}";
             return scriptName;
         }
 
         public static string EntityInterfaceName
         (
-            //YuU3dAppSetting u3DAppSetting,
+            ProjectInfo u3DAppSetting,
             ExcelSheetInfo sheetInfo
         )
         {
-            ////var scriptName = u3DAppSetting.LocAppId + "_IExcelEntity_" + sheetInfo.EnglishId;
-            var scriptName = "IExcelEntity_" + sheetInfo.EnglishId;
+            var scriptName = $"{u3DAppSetting.CurrentDevelopProjectName}_IExcelEntity_{sheetInfo.EnglishId}";
             return scriptName;
         }
 

@@ -10,6 +10,7 @@ using Common;
 using Common.Config;
 using Common.DataStruct;
 using Common.ScriptCreate;
+using Common.Utility;
 using NPOI.XSSF.UserModel;
 using System;
 using System.IO;
@@ -20,9 +21,10 @@ namespace Client.DataTable.Editor
     {
         public abstract ScriptType ScriptType { get; }
         protected ExcelSheetInfo SheetInfo { get; private set; }
-        protected ProjectInfo AppSetting { get; private set; }
+        protected ProjectInfo projectInfo => ProjectInfoDati.GetActualInstance();
 
         protected ExcelScriptExportSetting exportSetting;
+        public abstract string ScriptName { get; }
         protected YuStringAppender Appender { get; } = new YuStringAppender();
 
         private const string IGNORE_STR = "Ignore";
@@ -34,15 +36,21 @@ namespace Client.DataTable.Editor
         {
             this.exportSetting = exportSetting;
             GetSheetInfo(excelPath);
-            if (AppSetting != null)
+
+            if (projectInfo != null && !string.IsNullOrEmpty(projectInfo.ProjectScriptingDefines))
             {
-                Appender.AppendPrecomplie(AppSetting.ProjectScriptingDefines.Split(','));
+                Appender.AppendPrecomplie(projectInfo.ProjectScriptingDefines.Split(','));
             }
+
             AppendScript();
-            if (AppSetting != null)
+
+            if (projectInfo != null && !string.IsNullOrEmpty(projectInfo.ProjectScriptingDefines))
             {
                 Appender.AppendLine("#endif");
             }
+
+            var content = Appender.ToString();
+            YuIOUtility.WriteAllText($"{exportSetting.ExportDir}/{ScriptName}.cs", content);
             Dispose();
         }
 
@@ -54,7 +62,7 @@ namespace Client.DataTable.Editor
         {
             var readRule = exportSetting.readRule;
 
-            using (var fs = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read))
+            using (var fs = new FileStream(excelFilePath, FileMode.Open, FileAccess.ReadWrite))
             {
                 var workBook = new XSSFWorkbook(fs);
                 var firstSheet = workBook.GetSheetAt(0); // 约定只有第一个工作簿为有效导出源

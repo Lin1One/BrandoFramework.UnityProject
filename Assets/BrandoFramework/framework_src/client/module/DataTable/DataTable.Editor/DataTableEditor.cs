@@ -8,8 +8,10 @@
 
 using Common;
 using Common.ScriptCreate;
+using Common.Utility;
 using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 
 namespace Client.DataTable.Editor
 {
@@ -68,6 +70,7 @@ namespace Client.DataTable.Editor
                 CreateScript(TaregetExcel,this);
             Injector.Instance.Get<YuU3dExcelCsharpInterfaceScriptCreator>().
                 CreateScript(TaregetExcel,this);
+            AssetDatabaseUtility.Refresh();
         }
     }
 
