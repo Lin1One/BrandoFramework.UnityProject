@@ -3,7 +3,7 @@
     "references": [
         "OdinPlay",
         "OdinEditor",
-        "DotNetStudy"
+        "ProgramingStudio"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
