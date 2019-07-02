@@ -73,7 +73,7 @@ namespace Common.ScriptCreate
 
 
                 var content = appender.ToString();
-                YuIOUtility.WriteAllText(scriptPath, content);
+                IOUtility.WriteAllText(scriptPath, content);
                 appender.Clean();
                 successfulSettings.Add(setting);
             }

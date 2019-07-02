@@ -316,7 +316,7 @@ namespace Common.PrefsData
         {
             var instances = new List<GenericMultiDati<TActual, TImpl>>();
             var rootDir = DatiUtility.GetMultiScriptRootPath(typeof(TImpl));
-            var paths = YuIOUtility.GetPaths(rootDir).Where(p => p.EndsWith(".asset"))
+            var paths = IOUtility.GetPaths(rootDir).Where(p => p.EndsWith(".asset"))
                 .ToList();
 
             foreach (var p in paths)

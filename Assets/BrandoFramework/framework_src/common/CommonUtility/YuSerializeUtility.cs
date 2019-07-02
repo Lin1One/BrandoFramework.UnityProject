@@ -32,7 +32,7 @@ namespace Common.Utility
         public static void SerializeAndWriteTo(object obj, string path)
         {
             var bytes = Serialize(obj);
-            YuIOUtility.WriteAllBytes(path, bytes);
+            IOUtility.WriteAllBytes(path, bytes);
         }
 
         public static T Get<T>(string path) where T : class, new()

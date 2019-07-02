@@ -50,7 +50,7 @@ namespace Client.DataTable.Editor
             }
 
             var content = Appender.ToString();
-            YuIOUtility.WriteAllText($"{exportSetting.ExportDir}/{ScriptName}.cs", content);
+            IOUtility.WriteAllText($"{exportSetting.ExportDir}/{ScriptName}.cs", content);
             Dispose();
         }
 

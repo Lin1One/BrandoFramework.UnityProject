@@ -95,7 +95,7 @@ namespace Common.Utility
                 Refresh();
             }
 
-            YuIOUtility.EnsureDirExist(fullPath);
+            IOUtility.EnsureDirExist(fullPath);
             var assetsPath = YuUnityIOUtility.GetAssetsPath(fullPath);
             var arg = new object[] {asset, assetsPath};
             CreateAssetMethod.Invoke(null, arg);

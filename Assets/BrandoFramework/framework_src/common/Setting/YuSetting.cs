@@ -86,14 +86,14 @@ namespace Common.Setting
 
                 if (!YuUnityUtility.HasYuSrc)
                 {
-                    var asmDefinePaths = YuIOUtility.GetPathsContainSonDir(Instance.YuRootFullDir + "YuDLL/")
+                    var asmDefinePaths = IOUtility.GetPathsContainSonDir(Instance.YuRootFullDir + "YuDLL/")
                         .Where(p => p.EndsWith(".dll"));
                     assemblyIds = asmDefinePaths.Select(Path.GetFileNameWithoutExtension).ToList();
                     return assemblyIds;
                 }
                 else
                 {
-                    var asmDefinePaths = YuIOUtility.GetPathsContainSonDir(Instance.YuRootFullDir + "YuSrc/")
+                    var asmDefinePaths = IOUtility.GetPathsContainSonDir(Instance.YuRootFullDir + "YuSrc/")
                         .Where(p => p.EndsWith(".asmdef"));
                     assemblyIds = asmDefinePaths.Select(Path.GetFileNameWithoutExtension).ToList();
                     return assemblyIds;

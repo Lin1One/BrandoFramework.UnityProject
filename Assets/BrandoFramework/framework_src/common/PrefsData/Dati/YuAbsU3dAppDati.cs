@@ -16,13 +16,13 @@ namespace Common.PrefsData
     }
 
     [Serializable]
-    public abstract class YuAbsU3dAppDati<TActual, TImpl> : GenericMultiDati<TActual, TImpl>, IYuU3dAppId
-        where TActual : class, IYuU3dAppId, new()
+    public abstract class YuAbsU3dAppDati<TActual, TImpl> : GenericMultiDati<TActual, TImpl>
+        where TActual : class, new()
         where TImpl : class
     {
         protected override bool CheckIsNotAppDati() => false;
 
-        public string LocAppId => ActualSerializableObject.LocAppId;
+        //public string LocAppId => ActualSerializableObject.LocAppId;
     }
 }
 

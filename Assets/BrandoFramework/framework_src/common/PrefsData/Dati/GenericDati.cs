@@ -68,7 +68,7 @@ namespace Common.PrefsData
         protected virtual void Serialize(string originPath)
         {
             var bytes = SerializeUtility.Serialize(ActualSerializableObject);
-            YuIOUtility.WriteAllBytes(originPath, bytes, true);
+            IOUtility.WriteAllBytes(originPath, bytes, true);
         }
 
         #endregion

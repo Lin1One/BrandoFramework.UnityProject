@@ -42,7 +42,7 @@ namespace Common.Utility
 
             if (CompareTwoFileMd5(source, target)) return;
             File.Delete(source);
-            YuIOUtility.CopyFile(target, source);
+            IOUtility.CopyFile(target, source);
             Debug.Log($"目标路径{source}上的文件已和路径{target}同步完毕！");
         }
 

@@ -247,7 +247,7 @@ namespace Common.EditorWindow
         [Button("异步加载测试")]
         private void ReadAsyncTest()
         {
-            YuIOUtility.ReadFileAsync(AsyncLoadPath, bytes =>
+            IOUtility.ReadFileAsync(AsyncLoadPath, bytes =>
             {
                 //var instance = YuSerializeUtility.DeSerialize<YuU3dCommonSpanner>(bytes);
                 //Debug.Log(instance.ImageToBase64StringResult);

@@ -64,10 +64,10 @@ namespace Common.PrefsData
 
                         if (!File.Exists(editorPath))
                         {
-                            YuIOUtility.EnsureDirExist(editorPath);
+                            IOUtility.EnsureDirExist(editorPath);
                             instance = new T();
                             var jsContent = JsonUtility.ToJson(instance);
-                            YuIOUtility.WriteAllText(editorPath, jsContent);
+                            IOUtility.WriteAllText(editorPath, jsContent);
                             return instance;
                         }
 
@@ -80,10 +80,10 @@ namespace Common.PrefsData
 
                         if (!File.Exists(resourcesPath))
                         {
-                            YuIOUtility.EnsureDirExist(resourcesPath);
+                            IOUtility.EnsureDirExist(resourcesPath);
                             instance = new T();
                             var jsContent = JsonUtility.ToJson(instance);
-                            YuIOUtility.WriteAllText(resourcesPath, jsContent);
+                            IOUtility.WriteAllText(resourcesPath, jsContent);
                             return instance;
                         }
 
@@ -174,7 +174,7 @@ namespace Common.PrefsData
 
             if (Application.isPlaying)
             {
-                YuIOUtility.WriteAllText(writePath, jsContent);
+                IOUtility.WriteAllText(writePath, jsContent);
             }
             else
             {

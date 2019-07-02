@@ -12,7 +12,7 @@ namespace Common.Utility
     /// 2. 文件操作。
     /// 3. 路径操作。
     /// </summary>
-    public static class YuIOUtility
+    public static class IOUtility
     {
         #region 目录操作
 

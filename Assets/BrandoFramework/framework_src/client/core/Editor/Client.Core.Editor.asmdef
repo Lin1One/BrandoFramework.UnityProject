@@ -6,7 +6,8 @@
         "Framework.Common",
         "TestBorad",
         "Client.Module",
-        "Common.Editor"
+        "Common.Editor",
+        "Asset.Editor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

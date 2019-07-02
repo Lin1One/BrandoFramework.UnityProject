@@ -82,7 +82,7 @@ namespace Client.DataTable.Editor
                 appender.AppendLine();
                 appender.AppendLine("#endif");
                 var content = appender.ToString();
-                YuIOUtility.WriteAllText(ScriptPath, content);
+                IOUtility.WriteAllText(ScriptPath, content);
             }
 
             private string GetSimpleObjSwitchTypeStr(ExcelFieldType fieldType)
