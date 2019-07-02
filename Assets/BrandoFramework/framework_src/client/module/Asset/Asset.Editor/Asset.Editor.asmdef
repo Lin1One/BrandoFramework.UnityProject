@@ -1,0 +1,17 @@
+{
+    "name": "Asset.Editor",
+    "references": [
+        "OdinEditor",
+        "OdinPlay",
+        "Framework.Common",
+        "Common.Editor"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

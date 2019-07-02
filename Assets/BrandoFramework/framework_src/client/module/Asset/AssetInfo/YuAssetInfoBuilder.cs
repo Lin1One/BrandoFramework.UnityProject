@@ -37,7 +37,7 @@ namespace Client.Assets.Editor
             //var currentApp = YuU3dAppSettingDati.CurrentActual;
             var assetInfos = new Dictionary<char, Dictionary<string, AssetInfo>>();
             var hotDir = ProjectInfoDati.GetActualInstance().CurrentProjectAssetDatabaseDirPath;
-            var hotPaths = YuIOUtility.GetPathsContainSonDir(hotDir, SelectAssetPath);
+            var hotPaths = IOUtility.GetPathsContainSonDir(hotDir, SelectAssetPath);
 
             foreach (var hotPath in hotPaths)
             {

@@ -47,7 +47,7 @@ namespace Client.Assets
         //[Inject]
         protected readonly ILoadCallbcker<TKey, TCallbackValue> Callbcker;
         //[Inject]
-        protected readonly IBundlePathHelper BundlePathHelper;
+        //protected readonly IBundlePathHelper BundlePathHelper;
         //[Inject]
         protected readonly IBundleDependInfoHelper DependInfoHelper;
         //[Inject]

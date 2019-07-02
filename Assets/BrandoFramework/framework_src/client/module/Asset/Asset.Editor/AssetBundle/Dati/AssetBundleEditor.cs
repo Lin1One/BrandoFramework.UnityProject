@@ -25,29 +25,25 @@ namespace Client.Assets.Editor
     /// 应用AssetBundle打包配置。
     /// </summary>
     [Serializable]
-    public class ProjectAssetBundleSetting
+    public class AssetBundleEditor
     {
         #region 可视化
-
+        [Title("AssetBundle 编辑器",TitleAlignment = TitleAlignments.Centered)]
         [LabelText("是否打开AssetBundle配置图标")]
         public bool AssetBundleButtonWindowSwitch = false;
 
-        [BoxGroup("项目 Assetbundle 信息")]
+        [TabGroup("项目 Assetbundle 信息")]
         [HideLabel]
         public YuU3dAppAssetBundleInfo AssetbundleInfo;
 
-        [BoxGroup("当前目录配置")]
+        [TabGroup("打包目录配置")]
         [HideLabel]
-        public YuAssetBundleDirSetting TargetDirSetting;
-        
-        [BoxGroup("打包忽略规则")]
-        [HideLabel]
-        public YuAssetBundleIgnoreRule IgnoreRule;
+        public AssetBundleBuildSetting TargetDirSetting;
 
-        [BoxGroup("AssetBundle信息总览")]
+        [TabGroup("打包目录配置")]
         [LabelText("配置项列表")]
-        public List<YuAssetBundleDirSetting> BundleSettings
-            = new List<YuAssetBundleDirSetting>();
+        public List<AssetBundleBuildSetting> BundleSettings
+             = new List<AssetBundleBuildSetting>();
 
         #endregion
 
@@ -61,7 +57,7 @@ namespace Client.Assets.Editor
                 return;
             }
 
-            var setting = new YuAssetBundleDirSetting { Dir = dir };
+            var setting = new AssetBundleBuildSetting { Dir = dir };
             BundleSettings.Add(setting);
         }
 
@@ -77,7 +73,7 @@ namespace Client.Assets.Editor
             BundleSettings = BundleSettings.OrderBy(s => s.Dir).ToList();
         }
 
-        public void SetBuildAtTargetBuildType(string dir, YuAssetBundleAutoBuildType buildType)
+        public void SetBuildAtTargetBuildType(string dir, AssetBundleBuildType buildType)
         {
             ////var locAppId = YuEditorUtility.GetLocAppIdAtSelectDir();
             ////var appSetting = YuU3dAppSettingDati.TryGetApp(locAppId);
@@ -144,8 +140,5 @@ namespace Client.Assets.Editor
 
         #endregion
 
-        public ProjectAssetBundleSetting() { }
-
-        //public YuAppAssetBundleSetting(string appId) => LocAppId = appId;
     }
 }

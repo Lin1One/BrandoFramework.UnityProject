@@ -20,15 +20,15 @@ namespace Client.Assets.Editor
     /// 2. 包含
     /// </summary>
     [Serializable]
-    public class YuAssetBundleIgnoreRule
+    public class AssetBundleBuildIgnoreRule
     {
-        [LabelText("需要忽略的结尾后缀列表")]
+        [LabelText("忽略的后缀列表")]
         public List<string> IgnoreEndSuffixs = new List<string>();
 
-        [LabelText("需要忽略的包含字符串列表")]
+        [LabelText("忽略的包含字符串列表")]
         public List<string> IgnoreContains = new List<string>();
 
-        public YuAssetBundleIgnoreRule()
+        public AssetBundleBuildIgnoreRule()
         {
             IgnoreEndSuffixs.Add(".meta");
             IgnoreEndSuffixs.Add(".tpsheet");

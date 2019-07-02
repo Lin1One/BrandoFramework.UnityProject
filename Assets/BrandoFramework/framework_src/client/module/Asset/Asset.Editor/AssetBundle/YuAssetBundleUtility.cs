@@ -128,7 +128,7 @@ namespace Client.Assets
                    && !path.Contains(IGNORE_GITKEEP);
         }
 
-        public static bool EndCheck(YuAssetBundleIgnoreRule rule, string p)
+        public static bool EndCheck(AssetBundleBuildIgnoreRule rule, string p)
         {
             if (rule == null)
             {
@@ -146,7 +146,7 @@ namespace Client.Assets
             return true;
         }
 
-        public static bool ContainCheck(YuAssetBundleIgnoreRule rule, string p)
+        public static bool ContainCheck(AssetBundleBuildIgnoreRule rule, string p)
         {
             if (rule == null)
             {
@@ -223,24 +223,24 @@ namespace Client.Assets
         /// <param name="isBuild">是否在设置完AssetBundle名后进行打包，默认进行打包。</param>
         /// <param name="isRefresh">是否在操作全部完毕后进行刷新，默认不刷新。</param>
         /// <param name="isSaveBundleSetting">是否在设置完AssetBundle名进行全局AssetBundle配置的保存，默认保存。</param>
-        public static void SetBundleIdAndSelectIsBuild(YuAssetBundleDirSetting dirSetting
+        public static void SetBundleIdAndSelectIsBuild(AssetBundleBuildSetting dirSetting
             , bool isBuild = true, bool isRefresh = true, bool isSaveBundleSetting = true)
         {
             switch (dirSetting.BuildType)
             {
-                case YuAssetBundleAutoBuildType.EveryBuild:
+                case AssetBundleBuildType.EveryBuild:
                     SetBundleIdANdBuild_AtEvery(dirSetting, isBuild);
                     break;
-                case YuAssetBundleAutoBuildType.BuildAtSize:
+                case AssetBundleBuildType.BuildAtSize:
                     SetBundleIdANdBuild_AtSize(dirSetting, isBuild);
                     break;
-                case YuAssetBundleAutoBuildType.BuildAtDirSelf:
+                case AssetBundleBuildType.BuildAtDirSelf:
                     SetBundleIdANdBuild_AtDirSelf(dirSetting, isBuild);
                     break;
-                case YuAssetBundleAutoBuildType.BuildAtDirTree:
+                case AssetBundleBuildType.BuildAtDirTree:
                     SetBundleIdANdBuild_AtDirTree(dirSetting, isBuild);
                     break;
-                case YuAssetBundleAutoBuildType.BuildAtList:
+                case AssetBundleBuildType.BuildAtList:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -259,11 +259,11 @@ namespace Client.Assets
 
         #region 分类设置Id及打包实现
 
-        private static void SetBundleIdANdBuild_AtEvery(YuAssetBundleDirSetting dirSetting,
+        private static void SetBundleIdANdBuild_AtEvery(AssetBundleBuildSetting dirSetting,
             bool isBuild = true)
         {
             var everyPaths = dirSetting.SelfDirPaths();
-            var bundleId = YuIOUtility.GetSomeDirPath(dirSetting.Dir, 3).ToLower();
+            var bundleId = IOUtility.GetSomeDirPath(dirSetting.Dir, 3).ToLower();
             SetAssetBundleId(dirSetting, everyPaths, bundleId, true);
             if (isBuild)
             {
@@ -271,7 +271,7 @@ namespace Client.Assets
             }
         }
 
-        private static void SetBundleIdANdBuild_AtSize(YuAssetBundleDirSetting dirSetting,
+        private static void SetBundleIdANdBuild_AtSize(AssetBundleBuildSetting dirSetting,
             bool isBuild = true)
         {
             var sizeInfo = dirSetting.GetSizeInfo();
@@ -298,7 +298,7 @@ namespace Client.Assets
             ////}
         }
 
-        private static void SetBundleIdANdBuild_AtDirSelf(YuAssetBundleDirSetting dirSetting,
+        private static void SetBundleIdANdBuild_AtDirSelf(AssetBundleBuildSetting dirSetting,
             bool isBuild = true)
         {
             //var dirSelfPaths = dirSetting.SelfDirPaths();
@@ -311,7 +311,7 @@ namespace Client.Assets
             //}
         }
 
-        private static void SetBundleIdANdBuild_AtDirTree(YuAssetBundleDirSetting dirSetting,
+        private static void SetBundleIdANdBuild_AtDirTree(AssetBundleBuildSetting dirSetting,
             bool isBuild = true)
         {
             ////var paths = dirSetting.GetFullPathsAtDirTree();
@@ -323,14 +323,14 @@ namespace Client.Assets
             }
         }
 
-        private static void SetBundleIdANdBuild_AtList(YuAssetBundleDirSetting dirSetting,
+        private static void SetBundleIdANdBuild_AtList(AssetBundleBuildSetting dirSetting,
             bool isBuild = true)
         {
         }
 
         #endregion
 
-        private static void SetAssetBundleId(YuAssetBundleDirSetting dirSetting,
+        private static void SetAssetBundleId(AssetBundleBuildSetting dirSetting,
             List<string> paths, string bundleId = null, bool plusFileName = false)
         {
             ////var appBundleInfo = currentAssetBundleInfo;
@@ -374,7 +374,7 @@ namespace Client.Assets
         }
 
 
-        private static void SetAssetBundleIdAtSizeAssetBundle(YuAssetBundleDirSetting dirSetting,
+        private static void SetAssetBundleIdAtSizeAssetBundle(AssetBundleBuildSetting dirSetting,
             List<string> paths,
            //// YuAppAssetBundleInfo appBundleInfo,
             string bundleId = null)
@@ -392,7 +392,7 @@ namespace Client.Assets
 
                 var assetLowerId = assetId.ToLower();
                 var finalBundleId = bundleId ??
-                    ($"({YuIOUtility.GetSomeDirPath(dirSetting.Dir, 3).ToLower()}_{assetLowerId}");
+                    ($"({IOUtility.GetSomeDirPath(dirSetting.Dir, 3).ToLower()}_{assetLowerId}");
                 finalBundleId = finalBundleId.ToLower();
                 if (bundleIds.Contains(finalBundleId))
                 {
@@ -417,19 +417,19 @@ namespace Client.Assets
 
         #region 移动打包后的AssetBundle文件进行目录分类
 
-        private static void TryMoveAssetBundle(YuAssetBundleDirSetting dirSetting,
+        private static void TryMoveAssetBundle(AssetBundleBuildSetting dirSetting,
             List<string> paths)
         {
             switch (dirSetting.BuildType)
             {
-                case YuAssetBundleAutoBuildType.EveryBuild:
+                case AssetBundleBuildType.EveryBuild:
                     //MoveAssetBundleAtEveryBuild(paths, dirSetting);
                     break;
-                case YuAssetBundleAutoBuildType.BuildAtSize:
-                case YuAssetBundleAutoBuildType.BuildAtList:
+                case AssetBundleBuildType.BuildAtSize:
+                case AssetBundleBuildType.BuildAtList:
                     break;
-                case YuAssetBundleAutoBuildType.BuildAtDirSelf:
-                case YuAssetBundleAutoBuildType.BuildAtDirTree:
+                case AssetBundleBuildType.BuildAtDirSelf:
+                case AssetBundleBuildType.BuildAtDirTree:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -437,7 +437,7 @@ namespace Client.Assets
         }
 
         private static void MoveAssetBundleAtEveryBuild(List<string> paths,
-            YuAssetBundleDirSetting dirSetting)
+            AssetBundleBuildSetting dirSetting)
         {
             ////var bundleIds = paths.Select(p => Path.GetFileNameWithoutExtension(p)?.ToLower())
             ////    .ToList();
@@ -459,7 +459,7 @@ namespace Client.Assets
 
         private static double buildTotalSecond;
 
-        private static void BuildAssetBundle(YuAssetBundleDirSetting dirSetting)
+        private static void BuildAssetBundle(AssetBundleBuildSetting dirSetting)
         {
             ////var appSetting = dirSetting.LocU3DApp;
             ////var startTime = DateTime.Now;

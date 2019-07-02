@@ -15,7 +15,7 @@ using System.Collections.Generic;
 namespace Client.Assets.Editor
 {
     [Serializable]
-    public class YuAssetBundleBaseNode
+    public class AssetBundleBuildBaseNode
     {
         [LabelText("AssetBundle文件名")] public string BundleId;
 

@@ -18,7 +18,7 @@ namespace Client.Assets.Editor
     /// 基于尺寸自动分包的AssetBundle打包配置。
     /// </summary>
     [Serializable]
-    public class YuAssetBundleBuildAtSizeSetting
+    public class AssetBundleBuildAtSizeSetting
     {
         [BoxGroup("尺寸分包信息")]
         [LabelText("分包尺寸")]
@@ -35,7 +35,7 @@ namespace Client.Assets.Editor
         [BoxGroup("尺寸分包信息")]
         [HideLabel]
         [ReadOnly]
-        public YuAssetBundleSizeInfo SizeInfo;
+        public AssetBundleBuildSizeInfo SizeInfo;
 
     }
 }
