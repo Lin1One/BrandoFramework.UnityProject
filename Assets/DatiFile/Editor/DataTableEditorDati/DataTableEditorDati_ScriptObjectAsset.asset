@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: DataTableEditorDati_ScriptObjectAsset
   m_EditorClassIdentifier: 
   actualSerializableObject:
-    GlobalSetting:
-      ChineseCommentIndex: 0
-      EnglishCommentIndex: 2
-      StrcutDefineIndex: 3
-    scriptType: 0
     ScriptExportSetting:
-      ScriptExport:
-        TaregetExcel: 
-        ExportDir: 
+      readRule:
+        ChineseCommentIndex: 0
+        EnglishCommentIndex: 2
+        StrcutDefineIndex: 3
+      scriptType: 0
+      serializationType: 0
+      TaregetExcel: Assets/GameProjects/TestProject/OriginAssets/DataTable/Excel/TestExcel.xlsx
+      ExportDir: Assets/GameProjects/TestProject/Src/Play/DataTable
     DataExportSetting: {}

@@ -49,7 +49,7 @@ namespace Client.Assets
         private void InitAssetInfo()
         {
             var bytes = File.ReadAllBytes(
-                $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/Config/AssetInfo.byte");
+                $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().DevelopProjectName}/Config/AssetInfo.byte");
 
             _infos = SerializeUtility.DeSerialize<Dictionary<char, Dictionary<string, AssetInfo>>>(bytes);
         }

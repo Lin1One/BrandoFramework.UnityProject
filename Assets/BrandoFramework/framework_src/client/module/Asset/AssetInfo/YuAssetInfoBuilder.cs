@@ -76,7 +76,7 @@ namespace Client.Assets.Editor
                 }
             }
 
-            var writePath = $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/Config/AssetInfo.byte";
+            var writePath = $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().DevelopProjectName}/Config/AssetInfo.byte";
             SerializeUtility.SerializeAndWriteTo(assetInfos, writePath);
             Debug.Log("资源数据创建完毕！");
             AssetDatabase.Refresh();

@@ -6,6 +6,7 @@
 
 #endregion
 
+using Common.Config;
 using Common.DataStruct;
 using Common.Editor;
 using Common.PrefsData;
@@ -65,39 +66,41 @@ namespace Client.Assets.Editor
             //locU3DApp = YuU3dAppSettingDati.TryGetApp(locAppId);
             //appHelper = locU3DApp.Helper;
 
-            //var currentAssetbundleSetting
-            //    = YuU3dAppAssetBundleSettingDati.TryGetAssetBundleSetting(locAppId);
+            var currentAssetbundleSetting
+                = AssetBundleEditorDati.GetActualInstance();
 
-            //if (currentAssetbundleSetting == null)
-            //{
-            //    Debug.LogError($"所选文件夹 AssetBundleSetting 实例未创建 ！");
-            //    return;
-            //}
+            var projectInfo
+                = ProjectInfoDati.GetActualInstance();
 
-            //var dirs = Unity3DEditorUtility.GetSelectDirs();
-            //foreach (var dir in dirs)
-            //{
-            //    //if (!dir.StartsWith(appHelper.AssetDatabaseDir)
-            //    //    && dir.StartsWith(appHelper.StreamingAssetsDir))
-            //    //{
-            //    //    Debug.LogError($"目标目录不是一个有效的AssetBundle打包目录！");
-            //    //    return;
-            //    //}
+            if (currentAssetbundleSetting == null)
+            {
+                Debug.LogError($"所选文件夹 AssetBundleSetting 实例未创建 ！");
+                return;
+            }
 
-            //    currentAssetbundleSetting.SetBuildAtTargetBuildType(dir, buildType);
-            //    if (buildType == YuAssetBundleAutoBuildType.BuildAtDirTree) // 清理所有子目录的打包配置
-            //    {
-            //        var sonDirs = IOUtility.FirstSonDirs(dir);
-            //        foreach (var sonDir in sonDirs)
-            //        {
-            //            currentAssetbundleSetting.CleanBuildSettingAtDir(sonDir);
-            //        }
+            var dirs = Unity3DEditorUtility.GetSelectDirs();
+            foreach (var dir in dirs)
+            {
+                if (!dir.StartsWith(projectInfo.CurrentProjectAssetDatabaseDirPath))
+                {
+                    Debug.LogError($"目标目录不是一个有效的AssetBundle打包目录！");
+                    return;
+                }
 
-            //        Debug.Log($"目录{dir}已设置为目录树打包，其所有子目录的打包配置都已被清空！");
-            //    }
-            //}
+                currentAssetbundleSetting.SetBuildAtTargetBuildType(dir, buildType);
+                if (buildType == AssetBundleBuildType.BuildAtDirTree) // 清理所有子目录的打包配置
+                {
+                    var sonDirs = IOUtility.FirstSonDirs(dir);
+                    foreach (var sonDir in sonDirs)
+                    {
+                        currentAssetbundleSetting.CleanBuildSettingAtDir(sonDir);
+                    }
 
-            //YuU3dAppAssetBundleSettingDati.GetMultiAtId(locAppId).Save();
+                    Debug.Log($"目录{dir}已设置为目录树打包，其所有子目录的打包配置都已被清空！");
+                }
+            }
+
+            AssetBundleEditorDati.GetSingleDati().Save();
         }
 
         #endregion
@@ -420,7 +423,7 @@ namespace Client.Assets.Editor
 
         private static void SetTargetDirsBundleIdAndSelectBuild(bool isBuild, bool isSaveSetting)
         {
-            //var selectDir = Unity3DEditorUtility.GetSelectDir();
+            var selectDir = Unity3DEditorUtility.GetSelectDir();
             //var targetApp = Unity3DEditorUtility.TryGetLocAppAtDir(selectDir);
             //if (targetApp == null)
             //{
@@ -428,31 +431,32 @@ namespace Client.Assets.Editor
             //    return;
             //}
 
-            //var dirs = IOUtility.GetAllDir(selectDir);
-            //var appAssetBundleSetting = YuU3dAppAssetBundleSettingDati.TryGetAssetBundleSetting(targetApp.LocAppId);
-            //var dirSettings = new List<YuAssetBundleDirSetting>();
+            var dirs = IOUtility.GetAllDir(selectDir);
+            var appAssetBundleSetting = AssetBundleEditorDati.GetActualInstance();
+            var dirSettings = new List<AssetBundleBuildSetting>();
 
-            //foreach (var dir in dirs)
-            //{
-            //    var setting = appAssetBundleSetting.GetDirSetting(dir);
-            //    if (setting == null)
-            //    {
-            //        continue;
-            //    }
+            foreach (var dir in dirs)
+            {
+                var setting = appAssetBundleSetting.GetSetting(dir);
+                if (setting == null)
+                {
+                    continue;
+                }
 
-            //    dirSettings.Add(setting);
-            //}
-            //YuAssetBundleUtility.currentAssetBundleInfo = YuAssetBundleUtility.GetAppAssetBundleInfo(targetApp.LocAppId);
-            //for (int i = 0; i < dirSettings.Count; i++)
-            //{
-            //    EditorUtility.DisplayProgressBar("设置 AB 包名", $"正在设置 {dirSettings[i].Dir} 文件夹的 AB 包名", i * 1.0f / dirSettings.Count);
-            //    YuAssetBundleUtility.SetBundleIdAndSelectIsBuild(dirSettings[i],
-            //        isBuild, true, isSaveSetting);
-            //}
-            //EditorUtility.ClearProgressBar();
+                dirSettings.Add(setting);
+            }
+            //YuAssetBundleUtility.currentAssetBundleInfo = 
+            //    YuAssetBundleUtility.GetAppAssetBundleInfo(targetApp.LocAppId);
+            for (int i = 0; i < dirSettings.Count; i++)
+            {
+                EditorUtility.DisplayProgressBar("设置 AB 包名", $"正在设置 {dirSettings[i].Dir} 文件夹的 AB 包名", i * 1.0f / dirSettings.Count);
+                YuAssetBundleUtility.SetBundleIdAndSelectIsBuild(dirSettings[i],
+                    isBuild, true, isSaveSetting);
+            }
+            EditorUtility.ClearProgressBar();
             //YuAssetBundleUtility.SaveCurrentAppAssetBundleInfo();
 
-            //YuU3dAppAssetBundleSettingDati.GetMultiAtId(targetApp.LocAppId).Save();
+            AssetBundleEditorDati.GetSingleDati().Save();
         }
 
         #endregion

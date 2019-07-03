@@ -43,13 +43,13 @@ namespace Client.Assets.Editor
                 return;
             }
 
-            //var targetSetting = ActualSerializableObject.GetDirSetting(path);
-            //if (targetSetting == null)
-            //{
-            //    return;
-            //}
+            var targetSetting = ActualSerializableObject.GetSetting(path);
+            if (targetSetting == null)
+            {
+                return;
+            }
 
-            //ActualSerializableObject.TargetDirSetting = targetSetting;
+            ActualSerializableObject.TargetDirSetting = targetSetting;
         }
 
         private static bool IsSelected(string guid)

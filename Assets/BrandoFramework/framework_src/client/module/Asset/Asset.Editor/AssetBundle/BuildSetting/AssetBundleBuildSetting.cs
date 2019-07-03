@@ -130,8 +130,8 @@ namespace Client.Assets.Editor
         {
             var paths = IOUtility.GetPaths(Dir);
             var ignoreRule = IgnoreRule;
-            paths = paths.Where(p => YuAssetBundleUtility.EndCheck(ignoreRule, p))
-                .Where(p => YuAssetBundleUtility.ContainCheck(ignoreRule, p)).ToList();
+            paths = paths.Where(p => YuAssetBundleUtility.EndCheck(IgnoreRule, p))
+                .Where(p => YuAssetBundleUtility.ContainCheck(IgnoreRule, p)).ToList();
             var fileIds = paths.Select(Path.GetFileNameWithoutExtension).ToList();
 
             return fileIds;
@@ -166,10 +166,8 @@ namespace Client.Assets.Editor
         public List<string> SelfDirPaths()
         {
             var paths = IOUtility.GetPaths(Dir);
-            ////var ignoreRule = YuU3dAppAssetBundleSettingDati.TryGetAssetBundleSetting(LocAppId).IgnoreRule;
-            ////paths = paths.Where(p => YuAssetBundleUtility.EndCheck(ignoreRule, p))
-            ////    .Where(p => YuAssetBundleUtility.ContainCheck(ignoreRule, p)).ToList();
-
+            paths = paths.Where(p => YuAssetBundleUtility.EndCheck(IgnoreRule, p))
+                .Where(p => YuAssetBundleUtility.ContainCheck(IgnoreRule, p)).ToList();
             return paths;
         }
 

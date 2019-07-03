@@ -28,7 +28,7 @@ namespace Client.DataTable.Editor
             ExcelSheetInfo sheetInfo
         )
         {
-            var scriptName = $"{u3DAppSetting.CurrentDevelopProjectName}_ExcelEntity_{sheetInfo.EnglishId}";
+            var scriptName = $"{u3DAppSetting.DevelopProjectName}_ExcelEntity_{sheetInfo.EnglishId}";
             return scriptName;
         }
 
@@ -38,7 +38,7 @@ namespace Client.DataTable.Editor
             ExcelSheetInfo sheetInfo
         )
         {
-            var scriptName = $"{u3DAppSetting.CurrentDevelopProjectName}_IExcelEntity_{sheetInfo.EnglishId}";
+            var scriptName = $"{u3DAppSetting.DevelopProjectName}_IExcelEntity_{sheetInfo.EnglishId}";
             return scriptName;
         }
 

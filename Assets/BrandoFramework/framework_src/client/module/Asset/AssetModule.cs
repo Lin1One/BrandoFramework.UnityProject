@@ -46,7 +46,7 @@ namespace Client.Assets
         private string GetAssetPath(string assetId)
         {
             var assetInfo = AssetInfoHelper.GetAssetInfo(assetId);
-            var path = assetInfo.GetEditorPath($"Assets/GameProjects/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/AssetDatabase/");
+            var path = assetInfo.GetEditorPath($"Assets/GameProjects/{ProjectInfoDati.GetActualInstance().DevelopProjectName}/AssetDatabase/");
             return path;
         }
 

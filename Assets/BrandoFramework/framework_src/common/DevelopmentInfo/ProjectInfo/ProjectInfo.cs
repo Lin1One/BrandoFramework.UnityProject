@@ -24,7 +24,7 @@ namespace Common.Config
         [GUIColor( 0.1f,0.8f,0.1f)]
         [Title("项目信息配置", titleAlignment: TitleAlignments.Centered)]
         [LabelText("当前开发项目名称")]
-        public string CurrentDevelopProjectName;
+        public string DevelopProjectName;
 
         [BoxGroup("Dir")]
         [LabelWidth(130)]
@@ -35,8 +35,15 @@ namespace Common.Config
         [BoxGroup("Dir")]
         [LabelWidth(130)]
         [FolderPath]
-        [LabelText("项目Assetdatabase目录")]
+        [LabelText("Assetdatabase目录")]
         public string CurrentProjectAssetDatabaseDirPath;
+
+        [BoxGroup("Dir")]
+        [LabelWidth(130)]
+        [FolderPath]
+        [LabelText("AssetBundle输出目录")]
+        public string AssetBundleBuildDir;
+        
 
         [BoxGroup("Script")]
         [LabelWidth(130)]

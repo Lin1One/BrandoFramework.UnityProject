@@ -12,6 +12,8 @@
 
 #endregion
 
+using Common.Editor;
+using Common.Utility;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
@@ -44,7 +46,7 @@ namespace Client.Assets.Editor
         [LabelText("配置项列表")]
         public List<AssetBundleBuildSetting> BundleSettings
              = new List<AssetBundleBuildSetting>();
-
+        //Todo：目录打包宏
         #endregion
 
         #region 方法
@@ -61,12 +63,12 @@ namespace Client.Assets.Editor
             BundleSettings.Add(setting);
         }
 
-        ////public YuAssetBundleDirSetting GetDirSetting(string path)
-        ////{
-        ////    //path = YuUnityIOUtility.GetAssetsPath(path);
-        ////    //var setting = BundleSettings.Find(s => s.Dir == path);
-        ////    //return setting;
-        ////}
+        public AssetBundleBuildSetting GetSetting(string path)
+        {
+            path = YuUnityIOUtility.GetAssetsPath(path);
+            var setting = BundleSettings.Find(s => s.Dir == path);
+            return setting;
+        }
 
         private void OrderByDirId()
         {
@@ -75,39 +77,39 @@ namespace Client.Assets.Editor
 
         public void SetBuildAtTargetBuildType(string dir, AssetBundleBuildType buildType)
         {
-            ////var locAppId = YuEditorUtility.GetLocAppIdAtSelectDir();
-            ////var appSetting = YuU3dAppSettingDati.TryGetApp(locAppId);
+            //var locAppId = YuEditorUtility.GetLocAppIdAtSelectDir();
+            //var appSetting = YuU3dAppSettingDati.TryGetApp(locAppId);
 
-            ////if (appSetting == null)
-            ////{
-            ////    Debug.LogError($"目标目录{dir}不是一个应用下的目录！");
-            ////    return;
-            ////}
+            //if (appSetting == null)
+            //{
+            //    Debug.LogError($"目标目录{dir}不是一个应用下的目录！");
+            //    return;
+            //}
 
-            ////if (!YuAssetBundleUtility.IsLegalAssetBundleDir(dir, appSetting))
-            ////{
-            ////    Debug.LogError($"目标目录{dir}不是一个有效的AssetBundle目录！");
-            ////    return;
-            ////}
+            //if (!YuAssetBundleUtility.IsLegalAssetBundleDir(dir, appSetting))
+            //{
+            //    Debug.LogError($"目标目录{dir}不是一个有效的AssetBundle目录！");
+            //    return;
+            //}
 
-            ////var existSetting = BundleSettings.Find(s => s.Dir == dir);
-            ////if (existSetting == null)
-            ////{
-            ////    existSetting = new YuAssetBundleDirSetting
-            ////    {
-            ////        BuildType = buildType,
-            ////        Dir = dir,
-            ////        LocAppId = YuEditorUtility.GetLocAppIdAtSelectDir()
-            ////    };
-            ////    BundleSettings.Add(existSetting);
-            ////    BundleSettings = BundleSettings.OrderBy(s => s.Dir).ToList();
-            ////    Debug.Log($"目录{dir}当前不存在配置数据，已新建配置！");
-            ////}
-            ////else
-            ////{
-            ////    existSetting.BuildType = buildType;
-            ////    Debug.Log($"目录{dir}已设置为基于{buildType}打包方式！");
-            ////}
+            var existSetting = BundleSettings.Find(s => s.Dir == dir);
+            if (existSetting == null)
+            {
+                existSetting = new AssetBundleBuildSetting
+                {
+                    BuildType = buildType,
+                    Dir = dir,
+                    //LocAppId = Unity3DEditorUtility.GetLocAppIdAtSelectDir()
+                };
+                BundleSettings.Add(existSetting);
+                BundleSettings = BundleSettings.OrderBy(s => s.Dir).ToList();
+                Debug.Log($"目录{dir}当前不存在配置数据，已新建配置！");
+            }
+            else
+            {
+                existSetting.BuildType = buildType;
+                Debug.Log($"目录{dir}已设置为基于{buildType}打包方式！");
+            }
         }
 
         public void CleanBuildSettingAtDir(string dir,List<string> paths = null)

@@ -101,14 +101,14 @@ namespace Client.GamePlaying.AI
         [Button("保存行为树",buttonSize: ButtonSizes.Medium)]
         public void SaveCurrentHaviourTree()
         {
-            var writePath = $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/Config/BehaviourTreeData.byte";
+            var writePath = $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().DevelopProjectName}/Config/BehaviourTreeData.byte";
             SerializeUtility.SerializeAndWriteTo(instance, writePath);
         }
 
         [Button("加载行为树", buttonSize: ButtonSizes.Medium)]
         public YuAIBehaviorTree LoadCurrentHaviourTree(string behaviourId)
         {
-            var writePath = $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().CurrentDevelopProjectName}/Config/BehaviourTreeData.byte";
+            var writePath = $"{Application.streamingAssetsPath}/{ProjectInfoDati.GetActualInstance().DevelopProjectName}/Config/BehaviourTreeData.byte";
             var newInstance = SerializeUtility.DeSerialize<BehaviorTreeVisualization>(writePath);
             instance = newInstance;
             return CreateBehaviourTree();

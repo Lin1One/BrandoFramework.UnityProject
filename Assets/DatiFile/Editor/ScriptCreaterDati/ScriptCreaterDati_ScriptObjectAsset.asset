@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: ScriptCreaterDati_ScriptObjectAsset
   m_EditorClassIdentifier: 
   actualSerializableObject:
-    TargetDir: Assets/BrandoFramework/framework_src/common/Editor/BrandoWindow/
+    TargetDir: Assets/BrandoFramework/studystudio/AlgorithmsStudio/Sorting/
     DevelopId: LinYuzhou
     DevelopEmail: 836045613@qq.com
     ScriptCreateSettings: []

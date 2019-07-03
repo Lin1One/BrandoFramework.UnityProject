@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: DeveloperInfoDati_ScriptObjectAsset
   m_EditorClassIdentifier: Framework.Common:Common.Config:DeveloperInfoDati
   actualSerializableObject:
-    DeveloperName: LinYuzhou
-    DeveloperEmail: 836045613@qq.com
+    DeveloperName: 
+    DeveloperEmail: 
