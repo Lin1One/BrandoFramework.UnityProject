@@ -332,6 +332,11 @@ namespace Client.Assets
         {
         }
 
+        public void Init()
+        {
+            throw new NotImplementedException();
+        }
+
         public bool IsReady { get; }
     }
 }
