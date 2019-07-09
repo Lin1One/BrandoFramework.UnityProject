@@ -13,7 +13,7 @@ using UnityEngine;
 namespace Client.GamePlaying.Unit
 {
     [Singleton]
-    public class UnitModule 
+    public class UnitModule : IUnitModule
     {
         /// <summary>
         /// 所有活动的角色<类型,<唯一id，角色基类>>
@@ -41,7 +41,7 @@ namespace Client.GamePlaying.Unit
         public UnitEntityBase LeadPlayer
         { get { return m_leadPlayer; } }
 
-        public Transform RoleRoot
+        public Transform UnitRoot
         {
             get { return m_roleRoot != null ? m_roleRoot.transform : null; }
         }
@@ -168,6 +168,10 @@ namespace Client.GamePlaying.Unit
             }
         }
 
+        public void RemoveUnit(UnitEntityBase obj)
+        {
+        }
+
         public bool TryGetUnitByGuid(long guid, out UnitEntityBase unit)
         {
             foreach (var item in m_dicActiveUnit.Values)
@@ -215,7 +219,7 @@ namespace Client.GamePlaying.Unit
         private readonly Dictionary<Type, Stack<UnitEntityBase>> m_dicPool =
             new Dictionary<Type, Stack<UnitEntityBase>>();
 
-        private T GetUnit<T>() where T : UnitEntityBase, new()
+        public T GetUnit<T>() where T : UnitEntityBase, new()
         {
             Type type = typeof(T);
 
@@ -231,7 +235,7 @@ namespace Client.GamePlaying.Unit
             return unit;
         }
 
-        private void RecoverUnit(UnitEntityBase obj)
+        public void RecoverUnit(UnitEntityBase obj)
         {
             Type type = obj.GetType();
             m_dicPool[type].Push(obj);
