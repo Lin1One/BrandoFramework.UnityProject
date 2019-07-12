@@ -29,7 +29,7 @@ namespace Client.LegoUI
         public int PaddingLastY;
 
         [FoldoutGroup("UI子集元数据")] [LabelText("元素类型元数据")]
-        public List<YuLegoUIType> ElementTypes;
+        public List<LegoUIType> ElementTypes;
 
         [FoldoutGroup("UI子集元数据")] [LabelText("子组件引用元数据")]
         public List<LegoComponentRef> ComponentRefs;
@@ -163,7 +163,7 @@ namespace Client.LegoUI
 
         public int ElementIndex { get; set; } = -1;
 
-        public YuLegoUIType NextElement
+        public LegoUIType NextElement
         {
             get
             {
@@ -175,9 +175,9 @@ namespace Client.LegoUI
         #endregion
 
 
-        private Dictionary<YuLegoUIType, int> indexs;
+        private Dictionary<LegoUIType, int> indexs;
 
-        private Dictionary<YuLegoUIType, int> Indexs
+        private Dictionary<LegoUIType, int> Indexs
         {
             get
             {
@@ -186,28 +186,28 @@ namespace Client.LegoUI
                     return indexs;
                 }
 
-                indexs = new Dictionary<YuLegoUIType, int>
+                indexs = new Dictionary<LegoUIType, int>
                 {
-                    {YuLegoUIType.Text, -1},
-                    {YuLegoUIType.Button, -1},
-                    {YuLegoUIType.TButton, -1},
-                    {YuLegoUIType.Image, -1},
-                    {YuLegoUIType.RawImage, -1},
-                    {YuLegoUIType.Toggle, -1},
-                    {YuLegoUIType.PlaneToggle, -1},
-                    {YuLegoUIType.Slider, -1},
-                    {YuLegoUIType.Progressbar, -1},
-                    {YuLegoUIType.InputField, -1},
-                    {YuLegoUIType.Dropdown, -1},
-                    {YuLegoUIType.ScrollView, -1},
-                    {YuLegoUIType.Rocker, -1}
+                    {LegoUIType.Text, -1},
+                    {LegoUIType.Button, -1},
+                    {LegoUIType.TButton, -1},
+                    {LegoUIType.Image, -1},
+                    {LegoUIType.RawImage, -1},
+                    {LegoUIType.Toggle, -1},
+                    {LegoUIType.PlaneToggle, -1},
+                    {LegoUIType.Slider, -1},
+                    {LegoUIType.Progressbar, -1},
+                    {LegoUIType.InputField, -1},
+                    {LegoUIType.Dropdown, -1},
+                    {LegoUIType.ScrollView, -1},
+                    {LegoUIType.Rocker, -1}
                 };
 
                 return indexs;
             }
         }
 
-        private int GetTargetIndex(YuLegoUIType uiType)
+        private int GetTargetIndex(LegoUIType uiType)
         {
             var index = ++Indexs[uiType];
             return index;
@@ -217,7 +217,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.Text);
+                var index = GetTargetIndex(LegoUIType.Text);
                 var meta = TextMetas[index];
                 return meta;
             }
@@ -227,7 +227,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.Button);
+                var index = GetTargetIndex(LegoUIType.Button);
                 var meta = ButtonMetas[index];
                 return meta;
             }
@@ -237,7 +237,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.TButton);
+                var index = GetTargetIndex(LegoUIType.TButton);
                 var meta = TButtonMetas[index];
                 return meta;
             }
@@ -247,7 +247,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.Image);
+                var index = GetTargetIndex(LegoUIType.Image);
                 LegoImageMeta meta = null;
                 if (index  < ImageMetas.Count)
                 {
@@ -261,7 +261,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.RawImage);
+                var index = GetTargetIndex(LegoUIType.RawImage);
                 var meta = RawImageMetas[index];
                 return meta;
             }
@@ -271,7 +271,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.Toggle);
+                var index = GetTargetIndex(LegoUIType.Toggle);
                 var meta = ToggleMetas[index];
                 return meta;
             }
@@ -281,7 +281,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.PlaneToggle);
+                var index = GetTargetIndex(LegoUIType.PlaneToggle);
                 var meta = PlaneToggleMetas[index];
                 return meta;
             }
@@ -291,7 +291,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.Slider);
+                var index = GetTargetIndex(LegoUIType.Slider);
                 var meta = SliderMetas[index];
                 return meta;
             }
@@ -301,7 +301,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.Progressbar);
+                var index = GetTargetIndex(LegoUIType.Progressbar);
                 var meta = ProgressbarMetas[index];
                 return meta;
             }
@@ -311,7 +311,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.InputField);
+                var index = GetTargetIndex(LegoUIType.InputField);
                 var meta = InputFieldMetas[index];
                 return meta;
             }
@@ -321,7 +321,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.Dropdown);
+                var index = GetTargetIndex(LegoUIType.Dropdown);
                 var meta = DropdownMetas[index];
                 return meta;
             }
@@ -331,7 +331,7 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.ScrollView);
+                var index = GetTargetIndex(LegoUIType.ScrollView);
                 var meta = ScrollViewMetas[index];
                 return meta;
             }
@@ -343,15 +343,15 @@ namespace Client.LegoUI
         {
             get
             {
-                var index = GetTargetIndex(YuLegoUIType.Rocker);
+                var index = GetTargetIndex(LegoUIType.Rocker);
                 var meta = RockerMetas[index];
                 return meta;
             }
         }
 
-        private static List<YuLegoUIType> uiTypes;
+        private static List<LegoUIType> uiTypes;
 
-        private static List<YuLegoUIType> UiTypes
+        private static List<LegoUIType> UiTypes
         {
             get
             {
@@ -360,21 +360,21 @@ namespace Client.LegoUI
                     return uiTypes;
                 }
 
-                uiTypes = new List<YuLegoUIType>
+                uiTypes = new List<LegoUIType>
                 {
-                    YuLegoUIType.Text,
-                    YuLegoUIType.Button,
-                    YuLegoUIType.TButton,
-                    YuLegoUIType.Image,
-                    YuLegoUIType.RawImage,
-                    YuLegoUIType.Toggle,
-                    YuLegoUIType.PlaneToggle,
-                    YuLegoUIType.Slider,
-                    YuLegoUIType.Progressbar,
-                    YuLegoUIType.InputField,
-                    YuLegoUIType.Dropdown,
-                    YuLegoUIType.ScrollView,
-                    YuLegoUIType.Rocker
+                    LegoUIType.Text,
+                    LegoUIType.Button,
+                    LegoUIType.TButton,
+                    LegoUIType.Image,
+                    LegoUIType.RawImage,
+                    LegoUIType.Toggle,
+                    LegoUIType.PlaneToggle,
+                    LegoUIType.Slider,
+                    LegoUIType.Progressbar,
+                    LegoUIType.InputField,
+                    LegoUIType.Dropdown,
+                    LegoUIType.ScrollView,
+                    LegoUIType.Rocker
                 };
 
                 return uiTypes;

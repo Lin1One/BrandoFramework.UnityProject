@@ -76,7 +76,7 @@ namespace Client.LegoUI
         /// <summary>
         /// 正在构建的控件类型。
         /// </summary>
-        private YuLegoUIType buildingType;
+        private LegoUIType buildingType;
 
         /// <summary>
         /// 是否在后台加载UI。
@@ -487,7 +487,7 @@ namespace Client.LegoUI
                         buildingRectMeta = TaskMeta.NextRect;
                     }
 
-                    if (buildingType == YuLegoUIType.Component || buildingType == YuLegoUIType.Container)
+                    if (buildingType == LegoUIType.Component || buildingType == LegoUIType.Container)
                     {
                         PushTask();
                     }
@@ -599,10 +599,10 @@ namespace Client.LegoUI
         {
             switch (buildingType)
             {
-                case YuLegoUIType.Component:
+                case LegoUIType.Component:
                     PushSonComponentTask();
                     break;
-                case YuLegoUIType.Container:
+                case LegoUIType.Container:
                     PushContainerTask();
                     break;
             }
@@ -628,54 +628,54 @@ namespace Client.LegoUI
         {
             switch (buildingType)
             {
-                case YuLegoUIType.Text:
+                case LegoUIType.Text:
                     buildingControl = textPool.Take();
                     break;
-                case YuLegoUIType.Image:
+                case LegoUIType.Image:
                     buildingControl = imagePool.Take();
                     break;
-                case YuLegoUIType.RawImage:
+                case LegoUIType.RawImage:
                     buildingControl = rawImagePool.Take();
                     break;
-                case YuLegoUIType.Button:
+                case LegoUIType.Button:
                     buildingControl = buttonPool.Take();
                     break;
-                case YuLegoUIType.TButton:
+                case LegoUIType.TButton:
                     buildingControl = tButtonPool.Take();
                     break;
-                case YuLegoUIType.Toggle:
+                case LegoUIType.Toggle:
                     buildingControl = togglePool.Take();
                     break;
-                case YuLegoUIType.PlaneToggle:
+                case LegoUIType.PlaneToggle:
                     buildingControl = planeTogglePool.Take();
                     break;
-                case YuLegoUIType.InputField:
+                case LegoUIType.InputField:
                     buildingControl = inputFieldPool.Take();
                     break;
-                case YuLegoUIType.Slider:
+                case LegoUIType.Slider:
                     buildingControl = sliderPool.Take();
                     break;
-                case YuLegoUIType.Progressbar:
+                case LegoUIType.Progressbar:
                     buildingControl = progressbarPool.Take();
                     break;
-                case YuLegoUIType.Tab:
+                case LegoUIType.Tab:
                     break;
-                case YuLegoUIType.Dropdown:
+                case LegoUIType.Dropdown:
                     buildingControl = dropdownPool.Take();
                     break;
-                case YuLegoUIType.Rocker:
+                case LegoUIType.Rocker:
                     buildingControl = rockerPool.Take();
                     break;
-                case YuLegoUIType.Grid:
+                case LegoUIType.Grid:
                     break;
-                case YuLegoUIType.ScrollView:
+                case LegoUIType.ScrollView:
                     buildingControl = scrollViewPool.Take();
                     break;
-                case YuLegoUIType.None:
+                case LegoUIType.None:
                     break;
-                case YuLegoUIType.View:
+                case LegoUIType.View:
                     break;
-                case YuLegoUIType.InlineText:
+                case LegoUIType.InlineText:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -714,54 +714,54 @@ namespace Client.LegoUI
         {
             switch (buildingType)
             {
-                case YuLegoUIType.Text:
+                case LegoUIType.Text:
                     buildingControl = GetControlByDefaultControls<YuLegoText>();
                     break;
-                case YuLegoUIType.Image:
+                case LegoUIType.Image:
                     buildingControl = GetControlByDefaultControls<YuLegoImage>();
                     break;
-                case YuLegoUIType.RawImage:
+                case LegoUIType.RawImage:
                     buildingControl = GetControlByDefaultControls<YuLegoRawImage>();
                     break;
-                case YuLegoUIType.Button:
+                case LegoUIType.Button:
                     buildingControl = GetControlByDefaultControls<YuLegoButton>();
                     break;
-                case YuLegoUIType.TButton:
+                case LegoUIType.TButton:
                     buildingControl = GetControlByDefaultControls<YuLegoTButton>();
                     break;
-                case YuLegoUIType.Toggle:
+                case LegoUIType.Toggle:
                     buildingControl = GetControlByDefaultControls<YuLegoToggle>();
                     break;
-                case YuLegoUIType.PlaneToggle:
+                case LegoUIType.PlaneToggle:
                     buildingControl = GetControlByDefaultControls<YuLegoPlaneToggle>();
                     break;
-                case YuLegoUIType.InputField:
+                case LegoUIType.InputField:
                     buildingControl = GetControlByDefaultControls<YuLegoInputField>();
                     break;
-                case YuLegoUIType.Slider:
+                case LegoUIType.Slider:
                     buildingControl = GetControlByDefaultControls<YuLegoSlider>();
                     break;
-                case YuLegoUIType.Progressbar:
+                case LegoUIType.Progressbar:
                     buildingControl = GetControlByDefaultControls<YuLegoProgressbar>();
                     break;
-                case YuLegoUIType.Tab:
+                case LegoUIType.Tab:
                     break;
-                case YuLegoUIType.Dropdown:
+                case LegoUIType.Dropdown:
                     buildingControl = GetControlByDefaultControls<YuLegoDropdown>();
                     break;
-                case YuLegoUIType.Rocker:
+                case LegoUIType.Rocker:
                     buildingControl = GetControlByDefaultControls<YuLegoRocker>();
                     break;
-                case YuLegoUIType.Grid:
+                case LegoUIType.Grid:
                     break;
-                case YuLegoUIType.ScrollView:
+                case LegoUIType.ScrollView:
                     buildingControl = GetControlByDefaultControls<YuLegoScrollView>();
                     break;
-                case YuLegoUIType.None:
+                case LegoUIType.None:
                     break;
-                case YuLegoUIType.View:
+                case LegoUIType.View:
                     break;
-                case YuLegoUIType.InlineText:
+                case LegoUIType.InlineText:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

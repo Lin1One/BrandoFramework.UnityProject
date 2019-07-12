@@ -20,25 +20,25 @@ namespace Client.LegoUI
 {
     public partial class LegoUIMeta
     {
-        [NonSerialized] private Dictionary<YuLegoUIType, Action<Transform>> AddMetaActions;
+        [NonSerialized] private Dictionary<LegoUIType, Action<Transform>> AddMetaActions;
 
         private void InitAddMetActions()
         {
-            AddMetaActions.Add(YuLegoUIType.Text, AddTextMeta);
-            AddMetaActions.Add(YuLegoUIType.Image, AddImageMeta);
-            AddMetaActions.Add(YuLegoUIType.RawImage, AddRawImageMeta);
-            AddMetaActions.Add(YuLegoUIType.Button, AddButtonMeta);
-            AddMetaActions.Add(YuLegoUIType.TButton, AddTButtonMeta);
-            AddMetaActions.Add(YuLegoUIType.Toggle, AddToggleMeta);
-            AddMetaActions.Add(YuLegoUIType.PlaneToggle, AddPlaneToggleMeta);
-            AddMetaActions.Add(YuLegoUIType.InputField, AddInputFieldMeta);
-            AddMetaActions.Add(YuLegoUIType.Slider, AddSliderMeta);
-            AddMetaActions.Add(YuLegoUIType.Progressbar, AddProgressBarMeta);
-            AddMetaActions.Add(YuLegoUIType.Dropdown, AddDropdownMeta);
-            AddMetaActions.Add(YuLegoUIType.Component, AddComponentMeta);
-            AddMetaActions.Add(YuLegoUIType.Container, AddContainerMeta);
-            AddMetaActions.Add(YuLegoUIType.ScrollView, AddScrollViewMeta);
-            AddMetaActions.Add(YuLegoUIType.Rocker, AddRockerMeta);
+            AddMetaActions.Add(LegoUIType.Text, AddTextMeta);
+            AddMetaActions.Add(LegoUIType.Image, AddImageMeta);
+            AddMetaActions.Add(LegoUIType.RawImage, AddRawImageMeta);
+            AddMetaActions.Add(LegoUIType.Button, AddButtonMeta);
+            AddMetaActions.Add(LegoUIType.TButton, AddTButtonMeta);
+            AddMetaActions.Add(LegoUIType.Toggle, AddToggleMeta);
+            AddMetaActions.Add(LegoUIType.PlaneToggle, AddPlaneToggleMeta);
+            AddMetaActions.Add(LegoUIType.InputField, AddInputFieldMeta);
+            AddMetaActions.Add(LegoUIType.Slider, AddSliderMeta);
+            AddMetaActions.Add(LegoUIType.Progressbar, AddProgressBarMeta);
+            AddMetaActions.Add(LegoUIType.Dropdown, AddDropdownMeta);
+            AddMetaActions.Add(LegoUIType.Component, AddComponentMeta);
+            AddMetaActions.Add(LegoUIType.Container, AddContainerMeta);
+            AddMetaActions.Add(LegoUIType.ScrollView, AddScrollViewMeta);
+            AddMetaActions.Add(LegoUIType.Rocker, AddRockerMeta);
         }
 
         #region 添加元数据方法
@@ -136,7 +136,7 @@ namespace Client.LegoUI
             RockerMetas.Add(rockerMeta);
         }
 
-        public void AddOperateMeta(YuLegoUIType elementType,
+        public void AddOperateMeta(LegoUIType elementType,
             LegoRectTransformMeta rectMeta, Transform transform)
         {
             ElementTypes.Add(elementType);
@@ -220,7 +220,7 @@ namespace Client.LegoUI
         public void Init()
         {
             RootMeta = new LegoRectTransformMeta();
-            ElementTypes = new List<YuLegoUIType>();
+            ElementTypes = new List<LegoUIType>();
             ComponentRefs = new List<LegoComponentRef>();
             ContainerRefs = new List<LegoContainerRef>();
             RectMetas = new List<LegoRectTransformMeta>();
@@ -238,7 +238,7 @@ namespace Client.LegoUI
             ScrollViewMetas = new List<LegoScrollViewMeta>();
             RockerMetas = new List<LegoRockerMeta>();
 
-            AddMetaActions = new Dictionary<YuLegoUIType, Action<Transform>>();
+            AddMetaActions = new Dictionary<LegoUIType, Action<Transform>>();
             InitAddMetActions();
         }
 

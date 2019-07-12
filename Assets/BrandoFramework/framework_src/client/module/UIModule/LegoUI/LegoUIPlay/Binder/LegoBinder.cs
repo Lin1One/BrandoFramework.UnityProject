@@ -64,67 +64,67 @@ namespace Client.LegoUI
             }
         }
 
-        private void TryUnBingdngAtElementType(YuLegoUIType elementType, IYuLegoUI ui, string id,
+        private void TryUnBingdngAtElementType(LegoUIType elementType, IYuLegoUI ui, string id,
             IYuLegoUIRxModel uiRxModel)
         {
 
         }
 
-        private void BingdngAtElementType(YuLegoUIType elementType, IYuLegoUI ui, string id,
+        private void BingdngAtElementType(LegoUIType elementType, IYuLegoUI ui, string id,
             IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             switch (elementType)
             {
-                case YuLegoUIType.Text:
+                case LegoUIType.Text:
                     BindingText(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.Image:
+                case LegoUIType.Image:
                     BindingImage(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.RawImage:
+                case LegoUIType.RawImage:
                     BindingRawImage(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.Button:
+                case LegoUIType.Button:
                     BindingButton(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.TButton:
+                case LegoUIType.TButton:
                     BindingTButton(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.InputField:
+                case LegoUIType.InputField:
                     BindingInputField(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.Slider:
+                case LegoUIType.Slider:
                     BindingSlider(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.Progressbar:
+                case LegoUIType.Progressbar:
                     BindingProgressbar(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.Toggle:
+                case LegoUIType.Toggle:
                     BindingToggle(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.Tab:
+                case LegoUIType.Tab:
                     break;
-                case YuLegoUIType.Dropdown:
+                case LegoUIType.Dropdown:
                     BindingDropdown(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.Rocker:
+                case LegoUIType.Rocker:
                     break;
-                case YuLegoUIType.Grid:
+                case LegoUIType.Grid:
                     break;
-                case YuLegoUIType.ScrollView:
+                case LegoUIType.ScrollView:
                     break;
-                case YuLegoUIType.None:
+                case LegoUIType.None:
                     break;
-                case YuLegoUIType.InlineText:
+                case LegoUIType.InlineText:
                     break;
-                case YuLegoUIType.PlaneToggle:
+                case LegoUIType.PlaneToggle:
                     BindingPlaneToggle(ui, id, uiRxModel, rectMeta);
                     break;
-                case YuLegoUIType.Component:
+                case LegoUIType.Component:
                     break;
-                case YuLegoUIType.Container:
+                case LegoUIType.Container:
                     break;
-                case YuLegoUIType.View:
+                case LegoUIType.View:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(elementType), elementType, null);
