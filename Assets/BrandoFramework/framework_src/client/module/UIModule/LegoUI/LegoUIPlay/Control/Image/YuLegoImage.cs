@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.Sprites;
 using UnityEngine.UI;
+using YuU3dPlay;
 
 namespace Client.LegoUI
 {

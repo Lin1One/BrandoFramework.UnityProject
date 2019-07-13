@@ -6,6 +6,7 @@
 
 #endregion
 
+using Common.Config;
 using Common.Utility;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace Client.LegoUI
                 }
                 else
                 {
-                    string curAppID = YuU3dAppSettingDati.CurrentAppId;
+                    string curAppID = ProjectInfoDati.GetActualInstance().DevelopProjectName;
                     if (AppTextStyleInfoDic.ContainsKey(curAppID))
                     {
                         currentAppTextStyle = AppTextStyleInfoDic[curAppID];
@@ -69,12 +70,13 @@ namespace Client.LegoUI
         [Button("保存修改",25)]
         private static void SaveTextStyleChange()
         {
+            var appID = ProjectInfoDati.GetActualInstance().DevelopProjectName;
             currentAppTextStyle =
-                AppTextStyleInfoDic[YuU3dAppSettingDati.CurrentAppId];
+                AppTextStyleInfoDic[appID];
             string fullPath = GetAppTextStyleSettingTxtPath(
-                YuU3dAppSettingDati.CurrentAppId);
+                appID);
             var jsContent = JsonUtility.ToJson(currentAppTextStyle);
-            jsContent = EditorAPIInvoker.PrettifyJsonString(jsContent);
+            ////jsContent = EditorAPIInvoker.PrettifyJsonString(jsContent);
             IOUtility.WriteAllText(fullPath, jsContent);
         }
 

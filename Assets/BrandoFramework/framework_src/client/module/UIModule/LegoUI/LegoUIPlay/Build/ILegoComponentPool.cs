@@ -10,10 +10,10 @@ namespace Client.LegoUI
 {
     public interface ILegoComponentPool
     {
-        IYuLegoUI Take(IYuLegoView locView, string componentId);
+        ILegoUI Take(ILegoView locView, string componentId);
 
-        IYuLegoUI Take(IYuLegoUI locUi, string componentId);
+        ILegoUI Take(ILegoUI locUi, string componentId);
 
-        void Restore(IYuLegoUI ui);
+        void Restore(ILegoUI ui);
     }
 }

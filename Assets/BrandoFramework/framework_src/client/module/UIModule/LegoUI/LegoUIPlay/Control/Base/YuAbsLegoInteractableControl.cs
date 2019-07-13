@@ -83,7 +83,7 @@ namespace Client.LegoUI
 
         private RectTransform m_RectTransform;
 
-        public IYuLegoUI LocUI { get; private set; }
+        public ILegoUI LocUI { get; private set; }
 
         public RectTransform RectTransform
         {
@@ -104,7 +104,7 @@ namespace Client.LegoUI
 
         #region 构造
 
-        public virtual void Construct(IYuLegoUI locUI, object obj = null)
+        public virtual void Construct(ILegoUI locUI, object obj = null)
         {
             LocUI = locUI;
         }

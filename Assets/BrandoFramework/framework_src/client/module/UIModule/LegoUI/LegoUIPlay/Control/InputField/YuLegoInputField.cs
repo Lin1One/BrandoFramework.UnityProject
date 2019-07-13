@@ -2715,7 +2715,7 @@ namespace Client.LegoUI
 
         #endregion
 
-        public override void Construct(IYuLegoUI locUI, object obj = null)
+        public override void Construct(ILegoUI locUI, object obj = null)
         {
             base.Construct(locUI);
             onValueChanged.AddListener(OnValueChanged);

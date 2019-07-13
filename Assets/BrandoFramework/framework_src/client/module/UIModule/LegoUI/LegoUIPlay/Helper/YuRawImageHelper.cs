@@ -8,10 +8,9 @@
 
 #endregion
 
+using Common.Utility;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using Client.LegoUI;
-using YuU3dPlay;
 
 namespace Client.LegoUI
 {
@@ -19,7 +18,7 @@ namespace Client.LegoUI
     {
         [LabelText("动态贴图资源Id")] public string rawImageSrc;
 
-        private YuU3dAppSetting LocU3DApp => YuU3dAppSettingDati.CurrentActual;
+        ////private YuU3dAppSetting LocU3DApp => YuU3dAppSettingDati.CurrentActual;
 
         private void OnEnable()
         {
@@ -29,14 +28,14 @@ namespace Client.LegoUI
                 return;
             }
 
-            var jpgFullPath = LocU3DApp.Helper.OriginRawImageDir + rawImageSrc + ".jpg";
+            var jpgFullPath = /*LocU3DApp.Helper.OriginRawImageDir + rawImageSrc+*/ ".jpg";
             var jpgAssetsPath = YuUnityIOUtility.GetAssetsPath(jpgFullPath);
-            var texture2D = YuAssetDatabaseUtility.LoadAssetAtPath<Texture2D>(jpgAssetsPath);
+            var texture2D = AssetDatabaseUtility.LoadAssetAtPath<Texture2D>(jpgAssetsPath);
             if (texture2D == null)
             {
-                var pngFullPath = LocU3DApp.Helper.OriginRawImageDir + rawImageSrc + ".png";
+                var pngFullPath = /*LocU3DApp.Helper.OriginRawImageDir + rawImageSrc + */".png";
                 var pngAssetsPath = YuUnityIOUtility.GetAssetsPath(pngFullPath);
-                texture2D = YuAssetDatabaseUtility.LoadAssetAtPath<Texture2D>(pngAssetsPath);
+                texture2D = AssetDatabaseUtility.LoadAssetAtPath<Texture2D>(pngAssetsPath);
             }
 
             rawImage.texture = texture2D;

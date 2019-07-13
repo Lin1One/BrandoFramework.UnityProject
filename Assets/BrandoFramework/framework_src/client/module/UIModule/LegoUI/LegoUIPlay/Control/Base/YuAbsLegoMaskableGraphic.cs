@@ -12,6 +12,8 @@
 
 #endregion
 
+using Client.Assets;
+using Common;
 using UnityEngine;
 using UnityEngine.UI;
 using YuCommon;
@@ -37,12 +39,12 @@ namespace Client.LegoUI
                     return assetModule;
                 }
 
-                assetModule = YuU3dAppUtility.Injector.Get<IAssetModule>();
+                assetModule = Injector.Instance.Get<IAssetModule>();
                 return assetModule;
             }
         }
 
-        public IYuLegoUI LocUI { get; private set; }
+        public ILegoUI LocUI { get; private set; }
 
         public LegoRectTransformMeta RectMeta { get; protected set; }
 
@@ -89,7 +91,7 @@ namespace Client.LegoUI
         public abstract void Metamorphose(LegoUIMeta uiMeta);
 
         public LegoMetamorphoseStage MetamorphoseStage { get; protected set; }
-        public void Construct(IYuLegoUI locUI, object obj = null)
+        public void Construct(ILegoUI locUI, object obj = null)
         {
             LocUI = locUI;
         }

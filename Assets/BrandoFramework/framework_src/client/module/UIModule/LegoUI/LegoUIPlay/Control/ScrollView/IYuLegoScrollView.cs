@@ -31,21 +31,21 @@ namespace Client.LegoUI
         /// </summary>
         /// <param name="callback"></param>
         /// <returns></returns>
-        IYuLegoScrollView OnAddComponent(Action<IYuLegoComponent> callback);
+        IYuLegoScrollView OnAddComponent(Action<ILegoComponent> callback);
 
         /// <summary>
         /// 组件绘制完毕后回调吗，用于做业务的特殊处理。
         /// </summary>
         /// <param name="onDraw"></param>
         /// <returns></returns>
-        IYuLegoScrollView OnDrawComponent(Action<IYuLegoComponent, IYuLegoUIRxModel> onDraw);
+        IYuLegoScrollView OnDrawComponent(Action<ILegoComponent, IYuLegoUIRxModel> onDraw);
 
         /// <summary>
         /// 替换滚动列表所有组件后，返回新组件链表
         /// </summary>
         /// <param name="onDraw"></param>
         /// <returns></returns>
-        IYuLegoScrollView OnReplaceComponents(Action<LinkedList<IYuLegoComponent>> callback);
+        IYuLegoScrollView OnReplaceComponents(Action<LinkedList<ILegoComponent>> callback);
 
         RectTransform Content { get; }
 

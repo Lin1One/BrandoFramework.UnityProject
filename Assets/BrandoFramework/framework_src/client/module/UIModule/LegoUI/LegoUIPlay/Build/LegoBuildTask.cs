@@ -141,7 +141,7 @@ namespace Client.LegoUI
         /// </summary>
         private int taskCurrentElementIndex = -1;
 
-        public Action<IYuLegoUI> UiBuildCallback { get; private set; }
+        public Action<ILegoUI> UiBuildCallback { get; private set; }
 
         private void OnSonCompleted(RectTransform uiRect)
         {
@@ -253,7 +253,7 @@ namespace Client.LegoUI
             return this;
         }
 
-        public LegoBuildTask SetUILoadCallback(Action<IYuLegoUI> callback)
+        public LegoBuildTask SetUILoadCallback(Action<ILegoUI> callback)
         {
             UiBuildCallback = callback;
             return this;

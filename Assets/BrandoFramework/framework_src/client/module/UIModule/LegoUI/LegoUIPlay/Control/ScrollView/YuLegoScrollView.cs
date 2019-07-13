@@ -6,6 +6,8 @@
 
 #endregion
 
+using Client.Extend;
+using Common;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -34,9 +36,9 @@ namespace Client.LegoUI
         private int lastIndex = 0;
         private int minVisibleLine; // 可见的最小行数
 
-        private static YuLegoScrollViewPipelineRouter pipelineRouter;
+        private static LegoScrollViewPipelineRouter pipelineRouter;
 
-        private static YuLegoScrollViewPipelineRouter PipelineRouter
+        private static LegoScrollViewPipelineRouter PipelineRouter
         {
             get
             {
@@ -45,7 +47,7 @@ namespace Client.LegoUI
                     return pipelineRouter;
                 }
 
-                pipelineRouter = YuU3dAppUtility.Injector.Get<YuLegoScrollViewPipelineRouter>();
+                pipelineRouter = Injector.Instance.Get<LegoScrollViewPipelineRouter>();
                 return pipelineRouter;
             }
         }
@@ -82,8 +84,8 @@ namespace Client.LegoUI
             }
         }
 
-        private readonly LinkedList<IYuLegoComponent> components
-            = new LinkedList<IYuLegoComponent>();
+        private readonly LinkedList<ILegoComponent> components
+            = new LinkedList<ILegoComponent>();
 
         public IYuLegoScrollViewRxModel ScRxModel { get; private set; }
 
@@ -125,7 +127,7 @@ namespace Client.LegoUI
                     return legoBinder;
                 }
 
-                legoBinder = YuU3dAppUtility.Injector.Get<LegoBinder>();
+                legoBinder =Injector.Instance.Get<LegoBinder>();
                 return legoBinder;
             }
         }
@@ -141,14 +143,14 @@ namespace Client.LegoUI
                     return metaHelper;
                 }
 
-                metaHelper = YuU3dAppUtility.Injector.Get<LegoMetaHelper>();
+                metaHelper = Injector.Instance.Get<LegoMetaHelper>();
                 return metaHelper;
             }
         }
 
-        private IYuLegoViewModule viewModule;
+        private ILegoViewModule viewModule;
 
-        private IYuLegoViewModule ViewModule
+        private ILegoViewModule ViewModule
         {
             get
             {
@@ -157,7 +159,7 @@ namespace Client.LegoUI
                     return viewModule;
                 }
 
-                viewModule = YuU3dAppUtility.Injector.Get<IYuLegoViewModule>();
+                viewModule = Injector.Instance.Get<ILegoViewModule>();
                 return viewModule;
             }
         }
@@ -425,7 +427,7 @@ namespace Client.LegoUI
 
         #region 控制子项方法
 
-        private void UpdateComponentAtInit(IYuLegoComponent component)
+        private void UpdateComponentAtInit(ILegoComponent component)
         {
             component.UIRect.SetParent(Content);
             component.UIRect.AsLeftTop();
@@ -436,7 +438,7 @@ namespace Client.LegoUI
             UpdateComponentEvery(component);
         }
 
-        private void UpdateComponentEvery(IYuLegoComponent component)
+        private void UpdateComponentEvery(ILegoComponent component)
         {
             var componentPosition = GetItemPosition(component.ScrollViewId);
             component.UIRect.localPosition = componentPosition;
@@ -490,14 +492,14 @@ namespace Client.LegoUI
             return tmpPosition;
         }
 
-        private void OnComponentLoaded(IYuLegoUI legoui)
+        private void OnComponentLoaded(ILegoUI legoui)
         {
             legoui.SetParentUi(LocUI);
-            IYuLegoComponent component = (IYuLegoComponent)legoui;
+            ILegoComponent component = (ILegoComponent)legoui;
             if (componentMeta == null)
             {
                 var bigId = legoui.UIRect.name;
-                var lowerId = YuBigAssetIdMap.GetLowerId(bigId);
+                var lowerId = "";//YuBigAssetIdMap.GetLowerId(bigId);
                 var uiMeta = metaHelper.GetMeta(lowerId);
                 componentMeta = uiMeta;
             }
@@ -521,7 +523,7 @@ namespace Client.LegoUI
             }
         }
 
-        private void DrawComponent(IYuLegoComponent component)
+        private void DrawComponent(ILegoComponent component)
         {
             var uiRxModel = ScRxModel.GetRxModel(component.ScrollViewId);
             if(uiRxModel == null)
@@ -545,7 +547,7 @@ namespace Client.LegoUI
                 foreach (var sonComponent in component.SonComponentDict)
                 {
                     var bigId = sonComponent.Key;
-                    var lowerId = YuBigAssetIdMap.GetLowerId(bigId);
+                    var lowerId = "";//YuBigAssetIdMap.GetLowerId(bigId);
                     LegoUIMeta sonComponentMeta = metaHelper.GetMeta(lowerId);
                     IYuLegoUIRxModel sonComponentRxModel = uiRxModel.SonComponentModels[bigId];
                     
@@ -588,9 +590,9 @@ namespace Client.LegoUI
 
 
         private Action<IYuLegoUIRxModel> onComponentRxModelAdd;
-        private Action<IYuLegoComponent> onComponentBuilded;
-        private Action<LinkedList<IYuLegoComponent>> onReplaceComponents;
-        private Action<IYuLegoComponent, IYuLegoUIRxModel> onDrawComponent;
+        private Action<ILegoComponent> onComponentBuilded;
+        private Action<LinkedList<ILegoComponent>> onReplaceComponents;
+        private Action<ILegoComponent, IYuLegoUIRxModel> onDrawComponent;
 
         #endregion
 
@@ -683,7 +685,7 @@ namespace Client.LegoUI
 
         #region 乐高视图控件接口实现
 
-        public IYuLegoUI LocUI { get; private set; }
+        public ILegoUI LocUI { get; private set; }
         private RectTransform selfRect;
 
         public RectTransform RectTransform
@@ -720,7 +722,7 @@ namespace Client.LegoUI
 
         public string Name => gameObject.name;
 
-        public void Construct(IYuLegoUI locUI, object obj = null)
+        public void Construct(ILegoUI locUI, object obj = null)
         {
 #if DEBUG
             if (Content.childCount > 0)
@@ -763,19 +765,19 @@ namespace Client.LegoUI
             return this;
         }
 
-        public IYuLegoScrollView OnAddComponent(Action<IYuLegoComponent> callback)
+        public IYuLegoScrollView OnAddComponent(Action<ILegoComponent> callback)
         {
             onComponentBuilded = callback;
             return this;
         }
 
-        public IYuLegoScrollView OnReplaceComponents(Action<LinkedList<IYuLegoComponent>> callback)
+        public IYuLegoScrollView OnReplaceComponents(Action<LinkedList<ILegoComponent>> callback)
         {
             onReplaceComponents = callback;
             return this;
         }
 
-        public IYuLegoScrollView OnDrawComponent(Action<IYuLegoComponent, IYuLegoUIRxModel> onDraw)
+        public IYuLegoScrollView OnDrawComponent(Action<ILegoComponent, IYuLegoUIRxModel> onDraw)
         {
             onDrawComponent = onDraw;
             return this;
@@ -873,8 +875,8 @@ namespace Client.LegoUI
             if (components.Count + requestTaskCount < RequireCount)
             {
                 requestTaskCount++;
-                var lowId = YuBigAssetIdMap.GetLowerId(ComponentId);
-                viewModule.GetScrollViewComponent(lowId, OnComponentLoaded);
+                ////var lowId = YuBigAssetIdMap.GetLowerId(ComponentId);
+                ////viewModule.GetScrollViewComponent(lowId, OnComponentLoaded);
             }
             else
             {
@@ -947,7 +949,7 @@ namespace Client.LegoUI
             }
         }
 
-        private void BindSonComponentRxmodl(IYuLegoUIRxModel rxModel, IYuLegoUI component)
+        private void BindSonComponentRxmodl(IYuLegoUIRxModel rxModel, ILegoUI component)
         {
             foreach (var sonComponent in component.SonComponentDict)
             {

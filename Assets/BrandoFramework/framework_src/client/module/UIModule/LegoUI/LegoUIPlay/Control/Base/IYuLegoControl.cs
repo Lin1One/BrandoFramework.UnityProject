@@ -20,7 +20,7 @@ namespace Client.LegoUI
         /// <summary>
         /// 乐高视图控件所在组件。
         /// </summary>
-        IYuLegoUI LocUI { get; }
+        ILegoUI LocUI { get; }
 
         /// <summary>
         /// 乐高视图控件的RectTransform组件。
@@ -56,7 +56,7 @@ namespace Client.LegoUI
 
         #region 构造
 
-        void Construct(IYuLegoUI locUI, object obj = null);
+        void Construct(ILegoUI locUI, object obj = null);
 
         #endregion
     }

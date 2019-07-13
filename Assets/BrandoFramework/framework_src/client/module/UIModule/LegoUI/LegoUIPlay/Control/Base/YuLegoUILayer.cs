@@ -29,8 +29,8 @@ namespace Client.LegoUI
 
         private float _layerSpacing;
 
-        private readonly LinkedList<IYuLegoView> _views
-            = new LinkedList<IYuLegoView>();
+        private readonly LinkedList<ILegoView> _views
+            = new LinkedList<ILegoView>();
 
 
         public float TopZ => _views.First?.Value.DepthZ ?? 0;
@@ -46,7 +46,7 @@ namespace Client.LegoUI
 
         public YuLegoUILayer NextLayer { get; private set; }
 
-        public void PushView(IYuLegoView view)
+        public void PushView(ILegoView view)
         {
 
             if (Math.Abs(BottomZ) < _layerSpacing)

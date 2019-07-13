@@ -550,7 +550,7 @@ namespace Client.LegoUI
 
         #region Lego
 
-        public override void Construct(IYuLegoUI locUI, object obj = null)
+        public override void Construct(ILegoUI locUI, object obj = null)
         {
             base.Construct(locUI);
             onValueChanged.AddListener(OnValueChanged);

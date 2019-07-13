@@ -1,4 +1,6 @@
-﻿using System;
+﻿using client_module_event;
+using Common;
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -15,7 +17,7 @@ namespace Client.LegoUI
     {
         #region Lego
 
-        public IYuLegoUI LocUI { get; private set; }
+        public ILegoUI LocUI { get; private set; }
 
         private RectTransform m_RectTransform;
         public RectTransform RectTransform
@@ -37,7 +39,7 @@ namespace Client.LegoUI
         public GameObject GameObject => RectTransform.gameObject;
         public string Name => RectTransform.name;
 
-        public void Construct(IYuLegoUI locUI, object obj = null)
+        public void Construct(ILegoUI locUI, object obj = null)
         {
             LocUI = locUI;
             //rockerPosition = RockerImage.RectTransform.localPosition;
@@ -50,9 +52,9 @@ namespace Client.LegoUI
             radius = RectTransform.sizeDelta.x * 0.5f;
         }
 
-        private static IYuU3DEventModule eventModule;
+        private static IU3DEventModule eventModule;
 
-        private static IYuU3DEventModule EventModule
+        private static IU3DEventModule EventModule
         {
             get
             {
@@ -61,7 +63,7 @@ namespace Client.LegoUI
                     return eventModule;
                 }
 
-                eventModule = YuU3dAppUtility.Injector.Get<IYuU3DEventModule>();
+                eventModule = Injector.Instance.Get<IU3DEventModule>();
                 return eventModule;
             }
         }

@@ -10,7 +10,7 @@ using YuU3dPlay;
 
 namespace Client.LegoUI
 {
-    public interface IYuLegoImage : ILegoControl, IYuColor
+    public interface IYuLegoImage : ILegoControl//, /IYuColor
     {
         /// <summary>
         /// 图片使用使用的精灵资源名。

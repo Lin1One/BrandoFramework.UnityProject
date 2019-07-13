@@ -1,0 +1,298 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FA7C4CA8-8062-4728-85D3-3F60FF2953AA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>YuLegoUIPlay</RootNamespace>
+    <AssemblyName>YuLegoUIPlay</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\..\XTwo\Assets\_Yu\YuDLL\Play\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;UNITY_EDITOR</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\.YuDllRef\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\.YuDllRef\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\..\.YuDllRef\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Binder\IYuLegoBinder.cs" />
+    <Compile Include="Binder\YuLegoBinder.cs" />
+    <Compile Include="Binder\YuLegoButtonBinder.cs" />
+    <Compile Include="Binder\YuLegoDropdownBinder.cs" />
+    <Compile Include="Binder\YuLegoImageBinder.cs" />
+    <Compile Include="Binder\YuLegoInputFieldBinder.cs" />
+    <Compile Include="Binder\YuLegoPlaneToggleBinder.cs" />
+    <Compile Include="Binder\YuLegoProgressbarBinder.cs" />
+    <Compile Include="Binder\YuLegoRawImageBinder.cs" />
+    <Compile Include="Binder\YuLegoRockerBinder.cs" />
+    <Compile Include="Binder\YuLegoSliderBinder.cs" />
+    <Compile Include="Binder\YuLegoTButtonBinder.cs" />
+    <Compile Include="Binder\YuLegoTextBinder.cs" />
+    <Compile Include="Binder\YuLegoToggleBinder.cs" />
+    <Compile Include="Build\IYuLegoComponentPool.cs" />
+    <Compile Include="Build\YuLegoBuildCacher.cs" />
+    <Compile Include="Build\YuLegoBuilder.cs" />
+    <Compile Include="Build\YuLegoBuildTask.cs" />
+    <Compile Include="Build\YuLegoBuildTaskPool.cs" />
+    <Compile Include="Build\YuLegoDefaultControls.cs" />
+    <Compile Include="Build\YuLegoMetamorphoseStage.cs" />
+    <Compile Include="Conmon\YuLegoConstant.cs" />
+    <Compile Include="Conmon\YuLegoControlStorage.cs" />
+    <Compile Include="Conmon\YuLegoFontData.cs" />
+    <Compile Include="Conmon\YuLegoInteractableType.cs" />
+    <Compile Include="Conmon\YuLegoPipelineBridge.cs" />
+    <Compile Include="Conmon\YuLegoScrollViewPipelineType.cs" />
+    <Compile Include="Conmon\YuLegoSpriteString.cs" />
+    <Compile Include="Conmon\YuLegoTextureString.cs" />
+    <Compile Include="Conmon\YuLegoViewElementType.cs" />
+    <Compile Include="ControlPool\YuLegoButtonPool.cs" />
+    <Compile Include="ControlPool\YuLegoControlPool.cs" />
+    <Compile Include="ControlPool\YuLegoDropdownPool.cs" />
+    <Compile Include="ControlPool\YuLegoImagePool.cs" />
+    <Compile Include="ControlPool\YuLegoInputFieldPool.cs" />
+    <Compile Include="ControlPool\YuLegoPlaneTogglePool.cs" />
+    <Compile Include="ControlPool\YuLegoProgressbarPool.cs" />
+    <Compile Include="ControlPool\YuLegoRawImagePool.cs" />
+    <Compile Include="ControlPool\YuLegoRectTransformPool.cs" />
+    <Compile Include="ControlPool\YuLegoRockerPool.cs" />
+    <Compile Include="ControlPool\YuLegoScrollViewPool.cs" />
+    <Compile Include="ControlPool\YuLegoSliderPool.cs" />
+    <Compile Include="ControlPool\YuLegoTButtonPool.cs" />
+    <Compile Include="ControlPool\YuLegoTextPool.cs" />
+    <Compile Include="ControlPool\YuLegoTogglePool.cs" />
+    <Compile Include="Control\Button\IYuLegoButton.cs" />
+    <Compile Include="Control\Button\YuLegoButton.cs" />
+    <Compile Include="Control\Button\YuLegoButtonHelper.cs" />
+    <Compile Include="Control\Common\IYuLegoControl.cs" />
+    <Compile Include="Control\Common\YuAbsLegoInteractableControl.cs" />
+    <Compile Include="Control\Common\YuAbsLegoMaskableGraphic.cs" />
+    <Compile Include="Control\Common\YuLegoCoroutineTween.cs" />
+    <Compile Include="Control\Dropdown\IYuLegoDropdown.cs" />
+    <Compile Include="Control\Dropdown\YuLegoDropdown.cs" />
+    <Compile Include="Control\Grid\YuLegoGridLayoutGroup.cs" />
+    <Compile Include="Control\Image\IYuLegoImage.cs" />
+    <Compile Include="Control\Image\YuLegoImage.cs" />
+    <Compile Include="Control\InputField\IYuLegoInputField.cs" />
+    <Compile Include="Control\InputField\YuLegoInputField.cs" />
+    <Compile Include="Control\LegoLrregularScrollView\YuLegoLrregularScrollView.cs" />
+    <Compile Include="Control\PlaneToggle\IYuLegoPlaneToggle.cs" />
+    <Compile Include="Control\PlaneToggle\YuLegoPlaneToggle.cs" />
+    <Compile Include="Control\Progressbar\IYuLegoProgressbar.cs" />
+    <Compile Include="Control\Progressbar\YuLegoProgressbar.cs" />
+    <Compile Include="Control\PulldownMenu\YuLegoPulldownMenu.cs" />
+    <Compile Include="Control\RawImage\IYuLegoRawImage.cs" />
+    <Compile Include="Control\RawImage\YuLegoRawImage.cs" />
+    <Compile Include="Control\Rocker\IYuLegoRocker.cs" />
+    <Compile Include="Control\Rocker\YuLegoRocker.cs" />
+    <Compile Include="Control\ScrollView\IYuLegoScrollView.cs" />
+    <Compile Include="Control\ScrollView\YuArrangement.cs" />
+    <Compile Include="Control\ScrollView\YuLegoScrollView.cs" />
+    <Compile Include="Control\ScrollView\YuLegoScrollViewHelper.cs" />
+    <Compile Include="Control\ScrollView\YuLegoScrollViewType.cs" />
+    <Compile Include="Control\Slider\IYuLegoSlider.cs" />
+    <Compile Include="Control\Slider\YuLegoSlider.cs" />
+    <Compile Include="Control\TButton\YuLegoTButton.cs" />
+    <Compile Include="Control\Text\IYuLegoText.cs" />
+    <Compile Include="Control\Text\YuLegoText.cs" />
+    <Compile Include="Control\Text\YuLegoTextHelper.cs" />
+    <Compile Include="Control\Toggle\IYuLegoToggle.cs" />
+    <Compile Include="Control\Toggle\YuLegoToggle.cs" />
+    <Compile Include="Control\Toggle\YuLegoToggleGroup.cs" />
+    <Compile Include="Helper\YuLegoComponentHelper.cs" />
+    <Compile Include="Helper\YuLegoSoundHelper.cs" />
+    <Compile Include="Helper\YuLegoViewHelper.cs" />
+    <Compile Include="Helper\YuRawImageHelper.cs" />
+    <Compile Include="MetaInfo\ButtonMeta\YuLegoButtonMeta.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoAppViewMeta.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoColorMeta.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoColorTintMeta.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoComponentRef.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoContainerRef.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoUIEffectInfo.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoGlobalMeta.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoRectTransformMeta.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoSpriteSwapMeta.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoTransition.cs" />
+    <Compile Include="MetaInfo\CommonMeta\YuLegoUISoundInfo.cs" />
+    <Compile Include="MetaInfo\DropdownMeta\YuLegoDropdownMeta.cs" />
+    <Compile Include="MetaInfo\Helper\YuLegoMetaHelper.cs" />
+    <Compile Include="MetaInfo\ImageMeta\YuImageFillAmount_Radial180_Radial360.cs" />
+    <Compile Include="MetaInfo\ImageMeta\YuImageFillAmount_Radial90.cs" />
+    <Compile Include="MetaInfo\ImageMeta\YuImageFillHType.cs" />
+    <Compile Include="MetaInfo\ImageMeta\YuImageFillMethodType.cs" />
+    <Compile Include="MetaInfo\ImageMeta\YuImageFillVType.cs" />
+    <Compile Include="MetaInfo\ImageMeta\YuImageType.cs" />
+    <Compile Include="MetaInfo\ImageMeta\YuLegoImageMeta.cs" />
+    <Compile Include="MetaInfo\InputFieldMeta\YuLegoInputFieldMeta.cs" />
+    <Compile Include="MetaInfo\PlaneToggleMeta\YuLegoPlaneToggleMeta.cs" />
+    <Compile Include="MetaInfo\ProgressbarMeta\YuLegoProgressbarMeta.cs" />
+    <Compile Include="MetaInfo\RawImageMeta\YuLegoRawImageMeta.cs" />
+    <Compile Include="MetaInfo\RockerMeta\YuLegoRockerMeta.cs" />
+    <Compile Include="MetaInfo\ScrollViewMeta\YuLegoScrollViewMeta.cs" />
+    <Compile Include="MetaInfo\SliderMeta\YuLegoSliderMeta.cs" />
+    <Compile Include="MetaInfo\TButtonMeta\YuLegoTButtonMeta.cs" />
+    <Compile Include="MetaInfo\TextMeta\YuAppTextStyleInfo.cs" />
+    <Compile Include="MetaInfo\TextMeta\YuLegoTextAlignment.cs" />
+    <Compile Include="MetaInfo\TextMeta\YuLegoTextFontStyle.cs" />
+    <Compile Include="MetaInfo\TextMeta\YuLegoTextHorizontalOverflow.cs" />
+    <Compile Include="MetaInfo\TextMeta\YuLegoTextMeta.cs" />
+    <Compile Include="MetaInfo\TextMeta\YuLegoTextStyleInfo.cs" />
+    <Compile Include="MetaInfo\TextMeta\YuLegoTextStyleMeta.cs" />
+    <Compile Include="MetaInfo\TextMeta\YuLegoTextVerticalOverflow.cs" />
+    <Compile Include="MetaInfo\ToggleMeta\YuLegoToggleMeta.cs" />
+    <Compile Include="MetaInfo\UIMeta\YuLegoUIMeta.cs" />
+    <Compile Include="MetaInfo\UIMeta\YuLegoUIMetaAsset.cs" />
+    <Compile Include="MetaInfo\ViewMeta\YuLegoUISetting.cs" />
+    <Compile Include="Module\IYuLegoUICodeLoader.cs" />
+    <Compile Include="Module\IYuLegoViewModule.cs" />
+    <Compile Include="Module\YuLegoScrollViewPipelineRouter.cs" />
+    <Compile Include="Module\YuLegoUICodeInstanceLoader.cs" />
+    <Compile Include="Module\YuLegoUILoader.cs" />
+    <Compile Include="Module\YuLegoUIPipelineRouter.cs" />
+    <Compile Include="Module\YuLegoViewModule.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RouterAndHandler\IYuLegoActionHandler.cs" />
+    <Compile Include="RouterAndHandler\IYuLegoLogicContext.cs" />
+    <Compile Include="RouterAndHandler\IYuLegoLogicer.cs" />
+    <Compile Include="RouterAndHandler\IYuLegoPipelineHandler.cs" />
+    <Compile Include="RouterAndHandler\IYuLegoScrollViewPipelineHandler.cs" />
+    <Compile Include="RouterAndHandler\YuAbsLegoLogicer.cs" />
+    <Compile Include="RouterAndHandler\YuLegoLogicContext.cs" />
+    <Compile Include="RouterAndHandler\YuLegoRouter.cs" />
+    <Compile Include="Router\IYuLegoActionHandlerRouter.cs" />
+    <Compile Include="Router\YuLegoActionHandlerRouter.cs" />
+    <Compile Include="RxModel\BaseStruct\YuLegoRxBool.cs" />
+    <Compile Include="RxModel\BaseStruct\YuLegoRxByte.cs" />
+    <Compile Include="RxModel\BaseStruct\YuLegoRxDouble.cs" />
+    <Compile Include="RxModel\BaseStruct\YuLegoRxFloat.cs" />
+    <Compile Include="RxModel\BaseStruct\YuLegoRxInt.cs" />
+    <Compile Include="RxModel\BaseStruct\YuLegoRxLong.cs" />
+    <Compile Include="RxModel\BaseStruct\YuLegoRxShort.cs" />
+    <Compile Include="RxModel\BaseStruct\YuLegoRxString.cs" />
+    <Compile Include="RxModel\Common\YuLegoRxStrcutPool.cs" />
+    <Compile Include="RxModel\Common\YuLegoRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\IYuLegoControlRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuAbsLegoInteractableRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoButtonRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoDropdownRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoImageRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoInputFieldRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoPlaneToggleRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoProgressbarRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoRawImageRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoControlRxModelPool.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoRockerRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoSliderRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoTButtonRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoTextRxModel.cs" />
+    <Compile Include="RxModel\ControlRxModel\YuLegoToggleRxModel.cs" />
+    <Compile Include="RxModel\ScrollViewRxModel\IYuLegoScrollViewRxModel.cs" />
+    <Compile Include="RxModel\ScrollViewRxModel\YuAbsLegoScrollViewRxModel.cs" />
+    <Compile Include="RxModel\ScrollViewRxModel\YuAbsLegoScrollViewRxModelMono.cs" />
+    <Compile Include="RxModel\ScrollViewRxModel\YuLegoScrollViewRxModel.cs" />
+    <Compile Include="RxModel\UIRxModel\IYuLegoUIRxModel.cs" />
+    <Compile Include="RxModel\UIRxModel\YuAbsLegoUIRxModelMono.cs" />
+    <Compile Include="RxModel\UIRxModel\YuLegoUIRxModel.cs" />
+    <Compile Include="RxModel\YuAbsLegoRxStruct.cs" />
+    <Compile Include="RxModel\YuLegoRxModelLoader.cs" />
+    <Compile Include="Setting\YuLegoAppSetting.cs" />
+    <Compile Include="Setting\YuLegoGlobalPicRefSetting.cs" />
+    <Compile Include="UI\IYuLegoComponent.cs" />
+    <Compile Include="UI\IYuLegoUI.cs" />
+    <Compile Include="UI\IYuLegoView.cs" />
+    <Compile Include="UI\YuAbsLegoComponent.cs" />
+    <Compile Include="UI\YuAbsLegoUI.cs" />
+    <Compile Include="UI\YuAbsLegoView.cs" />
+    <Compile Include="Unloader\IYuLegoUnloader.cs" />
+    <Compile Include="Unloader\YuLegoUnloader.cs" />
+    <Compile Include="Unloader\YuLegoUnloadTask.cs" />
+    <Compile Include="Unloader\YuLegoUnloadTaskPool.cs" />
+    <Compile Include="Utility\YuLegoFontUpdateTracker.cs" />
+    <Compile Include="Utility\YuLegoListPool.cs" />
+    <Compile Include="Utility\YuLegoObjectPool.cs" />
+    <Compile Include="Utility\YuLegoSetPropertyUtility.cs" />
+    <Compile Include="Utility\YuLegoUtility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="YuLegoUIPlay.asmdef" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Core\YuCommon\YuCommon.csproj">
+      <Project>{939b1e41-b536-4014-ad5a-4e7db26f2df8}</Project>
+      <Name>YuCommon</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Core\YuPlay\YuPlay.csproj">
+      <Project>{44bbb80c-09c7-4d53-af29-9b3a2ec5c3cb}</Project>
+      <Name>YuPlay</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Odin\OdinPlay\OdinPlay.csproj">
+      <Project>{50094c52-1746-445d-a008-1a23be51b753}</Project>
+      <Name>OdinPlay</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Tween\YuTweenPlay\YuTweenPlay.csproj">
+      <Project>{48a27cb7-84bb-41b0-a9d0-38d974c21768}</Project>
+      <Name>YuTweenPlay</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>rmdir /S /Q "$(ProjectDir)obj\Debug\TempPE\"
+rmdir /S /Q "$(ProjectDir)obj\Debug\"
+rmdir /S /Q "$(ProjectDir)obj\Release\TempPE\"
+rmdir /S /Q "$(ProjectDir)obj\Release\"
+rmdir /S /Q "$(ProjectDir)obj\"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

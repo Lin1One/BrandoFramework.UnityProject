@@ -40,7 +40,7 @@ namespace Client.LegoUI
             binderDict.Add(typeof(YuLegoDropdown), new LegoDropdownBinder());
         }
 
-        public void Binding(IYuLegoUI ui, LegoUIMeta uiMeta, IYuLegoUIRxModel uiRxModel)
+        public void Binding(ILegoUI ui, LegoUIMeta uiMeta, IYuLegoUIRxModel uiRxModel)
         {
 
             var rectMetas = uiMeta.RectMetas;
@@ -64,13 +64,13 @@ namespace Client.LegoUI
             }
         }
 
-        private void TryUnBingdngAtElementType(LegoUIType elementType, IYuLegoUI ui, string id,
+        private void TryUnBingdngAtElementType(LegoUIType elementType, ILegoUI ui, string id,
             IYuLegoUIRxModel uiRxModel)
         {
 
         }
 
-        private void BingdngAtElementType(LegoUIType elementType, IYuLegoUI ui, string id,
+        private void BingdngAtElementType(LegoUIType elementType, ILegoUI ui, string id,
             IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             switch (elementType)
@@ -133,7 +133,7 @@ namespace Client.LegoUI
 
         #region 具象控件绑定
 
-        private void BindingText(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingText(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoText)];
 
@@ -145,7 +145,7 @@ namespace Client.LegoUI
             binder.Binding(text, model, rectMeta);
         }
 
-        private void BindingImage(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingImage(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoImage)];
 
@@ -185,7 +185,7 @@ namespace Client.LegoUI
 #endif
         }
 
-        private void BindingRawImage(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingRawImage(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoRawImage)];
 
@@ -198,7 +198,7 @@ namespace Client.LegoUI
             binder.Binding(rawImage, model, rectMeta);
         }
 
-        private void BindingButton(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingButton(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoButton)];
 
@@ -210,7 +210,7 @@ namespace Client.LegoUI
             binder.Binding(button, model, rectMeta);
         }
 
-        private void BindingTButton(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingTButton(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoTButton)];
 
@@ -223,7 +223,7 @@ namespace Client.LegoUI
             binder.Binding(button, model, rectMeta);
         }
 
-        private void BindingToggle(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingToggle(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoToggle)];
 
@@ -236,7 +236,7 @@ namespace Client.LegoUI
             binder.Binding(toggle, model, rectMeta);
         }
 
-        private void BindingPlaneToggle(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingPlaneToggle(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoPlaneToggle)];
 
@@ -249,7 +249,7 @@ namespace Client.LegoUI
             binder.Binding(planeToggle, model, rectMeta);
         }
 
-        private void BindingProgressbar(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingProgressbar(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoProgressbar)];
 
@@ -261,7 +261,7 @@ namespace Client.LegoUI
             binder.Binding(progressbar, model, rectMeta);
         }
 
-        private void BindingInputField(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
+        private void BindingInputField(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel, LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoInputField)];
 
@@ -274,7 +274,7 @@ namespace Client.LegoUI
             binder.Binding(inputField, model, rectMeta);
         }
 
-        private void BindingSlider(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel
+        private void BindingSlider(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel
             , LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoSlider)];
@@ -288,7 +288,7 @@ namespace Client.LegoUI
             binder.Binding(slider, model, rectMeta);
         }
 
-        private void BindingDropdown(IYuLegoUI ui, string id, IYuLegoUIRxModel uiRxModel
+        private void BindingDropdown(ILegoUI ui, string id, IYuLegoUIRxModel uiRxModel
             , LegoRectTransformMeta rectMeta)
         {
             var binder = binderDict[typeof(YuLegoDropdown)];

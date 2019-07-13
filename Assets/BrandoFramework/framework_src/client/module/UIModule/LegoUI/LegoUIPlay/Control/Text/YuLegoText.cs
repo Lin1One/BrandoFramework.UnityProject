@@ -677,26 +677,26 @@ namespace Client.LegoUI
                     //AssetModule.Load<Font>(fontId);
 
 
-                   var currentApp = YuU3dAppSettingDati.CurrentActual;
-                    //图片字
-                    var path = currentApp.Helper.AssetDatabaseFontDir
-                               + fontId + ".fontsettings";
-                    var targetFont = AssetDatabaseUtility.LoadAssetAtPath<Font>(path);
-                    if (targetFont == null)
-                    {
-                        //文字字体
-                        path = currentApp.Helper.AssetDatabaseFontDir
-                               + fontId + ".ttf";
-                        targetFont = AssetDatabaseUtility.LoadAssetAtPath<Font>(path);
-                        if (targetFont == null)
-                        {
-                            Debug.LogError($"目标字体{fontId}不存在！");
-                            return null;
-                        }
-                    }
-                    //var targetFont = AssetModule.Load<Font>(fontId);
-                    fontCaches.Add(fontId, targetFont);
-                    return targetFont;
+                   //var currentApp = YuU3dAppSettingDati.CurrentActual;
+                   // //图片字
+                   // var path = currentApp.Helper.AssetDatabaseFontDir
+                   //            + fontId + ".fontsettings";
+                   // var targetFont = AssetDatabaseUtility.LoadAssetAtPath<Font>(path);
+                   // if (targetFont == null)
+                   // {
+                   //     //文字字体
+                   //     path = currentApp.Helper.AssetDatabaseFontDir
+                   //            + fontId + ".ttf";
+                   //     targetFont = AssetDatabaseUtility.LoadAssetAtPath<Font>(path);
+                   //     if (targetFont == null)
+                   //     {
+                   //         Debug.LogError($"目标字体{fontId}不存在！");
+                   //         return null;
+                   //     }
+                   // }
+                   // //var targetFont = AssetModule.Load<Font>(fontId);
+                   // fontCaches.Add(fontId, targetFont);
+                   // return targetFont;
                 }
 #endif
                 return LoadFontAtPlay(fontId);

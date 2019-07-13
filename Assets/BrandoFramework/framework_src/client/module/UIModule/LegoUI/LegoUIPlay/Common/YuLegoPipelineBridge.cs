@@ -12,19 +12,19 @@ namespace Client.LegoUI
     /// </summary>
     public interface IYuLegoPipelineBridge
     {
-        List<Action<IYuLegoUI>> GetPipelineAction(string id, YuUIPipelineType pipelineType);
+        List<Action<ILegoUI>> GetPipelineAction(string id, UIPipelineType pipelineType);
 
-        void Register(string id, YuUIPipelineType pipelineType, Action<IYuLegoUI> callback);
+        void Register(string id, UIPipelineType pipelineType, Action<ILegoUI> callback);
 
-        void Remove(string id, YuUIPipelineType pipelineType, Action<IYuLegoUI> callback);
+        void Remove(string id, UIPipelineType pipelineType, Action<ILegoUI> callback);
     }
 
     [Singleton]
     public class YuLegoPipelineBridge : IYuLegoPipelineBridge
     {
-        private Dictionary<string, Dictionary<YuUIPipelineType, List<Action<IYuLegoUI>>>> pipelineActions;
+        private Dictionary<string, Dictionary<UIPipelineType, List<Action<ILegoUI>>>> pipelineActions;
 
-        private Dictionary<string, Dictionary<YuUIPipelineType, List<Action<IYuLegoUI>>>> PipelineActions
+        private Dictionary<string, Dictionary<UIPipelineType, List<Action<ILegoUI>>>> PipelineActions
         {
             get
             {
@@ -33,12 +33,12 @@ namespace Client.LegoUI
                     return pipelineActions;
                 }
 
-                pipelineActions = new Dictionary<string, Dictionary<YuUIPipelineType, List<Action<IYuLegoUI>>>>();
+                pipelineActions = new Dictionary<string, Dictionary<UIPipelineType, List<Action<ILegoUI>>>>();
                 return pipelineActions;
             }
         }
 
-        public List<Action<IYuLegoUI>> GetPipelineAction(string id, YuUIPipelineType pipelineType)
+        public List<Action<ILegoUI>> GetPipelineAction(string id, UIPipelineType pipelineType)
         {
             if (!PipelineActions.ContainsKey(id))
             {
@@ -61,17 +61,17 @@ namespace Client.LegoUI
             return actions;
         }
 
-        public void Register(string id, YuUIPipelineType pipelineType, Action<IYuLegoUI> callback)
+        public void Register(string id, UIPipelineType pipelineType, Action<ILegoUI> callback)
         {
             if (!PipelineActions.ContainsKey(id))
             {
-                PipelineActions.Add(id, new Dictionary<YuUIPipelineType, List<Action<IYuLegoUI>>>());
+                PipelineActions.Add(id, new Dictionary<UIPipelineType, List<Action<ILegoUI>>>());
             }
 
             var uiActions = PipelineActions[id];
             if (!uiActions.ContainsKey(pipelineType))
             {
-                uiActions.Add(pipelineType, new List<Action<IYuLegoUI>>());
+                uiActions.Add(pipelineType, new List<Action<ILegoUI>>());
             }
 
             var actions = uiActions[pipelineType];
@@ -81,7 +81,7 @@ namespace Client.LegoUI
             }
         }
 
-        public void Remove(string id, YuUIPipelineType pipelineType, Action<IYuLegoUI> callback)
+        public void Remove(string id, UIPipelineType pipelineType, Action<ILegoUI> callback)
         {
             if (!PipelineActions.ContainsKey(id))
             {

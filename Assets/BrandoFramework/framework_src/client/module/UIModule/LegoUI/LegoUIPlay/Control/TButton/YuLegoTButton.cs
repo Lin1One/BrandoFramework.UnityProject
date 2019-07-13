@@ -6,6 +6,7 @@
 
 #endregion
 
+using Common.DataStruct;
 using System;
 using UnityEngine.UI;
 using YuCommon;
