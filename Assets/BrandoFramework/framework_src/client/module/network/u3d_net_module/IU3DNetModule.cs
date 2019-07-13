@@ -8,7 +8,6 @@ namespace client_module_network
     /// </summary>
     public interface IU3DNetModule
     {
-
         Dictionary<string, IU3dNetChannel> ChannelDic { get; }
         /// <summary>
         /// 向指定的通信通道发送消息

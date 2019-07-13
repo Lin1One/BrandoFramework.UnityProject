@@ -1,0 +1,17 @@
+{
+    "name": "Client.LegoUI",
+    "references": [
+        "OdinPlay",
+        "Framework.Common",
+        "Client.Core.Play",
+        "Client.Module"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}

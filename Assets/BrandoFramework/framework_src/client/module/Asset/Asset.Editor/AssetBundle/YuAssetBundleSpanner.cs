@@ -369,18 +369,18 @@ namespace Client.Assets.Editor
             //                        + YuU3dAppSettingDati.CurrentActual?.LocAppId + "_AtlasInfo.bytes";
 
             //var bytes = File.Exists(localSavePath) ? File.ReadAllBytes(localSavePath) : null;
-            //YuU3dLegoUIPlay.YuLegoAppAtlasInfo AppAtlasInfo;
+            //Client.LegoUI.YuLegoAppAtlasInfo AppAtlasInfo;
             //if (bytes == null)
             //{
-            //    AppAtlasInfo = new YuU3dLegoUIPlay.YuLegoAppAtlasInfo();
+            //    AppAtlasInfo = new Client.LegoUI.YuLegoAppAtlasInfo();
             //}
             //else
             //{
             //    AppAtlasInfo =
-            //        YuSerializeUtility.DeSerialize<YuU3dLegoUIPlay.YuLegoAppAtlasInfo>(bytes);
+            //        YuSerializeUtility.DeSerialize<Client.LegoUI.YuLegoAppAtlasInfo>(bytes);
             //    if (AppAtlasInfo == null)
             //    {
-            //        AppAtlasInfo = new YuU3dLegoUIPlay.YuLegoAppAtlasInfo();
+            //        AppAtlasInfo = new Client.LegoUI.YuLegoAppAtlasInfo();
             //    }
             //}
 

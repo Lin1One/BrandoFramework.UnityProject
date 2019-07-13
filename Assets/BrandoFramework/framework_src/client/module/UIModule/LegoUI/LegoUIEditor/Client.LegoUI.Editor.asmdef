@@ -1,10 +1,10 @@
 {
-    "name": "LegoUIPlay",
+    "name": "Client.LegoUI.Editor",
     "references": [
-        "OdinPlay",
-        "Framework.Common",
+        "Client.LegoUI",
+        "Common.Editor",
         "Client.Core.Play",
-        "Client.Module"
+        "Framework.Common"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Common
 {
-    public interface IYuReset
+    public interface IReset
     {
         void Reset();
     }
@@ -94,7 +94,7 @@ namespace Common
                 return false;
             }
 
-            var reset = t as IYuReset;
+            var reset = t as IReset;
             reset?.Reset();
             DispatchedObjects.Remove(t);
             AvaliableObjects.Add(t);
@@ -103,7 +103,7 @@ namespace Common
 
         public void ForceRestore(T t)
         {
-            var reset = t as IYuReset;
+            var reset = t as IReset;
             reset?.Reset();
             AvaliableObjects.Add(t);
         }
