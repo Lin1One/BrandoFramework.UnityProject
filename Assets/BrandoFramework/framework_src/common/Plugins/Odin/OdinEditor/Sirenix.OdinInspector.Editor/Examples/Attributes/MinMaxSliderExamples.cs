@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(MinMaxSliderAttribute), "Uses a Vector2 where x is the min knob and y is the max knob.")]
-    public class MinMaxSliderExamples
+    internal class MinMaxSliderExamples
     {
         [MinMaxSlider(-10, 10)]
         public Vector2 MinMaxValueSlider;

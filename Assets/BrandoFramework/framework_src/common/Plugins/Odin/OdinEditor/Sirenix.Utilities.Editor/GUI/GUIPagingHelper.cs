@@ -224,7 +224,7 @@ namespace Sirenix.Utilities.Editor
                 return;
             }
 
-            var isRepaint = Event.current.type == EventType.Repaint;
+            //var isRepaint = Event.current.type == EventType.Repaint;
             var drawPaging = this.isEnabled && !this.IsExpanded && showPaging && this.pageCount > 1;   // btnWith * 2
             var drawExpand = this.isEnabled && this.pageCount > 1;                                                            // btnWith
             var drawPagingField = drawPaging;                                                           // 40?
@@ -236,6 +236,7 @@ namespace Sirenix.Utilities.Editor
                 toolbarRect.xMax = btnRect.xMin;
                 if (GUI.Button(btnRect, GUIContent.none, SirenixGUIStyles.ToolbarButton))
                 {
+                    GUIHelper.RemoveFocusControl();
                     this.nextIsExpanded = !this.IsExpanded;
                 }
                 (this.IsExpanded ? EditorIcons.TriangleUp : EditorIcons.TriangleDown).Draw(btnRect, 16);
@@ -244,10 +245,11 @@ namespace Sirenix.Utilities.Editor
             // Right
             if (drawPaging)
             {
-                if (this.IsOnLastPage && isRepaint) GUIHelper.PushGUIEnabled(false);
+                //if (this.IsOnLastPage && isRepaint) GUIHelper.PushGUIEnabled(false);
                 var btnRect = toolbarRect.AlignRight(btnWidth, true);
                 if (GUI.Button(btnRect, GUIContent.none, SirenixGUIStyles.ToolbarButton))
                 {
+                    GUIHelper.RemoveFocusControl();
                     if (Event.current.button == 1)
                     {
                         this.nextPageNumber = this.PageCount - 1;
@@ -255,17 +257,22 @@ namespace Sirenix.Utilities.Editor
                     else
                     {
                         this.nextPageNumber = this.currentPage + 1;
+
+                        if (this.nextPageNumber >= this.pageCount)
+                        {
+                            this.nextPageNumber = 0;
+                        }
                     }
                 }
                 EditorIcons.TriangleRight.Draw(btnRect, 16);
-                if (this.IsOnLastPage && isRepaint) GUIHelper.PopGUIEnabled();
+                //if (this.IsOnLastPage && isRepaint) GUIHelper.PopGUIEnabled();
                 toolbarRect.xMax = btnRect.xMin;
             }
 
             // Paging field
             if (drawPagingField)
             {
-                var pageCountLbl = "/ " + (this.PageCount - 1).ToString();
+                var pageCountLbl = "/ " + this.PageCount.ToString();
                 var lblLength = SirenixGUIStyles.Label.CalcSize(new GUIContent(pageCountLbl)).x;
                 var lblRect = toolbarRect.AlignRight(lblLength + 5, true);
                 toolbarRect.xMax = lblRect.xMin;
@@ -281,7 +288,7 @@ namespace Sirenix.Utilities.Editor
                     this.nextPageNumber = next;
                 }
 
-                next = EditorGUI.IntField(fldRect.AlignCenterY(15), this.CurrentPage);
+                next = EditorGUI.IntField(fldRect.AlignCenterY(15), this.CurrentPage + 1) - 1;
                 if (next != this.CurrentPage)
                 {
                     this.nextPageNumber = next;
@@ -291,10 +298,11 @@ namespace Sirenix.Utilities.Editor
             // Left
             if (drawPaging)
             {
-                if (this.IsOnFirstPage && isRepaint) GUIHelper.PushGUIEnabled(false);
+                //if (this.IsOnFirstPage && isRepaint) GUIHelper.PushGUIEnabled(false);
                 var btnRect = toolbarRect.AlignRight(btnWidth, true);
                 if (GUI.Button(btnRect, GUIContent.none, SirenixGUIStyles.ToolbarButton))
                 {
+                    GUIHelper.RemoveFocusControl();
                     if (Event.current.button == 1)
                     {
                         this.nextPageNumber = 0;
@@ -302,10 +310,15 @@ namespace Sirenix.Utilities.Editor
                     else
                     {
                         this.nextPageNumber = this.currentPage - 1;
+
+                        if (this.nextPageNumber < 0)
+                        {
+                            this.nextPageNumber = this.pageCount - 1;
+                        }
                     }
                 }
                 EditorIcons.TriangleLeft.Draw(btnRect, 16);
-                if (this.IsOnFirstPage && isRepaint) GUIHelper.PopGUIEnabled();
+                //if (this.IsOnFirstPage && isRepaint) GUIHelper.PopGUIEnabled();
                 toolbarRect.xMax = btnRect.xMin;
             }
 

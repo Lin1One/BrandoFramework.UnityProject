@@ -48,7 +48,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 }
                 else
                 {
-                    context.Value.TitleHelper = new StringMemberHelper(property.ParentType, attribute.ToggleGroupTitle, ref context.Value.ErrorMessage);
+                    context.Value.TitleHelper = new StringMemberHelper(property, attribute.ToggleGroupTitle, ref context.Value.ErrorMessage);
                 }
             }
 

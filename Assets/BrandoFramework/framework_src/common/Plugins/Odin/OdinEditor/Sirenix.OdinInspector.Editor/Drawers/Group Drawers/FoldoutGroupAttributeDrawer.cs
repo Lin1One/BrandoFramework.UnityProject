@@ -27,7 +27,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         protected override void Initialize()
         {
             IsVisible = this.GetPersistentValue("IsVisible", this.Attribute.HasDefinedExpanded ? this.Attribute.Expanded : SirenixEditorGUI.ExpandFoldoutByDefault);
-            TitleHelper = new StringMemberHelper(this.Property.ParentType, this.Attribute.GroupName);
+            this.TitleHelper = new StringMemberHelper(this.Property, this.Attribute.GroupName);
             this.t = this.IsVisible.Value ? 1 : 0;
         }
 

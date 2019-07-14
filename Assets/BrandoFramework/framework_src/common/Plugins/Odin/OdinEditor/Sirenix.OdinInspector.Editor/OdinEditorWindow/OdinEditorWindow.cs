@@ -255,7 +255,7 @@ namespace Sirenix.OdinInspector.Editor
             this.wrappedAreaMaxHeight = maxHeight;
 
             // TODO: The 40 pixels right now represents the bottom task bar on Windows.
-            // We need a good way of getting screen "real estate" rect.
+            // We need a good way of getting screen a "real estate" rect.
             var screenHeight = Screen.currentResolution.height - 40;
             var originalP = this.position;
             originalP.x = (int)originalP.x;
@@ -785,7 +785,14 @@ namespace Sirenix.OdinInspector.Editor
                             if (this.propertyTrees[i] != null) this.propertyTrees[i].Dispose();
                             if (this.editors[i]) DestroyImmediate(this.editors[i]);
                             this.editors[i] = null;
-                            this.propertyTrees[i] = PropertyTree.Create(newTarget);
+
+                            if (newTarget is System.Collections.IList)
+                            {
+                                this.propertyTrees[i] = PropertyTree.Create(newTarget as System.Collections.IList);
+                            } else
+                            {
+                                this.propertyTrees[i] = PropertyTree.Create(newTarget);
+                            }
                         }
                     }
                 }

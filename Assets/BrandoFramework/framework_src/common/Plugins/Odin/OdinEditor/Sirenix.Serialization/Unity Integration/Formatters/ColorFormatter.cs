@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="Color"/> type.
     /// </summary>
-    /// <seealso cref="Color" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Color}" />
     public class ColorFormatter : MinimalBaseFormatter<Color>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();

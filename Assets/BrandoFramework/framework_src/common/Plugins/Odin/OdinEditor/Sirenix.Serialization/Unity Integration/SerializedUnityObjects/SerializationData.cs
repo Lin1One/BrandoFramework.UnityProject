@@ -78,7 +78,7 @@ namespace Sirenix.Serialization
             get
             {
                 return
-                    this.SerializedBytesString != null &&
+                    // this.SerializedBytesString != null && // Unity serialized strings remains null when an object is created until it's deserialized.
                     this.SerializedBytes != null &&
                     this.SerializationNodes != null &&
                     this.PrefabModifications != null &&

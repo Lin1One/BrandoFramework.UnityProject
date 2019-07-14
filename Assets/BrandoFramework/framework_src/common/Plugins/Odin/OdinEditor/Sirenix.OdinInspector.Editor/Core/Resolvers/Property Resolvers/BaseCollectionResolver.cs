@@ -10,13 +10,29 @@ namespace Sirenix.OdinInspector.Editor
 {
     using System;
     using System.Collections.Generic;
+    using UnityEditor;
     using UnityEngine.Assertions;
+    using Sirenix.Utilities;
 
     public abstract class BaseCollectionResolver<TCollection> : OdinPropertyResolver<TCollection>, ICollectionResolver
     {
         private Queue<Action> changeQueue = new Queue<Action>();
         private bool isReadOnly;
         private int isReadOnlyLastUpdateID;
+
+        private static bool? IsDerivedFromGenericIList_backingfield;
+        private static bool IsDerivedFromGenericList
+        {
+            get
+            {
+                if (!IsDerivedFromGenericIList_backingfield.HasValue)
+                {
+                    IsDerivedFromGenericIList_backingfield = typeof(TCollection).IsGenericType == false && typeof(TCollection).ImplementsOpenGenericClass(typeof(List<>));
+                }
+
+                return IsDerivedFromGenericIList_backingfield.Value;
+            }
+        }
 
         protected virtual bool ApplyToRootSelectionTarget { get { return false; } }
 
@@ -66,12 +82,36 @@ namespace Sirenix.OdinInspector.Editor
         public override bool CanResolveForPropertyFilter(InspectorProperty property)
         {
             if (!this.ApplyToRootSelectionTarget && property == property.Tree.SecretRootProperty) return false;
+
+            // Unity does not serialize concrete types derived from List<T> as if they are lists; instead it just serializes
+            // their fields as if they were a normal type. Therefore, don't confuse users by showing them a list. Collection
+            // resolvers should not resolve for it.
+            if (property.ValueEntry.SerializationBackend == SerializationBackend.Unity && IsDerivedFromGenericList)
+            {
+                return false;
+            }
+
             return true;
         }
 
         public bool ApplyChanges()
         {
             bool hasChanges = changeQueue.Count > 0;
+
+            if (hasChanges)
+            {
+                var serializationRoot = this.Property.SerializationRoot;
+
+                for (int j = 0; j < serializationRoot.ValueEntry.ValueCount; j++)
+                {
+                    UnityEngine.Object unityObj = serializationRoot.ValueEntry.WeakValues[j] as UnityEngine.Object;
+
+                    if (unityObj != null)
+                    {
+                        Undo.RecordObject(unityObj, "Change " + this.Property.PrefabModificationPath + " collection on " + unityObj.name);
+                    }
+                }
+            }
 
             while (changeQueue.Count > 0)
             {
@@ -84,6 +124,7 @@ namespace Sirenix.OdinInspector.Editor
 
                 if (this.Property.SupportsPrefabModifications)
                 {
+                    // Let all child properties apply prefab modification updates if necessary
                     this.Property.Update(true);
 
                     foreach (var child in this.Property.Children.Recurse())
@@ -92,7 +133,7 @@ namespace Sirenix.OdinInspector.Editor
                     }
                 }
 
-                this.Property.Children.ClearCaches();
+                this.Property.Children.ClearAndDisposeChildren();
             }
 
             return hasChanges;
@@ -146,9 +187,13 @@ namespace Sirenix.OdinInspector.Editor
 
             for (int i = 0; i < values.Length; i++)
             {
-                int capture = i;
-                this.EnqueueChange(() => this.Add((TCollection)this.Property.BaseValueEntry.WeakValues[capture], values[capture]));
+                this.QueueAdd(values[i], i);
             }
+        }
+
+        public void QueueAdd(object value, int selectionIndex)
+        {
+            this.EnqueueChange(() => this.Add((TCollection)this.Property.BaseValueEntry.WeakValues[selectionIndex], value));
         }
 
         public void QueueClear()
@@ -169,9 +214,13 @@ namespace Sirenix.OdinInspector.Editor
 
             for (int i = 0; i < values.Length; i++)
             {
-                int capture = i;
-                this.EnqueueChange(() => this.Remove((TCollection)this.Property.BaseValueEntry.WeakValues[capture], values[capture]));
+                this.QueueRemove(values[i], i);
             }
+        }
+
+        public void QueueRemove(object value, int selectionIndex)
+        {
+            this.EnqueueChange(() => this.Remove((TCollection)this.Property.BaseValueEntry.WeakValues[selectionIndex], value));
         }
 
         protected abstract void Add(TCollection collection, object value);

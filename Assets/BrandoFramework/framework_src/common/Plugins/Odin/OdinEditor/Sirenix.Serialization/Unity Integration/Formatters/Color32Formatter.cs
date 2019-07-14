@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="Color32"/> type.
     /// </summary>
-    /// <seealso cref="Color32" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Color32}" />
     public class Color32Formatter : MinimalBaseFormatter<Color32>
     {
         private static readonly Serializer<byte> ByteSerializer = Serializer.Get<byte>();

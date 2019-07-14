@@ -5,14 +5,12 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
     using System;
     using Utilities.Editor;
     using UnityEngine;
-    using Utilities;
-    using UnityEditor;
-    using System.Linq;
 
     /// <summary>
     /// Enum property drawer.

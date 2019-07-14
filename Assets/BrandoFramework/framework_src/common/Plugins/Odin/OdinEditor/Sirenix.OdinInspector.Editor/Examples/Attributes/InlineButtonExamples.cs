@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(InlineButtonAttribute))]
-    public class InlineButtonExamples
+    internal class InlineButtonExamples
     {
         // Inline Buttons:
         [InlineButton("A")]

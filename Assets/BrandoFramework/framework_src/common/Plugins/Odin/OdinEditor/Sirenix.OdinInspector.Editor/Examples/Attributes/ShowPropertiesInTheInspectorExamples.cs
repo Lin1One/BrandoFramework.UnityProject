@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(ShowInInspectorAttribute))]
-    public class ShowPropertiesInTheInspectorExamples
+    internal class ShowPropertiesInTheInspectorExamples
     {
         [SerializeField, HideInInspector]
         private int evenNumber;

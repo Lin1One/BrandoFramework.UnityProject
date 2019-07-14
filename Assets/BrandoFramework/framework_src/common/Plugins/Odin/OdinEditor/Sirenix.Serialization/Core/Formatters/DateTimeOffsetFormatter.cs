@@ -11,7 +11,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="DateTimeOffset"/> type.
     /// </summary>
-    /// <seealso cref="DateTimeOffset" />
+    /// <seealso cref="MinimalBaseFormatter{System.DateTimeOffset}" />
     public sealed class DateTimeOffsetFormatter : MinimalBaseFormatter<DateTimeOffset>
     {
         /// <summary>

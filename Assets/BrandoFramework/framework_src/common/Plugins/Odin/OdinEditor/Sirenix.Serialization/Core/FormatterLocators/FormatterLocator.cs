@@ -3,7 +3,6 @@ namespace Sirenix.Serialization
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
     using UnityEngine;
     using Utilities;
@@ -86,8 +85,10 @@ namespace Sirenix.Serialization
 #endif
                     }
 
-                    foreach (var attr in ass.GetCustomAttributes(typeof(RegisterFormatterAttribute), true).Cast<RegisterFormatterAttribute>())
+                    foreach (var attrUncast in ass.GetCustomAttributes(typeof(RegisterFormatterAttribute), true))
                     {
+                        var attr = (RegisterFormatterAttribute)attrUncast;
+
                         if (!attr.FormatterType.IsClass
                             || attr.FormatterType.IsAbstract
                             || attr.FormatterType.GetConstructor(Type.EmptyTypes) == null
@@ -105,8 +106,10 @@ namespace Sirenix.Serialization
                         });
                     }
 
-                    foreach (var attr in ass.GetCustomAttributes(typeof(RegisterFormatterLocatorAttribute), true).Cast<RegisterFormatterLocatorAttribute>())
+                    foreach (var attrUncast in ass.GetCustomAttributes(typeof(RegisterFormatterLocatorAttribute), true))
                     {
+                        var attr = (RegisterFormatterLocatorAttribute)attrUncast;
+
                         if (!attr.FormatterLocatorType.IsClass
                             || attr.FormatterLocatorType.IsAbstract
                             || attr.FormatterLocatorType.GetConstructor(Type.EmptyTypes) == null
@@ -146,13 +149,30 @@ namespace Sirenix.Serialization
             }
 
             // Order formatters and formatter locators by priority and then by name, to ensure consistency regardless of the order of loaded types, which is important for cross-platform cases.
-            FormatterInfos = FormatterInfos.OrderByDescending(n => n.Priority)
-                                           .ThenByDescending(n => n.FormatterType.Name)
-                                           .ToList();
+            
+            FormatterInfos.Sort((a, b) =>
+            {
+                int compare = -a.Priority.CompareTo(b.Priority);
 
-            FormatterLocators = FormatterLocators.OrderByDescending(n => n.Priority)
-                                                 .ThenByDescending(n => n.LocatorInstance.GetType().Name)
-                                                 .ToList();
+                if (compare == 0)
+                {
+                    compare = a.FormatterType.Name.CompareTo(b.FormatterType.Name);
+                }
+
+                return compare;
+            });
+            
+            FormatterLocators.Sort((a, b) =>
+            {
+                int compare = -a.Priority.CompareTo(b.Priority);
+
+                if (compare == 0)
+                {
+                    compare = a.LocatorInstance.GetType().Name.CompareTo(b.LocatorInstance.GetType().Name);
+                }
+
+                return compare;
+            });
         }
 
         /// <summary>
@@ -273,7 +293,7 @@ namespace Sirenix.Serialization
 
         private static void LogAOTError(Type type, Exception ex)
         {
-            var types = GetAllPossibleMissingAOTTypes(type).Select(t => t.GetNiceFullName()).ToArray();
+            var types = new List<string>(GetAllPossibleMissingAOTTypes(type)).ToArray();
 
             Debug.LogError("Creating a serialization formatter for the type '" + type.GetNiceFullName() + "' failed due to missing AOT support. \n\n" +
                 " Please use Odin's AOT generation feature to generate an AOT dll before building, and MAKE SURE that all of the following " +
@@ -284,15 +304,15 @@ namespace Sirenix.Serialization
             throw new SerializationAbortException("AOT formatter support was missing for type '" + type.GetNiceFullName() + "'.", ex);
         }
 
-        private static IEnumerable<Type> GetAllPossibleMissingAOTTypes(Type type)
+        private static IEnumerable<string> GetAllPossibleMissingAOTTypes(Type type)
         {
-            yield return type;
+            yield return type.GetNiceFullName() + " (name string: '" + TwoWaySerializationBinder.Default.BindToName(type) + "')";
 
             if (!type.IsGenericType) yield break;
 
             foreach (var arg in type.GetGenericArguments())
             {
-                yield return arg;
+                yield return arg.GetNiceFullName() + " (name string: '" + TwoWaySerializationBinder.Default.BindToName(arg) + "')";
 
                 if (arg.IsGenericType)
                 {

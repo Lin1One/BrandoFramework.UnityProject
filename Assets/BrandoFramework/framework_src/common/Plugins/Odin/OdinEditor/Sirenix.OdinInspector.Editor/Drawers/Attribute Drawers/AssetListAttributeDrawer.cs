@@ -245,6 +245,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     this.toggleableAssetLookup.Clear();
 
                     IEnumerable<AssetUtilities.AssetSearchResult> allAssets;
+#pragma warning disable CS0618 // Type or member is obsolete
                     if (this.PrettyPath == null)
                     {
                         allAssets = AssetUtilities.GetAllAssetsOfTypeWithProgress(typeof(TElement), null);
@@ -253,6 +254,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     {
                         allAssets = AssetUtilities.GetAllAssetsOfTypeWithProgress(typeof(TElement), "Assets/" + this.PrettyPath.TrimStart('/'));
                     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
                     int[] layers = this.LayerNames != null ? this.LayerNames.Select(l => LayerMask.NameToLayer(l)).ToArray() : null;
 
@@ -448,7 +450,9 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                                 path = AssetUtilities.GetAssetLocation(lastAsset);
                             }
                         }
+#pragma warning disable CS0618 // Type or member is obsolete
                         AssetUtilities.CreateNewAsset<TElement>(path, null);
+#pragma warning restore CS0618 // Type or member is obsolete
                         this.Rescan();
                     }
                 }

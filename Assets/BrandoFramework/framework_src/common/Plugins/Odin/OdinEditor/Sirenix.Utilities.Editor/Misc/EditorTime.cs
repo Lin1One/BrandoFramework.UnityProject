@@ -5,6 +5,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.Utilities.Editor
 {
     using System.Collections.Generic;

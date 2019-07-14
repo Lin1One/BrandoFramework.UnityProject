@@ -29,7 +29,6 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         private Func<IEnumerable<ValueDropdownItem>> getValues;
         private Func<IEnumerable<object>> getSelection;
         private IEnumerable<object> result;
-        private bool enableMultiSelect;
         private Dictionary<object, string> nameLookup;
         private InspectorPropertyValueGetter<object> rawGetter;
         private LocalPersistentContext<bool> isToggled;
@@ -47,11 +46,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             this.isToggled = this.GetPersistentValue("Toggled", SirenixEditorGUI.ExpandFoldoutByDefault);
 
             this.error = this.rawGetter.ErrorMessage;
-            this.isList = this.Property.ChildResolver as IOrderedCollectionResolver != null;
+            this.isList = this.Property.ChildResolver as ICollectionResolver != null;
             this.getSelection = () => this.Property.ValueEntry.WeakValues.Cast<object>();
             this.getValues = () =>
             {
-                return (this.rawGetter.GetValue() as IEnumerable)
+                var value = this.rawGetter.GetValue();
+
+                return value == null ? null : (this.rawGetter.GetValue() as IEnumerable)
                     .Cast<object>()
                     .Where(x => x != null)
                     .Select(x =>
@@ -76,7 +77,18 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
         private void ReloadDropdownCollections()
         {
-            var first = (this.rawGetter.GetValue() as IEnumerable).Cast<object>().FirstOrDefault();
+            if (this.error != null)
+            {
+                return;
+            }
+
+            object first = null;
+            var value = this.rawGetter.GetValue();
+            if (value != null)
+            {
+                first = (this.rawGetter.GetValue() as IEnumerable).Cast<object>().FirstOrDefault();
+            }
+
             var isNamedValueDropdownItems = first is IValueDropdownItem;
 
             if (isNamedValueDropdownItems)
@@ -156,7 +168,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
             if (this.isList)
             {
-                var changer = this.Property.ChildResolver as IOrderedCollectionResolver;
+                var changer = this.Property.ChildResolver as ICollectionResolver;
 
                 foreach (var item in query)
                 {
@@ -252,19 +264,18 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         private GenericSelector<object> CreateSelector()
         {
             IEnumerable<ValueDropdownItem> query = this.getValues();
+            if (query == null)
+            {
+                // God damm it bjarke.
+                query = Enumerable.Empty<ValueDropdownItem>();
+            }
+
             var enableSearch = query.Take(10).Count() == 10;
 
             GenericSelector<object> selector = new GenericSelector<object>(this.Attribute.DropdownTitle, false, query.Select(x => new GenericSelectorItem<object>(x.Text, x.Value)));
 
-            this.enableMultiSelect = this.isList;
             selector.CheckboxToggle = false;
-            //selector.EnableSingleClickToSelect();
-
-            if (this.isList && enableMultiSelect)
-            {
-                selector.SelectionTree.Selection.SupportsMultiSelect = true;
-                selector.DrawConfirmSelectionButton = true;
-            }
+            selector.EnableSingleClickToSelect();
 
             selector.SelectionTree.Config.DrawSearchToolbar = enableSearch;
 
@@ -273,10 +284,6 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             if (!this.isList)
             {
                 selection = this.getSelection();
-            }
-            else if (this.enableMultiSelect)
-            {
-                selection = this.getSelection().SelectMany(x => (x as IEnumerable).Cast<object>());
             }
 
             selection = selection.Select(x => (x == null ? null : x.GetType()) as object);

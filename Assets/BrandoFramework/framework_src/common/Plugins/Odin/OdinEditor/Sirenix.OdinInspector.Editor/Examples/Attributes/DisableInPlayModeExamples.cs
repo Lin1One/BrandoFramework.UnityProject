@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(DisableInPlayModeAttribute))]
-    public class DisableInPlayModeExamples
+    internal class DisableInPlayModeExamples
     {
         [Title("Disabled in play mode")]
         [DisableInPlayMode]

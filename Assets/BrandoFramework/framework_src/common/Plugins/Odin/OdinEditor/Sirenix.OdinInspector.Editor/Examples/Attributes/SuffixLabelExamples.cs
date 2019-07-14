@@ -6,9 +6,9 @@ namespace Sirenix.OdinInspector.Editor.Examples
 	using UnityEngine;
 
     [AttributeExample(typeof(SuffixLabelAttribute),
-            "The SuffixLabel attribute draws a label at the end of a property. " +
-            "It's useful for conveying intend about a property.")]
-    public class SuffixLabelExamples
+        "The SuffixLabel attribute draws a label at the end of a property. " +
+        "It's useful for conveying intend about a property.")]
+    internal class SuffixLabelExamples
 	{
 		[SuffixLabel("Prefab")]
 		public GameObject GameObject;

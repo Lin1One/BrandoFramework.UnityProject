@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(RequiredAttribute), "Required displays an error when objects are missing.")]
-    public class RequiredExamples
+    internal class RequiredExamples
     {
         [Required]
         public GameObject MyGameObject;

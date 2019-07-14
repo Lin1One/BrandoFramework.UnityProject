@@ -82,6 +82,11 @@ namespace Sirenix.OdinInspector
         /// </summary>
         public bool AlwaysAddDefaultValue;
 
+        /// <summary>
+        /// Whether adding a new element should copy the last element. False by default.
+        /// </summary>
+        public bool AddCopiesLastElement = false;
+
         private string onTitleBarGUI = null;
         private int numberOfItemsPerPage;
         private bool paging;

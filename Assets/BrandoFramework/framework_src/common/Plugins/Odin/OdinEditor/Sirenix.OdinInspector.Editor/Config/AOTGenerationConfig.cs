@@ -18,6 +18,7 @@ namespace Sirenix.Serialization
     using System.Linq;
     using UnityEditor;
     using UnityEngine;
+    using Sirenix.Serialization.Utilities.Editor;
 
     /// <summary>
     /// Contains configuration for generating an assembly that provides increased AOT support in Odin.
@@ -55,9 +56,16 @@ namespace Sirenix.Serialization
         [SerializeField, ToggleLeft, EnableIf("EnableAutomateBeforeBuilds"), SuffixLabel("$AutomateBeforeBuildsSuffix", false)]
         private bool automateBeforeBuilds = false;
 
+        [Indent]
         [SerializeField, ToggleLeft, ShowIf("ShowAutomateConfig")]
         private bool deleteDllAfterBuilds = true;
 
+        [Indent]
+        [SerializeField, ToggleLeft, ShowIf("ShowAutomateConfig")]
+        public bool AutomateForAllAOTPlatforms = true;
+
+        [Indent]
+        [HideIf("AutomateForAllAOTPlatforms")]
         [SerializeField, ShowIf("ShowAutomateConfig")]
         private List<BuildTarget> automateForPlatforms = new List<BuildTarget>()
         {
@@ -106,13 +114,42 @@ namespace Sirenix.Serialization
         /// <summary>
         /// The path to the AOT folder that the AOT .dll and linker file is created in, relative to the current project folder.
         /// </summary>
-        public string AOTFolderPath { get { return "Assets/" + SirenixAssetPaths.SirenixAssembliesPath + "AOT/"; } }
+        public string AOTFolderPath { get { return SirenixAssetPaths.SirenixAssembliesPath + "AOT/"; } }
 
         //[ToggleLeft]
         //[TitleGroup("Generate AOT DLL"), PropertyOrder(9)]
         //[InfoBox("If 'Emit AOT Formatters' is enabled, Odin will also generate serialization formatters for types which need it. This removes the need for reflection on AOT platforms, and can significantly speed up serialization.")]
         //[SerializeField]
         //private bool emitAOTFormatters = true;
+
+        public bool ShouldAutomationGeneration(BuildTarget target)
+        {
+            if (AutomateBeforeBuilds == false)
+                return false;
+
+            if (AutomateForAllAOTPlatforms)
+            {
+                var platform = EditorUserBuildSettings.activeBuildTarget;
+                var backend = AssemblyImportSettingsUtilities.GetCurrentScriptingBackend();
+                var api = AssemblyImportSettingsUtilities.GetCurrentApiCompatibilityLevel();
+                if (AssemblyImportSettingsUtilities.IsJITSupported(platform, backend, api))
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else if (AutomateForPlatforms != null && AutomateForPlatforms.Contains(target))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         [OnInspectorGUI, PropertyOrder(-10000)]
         private void DrawExperimentalText()
@@ -278,6 +315,12 @@ namespace Sirenix.Serialization
             this.InitializeTypeEntries();
         }
 
+        public List<Type> GetAOTSupportedTypes()
+        {
+            this.InitializeTypeEntries();
+            return this.supportSerializedTypes.Where(n => n.Emit && n.Type != null).Select(n => n.Type).ToList();
+        }
+
         private void InitializeTypeEntries()
         {
             this.supportSerializedTypes = this.supportSerializedTypes ?? new List<TypeEntry>();
@@ -314,6 +357,7 @@ namespace Sirenix.Serialization
 
             private static readonly GUIStyle NewLabelStyle = new GUIStyle("sv_label_3") { margin = new RectOffset(3, 3, 2, 0), alignment = TextAnchor.MiddleCenter };
             private static readonly GUIStyle ChangedLabelStyle = new GUIStyle("sv_label_4") { margin = new RectOffset(3, 3, 2, 0), alignment = TextAnchor.MiddleCenter };
+            private bool isEditing;
 
             protected override void DrawPropertyLayout(GUIContent label)
             {
@@ -324,15 +368,17 @@ namespace Sirenix.Serialization
                 var toggleRect = rect.SetWidth(20);
                 rect.xMin += 20;
 
+                if (value.Type == null)
+                {
+                    this.isEditing = true;
+                }
+
+                bool wasEditing = this.isEditing;
+
                 // Init
                 if (string.IsNullOrEmpty(value.NiceTypeName) && value.Type != null)
                 {
                     value.NiceTypeName = value.Type.GetNiceName();
-                }
-
-                if (value.IsNew || value.IsCustom || value.Type == null)
-                {
-                    rect.xMax -= 78;
                 }
 
                 // Toggle
@@ -340,39 +386,75 @@ namespace Sirenix.Serialization
                 valueChanged = value.Emit != (value.Emit = EditorGUI.Toggle(toggleRect, value.Emit));
                 GUIHelper.PopGUIEnabled();
 
-                // TextField
                 rect.y += 2;
-                GUI.SetNextControlName(entry.Property.Path);
-                bool isEditing = GUI.GetNameOfFocusedControl() == entry.Property.Path || value.Type == null;
-                GUIHelper.PushColor(isEditing ? Color.white : new Color(0, 0, 0, 0));
-                var newName = EditorGUI.TextField(rect, value.TypeName, EditorStyles.textField);
-                GUIHelper.PopColor();
+                rect.width -= 30;
 
-                // TextField overlay
-                if (!isEditing)
-                {
-                    GUI.Label(rect, value.NiceTypeName);
-                }
+                var textBoxRect = rect;
 
                 if (value.IsNew || value.IsCustom || value.Type == null)
                 {
-                    rect.xMin = rect.xMax + 3;
-                    rect.width = 75;
+                    textBoxRect.xMax -= 78;
                 }
 
                 // Labels
-                if (value.Type == null)
+                //if (value.IsNew || value.IsCustom || value.Type == null)
                 {
-                    EditorGUI.LabelField(rect, GUIHelper.TempContent("MISSING"), MissingLabelStyle);
+                    var lblRect = rect;
+
+                    lblRect.xMin = lblRect.xMax - 75;
+                    lblRect.width = 75;
+
+                    if (value.Type == null)
+                    {
+                        EditorGUI.LabelField(lblRect, GUIHelper.TempContent("MISSING"), MissingLabelStyle);
+                    }
+                    else if (value.IsCustom)
+                    {
+                        EditorGUI.LabelField(lblRect, GUIHelper.TempContent("MODIFIED"), ChangedLabelStyle);
+                    }
+                    else if (value.IsNew)
+                    {
+                        EditorGUI.LabelField(lblRect, GUIHelper.TempContent("NEW"), NewLabelStyle);
+                    }
+                    else
+                    {
+                        EditorGUI.LabelField(lblRect, GUIHelper.TempContent(""));
+                    }
                 }
-                else if (value.IsNew)
+
+                var newName = value.TypeName;
+                if (this.isEditing)
                 {
-                    EditorGUI.LabelField(rect, GUIHelper.TempContent("NEW"), NewLabelStyle);
+                    GUI.SetNextControlName(entry.Property.Path);
+
+                    // TextField
+                    newName = EditorGUI.TextField(textBoxRect, value.TypeName, EditorStyles.textField);
+
+                    if (GUI.GetNameOfFocusedControl() == entry.Property.Path && (Event.current.Equals(Event.KeyboardEvent("return")) || Event.current.OnKeyUp(KeyCode.Return)))
+                    {
+                        this.isEditing = false;
+                    }
                 }
-                else if (value.IsCustom)
+                else
                 {
-                    EditorGUI.LabelField(rect, GUIHelper.TempContent("MODIFIED"), ChangedLabelStyle);
+                    // TextField overlay
+                    if (GUI.Button(textBoxRect, value.NiceTypeName, EditorStyles.label))
+                    {
+                        this.isEditing = true;
+                    }
+
+                    if (Event.current.type == EventType.Repaint && rect.Contains(Event.current.mousePosition))
+                    {
+                        EditorIcons.Pen.Draw(rect.AlignRight(30).AddX(30), 16);
+                    }
                 }
+
+                //GUIHelper.PushColor(new Color(0.2f, 1, 0.2f, 1));
+                if (this.isEditing && SirenixEditorGUI.IconButton(rect.AlignRight(30).AddX(30), EditorIcons.Checkmark))
+                {
+                    this.isEditing = false;
+                }
+                //GUIHelper.PopColor();
 
                 // Set values
                 if ((newName ?? "") != (value.TypeName ?? ""))
@@ -382,6 +464,16 @@ namespace Sirenix.Serialization
                     value.Type = TypeBinder.BindToType(value.TypeName);
                     value.NiceTypeName = value.Type == null ? value.TypeName : value.Type.GetNiceName();
                     valueChanged = true;
+                }
+
+                if (wasEditing && !this.isEditing)
+                {
+                    if (value.Type != null)
+                    {
+                        value.TypeName = TypeBinder.BindToName(value.Type);
+                    }
+
+                    entry.Values.ForceMarkDirty();
                 }
 
                 if (valueChanged)

@@ -44,11 +44,11 @@ namespace Sirenix.OdinInspector.Editor
 
                 if (typeof(Texture).IsAssignableFrom(returnType))
                 {
-                    tree.Add(item.Name, null, (Texture)item.GetGetMethod().Invoke(null, null));
+                    tree.Add(item.Name, item.Name, (Texture)item.GetGetMethod().Invoke(null, null));
                 }
                 else if (typeof(EditorIcon).IsAssignableFrom(returnType))
                 {
-                    tree.Add(item.Name, null, (EditorIcon)item.GetGetMethod().Invoke(null, null));
+                    tree.Add(item.Name, item.Name, (EditorIcon)item.GetGetMethod().Invoke(null, null));
                 }
             }
         }

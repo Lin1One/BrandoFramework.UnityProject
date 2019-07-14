@@ -13,6 +13,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     using UnityEngine;
     using Sirenix.Utilities;
     using System.Collections;
+    using Sirenix.Serialization;
 
     /// <summary>
     /// Draws all nullable reference types, with an object field.
@@ -101,7 +102,14 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             if (objectPicker.IsReadyToClaim)
             {
                 var obj = objectPicker.ClaimObject();
-                entry.Property.Tree.DelayActionUntilRepaint(() => entry.WeakSmartValue = obj);
+                entry.Property.Tree.DelayActionUntilRepaint(() =>
+                {
+                    entry.WeakValues[0] = obj;
+                    for (int j = 1; j < entry.ValueCount; j++)
+                    {
+                        entry.WeakValues[j] = SerializationUtility.CreateCopy(obj);
+                    }
+                });
             }
         }
 
@@ -184,7 +192,14 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
                 if (EditorGUI.EndChangeCheck())
                 {
-                    this.ValueEntry.Property.Tree.DelayActionUntilRepaint(() => this.ValueEntry.WeakSmartValue = newValue);
+                    this.ValueEntry.Property.Tree.DelayActionUntilRepaint(() =>
+                    {
+                        this.ValueEntry.WeakValues[0] = newValue;
+                        for (int j = 1; j < this.ValueEntry.ValueCount; j++)
+                        {
+                            this.ValueEntry.WeakValues[j] = SerializationUtility.CreateCopy(newValue);
+                        }
+                    });
                 }
 
                 if (this.drawChildren)
@@ -214,7 +229,14 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
             if (EditorGUI.EndChangeCheck())
             {
-                this.ValueEntry.Property.Tree.DelayActionUntilRepaint(() => this.ValueEntry.WeakSmartValue = newValue);
+                this.ValueEntry.Property.Tree.DelayActionUntilRepaint(() =>
+                {
+                    this.ValueEntry.WeakValues[0] = newValue;
+                    for (int j = 1; j < this.ValueEntry.ValueCount; j++)
+                    {
+                        this.ValueEntry.WeakValues[j] = SerializationUtility.CreateCopy(newValue);
+                    }
+                });
             }
         }
 

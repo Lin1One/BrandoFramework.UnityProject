@@ -10,12 +10,18 @@ namespace Sirenix.Serialization.Editor
     using UnityEditor;
     using UnityEditor.SceneManagement;
     using UnityEngine;
+    using System.Reflection;
 
     public sealed class AOTSupportScanner : IDisposable
     {
         private bool scanning;
         private bool allowRegisteringScannedTypes;
         private HashSet<Type> seenSerializedTypes = new HashSet<Type>();
+
+        private static System.Diagnostics.Stopwatch smartProgressBarWatch = System.Diagnostics.Stopwatch.StartNew();
+        private static int smartProgressBarDisplaysSinceLastUpdate = 0;
+
+        private static readonly MethodInfo PlayerSettings_GetPreloadedAssets_Method = typeof(PlayerSettings).GetMethod("GetPreloadedAssets", BindingFlags.Public | BindingFlags.Static, null, Type.EmptyTypes, null);
 
         public void BeginScan()
         {
@@ -29,25 +35,134 @@ namespace Sirenix.Serialization.Editor
             Serializer.OnSerializedType += this.OnSerializedType;
         }
 
-        public bool ScanAllResources(bool includeResourceDependencies, bool showProgressBar)
+        public bool ScanPreloadedAssets(bool showProgressBar)
+        {
+            // The API does not exist in this version of Unity
+            if (PlayerSettings_GetPreloadedAssets_Method == null) return true;
+
+            UnityEngine.Object[] assets = (UnityEngine.Object[])PlayerSettings_GetPreloadedAssets_Method.Invoke(null, null);
+
+            if (assets == null) return true;
+
+            try
+            {
+                for (int i = 0; i < assets.Length; i++)
+                {
+                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning preloaded assets for AOT support", (i + 1) + " / " + assets.Length, (float)i / assets.Length))
+                    {
+                        return false;
+                    }
+
+                    var asset = assets[i];
+
+                    if (asset == null) continue;
+
+                    if (AssetDatabase.Contains(asset))
+                    {
+                        // Scan the asset and all its dependencies
+                        var path = AssetDatabase.GetAssetPath(asset);
+                        this.ScanAsset(path, true);
+                    }
+                    else
+                    {
+                        // Just scan the asset
+                        this.ScanObject(assets[i]);
+                    }
+                }
+            }
+            finally
+            {
+                if (showProgressBar)
+                {
+                    EditorUtility.ClearProgressBar();
+                }
+            }
+
+            return true;
+        }
+
+        public bool ScanAssetBundle(string bundle)
+        {
+            string[] assets = AssetDatabase.GetAssetPathsFromAssetBundle(bundle);
+            
+            foreach (var asset in assets)
+            {
+                this.ScanAsset(asset, true);
+            }
+
+            return true;
+        }
+
+        public bool ScanAllAssetBundles(bool showProgressBar)
         {
             try
             {
-                if (showProgressBar && EditorUtility.DisplayCancelableProgressBar("Scanning resources for AOT support", "Loading resource assets", 0f))
+                string[] bundles = AssetDatabase.GetAllAssetBundleNames();
+
+                for (int i = 0; i < bundles.Length; i++)
+                {
+                    var bundle = bundles[i];
+
+                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning asset bundles for AOT support", bundle, (float)i / bundles.Length))
+                    {
+                        return false;
+                    }
+
+                    this.ScanAssetBundle(bundle);
+                }
+            }
+            finally
+            {
+                if (showProgressBar)
+                {
+                    EditorUtility.ClearProgressBar();
+                }
+            }
+
+            return true;
+        }
+
+        public bool ScanAllResources(bool includeResourceDependencies, bool showProgressBar, List<string> resourcesPaths = null)
+        {
+            if (resourcesPaths == null)
+            {
+                resourcesPaths = new List<string>() {""};
+            }
+
+            try
+            {
+                if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning resources for AOT support", "Loading resource assets", 0f))
                 {
                     return false;
                 }
 
-                var resources = Resources.LoadAll("");
+                var resourcesSet = new HashSet<UnityEngine.Object>();
+                for (int i = 0; i < resourcesPaths.Count; i++)
+                {
+                    var resourcesPath = resourcesPaths[i];
+
+                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Listing resources for AOT support", resourcesPath, (float)i / resourcesPaths.Count))
+                    {
+                        return false;
+                    }
+
+                    resourcesSet.UnionWith(Resources.LoadAll(resourcesPath));
+                }
+
+                var resources = resourcesSet.ToArray();
 
                 for (int i = 0; i < resources.Length; i++)
                 {
-                    if (showProgressBar && EditorUtility.DisplayCancelableProgressBar("Scanning resource " + i + " for AOT support", resources[i].name, i / resources.Length))
+                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning resource " + i + " for AOT support", resources[i].name, (float)i / resources.Length))
                     {
                         return false;
                     }
 
                     var assetPath = AssetDatabase.GetAssetPath(resources[i]);
+
+                    // Exclude editor-only resources
+                    if (assetPath.ToLower().Contains("/editor/")) continue;
+
                     this.ScanAsset(assetPath, includeAssetDependencies: includeResourceDependencies);
                 }
 
@@ -106,17 +221,19 @@ namespace Sirenix.Serialization.Editor
                     {
                         var scenePath = scenePaths[i];
 
-                        if (showProgressBar && EditorUtility.DisplayCancelableProgressBar("Scanning scenes for AOT support", "Scene " + (i + 1) + "/" + scenePaths.Length + " - " + scenePath, (float)i / scenePaths.Length))
+                        if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning scenes for AOT support", "Scene " + (i + 1) + "/" + scenePaths.Length + " - " + scenePath, (float)i / scenePaths.Length))
                         {
                             return false;
                         }
 
-                        EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+                        var openScene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
 
-                        var sceneGOs = UnityEngine.Object.FindObjectsOfType<GameObject>();
+                        var sceneGOs = Resources.FindObjectsOfTypeAll<GameObject>();
 
                         foreach (var go in sceneGOs)
                         {
+                            if (go.scene != openScene) continue;
+                            
                             if ((go.hideFlags & HideFlags.DontSaveInBuild) == 0)
                             {
                                 foreach (var component in go.GetComponents<ISerializationCallbackReceiver>())
@@ -147,7 +264,39 @@ namespace Sirenix.Serialization.Editor
                     }
 
                     // Load a new empty scene that will be unloaded immediately, just to be sure we completely clear all changes made by the scan
-                    EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+                    // Sometimes this fails for unknown reasons. In that case, swallow any exceptions, and just soldier on and hope for the best!
+                    // Additionally, also eat any debug logs that happen here, because logged errors can stop the build process, and we don't want
+                    // that to happen.
+
+#if UNITY_2017_1_OR_NEWER
+                    bool previous = Debug.unityLogger.logEnabled;
+
+                    try
+                    {
+                        Debug.unityLogger.logEnabled = false;
+                        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+                    }
+                    catch { }
+                    finally
+                    {
+                        Debug.unityLogger.logEnabled = previous;
+                    }
+#else
+                    bool previous = Debug.logger.logEnabled;
+
+                    try
+                    {
+                        Debug.logger.logEnabled = false;
+                        EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+                    }
+                    catch { } 
+                    finally
+                    {
+                        Debug.logger.logEnabled = previous;
+                    }
+#endif
+
+
                 }
                 finally
                 {
@@ -166,7 +315,7 @@ namespace Sirenix.Serialization.Editor
                     for (int i = 0; i < scenePaths.Length; i++)
                     {
                         var scenePath = scenePaths[i];
-                        if (showProgressBar && EditorUtility.DisplayCancelableProgressBar("Scanning scene dependencies for AOT support", "Scene " + (i + 1) + "/" + scenePaths.Length + " - " + scenePath, (float)i / scenePaths.Length))
+                        if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning scene dependencies for AOT support", "Scene " + (i + 1) + "/" + scenePaths.Length + " - " + scenePath, (float)i / scenePaths.Length))
                         {
                             return false;
                         }
@@ -282,56 +431,58 @@ namespace Sirenix.Serialization.Editor
 
         private void OnLocatedEmitType(Type type)
         {
-            var typeFlags = AssemblyUtilities.GetAssemblyTypeFlag(type.Assembly);
-            if ((typeFlags & AssemblyTypeFlags.UnityEditorTypes) == AssemblyTypeFlags.UnityEditorTypes)
-            {
-                return;
-            }
-
-            if ((typeFlags & AssemblyTypeFlags.UserEditorTypes) == AssemblyTypeFlags.UserEditorTypes)
-            {
-                return;
-            }
+            if (!AllowRegisterType(type)) return;
 
             this.RegisterType(type);
         }
 
         private void OnSerializedType(Type type)
         {
-            var typeFlags = AssemblyUtilities.GetAssemblyTypeFlag(type.Assembly);
-            if ((typeFlags & AssemblyTypeFlags.UnityEditorTypes) == AssemblyTypeFlags.UnityEditorTypes)
-            {
-                return;
-            }
-
-            if ((typeFlags & AssemblyTypeFlags.UserEditorTypes) == AssemblyTypeFlags.UserEditorTypes)
-            {
-                return;
-            }
+            if (!AllowRegisterType(type)) return;
 
             this.RegisterType(type);
         }
 
         private void OnLocatedFormatter(IFormatter formatter)
         {
-            var typeFlags = AssemblyUtilities.GetAssemblyTypeFlag(formatter.SerializedType.Assembly);
-            if ((typeFlags & AssemblyTypeFlags.UnityEditorTypes) == AssemblyTypeFlags.UnityEditorTypes)
-            {
-                return;
-            }
-
-            if ((typeFlags & AssemblyTypeFlags.UserEditorTypes) == AssemblyTypeFlags.UserEditorTypes)
-            {
-                return;
-            }
-
             var type = formatter.SerializedType;
 
-            if (type != null)
-            {
-                this.RegisterType(type);
-            }
+            if (type == null) return;
+            if (!AllowRegisterType(type)) return;
+            this.RegisterType(type);
         }
+
+        private static bool AllowRegisterType(Type type)
+        {
+            if (IsEditorOnlyAssembly(type.Assembly))
+                return false;
+
+            if (type.IsGenericType)
+            {
+                foreach (var parameter in type.GetGenericArguments())
+                {
+                    if (!AllowRegisterType(parameter)) return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsEditorOnlyAssembly(Assembly assembly)
+        {
+            return EditorAssemblyNames.Contains(assembly.GetName().Name);
+        }
+
+        private static HashSet<string> EditorAssemblyNames = new HashSet<string>()
+        {
+            "Assembly-CSharp-Editor",
+            "Assembly-UnityScript-Editor",
+            "Assembly-Boo-Editor",
+            "Assembly-CSharp-Editor-firstpass",
+            "Assembly-UnityScript-Editor-firstpass",
+            "Assembly-Boo-Editor-firstpass",
+            typeof(Editor).Assembly.GetName().Name
+        };
 
         private void RegisterType(Type type)
         {
@@ -353,6 +504,29 @@ namespace Sirenix.Serialization.Editor
                     this.RegisterType(arg);
                 }
             }
+        }
+
+        private static bool DisplaySmartUpdatingCancellableProgressBar(string title, string details, float progress, int updateIntervalByMS = 200, int updateIntervalByCall = 50)
+        {
+            bool updateProgressBar =
+                    smartProgressBarWatch.ElapsedMilliseconds >= updateIntervalByMS
+                || ++smartProgressBarDisplaysSinceLastUpdate >= updateIntervalByCall;
+
+            if (updateProgressBar)
+            {
+                smartProgressBarWatch.Stop();
+                smartProgressBarWatch.Reset();
+                smartProgressBarWatch.Start();
+
+                smartProgressBarDisplaysSinceLastUpdate = 0;
+
+                if (EditorUtility.DisplayCancelableProgressBar(title, details, progress))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

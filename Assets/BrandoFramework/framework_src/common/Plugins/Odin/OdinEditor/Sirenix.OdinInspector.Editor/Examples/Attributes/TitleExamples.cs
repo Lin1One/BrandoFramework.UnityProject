@@ -8,7 +8,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
         "but it also supports properties, and methods." +
         "\n\nTitle also offers more features such as subtitles, options for horizontal underline, bold text and text alignment." +
         "\n\nBoth attributes, with Odin, supports either static strings, or refering to members strings by adding a $ in front.")]
-    public class TitleExamples
+    internal class TitleExamples
     {
         [Title("Titles and Headers")]
         public string MyTitle = "My Dynamic Title";

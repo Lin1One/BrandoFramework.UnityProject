@@ -1656,7 +1656,7 @@ namespace Sirenix.Utilities
         /// <para>Checks whether an array of types satisfy the constraints of a given generic method definition.</para>
         /// <para>If this method returns true, the given parameters can be safely used with <see cref="MethodInfo.MakeGenericMethod(Type[])"/> with the given generic method definition.</para>
         /// </summary>
-        /// <param name="genericType">The generic method definition to check.</param>
+        /// <param name="genericMethod">The generic method definition to check.</param>
         /// <param name="parameters">The parameters to check validity for.</param>
         /// <exception cref="System.ArgumentNullException">
         /// genericType is null

@@ -12,6 +12,7 @@ namespace Sirenix.OdinInspector.Editor
     using Sirenix.Utilities;
     using System;
     using System.Collections.Generic;
+    using UnityEngine;
 
     [ResolverPriority(-1)]
     public class StrongDictionaryPropertyResolver<TDictionary, TKey, TValue> : BaseKeyValueMapResolver<TDictionary>, IHasSpecialPropertyPaths, IPathRedirector, IMaySupportPrefabModifications
@@ -19,8 +20,14 @@ namespace Sirenix.OdinInspector.Editor
     {
         private int lastUpdateID;
 
+        private struct TempKeyInfo
+        {
+            public TKey Key;
+            public bool IsInvalid;
+        }
+
         private Dictionary<int, InspectorPropertyInfo> childInfos = new Dictionary<int, InspectorPropertyInfo>();
-        private Dictionary<int, TKey> tempInvalidKeys = new Dictionary<int, TKey>();
+        private Dictionary<int, TempKeyInfo> tempKeys = new Dictionary<int, TempKeyInfo>();
 
         private Dictionary<TDictionary, int> dictIndexMap = new Dictionary<TDictionary, int>();
         private List<TKey>[] keys;
@@ -31,6 +38,8 @@ namespace Sirenix.OdinInspector.Editor
         public bool MaySupportPrefabModifications { get { return KeyTypeSupportsPersistentPaths; } }
 
         public override Type ElementType { get { return typeof(EditableKeyValuePair<TKey, TValue>); } }
+
+        public bool ValueApplyIsTemporary;
 
         protected override void Initialize()
         {
@@ -135,13 +144,13 @@ namespace Sirenix.OdinInspector.Editor
                 }
 
                 TKey key = keys[childIndex];
-                TKey tempInvalidKey;
+                TempKeyInfo tempKeyInfo;
                 TValue value;
 
                 dict.TryGetValue(key, out value);
-                bool hasTempInvalidKey = this.tempInvalidKeys.TryGetValue(childIndex, out tempInvalidKey);
+                bool hasTempKey = this.tempKeys.TryGetValue(childIndex, out tempKeyInfo);
 
-                return new EditableKeyValuePair<TKey, TValue>(hasTempInvalidKey ? tempInvalidKey : key, value, hasTempInvalidKey);
+                return new EditableKeyValuePair<TKey, TValue>(hasTempKey ? tempKeyInfo.Key : key, value, hasTempKey ? tempKeyInfo.IsInvalid : false, hasTempKey);
             };
         }
 
@@ -176,13 +185,13 @@ namespace Sirenix.OdinInspector.Editor
                     {
                         // Ignore if new key already exists in dictionary
                         // and assign a temporary invalid key
-                        this.tempInvalidKeys[childIndex] = newKey;
+                        this.tempKeys[childIndex] = new TempKeyInfo() { Key = newKey, IsInvalid = true };
                     }
-                    else
+                    else if (!this.ValueApplyIsTemporary)
                     {
                         bool isPrefab = this.Property.SupportsPrefabModifications;
 
-                        this.tempInvalidKeys.Remove(childIndex);
+                        this.tempKeys.Remove(childIndex);
 
                         dict.Remove(oldKey);
                         dict.Add(newKey, newValue);
@@ -201,6 +210,7 @@ namespace Sirenix.OdinInspector.Editor
                         // Keep everything valid by refreshing all properties.
                         //
                         this.childInfos.Clear();
+                        this.Property.Children.ClearAndDisposeChildren();
 
                         //
                         // Get the value entry which now represents the new key, and register a value
@@ -224,6 +234,10 @@ namespace Sirenix.OdinInspector.Editor
                             }
                         }
                     }
+                    else
+                    {
+                        this.tempKeys[childIndex] = new TempKeyInfo() { Key = newKey, IsInvalid = false };
+                    }
                 }
                 else if (!PropertyValueEntry<TValue>.EqualityComparer(oldValue, newValue))
                 {
@@ -231,10 +245,10 @@ namespace Sirenix.OdinInspector.Editor
                     dict[newKey] = newValue;
                 }
 
-                if (value.IsInvalidKey && keysAreEqual)
+                if (value.IsTempKey && keysAreEqual)
                 {
-                    // The invalid key set has set the same key back, so it's not invalid any more; it was cancelled
-                    this.tempInvalidKeys.Remove(childIndex);
+                    // The temp key set has set the same key back, so it's not invalid any more; it was cancelled
+                    this.tempKeys.Remove(childIndex);
                 }
             };
         }
@@ -382,6 +396,7 @@ namespace Sirenix.OdinInspector.Editor
                 if (keyList.Count != oldKeyList.Count)
                 {
                     this.childInfos.Clear();
+                    this.Property.Children.ClearAndDisposeChildren();
                 }
                 else
                 {
@@ -390,6 +405,7 @@ namespace Sirenix.OdinInspector.Editor
                         if (!PropertyValueEntry<TKey>.EqualityComparer(keyList[j], oldKeyList[j]))
                         {
                             this.childInfos.Clear();
+                            this.Property.Children.ClearAndDisposeChildren();
                             break;
                         }
                     }

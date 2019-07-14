@@ -21,14 +21,6 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     /// </summary>
     public class EnumToggleButtonsAttributeDrawer<T> : OdinAttributeDrawer<EnumToggleButtonsAttribute, T>
     {
-        /// <summary>
-        /// Returns <c>true</c> if the drawer can draw the type.
-        /// </summary>
-        public override bool CanDrawTypeFilter(Type type)
-        {
-            return type.IsEnum;
-        }
-
         private class Context
         {
             public GUIContent[] Names;
@@ -37,6 +29,14 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             public bool IsFlagsEnum;
             public List<int> ColumnCounts;
             public float PreviousControlRectWidth;
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> if the drawer can draw the type.
+        /// </summary>
+        public override bool CanDrawTypeFilter(Type type)
+        {
+            return type.IsEnum;
         }
 
         /// <summary>
@@ -111,7 +111,19 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     if (context.Value.IsFlagsEnum)
                     {
                         var mask = TypeExtensions.GetEnumBitmask(context.Value.Values[i], enumType);
-                        selected = (mask & value) == mask;
+
+                        if (value == 0)
+                        {
+                            selected = mask == 0;
+                        }
+                        else if (mask != 0)
+                        {
+                            selected = (mask & value) == mask;
+                        }
+                        else
+                        {
+                            selected = false;
+                        }
                     }
                     else
                     {
@@ -146,7 +158,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         }
                         else
                         {
-                            if (selected)
+                            if (context.Value.Values[i] == 0)
+                            {
+                                value = 0;
+                            }
+                            else if (selected)
                             {
                                 value &= ~context.Value.Values[i];
                             }

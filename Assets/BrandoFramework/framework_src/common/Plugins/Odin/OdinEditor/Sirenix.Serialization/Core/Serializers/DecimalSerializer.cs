@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="decimal"/> type.
     /// </summary>
-    /// <seealso cref="decimal" />
+    /// <seealso cref="Serializer{System.Decimal}" />
     public sealed class DecimalSerializer : Serializer<decimal>
     {
         /// <summary>

@@ -1,6 +1,4 @@
 //-----------------------------------------------------------------------// <copyright file="ArrayListFormatter.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
-
-using System.Collections.Generic;
 using Sirenix.Serialization;
 
 [assembly: RegisterFormatter(typeof(ArrayListFormatter))]
@@ -13,7 +11,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the type <see cref="ArrayList"/>.
     /// </summary>
-    /// <seealso cref="List{T}" />
+    /// <seealso cref="BaseFormatter{System.Collections.Generic.List{T}}" />
     public class ArrayListFormatter : BaseFormatter<ArrayList>
     {
         private static readonly Serializer<object> ObjectSerializer = Serializer.Get<object>();
@@ -65,7 +63,7 @@ namespace Sirenix.Serialization
                         if (reader.IsInArrayNode == false)
                         {
                             // Something has gone wrong
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong at position " + reader.Stream.Position + ".");
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
                             break;
                         }
                     }

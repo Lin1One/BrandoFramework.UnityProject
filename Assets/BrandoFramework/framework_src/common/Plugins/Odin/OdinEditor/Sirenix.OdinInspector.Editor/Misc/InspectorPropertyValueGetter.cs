@@ -11,6 +11,7 @@ namespace Sirenix.OdinInspector.Editor
     using System.Reflection;
     using System;
     using System.Collections.Generic;
+    using Sirenix.Utilities.Editor.Expressions;
 
     /// <summary>
     ///	Helper class to get values from InspectorProperties.
@@ -21,7 +22,12 @@ namespace Sirenix.OdinInspector.Editor
         private Func<TReturnType> staticValueGetter;
         private Func<object, TReturnType> instanceValueGetter;
         private InspectorProperty memberProperty;
-        private MemberInfo memberInfo;
+
+        // TODO: Expressions temporarily disabled.
+        //private Delegate expressionMethod;
+        //private bool isStaticExpression;
+
+        public static readonly bool IsValueType = typeof(TReturnType).IsValueType;
 
         /// <summary>
         /// If any error occurred while looking for members, it will be stored here.
@@ -31,7 +37,8 @@ namespace Sirenix.OdinInspector.Editor
         /// <summary>
         /// Gets the referenced member information.
         /// </summary>
-        public MemberInfo MemberInfo { get { return this.memberInfo; } }
+        [Obsolete("A member is no longer guaranteed.", true)]
+        public MemberInfo MemberInfo { get { throw new NotSupportedException("How have you even called this?? Just stop!"); } }
 
         /// <summary>
         /// Creates a StringMemberHelper to get a display string.
@@ -44,40 +51,59 @@ namespace Sirenix.OdinInspector.Editor
         public InspectorPropertyValueGetter(InspectorProperty property, string memberName, bool allowInstanceMember = true, bool allowStaticMember = true)
         {
             this.memberProperty = property.FindParent(x => x.Info.GetMemberInfo() != null, true);
-            var parentType = this.memberProperty.ParentType;
 
-            var finder = MemberFinder.Start(parentType)
-                .HasReturnType<TReturnType>(true)
-                .IsNamed(memberName)
-                .HasNoParameters();
+            // TODO: Expression temporarily disabled.
+            //if (memberName != null && memberName.Length > 0 && memberName[0] == '$')
+            //{
+            //    var expression = memberName.Substring(1);
+            //    this.isStaticExpression = property.ParentValueProperty == null && property.Tree.IsStatic;
 
-            if (!allowInstanceMember && !allowStaticMember)
-            {
-                throw new InvalidOperationException("Require either allowInstanceMember and/or allowStaticMember to be true.");
-            }
-            else if (!allowInstanceMember)
-            {
-                finder.IsStatic();
-            }
-            else if (!allowStaticMember)
-            {
-                finder.IsInstance();
-            }
+            //    this.expressionMethod = ExpressionCompilerUtility.CompileExpression(expression, this.isStaticExpression, property.ParentType, out this.errorMessage);
 
-            if (finder.TryGetMember(out this.memberInfo, out this.errorMessage))
+            //    if (this.expressionMethod != null && this.expressionMethod.Method.ReturnType.IsCastableTo(typeof(TReturnType)) == false)
+            //    {
+            //        this.errorMessage = "Cannot cast type of " + this.expressionMethod.Method.ReturnType + " to type of " + typeof(TReturnType).Name + ".";
+            //        this.expressionMethod = null;
+            //    }
+            //}
+            //else
             {
-                if (this.memberInfo is MethodInfo)
+                var parentType = this.memberProperty.ParentType;
+
+                var finder = MemberFinder.Start(parentType)
+                    .HasReturnType<TReturnType>(true)
+                    .IsNamed(memberName)
+                    .HasNoParameters();
+
+                if (!allowInstanceMember && !allowStaticMember)
                 {
-                    memberName += "()";
+                    throw new InvalidOperationException("Require either allowInstanceMember and/or allowStaticMember to be true.");
+                }
+                else if (!allowInstanceMember)
+                {
+                    finder.IsStatic();
+                }
+                else if (!allowStaticMember)
+                {
+                    finder.IsInstance();
                 }
 
-                if (this.memberInfo.IsStatic())
+                MemberInfo member;
+                if (finder.TryGetMember(out member, out this.errorMessage))
                 {
-                    this.staticValueGetter = DeepReflection.CreateValueGetter<TReturnType>(parentType, memberName);
-                }
-                else
-                {
-                    this.instanceValueGetter = DeepReflection.CreateWeakInstanceValueGetter<TReturnType>(parentType, memberName);
+                    if (member is MethodInfo)
+                    {
+                        memberName += "()";
+                    }
+
+                    if (member.IsStatic())
+                    {
+                        this.staticValueGetter = DeepReflection.CreateValueGetter<TReturnType>(parentType, memberName);
+                    }
+                    else
+                    {
+                        this.instanceValueGetter = DeepReflection.CreateWeakInstanceValueGetter<TReturnType>(parentType, memberName);
+                    }
                 }
             }
         }
@@ -87,6 +113,19 @@ namespace Sirenix.OdinInspector.Editor
         /// </summary>
         public TReturnType GetValue()
         {
+            // TODO: Expressions temporarily disabled.
+            //if (this.expressionMethod != null)
+            //{
+            //    if (this.isStaticExpression)
+            //    {
+            //        return DoCast(this.expressionMethod.DynamicInvoke());
+            //    }
+            //    else
+            //    {
+            //        return DoCast(this.expressionMethod.DynamicInvoke(this.memberProperty.ParentValues[0]));
+            //    }
+            //}
+
             if (this.staticValueGetter != null)
             {
                 return this.staticValueGetter();
@@ -107,9 +146,29 @@ namespace Sirenix.OdinInspector.Editor
         /// </summary>
         public IEnumerable<TReturnType> GetValues()
         {
+            // TODO: Expressions temporarily disabled.
+            //if (this.expressionMethod != null)
+            //{
+            //    if (this.isStaticExpression)
+            //    {
+            //        yield return DoCast(this.expressionMethod.DynamicInvoke());
+            //    }
+            //    else
+            //    {
+            //        for (int i = 0; i < this.memberProperty.ParentValues.Count; i++)
+            //        {
+            //            yield return DoCast(this.expressionMethod.DynamicInvoke(this.memberProperty.ParentValues[i]));
+            //        }
+            //    }
+
+            //    yield break;
+            //}
+
             if (this.staticValueGetter != null)
             {
+                // TODO: @Bjarke Should this not be yield once for each selected object? Signed Mikkel/Tor.
                 yield return this.staticValueGetter();
+                yield break;
             }
 
             for (int i = 0; i < this.memberProperty.ParentValues.Count; i++)
@@ -120,6 +179,13 @@ namespace Sirenix.OdinInspector.Editor
                     yield return this.instanceValueGetter(instance);
                 }
             }
+        }
+
+        private static TReturnType DoCast(object value)
+        {
+            if (value is TReturnType) return (TReturnType)value;
+
+            return (TReturnType)Convert.ChangeType(value, typeof(TReturnType));
         }
     }
 }

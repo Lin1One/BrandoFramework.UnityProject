@@ -8,11 +8,11 @@
 
 namespace Sirenix.OdinInspector.Editor
 {
-    using Serialization;
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Reflection;
+    using UnityEditor;
     using UnityEngine;
     using Utilities;
 
@@ -335,7 +335,7 @@ namespace Sirenix.OdinInspector.Editor
                 this.Property.Tree.InvokeOnPropertyValueChanged(this.Property, index);
             };
 
-            if (Event.current.type == EventType.Repaint)
+            if (Event.current != null && Event.current.type == EventType.Repaint)
             {
                 action();
             }
@@ -1241,6 +1241,18 @@ namespace Sirenix.OdinInspector.Editor
 
             if (this.Values.AreDirty)
             {
+                var serializationRoot = this.Property.SerializationRoot;
+
+                for (int j = 0; j < serializationRoot.ValueEntry.ValueCount; j++)
+                {
+                    UnityEngine.Object unityObj = serializationRoot.ValueEntry.WeakValues[j] as UnityEngine.Object;
+
+                    if (unityObj != null)
+                    {
+                        Undo.RecordObject(unityObj, "Change " + this.Property.PrefabModificationPath + " on " + unityObj.name);
+                    }
+                }
+
                 changed = true;
 
                 for (int i = 0; i < this.ValueCount; i++)
@@ -1274,53 +1286,7 @@ namespace Sirenix.OdinInspector.Editor
                     }
                 }
             }
-
-            //if (this.listValueChanger != null && this.listValueChanger.ApplyChanges())
-            //{
-            //    changed = true;
-            //    this.Property.Children.Update();
-
-            //    if (tree.HasPrefabs)
-            //    {
-            //        if (this.SerializationBackend == SerializationBackend.Odin)
-            //        {
-            //            for (int i = 0; i < this.ValueCount; i++)
-            //            {
-            //                if (tree.TargetPrefabs[i] != null)
-            //                {
-            //                    tree.RegisterPrefabListLengthModification(this.Property, i, this.Property.Children.Count);
-            //                }
-            //            }
-
-            //            for (int i = 0; i < this.Property.Children.Count; i++)
-            //            {
-            //                this.Property.Children[i].Update(true);
-            //            }
-            //        }
-            //    }
-
-            //    tree.DelayAction(() =>
-            //    {
-            //        tree.UpdateTree();
-            //    });
-
-            //    for (int i = 0; i < this.ValueCount; i++)
-            //    {
-            //        this.TriggerOnValueChanged(i);
-            //    }
-            //}
-
-            //if (this.dictionaryHandler != null && this.dictionaryHandler.ApplyChanges())
-            //{
-            //    changed = true;
-            //    this.Property.Children.Update();
-
-            //    for (int i = 0; i < this.ValueCount; i++)
-            //    {
-            //        this.TriggerOnValueChanged(i);
-            //    }
-            //}
-
+            
             return changed;
         }
 

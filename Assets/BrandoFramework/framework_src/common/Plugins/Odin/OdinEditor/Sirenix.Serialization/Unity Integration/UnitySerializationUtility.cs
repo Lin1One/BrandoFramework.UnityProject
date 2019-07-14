@@ -131,7 +131,7 @@ namespace Sirenix.Serialization
         /// </summary>
         /// <param name="member">The member to check.</param>
         /// <param name="serializeUnityFields">Whether to allow serialization of members that will also be serialized by Unity.</param>
-        /// <param name="serializeUnityFields">The policy that Odin should be using for serialization of the given member. If this parameter is null, it defaults to <see cref="SerializationPolicies.Unity"/>.</param>
+        /// <param name="policy">The policy that Odin should be using for serialization of the given member. If this parameter is null, it defaults to <see cref="SerializationPolicies.Unity"/>.</param>
         /// <returns>True if Odin will serialize the member, otherwise false.</returns>
         public static bool OdinWillSerialize(MemberInfo member, bool serializeUnityFields, ISerializationPolicy policy = null)
         {
@@ -141,12 +141,13 @@ namespace Sirenix.Serialization
             }
 
             if (member.DeclaringType == typeof(UnityEngine.Object)) return false;
+            if (!policy.ShouldSerializeMember(member)) return false;
 
             // Allow serialization of fields with [OdinSerialize], regardless of whether Unity
             // serializes the field or not
             if (member is FieldInfo && member.HasCustomAttribute<OdinSerializeAttribute>())
             {
-                return policy.ShouldSerializeMember(member);
+                return true;
             }
 
             var willUnitySerialize = GuessIfUnityWillSerialize(member);
@@ -156,7 +157,7 @@ namespace Sirenix.Serialization
                 return serializeUnityFields;
             }
 
-            return policy.ShouldSerializeMember(member);
+            return true;
         }
 
         /// <summary>
@@ -374,10 +375,10 @@ namespace Sirenix.Serialization
                 {
                     var sData = supporter.SerializationData;
 
-                    if (!sData.ContainsData)
-                    {
-                        return;
-                    }
+                    //if (!sData.ContainsData)
+                    //{
+                    //    return;
+                    //}
 
                     sData.Prefab = null;
                     supporter.SerializationData = sData;
@@ -691,6 +692,26 @@ namespace Sirenix.Serialization
                     }
                 }
 
+                ISerializationPolicy serializationPolicy = SerializationPolicies.Unity;
+
+                // Get the policy to serialize with
+                {
+                    IOverridesSerializationPolicy policyOverride = unityObject as IOverridesSerializationPolicy;
+
+                    if (policyOverride != null)
+                    {
+                        serializationPolicy = policyOverride.SerializationPolicy ?? SerializationPolicies.Unity;
+
+                        if (context != null)
+                        {
+                            context.Config.SerializationPolicy = serializationPolicy;
+                        }
+
+                        serializeUnityFields = policyOverride.OdinSerializesUnityFields;
+                    }
+
+                }
+
                 if (pretendIsPlayer)
                 {
                     // We pretend as though we're serializing outside of the editor
@@ -714,11 +735,18 @@ namespace Sirenix.Serialization
                             using (var writer = new SerializationNodeDataWriter(newContext))
                             using (var resolver = Cache<UnityReferenceResolver>.Claim())
                             {
+                                if (data.SerializationNodes != null)
+                                {
+                                    // Reuse pre-expanded list to keep GC down
+                                    data.SerializationNodes.Clear();
+                                    writer.Nodes = data.SerializationNodes;
+                                }
+
                                 resolver.Value.SetReferencedUnityObjects(data.ReferencedUnityObjects);
 
-                                newContext.Value.Config.SerializationPolicy = SerializationPolicies.Unity;
+                                newContext.Value.Config.SerializationPolicy = serializationPolicy;
                                 newContext.Value.IndexReferenceResolver = resolver.Value;
-
+                                
                                 writer.Context = newContext;
 
                                 UnitySerializationUtility.SerializeUnityObject(unityObject, writer, serializeUnityFields);
@@ -731,6 +759,13 @@ namespace Sirenix.Serialization
                             using (var writer = new SerializationNodeDataWriter(context))
                             using (var resolver = Cache<UnityReferenceResolver>.Claim())
                             {
+                                if (data.SerializationNodes != null)
+                                {
+                                    // Reuse pre-expanded list to keep GC down
+                                    data.SerializationNodes.Clear();
+                                    writer.Nodes = data.SerializationNodes;
+                                }
+
                                 resolver.Value.SetReferencedUnityObjects(data.ReferencedUnityObjects);
                                 context.IndexReferenceResolver = resolver.Value;
 
@@ -1108,7 +1143,7 @@ namespace Sirenix.Serialization
 
             if (isPrefabData && prefabInstanceUnityObjects == null)
             {
-                throw new ArgumentNullException("prefabInstanceUnityObjects", "prefabInstanceUnityObjects cannot be null when isPrefabData is true.");
+                prefabInstanceUnityObjects = new List<UnityEngine.Object>(); // There's likely no data at all
             }
 
 #if UNITY_EDITOR
@@ -1181,7 +1216,7 @@ namespace Sirenix.Serialization
                 {
                     // The stored format says nodes, but there is no serialized node data.
                     // Figure out what format the serialized bytes are in, and deserialize that format instead
-
+                    
                     DataFormat formatGuess = data.SerializedBytes[0] == '{' ? DataFormat.JSON : DataFormat.Binary;
 
                     try
@@ -1236,6 +1271,22 @@ namespace Sirenix.Serialization
                             context.Config.DebugContext.LoggingPolicy = LoggingPolicy.LogErrors;
                             context.Config.DebugContext.Logger = DefaultLoggers.UnityLogger;
                         }
+                    }
+
+                    // If we have a policy override, use that
+                    {
+                        IOverridesSerializationPolicy policyOverride = unityObject as IOverridesSerializationPolicy;
+
+                        if (policyOverride != null)
+                        {
+                            var serializationPolicy = policyOverride.SerializationPolicy;
+
+                            if (serializationPolicy != null)
+                            {
+                                context.Config.SerializationPolicy = serializationPolicy;
+                            }
+                        }
+
                     }
 
                     if (!isPrefabData && !data.Prefab.SafeIsUnityNull())
@@ -1486,6 +1537,18 @@ namespace Sirenix.Serialization
                 throw new ArgumentNullException("reader");
             }
 
+            var policyOverride = unityObject as IOverridesSerializationPolicy;
+
+            if (policyOverride != null)
+            {
+                var policy = policyOverride.SerializationPolicy;
+
+                if (policy != null)
+                {
+                    reader.Context.Config.SerializationPolicy = policy;
+                }
+            }
+
             try
             {
                 reader.PrepareNewSerializationSession();
@@ -1506,23 +1569,74 @@ namespace Sirenix.Serialization
 
                     if (entryType == EntryType.Invalid)
                     {
-                        var message = "Encountered invalid entry while reading serialization data for Unity object of type '" + unityObject.GetType().GetNiceFullName() + "'. Please report this issue at 'https://bitbucket.org/sirenix/odin-inspector/issues', and copy paste this debug message into the issue report, along with any potential actions or recent changes in the project that might have happened to cause this message to occur. If the data dump in this message is cut off, please find the editor's log file (see https://docs.unity3d.com/Manual/LogFiles.html) and copy paste the full version of this message from there.\n" +
-                            "\n\n" +
-                            "Data dump:\n\n";
+                        // Oh boy. We have a lot of logging to do!
 
-                        message += "    Reader type: " + reader.GetType().Name + "\n";
+                        var message = "Encountered invalid entry while reading serialization data for Unity object of type '" + unityObject.GetType().GetNiceFullName() + "'. " +
+                            "This likely means that Unity has filled Odin's stored serialization data with garbage, which can randomly happen after upgrading the Unity version of the project, or when otherwise doing things that have a lot of fragile interactions with the asset database. " +
+                            "Locating the asset which causes this error log and causing it to reserialize (IE, modifying it and then causing it to be saved to disk) is likely to 'fix' the issue and make this message go away. " +
+                            "Experience shows that this issue is particularly likely to occur on prefab instances, and if this is the case, the parent prefab is also under suspicion, and should be re-saved and re-imported. " +
+                            "Note that DATA MAY HAVE BEEN LOST, and you should verify with your version control system (you're using one, right?!) that everything is alright, and if not, use it to rollback the asset to recover your data.\n\n\n";
+
+#if UNITY_EDITOR
+                        // Schedule a delayed log:
+                        try
+                        {
+                            message += "A delayed error message containing the originating object's name, type and scene/asset path (if applicable) will be scheduled for logging on Unity's main thread. Search for \"DELAYED SERIALIZATION LOG\". " +
+                                "This logging callback will also mark the object dirty if it is an asset, hopefully making the issue 'fix' itself. HOWEVER, THERE MAY STILL BE DATA LOSS.\n\n\n";
+
+                            UnityEditor.EditorApplication.delayCall += () =>
+                            {
+                                var log = "DELAYED SERIALIZATION LOG: Name = " + (unityObject != null ? unityObject.name : "(DESTROYED UNITY OBJECT)") + ", Type = " + unityObject.GetType().GetNiceFullName();
+
+                                UnityEngine.Object toPing = unityObject;
+
+                                var component = unityObject as Component;
+
+                                if (component != null && component.gameObject.scene.IsValid())
+                                {
+                                    log += ", ScenePath = " + component.gameObject.scene.path;
+                                }
+
+                                if (UnityEditor.AssetDatabase.Contains(unityObject))
+                                {
+                                    var path = UnityEditor.AssetDatabase.GetAssetPath(unityObject);
+                                    log += ", AssetPath = " + path;
+
+                                    toPing = UnityEditor.AssetDatabase.LoadMainAssetAtPath(path);
+
+                                    if (toPing == null) toPing = unityObject;
+
+                                    UnityEditor.EditorUtility.SetDirty(unityObject);
+                                    UnityEditor.AssetDatabase.SaveAssets();
+                                }
+
+                                Debug.LogError(log, toPing);
+                            };
+                        }
+                        catch
+                        {
+                            Debug.LogWarning("DELAYED SERIALIZATION LOG: Delaying log to main thread failed, likely due to a race condition when subscribing to EditorApplication.delayCall; this cannot be guarded against from our code. Try to provoke the error again and hope to get luckier next time!");
+                        }
+#endif
+
+                        message += 
+                            "IF YOU HAVE CONSISTENT REPRODUCTION STEPS THAT MAKE THIS ISSUE REOCCUR, please report it at this issue at 'https://bitbucket.org/sirenix/odin-inspector/issues/526', and copy paste this debug message into your comment, along with any potential actions or recent changes in the project that might have happened to cause this message to occur. " +
+                            "If the data dump in this message is cut off, please find the editor's log file (see https://docs.unity3d.com/Manual/LogFiles.html) and copy paste the full version of this message from there.\n\n\n" +
+                            "Data dump:\n\n" +
+                            "    Reader type: " + reader.GetType().Name + "\n";
 
                         try
                         {
-                            if (reader is SerializationNodeDataReader)
-                            {
-                                var nodes = (reader as SerializationNodeDataReader).Nodes;
-                                message += "    Nodes dump: \n\n" + string.Join("\n", nodes.Select(node => "    - Name: " + node.Name + "\n      Entry: " + node.Entry + "\n      Data: " + node.Data).ToArray());
-                            }
-                            else if (reader.Stream is MemoryStream)
-                            {
-                                message += "    Data stream dump (base64): " + ProperBitConverter.BytesToHexString((reader.Stream as MemoryStream).ToArray());
-                            }
+                            message += "    Data dump: " + reader.GetDataDump();
+                            //if (reader is SerializationNodeDataReader)
+                            //{
+                            //    var nodes = (reader as SerializationNodeDataReader).Nodes;
+                            //    message += "    Nodes dump: \n\n" + string.Join("\n", nodes.Select(node => "    - Name: " + node.Name + "\n      Entry: " + node.Entry + "\n      Data: " + node.Data).ToArray());
+                            //}
+                            //else if (reader.Stream is MemoryStream)
+                            //{
+                            //    message += "    Data stream dump (base64): " + ProperBitConverter.BytesToHexString((reader.Stream as MemoryStream).ToArray());
+                            //}
                         }
                         finally
                         {
@@ -2089,7 +2203,15 @@ namespace Sirenix.Serialization
             else
             {
                 writer.Context = context;
-                writer.Stream = stream;
+
+                if (writer is BinaryDataWriter)
+                {
+                    (writer as BinaryDataWriter).Stream = stream;
+                }
+                else if (writer is JsonDataWriter)
+                {
+                    (writer as JsonDataWriter).Stream = stream;
+                }
             }
 
             return writer;
@@ -2107,7 +2229,15 @@ namespace Sirenix.Serialization
             else
             {
                 reader.Context = context;
-                reader.Stream = stream;
+
+                if (reader is BinaryDataReader)
+                {
+                    (reader as BinaryDataReader).Stream = stream;
+                }
+                else if (reader is JsonDataReader)
+                {
+                    (reader as JsonDataReader).Stream = stream;
+                }
             }
 
             return reader;

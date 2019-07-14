@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(GUIColorAttribute))]
-    public class GUIColorExamples
+    internal class GUIColorExamples
     {
         [GUIColor(0.3f, 0.8f, 0.8f, 1f)]
         public int ColoredInt1;

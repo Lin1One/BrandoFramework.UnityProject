@@ -5,8 +5,10 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
+    using Sirenix.Utilities;
     using Sirenix.Utilities.Editor;
     using UnityEditor;
     using UnityEngine;
@@ -14,7 +16,6 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     /// <summary>
     /// Draws char properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeCharDrawer : OdinAttributeDrawer<DelayedPropertyAttribute, char>
     {
         /// <summary>
@@ -22,14 +23,21 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            this.ValueEntry.SmartValue = SirenixEditorGUI.DynamicPrimitiveField(label, this.ValueEntry.SmartValue);
+            //this.ValueEntry.SmartValue = SirenixEditorGUI.DynamicPrimitiveField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
+            EditorGUI.BeginChangeCheck();
+            string s = new string(this.ValueEntry.SmartValue, 1);
+            s = SirenixEditorFields.DelayedTextField(label, s, GUILayoutOptions.MinWidth(0));
+
+            if (EditorGUI.EndChangeCheck() && s.Length > 0)
+            {
+                this.ValueEntry.SmartValue = s[0];
+            }
         }
     }
 
     /// <summary>
     /// Draws string properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeStringDrawer : OdinAttributeDrawer<DelayedPropertyAttribute, string>
     {
         /// <summary>
@@ -37,17 +45,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            entry.SmartValue = label == null ?
-                EditorGUILayout.DelayedTextField(entry.SmartValue) :
-                EditorGUILayout.DelayedTextField(label, entry.SmartValue);
+            this.ValueEntry.SmartValue = SirenixEditorFields.DelayedTextField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
         }
     }
 
     /// <summary>
     /// Draws sbyte properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeSByteDrawer : OdinAttributeDrawer<DelayedPropertyAttribute, sbyte>
     {
         /// <summary>
@@ -55,10 +59,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            int value = label == null ?
-                EditorGUILayout.DelayedIntField(entry.SmartValue) :
-                EditorGUILayout.DelayedIntField(label, entry.SmartValue);
+            int value = SirenixEditorFields.DelayedIntField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
 
             if (value < sbyte.MinValue)
             {
@@ -69,14 +70,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 value = sbyte.MaxValue;
             }
 
-            entry.SmartValue = (sbyte)value;
+            this.ValueEntry.SmartValue = (sbyte)value;
         }
     }
 
     /// <summary>
     /// Draws byte properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeByteDrawer : OdinAttributeDrawer<DelayedPropertyAttribute, byte>
     {
         /// <summary>
@@ -84,11 +84,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-
-            int value = label == null ?
-                EditorGUILayout.DelayedIntField(entry.SmartValue) :
-                EditorGUILayout.DelayedIntField(label, entry.SmartValue);
+            int value = SirenixEditorFields.DelayedIntField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
 
             if (value < byte.MinValue)
             {
@@ -99,14 +95,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 value = byte.MaxValue;
             }
 
-            entry.SmartValue = (byte)value;
+            this.ValueEntry.SmartValue = (byte)value;
         }
     }
 
     /// <summary>
     /// Draws short properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeInt16Drawer : OdinAttributeDrawer<DelayedPropertyAttribute, short>
     {
         /// <summary>
@@ -114,10 +109,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            int value = label == null ?
-                EditorGUILayout.DelayedIntField(entry.SmartValue) :
-                EditorGUILayout.DelayedIntField(label, entry.SmartValue);
+            int value = SirenixEditorFields.DelayedIntField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
 
             if (value < short.MinValue)
             {
@@ -128,14 +120,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 value = short.MaxValue;
             }
 
-            entry.SmartValue = (short)value;
+            this.ValueEntry.SmartValue = (short)value;
         }
     }
 
     /// <summary>
     /// Draws ushort properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeUInt16Drawer : OdinAttributeDrawer<DelayedPropertyAttribute, ushort>
     {
         /// <summary>
@@ -143,10 +134,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            int value = label == null ?
-                EditorGUILayout.DelayedIntField(entry.SmartValue) :
-                EditorGUILayout.DelayedIntField(label, entry.SmartValue);
+            int value = SirenixEditorFields.DelayedIntField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
 
             if (value < ushort.MinValue)
             {
@@ -157,14 +145,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 value = ushort.MaxValue;
             }
 
-            entry.SmartValue = (ushort)value;
+            this.ValueEntry.SmartValue = (ushort)value;
         }
     }
 
     /// <summary>
     /// Draws int properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeInt32Drawer : OdinAttributeDrawer<DelayedPropertyAttribute, int>
     {
         /// <summary>
@@ -172,17 +159,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            entry.SmartValue = label == null ?
-                EditorGUILayout.DelayedIntField(entry.SmartValue) :
-                EditorGUILayout.DelayedIntField(label, entry.SmartValue);
+            this.ValueEntry.SmartValue = SirenixEditorFields.DelayedIntField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
         }
     }
 
     /// <summary>
     /// Draws uint properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeUInt32Drawer : OdinAttributeDrawer<DelayedPropertyAttribute, uint>
     {
         /// <summary>
@@ -190,25 +173,24 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            uint value = entry.SmartValue;
-            string str = value.ToString();
+            long value = SirenixEditorFields.DelayedLongField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
 
-            str = label == null ?
-                EditorGUILayout.DelayedTextField(str) :
-                EditorGUILayout.DelayedTextField(label, str);
-
-            if (GUI.changed && uint.TryParse(str, out value))
+            if (value < uint.MinValue)
             {
-                entry.SmartValue = value;
+                value = uint.MinValue;
             }
+            else if (value > uint.MaxValue)
+            {
+                value = uint.MaxValue;
+            }
+
+            this.ValueEntry.SmartValue = (uint)value;
         }
     }
 
     /// <summary>
     /// Draws long properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeInt64Drawer : OdinAttributeDrawer<DelayedPropertyAttribute, long>
     {
         /// <summary>
@@ -216,25 +198,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            long value = entry.SmartValue;
-            string str = value.ToString();
-
-            str = label == null ?
-                EditorGUILayout.DelayedTextField(str) :
-                EditorGUILayout.DelayedTextField(label, str);
-
-            if (GUI.changed && long.TryParse(str, out value))
-            {
-                entry.SmartValue = value;
-            }
+            this.ValueEntry.SmartValue = SirenixEditorFields.DelayedLongField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
         }
     }
 
     /// <summary>
     /// Draws ulong properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeUInt64Drawer : OdinAttributeDrawer<DelayedPropertyAttribute, ulong>
     {
         /// <summary>
@@ -242,17 +212,16 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            ulong value = entry.SmartValue;
+            ulong value = this.ValueEntry.SmartValue;
             string str = value.ToString();
 
             str = label == null ?
-                EditorGUILayout.DelayedTextField(str) :
-                EditorGUILayout.DelayedTextField(label, str);
+                EditorGUILayout.DelayedTextField(str, GUILayoutOptions.MinWidth(0)) :
+                EditorGUILayout.DelayedTextField(label, str, GUILayoutOptions.MinWidth(0));
 
             if (GUI.changed && ulong.TryParse(str, out value))
             {
-                entry.SmartValue = value;
+                this.ValueEntry.SmartValue = value;
             }
         }
     }
@@ -260,7 +229,6 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     /// <summary>
     /// Draws float properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeFloatDrawer : OdinAttributeDrawer<DelayedPropertyAttribute, float>
     {
         /// <summary>
@@ -268,17 +236,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            entry.SmartValue = label == null ?
-                EditorGUILayout.DelayedFloatField(entry.SmartValue) :
-                EditorGUILayout.DelayedFloatField(label, entry.SmartValue);
+            this.ValueEntry.SmartValue = SirenixEditorFields.DelayedFloatField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
         }
     }
 
     /// <summary>
     /// Draws double properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeDoubleDrawer : OdinAttributeDrawer<DelayedPropertyAttribute, double>
     {
         /// <summary>
@@ -286,25 +250,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            double value = entry.SmartValue;
-            string str = value.ToString();
-
-            str = label == null ?
-                EditorGUILayout.DelayedTextField(str) :
-                EditorGUILayout.DelayedTextField(label, str);
-
-            if (GUI.changed && double.TryParse(str, out value))
-            {
-                entry.SmartValue = value;
-            }
+            this.ValueEntry.SmartValue = SirenixEditorFields.DelayedDoubleField(label, this.ValueEntry.SmartValue, GUILayoutOptions.MinWidth(0));
         }
     }
 
     /// <summary>
     /// Draws decimal properties marked with <see cref="DelayedPropertyAttribute"/>.
     /// </summary>
-
     public sealed class DelayedPropertyAttributeDecimalDrawer : OdinAttributeDrawer<DelayedPropertyAttribute, decimal>
     {
         /// <summary>
@@ -312,18 +264,14 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-
-            decimal value = entry.SmartValue;
+            decimal value = this.ValueEntry.SmartValue;
             string str = value.ToString();
 
-            str = label == null ?
-                EditorGUILayout.DelayedTextField(str) :
-                EditorGUILayout.DelayedTextField(label, str);
+            str = SirenixEditorFields.DelayedTextField(label, str, GUILayoutOptions.MinWidth(0));
 
             if (GUI.changed && decimal.TryParse(str, out value))
             {
-                entry.SmartValue = value;
+                this.ValueEntry.SmartValue = value;
             }
         }
     }

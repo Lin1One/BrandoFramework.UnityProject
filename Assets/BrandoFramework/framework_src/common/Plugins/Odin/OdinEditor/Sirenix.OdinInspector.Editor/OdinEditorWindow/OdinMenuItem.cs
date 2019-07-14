@@ -509,7 +509,7 @@ namespace Sirenix.OdinInspector.Editor
                 }
                 else if (makeNewGetter)
                 {
-                    this.nameValueGetter = new StringMemberHelper(val.GetType(), this.name);
+                    this.nameValueGetter = new StringMemberHelper(val.GetType(), false, this.name); // TODO: static?
                 }
 
                 if (this.nameValueGetter != null)

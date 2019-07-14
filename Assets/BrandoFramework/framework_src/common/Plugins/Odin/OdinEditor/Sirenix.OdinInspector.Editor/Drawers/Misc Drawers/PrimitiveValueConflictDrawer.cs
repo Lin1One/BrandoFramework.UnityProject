@@ -51,6 +51,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         entry.Values[i] = entry.SmartValue;
                     }
                 }
+
+                EditorGUI.showMixedValue = false;
             }
             else
             {

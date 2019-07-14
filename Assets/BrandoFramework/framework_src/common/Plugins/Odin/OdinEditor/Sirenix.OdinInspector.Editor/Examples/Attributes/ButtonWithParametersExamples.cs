@@ -9,7 +9,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
         Name = "Parameters Examples",
         Description = "You can also use the Button attribute on any method with parameters.\n" +
         "This will draw a form in the inspector that lets you fill out the parameters that gets passed to the method when the button is pressed.")]
-    public class ButtonWithParametersExamples
+    internal class ButtonWithParametersExamples
     {
         [Button]
         private void Default(float a, float b, GameObject c)

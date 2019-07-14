@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="double"/> type.
     /// </summary>
-    /// <seealso cref="double" />
+    /// <seealso cref="Serializer{System.Double}" />
     public sealed class DoubleSerializer : Serializer<double>
     {
         /// <summary>

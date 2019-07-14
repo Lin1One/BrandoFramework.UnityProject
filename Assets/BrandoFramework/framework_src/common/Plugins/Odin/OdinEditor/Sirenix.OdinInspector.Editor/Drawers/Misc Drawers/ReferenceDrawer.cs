@@ -21,7 +21,9 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     [DrawerPriority(90, 0, 0)]
     public sealed class ReferenceDrawer<T> : OdinValueDrawer<T> where T : class
     {
+        private LocalPersistentContext<bool> isToggled;
         private bool drawAsReference;
+        private bool hideReferenceBox;
 
         /// <summary>
         /// Prevents the drawer from being applied to UnityEngine.Object references since they are shown as an object field, and is not drawn in-line.
@@ -31,6 +33,17 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             return
                 !typeof(MemberInfo).IsAssignableFrom(type) &&
                 !typeof(UnityEngine.Object).IsAssignableFrom(type);
+        }
+
+        protected override bool CanDrawValueProperty(InspectorProperty property)
+        {
+            return base.CanDrawValueProperty(property) && !property.Attributes.HasAttribute<DoNotDrawAsReferenceAttribute>();
+        }
+
+        protected override void Initialize()
+        {
+            this.isToggled = this.GetPersistentValue("is_Toggled", false);
+            this.hideReferenceBox = this.Property.Attributes.HasAttribute<HideDuplicateReferenceBoxAttribute>();
         }
 
         /// <summary>
@@ -47,7 +60,6 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
             if (this.drawAsReference)
             {
-                var isToggled = this.GetPersistentValue("is_Toggled", false);
                 var targetProp = entry.Property.Tree.GetPropertyAtPath(entry.TargetReferencePath);
 
                 if (targetProp == null)
@@ -55,22 +67,41 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     GUILayout.Label("Reference to " + entry.TargetReferencePath + ". But no property was found at path, which is a problem.");
                     return;
                 }
-                SirenixEditorGUI.BeginToolbarBox();
-                SirenixEditorGUI.BeginToolbarBoxHeader();
-                Rect valueRect;
-                isToggled.Value = SirenixEditorGUI.Foldout(isToggled.Value, label, out valueRect);
-                GUI.Label(valueRect, "Reference to " + targetProp.Path, SirenixGUIStyles.LeftAlignedGreyMiniLabel);
-                SirenixEditorGUI.EndToolbarBoxHeader();
-                if (SirenixEditorGUI.BeginFadeGroup(entry.Context.Get(this, "k", 0), isToggled.Value))
+
+                var isInReference = targetProp.Context.GetGlobal("is_in_reference", false);
+
+                bool drawReferenceBox = true;
+
+                if (!isInReference.Value)
                 {
-                    var isInReference = targetProp.Context.GetGlobal("is_in_reference", false);
+                    drawReferenceBox = !this.hideReferenceBox;
+                }
+
+                if (drawReferenceBox)
+                {
+                    SirenixEditorGUI.BeginToolbarBox();
+                    SirenixEditorGUI.BeginToolbarBoxHeader();
+                    Rect valueRect;
+                    this.isToggled.Value = SirenixEditorGUI.Foldout(this.isToggled.Value, label, out valueRect);
+                    GUI.Label(valueRect, "Reference to " + targetProp.Path, SirenixGUIStyles.LeftAlignedGreyMiniLabel);
+                    SirenixEditorGUI.EndToolbarBoxHeader();
+                    if (SirenixEditorGUI.BeginFadeGroup(entry.Context.Get(this, "k", 0), this.isToggled.Value))
+                    {
+                        bool previous = isInReference.Value;
+                        isInReference.Value = true;
+                        targetProp.Draw(label);
+                        isInReference.Value = previous;
+                    }
+                    SirenixEditorGUI.EndFadeGroup();
+                    SirenixEditorGUI.EndToolbarBox();
+                }
+                else
+                {
                     bool previous = isInReference.Value;
                     isInReference.Value = true;
-                    targetProp.Draw(targetProp.Label);
+                    targetProp.Draw(label);
                     isInReference.Value = previous;
                 }
-                SirenixEditorGUI.EndFadeGroup();
-                SirenixEditorGUI.EndToolbarBox();
             }
             else
             {

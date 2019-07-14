@@ -7,7 +7,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using System.Collections.Generic;
     
     [AttributeExample(typeof(AssetListAttribute), "The AssetList attribute work on both lists of UnityEngine.Object types and UnityEngine.Object types, but have different behaviour.")]
-    public class AssetListExamples
+    internal class AssetListExamples
     {
         [AssetList]
         [PreviewField(70, ObjectFieldAlignment.Center)]

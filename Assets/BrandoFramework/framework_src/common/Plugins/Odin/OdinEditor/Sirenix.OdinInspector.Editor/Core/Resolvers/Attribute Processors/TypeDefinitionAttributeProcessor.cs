@@ -95,7 +95,6 @@ namespace Sirenix.OdinInspector.Editor
         private static bool ContinueAddingAttributesFor(Type type)
         {
             if (type == null) return false;
-            if (type.IsInterface) return false;
             var flag = AssemblyUtilities.GetAssemblyTypeFlag(type.Assembly);
             if (flag == AssemblyTypeFlags.OtherTypes) return false;
             if (flag == AssemblyTypeFlags.UnityTypes) return false;

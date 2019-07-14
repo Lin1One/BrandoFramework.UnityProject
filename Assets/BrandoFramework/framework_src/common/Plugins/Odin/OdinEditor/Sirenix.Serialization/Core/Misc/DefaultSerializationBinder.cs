@@ -58,25 +58,49 @@ namespace Sirenix.Serialization
     /// <seealso cref="BindTypeNameToTypeAttribute" />
     public class DefaultSerializationBinder : TwoWaySerializationBinder
     {
+        private static readonly object ASSEMBLY_LOOKUP_LOCK = new object();
         private static readonly Dictionary<string, Assembly> assemblyNameLookUp = new Dictionary<string, Assembly>();
-
-        private static readonly object TYPEMAP_LOCK = new object();
-        private static readonly object NAMEMAP_LOCK = new object();
-        private static readonly Dictionary<string, Type> typeMap = new Dictionary<string, Type>();
-        private static readonly Dictionary<Type, string> nameMap = new Dictionary<Type, string>();
         private static readonly Dictionary<string, Type> customTypeNameToTypeBindings = new Dictionary<string, Type>();
+
+        private static readonly object TYPETONAME_LOCK = new object();
+        private static readonly Dictionary<Type, string> nameMap = new Dictionary<Type, string>();
+
+        private static readonly object NAMETOTYPE_LOCK = new object();
+        private static readonly Dictionary<string, Type> typeMap = new Dictionary<string, Type>();
+
+        private static readonly List<string> genericArgNamesList = new List<string>();
+        private static readonly List<Type> genericArgTypesList = new List<Type>();
 
         static DefaultSerializationBinder()
         {
+            AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
+            {
+                RegisterAssembly(args.LoadedAssembly);
+            };
+
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                var name = assembly.GetName().Name;
+                RegisterAssembly(assembly);
+            }
+        }
 
+        private static void RegisterAssembly(Assembly assembly)
+        {
+            var name = assembly.GetName().Name;
+
+            bool wasAdded = false;
+
+            lock (ASSEMBLY_LOOKUP_LOCK)
+            {
                 if (!assemblyNameLookUp.ContainsKey(name))
                 {
                     assemblyNameLookUp.Add(name, assembly);
+                    wasAdded = true;
                 }
+            }
 
+            if (wasAdded)
+            {
                 var customAttributes = assembly.GetCustomAttributes(typeof(BindTypeNameToTypeAttribute), false);
                 if (customAttributes != null)
                 {
@@ -85,13 +109,16 @@ namespace Sirenix.Serialization
                         var attr = customAttributes[i] as BindTypeNameToTypeAttribute;
                         if (attr != null && attr.NewType != null)
                         {
-                            if (attr.OldTypeName.Contains(","))
+                            lock (ASSEMBLY_LOOKUP_LOCK)
                             {
-                                customTypeNameToTypeBindings[attr.OldTypeName] = attr.NewType;
-                            }
-                            else
-                            {
-                                customTypeNameToTypeBindings[attr.OldTypeName + ", " + assembly.GetName().Name] = attr.NewType;
+                                //if (attr.OldTypeName.Contains(","))
+                                //{
+                                    customTypeNameToTypeBindings[attr.OldTypeName] = attr.NewType;
+                                //}
+                                //else
+                                //{
+                                //    customTypeNameToTypeBindings[attr.OldTypeName + ", " + assembly.GetName().Name] = attr.NewType;
+                                //}
                             }
                         }
                     }
@@ -117,7 +144,7 @@ namespace Sirenix.Serialization
 
             string result;
 
-            lock (NAMEMAP_LOCK)
+            lock (TYPETONAME_LOCK)
             {
                 if (nameMap.TryGetValue(type, out result) == false)
                 {
@@ -168,7 +195,7 @@ namespace Sirenix.Serialization
         /// </summary>
         public override bool ContainsType(string typeName)
         {
-            lock (TYPEMAP_LOCK)
+            lock (NAMETOTYPE_LOCK)
             {
                 return typeMap.ContainsKey(typeName);
             }
@@ -192,42 +219,11 @@ namespace Sirenix.Serialization
 
             Type result;
 
-            lock (TYPEMAP_LOCK)
+            lock (NAMETOTYPE_LOCK)
             {
                 if (typeMap.TryGetValue(typeName, out result) == false)
                 {
-                    // Looks for custom defined type name lookups defined with the BindTypeNameToTypeAttribute.
-                    customTypeNameToTypeBindings.TryGetValue(typeName, out result);
-
-                    // Do more fancy stuff.
-
-                    // Final fallback to classic .NET type string format
-                    if (result == null)
-                    {
-                        result = Type.GetType(typeName);
-                    }
-
-                    if (result == null)
-                    {
-                        result = AssemblyUtilities.GetTypeByCachedFullName(typeName);
-                    }
-
-                    // TODO: Type lookup error handling; use an out bool or a "Try" pattern?
-
-                    string typeStr, assemblyStr;
-
-                    ParseName(typeName, out typeStr, out assemblyStr);
-
-                    if (result == null && assemblyStr != null && assemblyNameLookUp.ContainsKey(assemblyStr))
-                    {
-                        var assembly = assemblyNameLookUp[assemblyStr];
-                        result = assembly.GetType(typeStr);
-                    }
-
-                    if (result == null)
-                    {
-                        result = AssemblyUtilities.GetTypeByCachedFullName(typeStr);
-                    }
+                    result = this.ParseTypeName(typeName, debugContext);
 
                     if (result == null && debugContext != null)
                     {
@@ -240,6 +236,86 @@ namespace Sirenix.Serialization
             }
 
             return result;
+        }
+
+        private Type ParseTypeName(string typeName, DebugContext debugContext)
+        {
+            Type type;
+
+            lock (ASSEMBLY_LOOKUP_LOCK)
+            {
+                // Look for custom defined type name lookups defined with the BindTypeNameToTypeAttribute.
+                if (customTypeNameToTypeBindings.TryGetValue(typeName, out type))
+                {
+                    return type;
+                }
+            }
+
+            // Let's try it the traditional .NET way
+            type = Type.GetType(typeName);
+            if (type != null) return type;
+            
+            // Generic/array type name handling
+            type = ParseGenericAndOrArrayType(typeName, debugContext);
+            if (type != null) return type;
+
+            string typeStr, assemblyStr;
+
+            ParseName(typeName, out typeStr, out assemblyStr);
+
+            if (!string.IsNullOrEmpty(typeStr))
+            {
+                lock (ASSEMBLY_LOOKUP_LOCK)
+                {
+                    // Look for custom defined type name lookups defined with the BindTypeNameToTypeAttribute.
+                    if (customTypeNameToTypeBindings.TryGetValue(typeStr, out type))
+                    {
+                        return type;
+                    }
+                }
+
+                Assembly assembly;
+
+                // Try to load from the named assembly
+                if (assemblyStr != null)
+                {
+                    lock (ASSEMBLY_LOOKUP_LOCK)
+                    {
+                        assemblyNameLookUp.TryGetValue(assemblyStr, out assembly);
+                    }
+
+                    if (assembly == null)
+                    {
+                        try
+                        {
+                            assembly = Assembly.Load(assemblyStr);
+                        }
+                        catch { }
+                    }
+
+                    if (assembly != null)
+                    {
+                        type = assembly.GetType(typeStr);
+                        if (type != null) return type;
+                    }
+                }
+
+                // Try to check all assemblies for the type string
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+
+                for (int i = 0; i < assemblies.Length; i++)
+                {
+                    assembly = assemblies[i];
+
+                    type = assembly.GetType(typeStr, false);
+                    if (type != null) return type;
+                }
+            }
+
+            //type = AssemblyUtilities.GetTypeByCachedFullName(typeStr);
+            //if (type != null) return type;
+            
+            return null;
         }
 
         private static void ParseName(string fullName, out string typeName, out string assemblyName)
@@ -269,6 +345,173 @@ namespace Sirenix.Serialization
             {
                 assemblyName = fullName.Substring(firstComma, secondComma - firstComma).Trim(',', ' ');
             }
+        }
+
+        private Type ParseGenericAndOrArrayType(string typeName, DebugContext debugContext)
+        {
+            string actualTypeName;
+            List<string> genericArgNames;
+
+            bool isGeneric;
+            bool isArray;
+            int arrayRank;
+
+            if (!TryParseGenericAndOrArrayTypeName(typeName, out actualTypeName, out isGeneric, out genericArgNames, out isArray, out arrayRank)) return null;
+
+            Type type = this.BindToType(actualTypeName, debugContext);
+
+            if (type == null) return null;
+
+            if (isGeneric)
+            {
+                if (!type.IsGenericType) return null;
+
+                List<Type> args = genericArgTypesList;
+                args.Clear();
+
+                for (int i = 0; i < genericArgNames.Count; i++)
+                {
+                    Type arg = this.BindToType(genericArgNames[i], debugContext);
+                    if (arg == null) return null;
+                    args.Add(arg);
+                }
+
+                var argsArray = args.ToArray();
+
+                if (!type.AreGenericConstraintsSatisfiedBy(argsArray))
+                {
+                    if (debugContext != null)
+                    {
+                        string argsStr = "";
+
+                        foreach (var arg in args)
+                        {
+                            if (argsStr != "") argsStr += ", ";
+                            argsStr += arg.GetNiceFullName();
+                        }
+
+                        debugContext.LogWarning("Deserialization type lookup failure: The generic type arguments '" + argsStr + "' do not satisfy the generic constraints of generic type definition '" + type.GetNiceFullName() + "'. All this parsed from the full type name string: '" + typeName + "'");
+                    }
+
+                    return null;
+                }
+
+                type = type.MakeGenericType(argsArray);
+            }
+
+            if (isArray)
+            {
+                type = type.MakeArrayType(arrayRank);
+            }
+
+            return type;
+        }
+        
+        private static bool TryParseGenericAndOrArrayTypeName(string typeName, out string actualTypeName, out bool isGeneric, out List<string> genericArgNames, out bool isArray, out int arrayRank)
+        {
+            isGeneric = false;
+            isArray = false;
+            arrayRank = 0;
+
+            bool parsingGenericArguments = false;
+
+            string argName;
+            genericArgNames = null;
+            actualTypeName = null;
+
+            for (int i = 0; i < typeName.Length; i++)
+            {
+                if (typeName[i] == '[')
+                {
+                    var next = Peek(typeName, i, 1);
+
+                    if (next == ',' || next == ']')
+                    {
+                        if (actualTypeName == null)
+                        {
+                            actualTypeName = typeName.Substring(0, i);
+                        }
+
+                        isArray = true;
+                        arrayRank = 1;
+                        i++;
+
+                        if (next == ',')
+                        {
+                            while (next == ',')
+                            {
+                                arrayRank++;
+                                next = Peek(typeName, i, 1);
+                                i++;
+                            }
+
+                            if (next != ']')
+                                return false; // Malformed type name
+                        }
+                    }
+                    else
+                    {
+                        if (!isGeneric)
+                        {
+                            actualTypeName = typeName.Substring(0, i);
+                            isGeneric = true;
+                            parsingGenericArguments = true;
+                            genericArgNames = genericArgNamesList;
+                            genericArgNames.Clear();
+                        }
+                        else if (isGeneric && ReadGenericArg(typeName, ref i, out argName))
+                        {
+                            genericArgNames.Add(argName);
+                        }
+                        else return false; // Malformed type name
+                    }
+                }
+                else if (typeName[i] == ']')
+                {
+                    if (!parsingGenericArguments) return false; // This is not a valid type name, since we're hitting "]" without currently being in the process of parsing the generic arguments or an array thingy
+                    parsingGenericArguments = false;
+                }
+                else if (typeName[i] == ',' && !parsingGenericArguments)
+                {
+                    actualTypeName += typeName.Substring(i);
+                    break;
+                }
+            }
+            
+            return isArray || isGeneric;
+        }
+
+        private static char Peek(string str, int i, int ahead)
+        {
+            if (i + ahead < str.Length) return str[i + ahead];
+            return '\0';
+        }
+
+        private static bool ReadGenericArg(string typeName, ref int i, out string argName)
+        {
+            argName = null;
+            if (typeName[i] != '[') return false;
+
+            int start = i + 1;
+            int genericDepth = 0;
+
+            for (; i < typeName.Length; i++)
+            {
+                if (typeName[i] == '[') genericDepth++;
+                else if (typeName[i] == ']')
+                {
+                    genericDepth--;
+
+                    if (genericDepth == 0)
+                    {
+                        int length = i - start;
+                        argName = typeName.Substring(start, length);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(WrapAttribute))]
-    public class WrapExamples
+    internal class WrapExamples
     {
         [Wrap(0f, 100f)]
         public int IntWrapFrom0To100;

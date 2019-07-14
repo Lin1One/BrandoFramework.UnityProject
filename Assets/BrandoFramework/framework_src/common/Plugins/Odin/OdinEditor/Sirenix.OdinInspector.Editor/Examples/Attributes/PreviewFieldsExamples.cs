@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(PreviewFieldAttribute))]
-    public class PreviewFieldsExamples
+    internal class PreviewFieldsExamples
     {
         [PreviewField]
         public Object RegularPreviewField;

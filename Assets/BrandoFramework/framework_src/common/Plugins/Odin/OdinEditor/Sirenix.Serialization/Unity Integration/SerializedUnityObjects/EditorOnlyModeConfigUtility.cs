@@ -1,9 +1,4 @@
 //-----------------------------------------------------------------------// <copyright file="EditorOnlyModeConfigUtility.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
-//-----------------------------------------------------------------------
-// <copyright file="EditorOnlyModeConfigUtility.cs" company="Sirenix IVS">
-// Copyright (c) Sirenix IVS. All rights reserved.
-// </copyright>
-//-----------------------------------------------------------------------
 #if UNITY_EDITOR
 
 namespace Sirenix.OdinInspector
@@ -14,7 +9,7 @@ namespace Sirenix.OdinInspector
     using System.Reflection;
     using UnityEngine;
 
-    internal static class EditorOnlyModeConfigUtility
+    public static class EditorOnlyModeConfigUtility
     {
         private static bool initialized;
 
@@ -46,7 +41,6 @@ namespace Sirenix.OdinInspector
                 return !isInEditorOnlyModeGetter(ref instance);
             }
         }
-
 
         public static void InternalOnInspectorGUI(Type serializedType)
         {

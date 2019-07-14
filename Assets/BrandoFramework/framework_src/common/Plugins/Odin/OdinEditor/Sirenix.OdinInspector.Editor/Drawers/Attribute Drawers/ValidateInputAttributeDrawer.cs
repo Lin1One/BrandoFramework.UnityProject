@@ -164,7 +164,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
                     if (attribute.DefaultMessage != null)
                     {
-                        context.Value.ValidationMessageHelper = new StringMemberHelper(entry.ParentType, attribute.DefaultMessage);
+                        context.Value.ValidationMessageHelper = new StringMemberHelper(entry.Property, attribute.DefaultMessage);
 
                         if (context.Value.ValidationMessageHelper.ErrorMessage != null)
                         {

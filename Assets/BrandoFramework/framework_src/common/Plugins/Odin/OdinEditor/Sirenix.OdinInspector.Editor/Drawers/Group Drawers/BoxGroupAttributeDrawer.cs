@@ -24,7 +24,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void Initialize()
         {
-            this.labelGetter = new StringMemberHelper(this.Property.ParentType, this.Attribute.GroupName);
+            this.labelGetter = new StringMemberHelper(this.Property, this.Attribute.GroupName);
         }
 
         /// <summary>

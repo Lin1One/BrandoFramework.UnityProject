@@ -14,7 +14,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     /// <summary>
     /// The GUIStyleState Drawer
     /// </summary>
-    /// <seealso cref="GUIStyleState" />
+    /// <seealso cref="Sirenix.OdinInspector.Editor.OdinValueDrawer{UnityEngine.GUIStyleState}" />
     public class GUIStyleStateDrawer : OdinValueDrawer<GUIStyleState>
     {
         private bool isVisible;

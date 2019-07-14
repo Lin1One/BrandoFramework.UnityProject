@@ -11,7 +11,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     // Margin-left and right can only be specified in pixels.
 
     [AttributeExample(typeof(HorizontalGroupAttribute))]
-    public class HorizontalGroupAttributeExamples
+    internal class HorizontalGroupAttributeExamples
     {
         [HorizontalGroup]
         public int A;

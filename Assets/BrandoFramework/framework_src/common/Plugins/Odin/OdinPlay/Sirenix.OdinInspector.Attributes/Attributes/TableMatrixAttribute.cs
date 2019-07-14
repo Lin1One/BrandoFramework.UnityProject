@@ -111,5 +111,15 @@ namespace Sirenix.OdinInspector
         /// If true, no row indices drawn.
         /// </summary>
         public bool HideRowIndices = false;
+
+        /// <summary>
+        /// Whether the drawn table should respect the current GUI indent level.
+        /// </summary>
+        public bool RespectIndentLevel = true;
+
+        /// <summary>
+        /// If true, tables are drawn with rows/columns reversed (C# initialization order).
+        /// </summary>
+        public bool Transpose = false;
     }
 }

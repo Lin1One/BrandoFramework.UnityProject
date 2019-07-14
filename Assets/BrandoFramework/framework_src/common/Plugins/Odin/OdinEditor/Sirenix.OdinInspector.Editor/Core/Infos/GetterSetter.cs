@@ -50,7 +50,7 @@ namespace Sirenix.OdinInspector.Editor
         /// <summary>
         /// Initializes a new instance of the <see cref="GetterSetter{TOwner, TValue}"/> class.
         /// </summary>
-        /// <param name="fieldInfo">The field member to represent.</param>
+        /// <param name="memberInfo">The field member to represent.</param>
         /// <param name="isReadOnly">if set to <c>true</c> [is readonly].</param>
         public GetterSetter(MemberInfo memberInfo, bool isReadOnly)
         {

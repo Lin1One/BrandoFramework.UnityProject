@@ -19,9 +19,13 @@ namespace Sirenix.OdinInspector.Editor
 
             for (int i = 0; i < values.Length; i++)
             {
-                int capture = i;
-                this.EnqueueChange(() => this.InsertAt((TCollection)this.Property.BaseValueEntry.WeakValues[capture], index, values[capture]));
+                this.QueueInsertAt(index, values[i], i);
             }
+        }
+
+        public void QueueInsertAt(int index, object value, int selectionIndex)
+        {
+            this.EnqueueChange(() => this.InsertAt((TCollection)this.Property.BaseValueEntry.WeakValues[selectionIndex], index, value));
         }
 
         public void QueueRemoveAt(int index)
@@ -35,9 +39,13 @@ namespace Sirenix.OdinInspector.Editor
 
             for (int i = 0; i < count; i++)
             {
-                int capture = i;
-                this.EnqueueChange(() => this.RemoveAt((TCollection)this.Property.BaseValueEntry.WeakValues[capture], index));
+                QueueRemoveAt(index, i);
             }
+        }
+
+        public void QueueRemoveAt(int index, int selectionIndex)
+        {
+            this.EnqueueChange(() => this.RemoveAt((TCollection)this.Property.BaseValueEntry.WeakValues[selectionIndex], index));
         }
 
         protected abstract void InsertAt(TCollection collection, int index, object value);

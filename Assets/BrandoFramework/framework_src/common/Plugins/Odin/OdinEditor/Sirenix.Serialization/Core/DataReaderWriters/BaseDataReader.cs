@@ -145,7 +145,7 @@ namespace Sirenix.Serialization
         /// <summary>
         /// Exits the closest array. This method will keep skipping entries using <see cref="IDataReader.SkipEntry(DeserializationContext)"/> until an <see cref="EntryType.EndOfArray"/> is reached, or the end of the stream is reached.
         /// <para />
-        /// This call MUST have been preceded by a corresponding call to <see cref="IDataReader.EnterArray(out long)(out Type)"/>.
+        /// This call MUST have been preceded by a corresponding call to <see cref="IDataReader.EnterArray(out long)"/>.
         /// <para />
         /// This call will change the values of the <see cref="IDataReader.IsInArrayNode"/>, <see cref="IDataReader.CurrentNodeName"/>, <see cref="IDataReader.CurrentNodeId"/> and <see cref="IDataReader.CurrentNodeDepth"/> to the correct values for the node that was prior to the exited array node.
         /// </summary>
@@ -506,6 +506,11 @@ namespace Sirenix.Serialization
         {
             this.ClearNodes();
         }
+
+        /// <summary>
+        /// Gets a dump of the data being read by the writer. The format of this dump varies, but should be useful for debugging purposes.
+        /// </summary>
+        public abstract string GetDataDump();
 
         /// <summary>
         /// Peeks the current entry.

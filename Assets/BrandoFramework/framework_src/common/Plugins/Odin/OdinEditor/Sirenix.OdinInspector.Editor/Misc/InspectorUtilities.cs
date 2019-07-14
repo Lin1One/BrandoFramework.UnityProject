@@ -6,10 +6,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-#if UNITY_5_3 && !UNITY_5_3_OR_NEWER
-#define UNITY_5_3_OR_NEWER
-#endif
-
 namespace Sirenix.OdinInspector.Editor
 {
     using System;
@@ -76,63 +72,67 @@ namespace Sirenix.OdinInspector.Editor
 
             if (hasSpecialCharacters)
             {
-                StringBuilder sb = new StringBuilder(odinPropertyPath.Length + 5);
-
-                bool skipUntilNextDot = false;
-
-                for (int i = 0; i < odinPropertyPath.Length; i++)
+                using (var sbCache = Cache<StringBuilder>.Claim())
                 {
-                    var c = odinPropertyPath[i];
+                    StringBuilder sb = sbCache.Value;
+                    sb.Length = 0;
 
-                    if (c == '.') skipUntilNextDot = false;
-                    else if (skipUntilNextDot) continue;
+                    bool skipUntilNextDot = false;
 
-                    if (c == '$')
+                    for (int i = 0; i < odinPropertyPath.Length; i++)
                     {
-                        sb.Append(isUnity ? "Array.data[" : "[");
-                        i++;
+                        var c = odinPropertyPath[i];
 
-                        while (i < odinPropertyPath.Length && char.IsNumber(odinPropertyPath[i]))
+                        if (c == '.') skipUntilNextDot = false;
+                        else if (skipUntilNextDot) continue;
+
+                        if (c == '$')
                         {
-                            sb.Append(odinPropertyPath[i]);
+                            sb.Append(isUnity ? "Array.data[" : "[");
                             i++;
+
+                            while (i < odinPropertyPath.Length && char.IsNumber(odinPropertyPath[i]))
+                            {
+                                sb.Append(odinPropertyPath[i]);
+                                i++;
+                            }
+
+                            // Insert ']' char after array number
+                            sb.Append(']');
+
+                            // Make sure we don't skip the next char
+                            i--;
                         }
-
-                        // Insert ']' char after array number
-                        sb.Append(']');
-
-                        // Make sure we don't skip the next char
-                        i--;
-                    }
-                    else if (c == '#')
-                    {
-                        skipUntilNextDot = true;
-                        continue;
-                    }
-                    else if (c == '.')
-                    {
-                        if (sb.Length > 0 && sb[sb.Length - 1] != '.') // Never add a dot at the start, or just after another dot
+                        else if (c == '#')
                         {
-                            sb.Append('.');
+                            skipUntilNextDot = true;
+                            continue;
+                        }
+                        else if (c == '.')
+                        {
+                            if (sb.Length > 0 && sb[sb.Length - 1] != '.') // Never add a dot at the start, or just after another dot
+                            {
+                                sb.Append('.');
+                            }
+                        }
+                        else
+                        {
+                            sb.Append(c);
                         }
                     }
-                    else
+
+                    while (sb.Length > 0 && sb[0] == '.')
                     {
-                        sb.Append(c);
+                        sb.Remove(0, 1);
                     }
-                }
 
-                while (sb.Length > 0 && sb[0] == '.')
-                {
-                    sb.Remove(0, 1);
-                }
+                    while (sb.Length > 0 && sb[sb.Length - 1] == '.')
+                    {
+                        sb.Remove(sb.Length - 1, 1);
+                    }
 
-                while (sb.Length > 0 && sb[sb.Length - 1] == '.')
-                {
-                    sb.Remove(sb.Length - 1, 1);
+                    return sb.ToString();
                 }
-
-                return sb.ToString();
             }
             else
             {
@@ -266,42 +266,6 @@ namespace Sirenix.OdinInspector.Editor
             {
                 appliedOdinChanges = true;
                 GUIHelper.RequestRepaint();
-
-                if (!tree.IsStatic && tree.TargetType.ImplementsOrInherits(typeof(UnityEngine.Object)))
-                {
-                    var targets = tree.WeakTargets;
-
-                    for (int i = 0; i < targets.Count; i++)
-                    {
-                        var target = (UnityEngine.Object)targets[i];
-
-                        if (AssetDatabase.Contains(target))
-                        {
-                            EditorUtility.SetDirty(target);
-                        }
-                        else if (Application.isPlaying == false)
-                        {
-#if UNITY_5_3_OR_NEWER
-                            if (tree.TargetType.ImplementsOrInherits(typeof(Component)))
-                            {
-                                Component component = (Component)target;
-                                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(component.gameObject.scene);
-                            }
-                            else
-                            {
-                                // We can't find out where this thing is from
-                                // It is probably a "temporary" UnityObject created from a script somewhere
-                                // Just to be safe, mark it as dirty, and mark all scenes as dirty
-
-                                EditorUtility.SetDirty(target);
-                                UnityEditor.SceneManagement.EditorSceneManager.MarkAllScenesDirty();
-                            }
-#else
-                                EditorApplication.MarkSceneDirty();
-#endif
-                        }
-                    }
-                }
             }
 
             // This is very important, as applying changes may cause more actions to be delayed
@@ -370,6 +334,43 @@ namespace Sirenix.OdinInspector.Editor
                 }
             }
 #endif
+        }
+
+        public static void RegisterUnityObjectDirty(UnityEngine.Object unityObj)
+        {
+            //var component = unityObj as Component;
+
+            if (AssetDatabase.Contains(unityObj) /*|| (component != null && AssetDatabase.Contains(component.gameObject))*/)
+            {
+                EditorUtility.SetDirty(unityObj);
+                //if (component != null)
+                //{
+                //    EditorUtility.SetDirty(component.gameObject);
+                //}
+            }
+            else if (Application.isPlaying == false)
+            {
+                if (unityObj is Component)
+                {
+                    Component component = (Component)unityObj;
+                    EditorUtility.SetDirty(component);
+                    EditorUtility.SetDirty(component.gameObject);
+                    UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(component.gameObject.scene);
+                }
+                else if (unityObj is EditorWindow || unityObj is ScriptableObject)
+                {
+                    EditorUtility.SetDirty(unityObj);
+                }
+                else
+                {
+                    // We can't find out where this thing is from
+                    // It is probably a "temporary" UnityObject created from a script somewhere
+                    // Just to be safe, mark it as dirty, and mark all scenes as dirty
+
+                    EditorUtility.SetDirty(unityObj);
+                    UnityEditor.SceneManagement.EditorSceneManager.MarkAllScenesDirty();
+                }
+            }
         }
 
         /// <summary>

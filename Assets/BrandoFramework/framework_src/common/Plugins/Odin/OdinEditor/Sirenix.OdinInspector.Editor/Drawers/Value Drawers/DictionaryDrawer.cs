@@ -3,13 +3,13 @@
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
     using Sirenix.OdinInspector.Editor;
+    using Sirenix.Serialization;
     using Sirenix.Utilities;
     using Sirenix.Utilities.Editor;
     using System.Collections.Generic;
     using System.Linq;
     using UnityEditor;
     using UnityEngine;
-    using Sirenix.Serialization;
 
     /// <summary>
     /// Property drawer for <see cref="IDictionary{TKey, TValue}"/>.
@@ -19,7 +19,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         private const string CHANGE_ID = "DICTIONARY_DRAWER";
         private static readonly bool KeyIsValueType = typeof(TKey).IsValueType;
         private static GUIStyle addKeyPaddingStyle;
-
+        private static GUIStyle listItemStyle;
         private static GUIStyle AddKeyPaddingStyle
         {
             get
@@ -39,30 +39,54 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             }
         }
 
-        private class Context
+        private GUIPagingHelper paging = new GUIPagingHelper();
+        private GeneralDrawerConfig config;
+        private LocalPersistentContext<bool> toggled;
+        private float keyWidthOffset;
+        private bool showAddKeyGUI = false;
+        private bool? newKeyIsValid;
+        private string newKeyErrorMessage;
+        private TKey newKey;
+        private TValue newValue;
+        private StrongDictionaryPropertyResolver<TDictionary, TKey, TValue> dictionaryResolver;
+        private GUIContent label;
+        private DictionaryDrawerSettings attrSettings;
+        private bool disableAddKey;
+        private GUIContent keyLabel;
+        private GUIContent valueLabel;
+        private float keyLabelWidth;
+        private float valueLabelWidth;
+        private TempKeyValuePair<TKey, TValue> tempKeyValue;
+        private IPropertyValueEntry<TKey> tempKeyEntry;
+        private IPropertyValueEntry<TValue> tempValueEntry;
+
+        protected override void Initialize()
         {
-            public GUIPagingHelper Paging = new GUIPagingHelper();
-            public GeneralDrawerConfig Config;
-            public LocalPersistentContext<bool> Toggled;
-            public float KeyWidthOffset;
-            public bool ShowAddKeyGUI = false;
-            public bool? NewKewIsValid;
-            public string NewKeyErrorMessage;
-            public TKey NewKey;
-            public TValue NewValue;
-            public StrongDictionaryPropertyResolver<TDictionary, TKey, TValue> DictionaryResolver;
-            public GUIContent Label;
-            public DictionaryDrawerSettings AttrSettings;
-            public bool DisableAddKey;
-
-            public TempKeyValuePair<TKey, TValue> TempKeyValue;
-            public IPropertyValueEntry<TKey> TempKeyEntry;
-            public IPropertyValueEntry<TValue> TempValueEntry;
-
-            public GUIStyle ListItemStyle = new GUIStyle(GUIStyle.none)
+            listItemStyle = new GUIStyle(GUIStyle.none)
             {
                 padding = new RectOffset(7, 20, 3, 3)
             };
+
+            var entry = this.ValueEntry;
+
+            this.toggled = this.GetPersistentValue("Toggled", GeneralDrawerConfig.Instance.OpenListsByDefault);
+            this.keyWidthOffset = 130;
+            this.label = this.Property.Label ?? new GUIContent(typeof(TDictionary).GetNiceName());
+            this.attrSettings = entry.Property.Info.GetAttribute<DictionaryDrawerSettings>() ?? new DictionaryDrawerSettings();
+            this.disableAddKey = entry.Property.Tree.PrefabModificationHandler.HasPrefabs && !entry.Property.SupportsPrefabModifications;
+            this.keyLabel = new GUIContent(this.attrSettings.KeyLabel);
+            this.valueLabel = new GUIContent(this.attrSettings.ValueLabel);
+            this.keyLabelWidth = EditorStyles.label.CalcSize(this.keyLabel).x + 20;
+            this.valueLabelWidth = EditorStyles.label.CalcSize(this.valueLabel).x + 20;
+
+            if (!this.disableAddKey)
+            {
+                this.tempKeyValue = new TempKeyValuePair<TKey, TValue>();
+                var tree = PropertyTree.Create(this.tempKeyValue);
+                tree.UpdateTree();
+                this.tempKeyEntry = (IPropertyValueEntry<TKey>)tree.GetPropertyAtPath("Key").ValueEntry;
+                this.tempValueEntry = (IPropertyValueEntry<TValue>)tree.GetPropertyAtPath("Value").ValueEntry;
+            }
         }
 
         /// <summary>
@@ -71,70 +95,49 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         protected override void DrawPropertyLayout(GUIContent label)
         {
             var entry = this.ValueEntry;
-            var context = entry.Property.Context.Get(this, "context", (Context)null);
-            if (context.Value == null)
-            {
-                context.Value = new Context();
-                context.Value.Toggled = entry.Context.GetPersistent(this, "Toggled", GeneralDrawerConfig.Instance.OpenListsByDefault);
-                context.Value.KeyWidthOffset = 130;
-                context.Value.Label = label ?? new GUIContent(typeof(TDictionary).GetNiceName());
-                context.Value.AttrSettings = entry.Property.Info.GetAttribute<DictionaryDrawerSettings>() ?? new DictionaryDrawerSettings();
-                context.Value.DisableAddKey = entry.Property.Tree.PrefabModificationHandler.HasPrefabs && !entry.Property.SupportsPrefabModifications;
 
-                if (!context.Value.DisableAddKey)
-                {
-                    context.Value.TempKeyValue = new TempKeyValuePair<TKey, TValue>();
-
-                    var tree = PropertyTree.Create(context.Value.TempKeyValue);
-                    tree.UpdateTree();
-
-                    context.Value.TempKeyEntry = (IPropertyValueEntry<TKey>)tree.GetPropertyAtPath("Key").ValueEntry;
-                    context.Value.TempValueEntry = (IPropertyValueEntry<TValue>)tree.GetPropertyAtPath("Value").ValueEntry;
-                }
-            }
-
-            context.Value.DictionaryResolver = entry.Property.ChildResolver as StrongDictionaryPropertyResolver<TDictionary, TKey, TValue>;
-            context.Value.Config = GeneralDrawerConfig.Instance;
-            context.Value.Paging.NumberOfItemsPerPage = context.Value.Config.NumberOfItemsPrPage;
-            context.Value.ListItemStyle.padding.right = !entry.IsEditable || context.Value.AttrSettings.IsReadOnly ? 4 : 20;
+            this.dictionaryResolver = entry.Property.ChildResolver as StrongDictionaryPropertyResolver<TDictionary, TKey, TValue>;
+            this.config = GeneralDrawerConfig.Instance;
+            this.paging.NumberOfItemsPerPage = this.config.NumberOfItemsPrPage;
+            listItemStyle.padding.right = !entry.IsEditable || this.attrSettings.IsReadOnly ? 4 : 20;
 
             SirenixEditorGUI.BeginIndentedVertical(SirenixGUIStyles.PropertyPadding);
             {
-                context.Value.Paging.Update(elementCount: entry.Property.Children.Count);
-                this.DrawToolbar(entry, context.Value);
-                context.Value.Paging.Update(elementCount: entry.Property.Children.Count);
+                this.paging.Update(elementCount: entry.Property.Children.Count);
+                this.DrawToolbar(entry);
+                this.paging.Update(elementCount: entry.Property.Children.Count);
 
-                if (!context.Value.DisableAddKey && context.Value.AttrSettings.IsReadOnly == false)
+                if (!this.disableAddKey && this.attrSettings.IsReadOnly == false)
                 {
-                    this.DrawAddKey(entry, context.Value);
+                    this.DrawAddKey(entry);
                 }
 
                 float t;
                 GUIHelper.BeginLayoutMeasuring();
-                if (SirenixEditorGUI.BeginFadeGroup(UniqueDrawerKey.Create(entry.Property, this), context.Value.Toggled.Value, out t))
+                if (SirenixEditorGUI.BeginFadeGroup(UniqueDrawerKey.Create(entry.Property, this), this.toggled.Value, out t))
                 {
                     var rect = SirenixEditorGUI.BeginVerticalList(false);
-                    if (context.Value.AttrSettings.DisplayMode == DictionaryDisplayOptions.OneLine)
+                    if (this.attrSettings.DisplayMode == DictionaryDisplayOptions.OneLine)
                     {
                         var maxWidth = rect.width - 90;
-                        rect.xMin = context.Value.KeyWidthOffset + 22;
+                        rect.xMin = this.keyWidthOffset + 22;
                         rect.xMax = rect.xMin + 10;
-                        context.Value.KeyWidthOffset = context.Value.KeyWidthOffset + SirenixEditorGUI.SlideRect(rect).x;
+                        this.keyWidthOffset = this.keyWidthOffset + SirenixEditorGUI.SlideRect(rect).x;
 
                         if (Event.current.type == EventType.Repaint)
                         {
-                            context.Value.KeyWidthOffset = Mathf.Clamp(context.Value.KeyWidthOffset, 90, maxWidth);
+                            this.keyWidthOffset = Mathf.Clamp(this.keyWidthOffset, 90, maxWidth);
                         }
 
-                        if (context.Value.Paging.ElementCount != 0)
+                        if (this.paging.ElementCount != 0)
                         {
                             var headerRect = SirenixEditorGUI.BeginListItem(false);
                             {
                                 GUILayout.Space(14);
                                 if (Event.current.type == EventType.Repaint)
                                 {
-                                    GUI.Label(headerRect.SetWidth(context.Value.KeyWidthOffset), context.Value.AttrSettings.KeyLabel, SirenixGUIStyles.LabelCentered);
-                                    GUI.Label(headerRect.AddXMin(context.Value.KeyWidthOffset), context.Value.AttrSettings.ValueLabel, SirenixGUIStyles.LabelCentered);
+                                    GUI.Label(headerRect.SetWidth(this.keyWidthOffset), this.keyLabel, SirenixGUIStyles.LabelCentered);
+                                    GUI.Label(headerRect.AddXMin(this.keyWidthOffset), this.valueLabel, SirenixGUIStyles.LabelCentered);
                                     SirenixEditorGUI.DrawSolidRect(headerRect.AlignBottom(1), SirenixGUIStyles.BorderColor);
                                 }
                             }
@@ -142,7 +145,9 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         }
                     }
 
-                    this.DrawElements(entry, label, context.Value);
+                    GUIHelper.PushHierarchyMode(false);
+                    this.DrawElements(entry, label);
+                    GUIHelper.PopHierarchyMode();
                     SirenixEditorGUI.EndVerticalList();
                 }
                 SirenixEditorGUI.EndFadeGroup();
@@ -155,11 +160,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     outerRect.yMin -= 1;
                     SirenixEditorGUI.DrawBorders(outerRect, 1, col);
                     col.a *= t;
-                    if (context.Value.AttrSettings.DisplayMode == DictionaryDisplayOptions.OneLine)
+                    if (this.attrSettings.DisplayMode == DictionaryDisplayOptions.OneLine)
                     {
                         // Draw Slide Rect Border
                         outerRect.width = 1;
-                        outerRect.x += context.Value.KeyWidthOffset + 13;
+                        outerRect.x += this.keyWidthOffset + 13;
                         SirenixEditorGUI.DrawSolidRect(outerRect, col);
                     }
                 }
@@ -167,83 +172,96 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             SirenixEditorGUI.EndIndentedVertical();
         }
 
-        private void DrawAddKey(IPropertyValueEntry<TDictionary> entry, Context context)
+        private void DrawAddKey(IPropertyValueEntry<TDictionary> entry)
         {
-            if (entry.IsEditable == false || context.AttrSettings.IsReadOnly)
+            if (entry.IsEditable == false || this.attrSettings.IsReadOnly)
             {
                 return;
             }
 
-            if (SirenixEditorGUI.BeginFadeGroup(context, context.ShowAddKeyGUI))
+            if (SirenixEditorGUI.BeginFadeGroup(this, this.showAddKeyGUI))
             {
                 GUILayout.BeginVertical(AddKeyPaddingStyle);
                 {
-                    if (typeof(TKey) == typeof(string) && context.NewKey == null)
+                    if (typeof(TKey) == typeof(string) && this.newKey == null)
                     {
-                        context.NewKey = (TKey)(object)"";
-                        context.NewKewIsValid = null;
+                        this.newKey = (TKey)(object)"";
+                        this.newKeyIsValid = null;
                     }
 
-                    if (context.NewKewIsValid == null)
+                    if (this.newKeyIsValid == null)
                     {
-                        context.NewKewIsValid = CheckKeyIsValid(entry, context.NewKey, out context.NewKeyErrorMessage);
+                        this.newKeyIsValid = CheckKeyIsValid(entry, this.newKey, out this.newKeyErrorMessage);
                     }
 
-                    InspectorUtilities.BeginDrawPropertyTree(context.TempKeyEntry.Property.Tree, false);
+                    InspectorUtilities.BeginDrawPropertyTree(this.tempKeyEntry.Property.Tree, false);
 
                     // Key
                     {
-                        //context.TempKeyValue.key = context.NewKey;
-                        context.TempKeyEntry.Property.Update();
+                        //this.TempKeyValue.key = this.NewKey;
+                        this.tempKeyEntry.Property.Update();
 
                         EditorGUI.BeginChangeCheck();
 
-                        context.TempKeyEntry.Property.Draw(new GUIContent(context.AttrSettings.KeyLabel));
+                        this.tempKeyEntry.Property.Draw(this.keyLabel);
 
                         bool changed1 = EditorGUI.EndChangeCheck();
-                        bool changed2 = context.TempKeyEntry.ApplyChanges();
+                        bool changed2 = this.tempKeyEntry.ApplyChanges();
 
                         if (changed1 || changed2)
                         {
-                            context.NewKey = context.TempKeyValue.Key;
-                            EditorApplication.delayCall += () => context.NewKewIsValid = null;
+                            this.newKey = this.tempKeyValue.Key;
+                            EditorApplication.delayCall += () => this.newKeyIsValid = null;
                             GUIHelper.RequestRepaint();
                         }
                     }
 
                     // Value
                     {
-                        //context.TempKeyValue.value = context.NewValue;
-                        context.TempValueEntry.Property.Update();
-                        context.TempValueEntry.Property.Draw(new GUIContent(context.AttrSettings.ValueLabel));
-                        context.TempValueEntry.ApplyChanges();
-                        context.NewValue = context.TempKeyValue.Value;
+                        //this.TempKeyValue.value = this.NewValue;
+                        this.tempValueEntry.Property.Update();
+                        this.tempValueEntry.Property.Draw(this.valueLabel);
+                        this.tempValueEntry.ApplyChanges();
+                        this.newValue = this.tempKeyValue.Value;
                     }
 
-                    context.TempKeyEntry.Property.Tree.InvokeDelayedActions();
-                    var changed = context.TempKeyEntry.Property.Tree.ApplyChanges();
+                    this.tempKeyEntry.Property.Tree.InvokeDelayedActions();
+                    var changed = this.tempKeyEntry.Property.Tree.ApplyChanges();
 
                     if (changed)
                     {
-                        context.NewKey = context.TempKeyValue.Key;
-                        EditorApplication.delayCall += () => context.NewKewIsValid = null;
+                        this.newKey = this.tempKeyValue.Key;
+                        EditorApplication.delayCall += () => this.newKeyIsValid = null;
                         GUIHelper.RequestRepaint();
                     }
 
-                    InspectorUtilities.EndDrawPropertyTree(context.TempKeyEntry.Property.Tree);
+                    InspectorUtilities.EndDrawPropertyTree(this.tempKeyEntry.Property.Tree);
 
-                    GUIHelper.PushGUIEnabled(GUI.enabled && context.NewKewIsValid.Value);
-                    if (GUILayout.Button(context.NewKewIsValid.Value ? "Add" : context.NewKeyErrorMessage))
+                    GUIHelper.PushGUIEnabled(GUI.enabled && this.newKeyIsValid.Value);
+                    if (GUILayout.Button(this.newKeyIsValid.Value ? "Add" : this.newKeyErrorMessage))
                     {
-                        context.DictionaryResolver.QueueSet(Enumerable.Repeat<object>(context.NewKey, entry.ValueCount).ToArray(), Enumerable.Repeat<object>(context.NewValue, entry.ValueCount).ToArray());
-                        EditorApplication.delayCall += () => context.NewKewIsValid = null;
+                        var keys = new object[entry.ValueCount];
+                        var values = new object[entry.ValueCount];
+
+                        for (int i = 0; i < keys.Length; i++)
+                        {
+                            keys[i] = SerializationUtility.CreateCopy(this.newKey);
+                        }
+
+                        for (int i = 0; i < values.Length; i++)
+                        {
+                            values[i] = SerializationUtility.CreateCopy(this.newValue);
+                        }
+
+                        this.dictionaryResolver.QueueSet(keys, values);
+                        EditorApplication.delayCall += () => this.newKeyIsValid = null;
                         GUIHelper.RequestRepaint();
 
                         entry.Property.Tree.DelayActionUntilRepaint(() =>
                         {
-                            context.NewValue = default(TValue);
-                            context.TempKeyValue.Value = default(TValue);
-                            context.TempValueEntry.Update();
+                            this.newValue = default(TValue);
+                            this.tempKeyValue.Value = default(TValue);
+                            this.tempValueEntry.Update();
                         });
                     }
                     GUIHelper.PopGUIEnabled();
@@ -253,19 +271,24 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             SirenixEditorGUI.EndFadeGroup();
         }
 
-        private void DrawToolbar(IPropertyValueEntry<TDictionary> entry, Context context)
+        private void DrawToolbar(IPropertyValueEntry<TDictionary> entry)
         {
             SirenixEditorGUI.BeginHorizontalToolbar();
             {
                 if (entry.ListLengthChangedFromPrefab) GUIHelper.PushIsBoldLabel(true);
 
-                if (context.Config.HideFoldoutWhileEmpty && context.Paging.ElementCount == 0)
+                if (this.config.HideFoldoutWhileEmpty && this.paging.ElementCount == 0)
                 {
-                    GUILayout.Label(context.Label, GUILayoutOptions.ExpandWidth(false));
+                    GUILayout.Label(this.label, GUILayoutOptions.ExpandWidth(false));
                 }
                 else
                 {
-                    context.Toggled.Value = SirenixEditorGUI.Foldout(context.Toggled.Value, context.Label);
+                    var newState = SirenixEditorGUI.Foldout(this.toggled.Value, this.label);
+                    if (!newState && this.toggled.Value)
+                    {
+                        this.showAddKeyGUI = false;
+                    }
+                    this.toggled.Value = newState;
                 }
 
                 if (entry.ListLengthChangedFromPrefab) GUIHelper.PopIsBoldLabel();
@@ -273,7 +296,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 GUILayout.FlexibleSpace();
 
                 // Item Count
-                if (context.Config.ShowItemCount)
+                if (this.config.ShowItemCount)
                 {
                     if (entry.ValueState == PropertyValueState.CollectionLengthConflict)
                     {
@@ -283,65 +306,70 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     }
                     else
                     {
-                        GUILayout.Label(context.Paging.ElementCount == 0 ? "Empty" : context.Paging.ElementCount + " items", EditorStyles.centeredGreyMiniLabel);
+                        GUILayout.Label(this.paging.ElementCount == 0 ? "Empty" : this.paging.ElementCount + " items", EditorStyles.centeredGreyMiniLabel);
                     }
                 }
 
                 bool hidePaging =
-                        context.Config.HidePagingWhileCollapsed && context.Toggled.Value == false ||
-                        context.Config.HidePagingWhileOnlyOnePage && context.Paging.PageCount == 1;
+                        this.config.HidePagingWhileCollapsed && this.toggled.Value == false ||
+                        this.config.HidePagingWhileOnlyOnePage && this.paging.PageCount == 1;
 
                 if (!hidePaging)
                 {
                     var wasEnabled = GUI.enabled;
-                    bool pagingIsRelevant = context.Paging.IsEnabled && context.Paging.PageCount != 1;
+                    bool pagingIsRelevant = this.paging.IsEnabled && this.paging.PageCount != 1;
 
-                    GUI.enabled = wasEnabled && pagingIsRelevant && !context.Paging.IsOnFirstPage;
+                    GUI.enabled = wasEnabled && pagingIsRelevant && !this.paging.IsOnFirstPage;
                     if (SirenixEditorGUI.ToolbarButton(EditorIcons.ArrowLeft, true))
                     {
                         if (Event.current.button == 0)
                         {
-                            context.Paging.CurrentPage--;
+                            this.paging.CurrentPage--;
                         }
                         else
                         {
-                            context.Paging.CurrentPage = 0;
+                            this.paging.CurrentPage = 0;
                         }
                     }
 
                     GUI.enabled = wasEnabled && pagingIsRelevant;
-                    var width = GUILayoutOptions.Width(10 + context.Paging.PageCount.ToString().Length * 10);
-                    context.Paging.CurrentPage = EditorGUILayout.IntField(context.Paging.CurrentPage + 1, width) - 1;
-                    GUILayout.Label(GUIHelper.TempContent("/ " + context.Paging.PageCount));
+                    var width = GUILayoutOptions.Width(10 + this.paging.PageCount.ToString().Length * 10);
+                    this.paging.CurrentPage = EditorGUILayout.IntField(this.paging.CurrentPage + 1, width) - 1;
+                    GUILayout.Label(GUIHelper.TempContent("/ " + this.paging.PageCount));
 
-                    GUI.enabled = wasEnabled && pagingIsRelevant && !context.Paging.IsOnLastPage;
+                    GUI.enabled = wasEnabled && pagingIsRelevant && !this.paging.IsOnLastPage;
                     if (SirenixEditorGUI.ToolbarButton(EditorIcons.ArrowRight, true))
                     {
                         if (Event.current.button == 0)
                         {
-                            context.Paging.CurrentPage++;
+                            this.paging.CurrentPage++;
                         }
                         else
                         {
-                            context.Paging.CurrentPage = context.Paging.PageCount - 1;
+                            this.paging.CurrentPage = this.paging.PageCount - 1;
                         }
                     }
 
-                    GUI.enabled = wasEnabled && context.Paging.PageCount != 1;
-                    if (context.Config.ShowExpandButton)
+                    GUI.enabled = wasEnabled && this.paging.PageCount != 1;
+                    if (this.config.ShowExpandButton)
                     {
-                        if (SirenixEditorGUI.ToolbarButton(context.Paging.IsEnabled ? EditorIcons.ArrowDown : EditorIcons.ArrowUp, true))
+                        if (SirenixEditorGUI.ToolbarButton(this.paging.IsEnabled ? EditorIcons.ArrowDown : EditorIcons.ArrowUp, true))
                         {
-                            context.Paging.IsEnabled = !context.Paging.IsEnabled;
+                            this.paging.IsEnabled = !this.paging.IsEnabled;
                         }
                     }
                     GUI.enabled = wasEnabled;
                 }
-                if (!context.DisableAddKey && context.AttrSettings.IsReadOnly != true)
+                if (!this.disableAddKey && this.attrSettings.IsReadOnly != true)
                 {
                     if (SirenixEditorGUI.ToolbarButton(EditorIcons.Plus))
                     {
-                        context.ShowAddKeyGUI = !context.ShowAddKeyGUI;
+                        this.showAddKeyGUI = !this.showAddKeyGUI;
+
+                        if (this.showAddKeyGUI)
+                        {
+                            this.toggled.Value = true;
+                        }
                     }
                 }
             }
@@ -376,19 +404,19 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             }
         }
 
-        private void DrawElements(IPropertyValueEntry<TDictionary> entry, GUIContent label, Context context)
+        private void DrawElements(IPropertyValueEntry<TDictionary> entry, GUIContent label)
         {
-            for (int i = context.Paging.StartIndex; i < context.Paging.EndIndex; i++)
+            for (int i = this.paging.StartIndex; i < this.paging.EndIndex; i++)
             {
                 var keyValuePairProperty = entry.Property.Children[i];
                 var keyValuePairValue = (keyValuePairProperty.ValueEntry as IPropertyValueEntry<EditableKeyValuePair<TKey, TValue>>).SmartValue;
 
-                Rect rect = SirenixEditorGUI.BeginListItem(false, context.ListItemStyle);
+                Rect rect = SirenixEditorGUI.BeginListItem(false, listItemStyle);
                 {
-                    if (context.AttrSettings.DisplayMode != DictionaryDisplayOptions.OneLine)
+                    if (this.attrSettings.DisplayMode != DictionaryDisplayOptions.OneLine)
                     {
                         bool defaultExpanded;
-                        switch (context.AttrSettings.DisplayMode)
+                        switch (this.attrSettings.DisplayMode)
                         {
                             case DictionaryDisplayOptions.CollapsedFoldout:
                                 defaultExpanded = false;
@@ -416,9 +444,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                             GUILayout.BeginVertical(HeaderMargin);
                             GUIHelper.PushIsDrawingDictionaryKey(true);
 
-                            GUIHelper.PushLabelWidth(10);
+                            GUIHelper.PushLabelWidth(this.keyLabelWidth);
 
-                            keyValuePairProperty.Children[0].Draw(null);
+                            var keyProperty = keyValuePairProperty.Children[0];
+                            var keyLabel = GUIHelper.TempContent(" ");
+                            DrawKeyProperty(keyProperty, keyLabel);
 
                             GUIHelper.PopLabelWidth();
 
@@ -428,7 +458,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                             {
                                 GUIHelper.PopColor();
                             }
-                            isExpanded.Value = SirenixEditorGUI.Foldout(btnRect, isExpanded.Value, GUIHelper.TempContent("Key"));
+                            isExpanded.Value = SirenixEditorGUI.Foldout(btnRect, isExpanded.Value, this.keyLabel);
                         }
                         SirenixEditorGUI.EndToolbarBoxHeader();
 
@@ -443,7 +473,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     else
                     {
                         GUILayout.BeginHorizontal();
-                        GUILayout.BeginVertical(GUILayoutOptions.Width(context.KeyWidthOffset));
+                        GUILayout.BeginVertical(GUILayoutOptions.Width(this.keyWidthOffset));
                         {
                             var keyProperty = keyValuePairProperty.Children[0];
 
@@ -452,17 +482,17 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                                 GUIHelper.PushColor(Color.red);
                             }
 
-                            if (context.AttrSettings.IsReadOnly) GUIHelper.PushGUIEnabled(false);
+                            if (this.attrSettings.IsReadOnly) GUIHelper.PushGUIEnabled(false);
 
                             GUIHelper.PushIsDrawingDictionaryKey(true);
                             GUIHelper.PushLabelWidth(10);
 
-                            keyProperty.Draw(null);
+                            DrawKeyProperty(keyProperty, null);
 
                             GUIHelper.PopLabelWidth();
                             GUIHelper.PopIsDrawingDictionaryKey();
 
-                            if (context.AttrSettings.IsReadOnly) GUIHelper.PopGUIEnabled();
+                            if (this.attrSettings.IsReadOnly) GUIHelper.PopGUIEnabled();
 
                             if (keyValuePairValue.IsInvalidKey)
                             {
@@ -483,23 +513,105 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         GUILayout.EndVertical();
                         GUILayout.EndHorizontal();
                     }
-                    
-                    if (entry.IsEditable && !context.AttrSettings.IsReadOnly && SirenixEditorGUI.IconButton(new Rect(rect.xMax - 24 + 5, rect.y + 4 + ((int)rect.height - 23) / 2, 14, 14), EditorIcons.X))
+
+                    if (entry.IsEditable && !this.attrSettings.IsReadOnly && SirenixEditorGUI.IconButton(new Rect(rect.xMax - 24 + 5, rect.y + 4 + ((int)rect.height - 23) / 2, 14, 14), EditorIcons.X))
                     {
-                        context.DictionaryResolver.QueueRemoveKey(Enumerable.Range(0, entry.ValueCount).Select(n => context.DictionaryResolver.GetKey(n, i)).ToArray());
-                        EditorApplication.delayCall += () => context.NewKewIsValid = null;
+                        this.dictionaryResolver.QueueRemoveKey(Enumerable.Range(0, entry.ValueCount).Select(n => this.dictionaryResolver.GetKey(n, i)).ToArray());
+                        EditorApplication.delayCall += () => this.newKeyIsValid = null;
                         GUIHelper.RequestRepaint();
                     }
                 }
                 SirenixEditorGUI.EndListItem();
             }
 
-            if (context.Paging.IsOnLastPage && entry.ValueState == PropertyValueState.CollectionLengthConflict)
+            if (this.paging.IsOnLastPage && entry.ValueState == PropertyValueState.CollectionLengthConflict)
             {
                 SirenixEditorGUI.BeginListItem(false);
                 GUILayout.Label(GUIHelper.TempContent("------"), EditorStyles.centeredGreyMiniLabel);
                 SirenixEditorGUI.EndListItem();
             }
+        }
+
+        private void DrawKeyProperty(InspectorProperty keyProperty, GUIContent keyLabel)
+        {
+            EditorGUI.BeginChangeCheck();
+
+#if SIRENIX_INTERNAL
+            var keyValuePairValue = (keyProperty.Parent.ValueEntry as IPropertyValueEntry<EditableKeyValuePair<TKey, TValue>>).SmartValue;
+
+            if (keyValuePairValue.IsTempKey && !keyValuePairValue.IsInvalidKey)
+            {
+                GUIHelper.PushColor(Color.green);
+            }
+#endif
+
+            keyProperty.Draw(keyLabel);
+
+#if SIRENIX_INTERNAL
+            if (keyValuePairValue.IsTempKey && !keyValuePairValue.IsInvalidKey)
+            {
+                GUIHelper.PopColor();
+            }
+#endif
+
+            var guiChanged = EditorGUI.EndChangeCheck();
+
+            bool valuesAreDirty = ValuesAreDirty(keyProperty);
+
+            if (!guiChanged && valuesAreDirty)
+            {
+                this.dictionaryResolver.ValueApplyIsTemporary = true;
+                ApplyChangesToProperty(keyProperty);
+                this.dictionaryResolver.ValueApplyIsTemporary = false;
+            }
+            else if (guiChanged && !valuesAreDirty)
+            {
+                MarkPropertyDirty(keyProperty);
+            }
+        }
+
+        private static void MarkPropertyDirty(InspectorProperty keyProperty)
+        {
+            keyProperty.ValueEntry.WeakValues.ForceMarkDirty();
+
+            if (KeyIsValueType)
+            {
+                for (int i = 0; i < keyProperty.Children.Count; i++)
+                {
+                    MarkPropertyDirty(keyProperty.Children[i]);
+                }
+            }
+        }
+
+        private static void ApplyChangesToProperty(InspectorProperty keyProperty)
+        {
+            if (keyProperty.ValueEntry != null && keyProperty.ValueEntry.WeakValues.AreDirty) keyProperty.ValueEntry.ApplyChanges();
+
+            if (KeyIsValueType)
+            {
+                for (int i = 0; i < keyProperty.Children.Count; i++)
+                {
+                    ApplyChangesToProperty(keyProperty.Children[i]);
+                }
+            }
+        }
+
+        private static bool ValuesAreDirty(InspectorProperty keyProperty)
+        {
+            if (keyProperty.ValueEntry != null && keyProperty.ValueEntry.WeakValues.AreDirty)
+            {
+                return true;
+            }
+
+            if (KeyIsValueType)
+            {
+                for (int i = 0; i < keyProperty.Children.Count; i++)
+                {
+                    if (ValuesAreDirty(keyProperty.Children[i])) return true;
+                }
+            }
+
+            return false;
         }
 
         private static bool CheckKeyIsValid(IPropertyValueEntry<TDictionary> entry, TKey key, out string errorMessage)

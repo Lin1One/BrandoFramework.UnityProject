@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 //-----------------------------------------------------------------------// <copyright file="UnityObjectPropertyResolver.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
-// <copyright file="EmptyPropertyResolver.cs" company="Sirenix IVS">
+// <copyright file="UnityObjectPropertyResolver.cs" company="Sirenix IVS">
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------

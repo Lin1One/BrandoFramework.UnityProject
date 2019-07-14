@@ -15,7 +15,7 @@ namespace Sirenix.OdinInspector.Editor
     using System.Linq;
     using System.Runtime.Serialization;
 
-    internal static class OdinPropertyProcessorLocator
+    public static class OdinPropertyProcessorLocator
     {
         private static readonly Dictionary<Type, OdinPropertyProcessor> EmptyInstances = new Dictionary<Type, OdinPropertyProcessor>();
         public static readonly TypeSearchIndex SearchIndex = new TypeSearchIndex() { MatchedTypeLogName = "member property processor" };

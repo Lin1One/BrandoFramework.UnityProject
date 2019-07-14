@@ -79,7 +79,7 @@ namespace Sirenix.Utilities.Editor
 
         /// <summary>
         /// Loads an image from bytes with the specified width and height. Use this instead of someTexture.LoadImage() if you're compiling to an assembly. Unity has moved the method in 2017, 
-        /// and Unity's assembly updater is not able to fix it for you. This searches for a prober LoadImage method in multiple locations, and also handles type name conflicts.
+        /// and Unity's assembly updater is not able to fix it for you. This searches for a proper LoadImage method in multiple locations, and also handles type name conflicts.
         /// </summary>
         public static Texture2D LoadImage(int width, int height, byte[] bytes)
         {
@@ -207,7 +207,7 @@ namespace Sirenix.Utilities.Editor
             Texture2D texture = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, false, true);
             texture.filterMode = FilterMode.Bilinear;
             texture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
-            //texture.alphaIsTransparency = true;
+            texture.alphaIsTransparency = true;
             texture.Apply();
 
             RenderTexture.ReleaseTemporary(rt);

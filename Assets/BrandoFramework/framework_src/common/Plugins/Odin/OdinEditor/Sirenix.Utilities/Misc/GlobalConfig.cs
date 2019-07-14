@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------// <copyright file="GlobalConfig.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------// <copyright file="GlobalConfig.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
 // <copyright file="GlobalConfig.cs" company="Sirenix IVS">
 // Copyright (c) Sirenix IVS. All rights reserved.
@@ -126,15 +127,27 @@ namespace Sirenix.Utilities
                             inst = ScriptableObject.CreateInstance<T>();
 
 #if UNITY_EDITOR
+                            // TODO: What do we do if it gives us a path to a package?
+                            // Can we figure out where the package is actually located, and can we assume we have write rights?
+                            // Can we use purely the AssetDatabase and not do any IO manually?
 
-                            if (!Directory.Exists(ConfigAttribute.FullPath))
+                            if (!Directory.Exists(ConfigAttribute.AssetPathWithAssetsPrefix))
                             {
-                                Directory.CreateDirectory(new DirectoryInfo(ConfigAttribute.FullPath).FullName);
+                                Directory.CreateDirectory(new DirectoryInfo(ConfigAttribute.AssetPathWithAssetsPrefix).FullName);
                                 UnityEditor.AssetDatabase.Refresh();
                             }
 
                             string niceName = typeof(T).GetNiceName();
-                            string assetPath = "Assets/" + ConfigAttribute.AssetPath + niceName + ".asset";
+
+                            string assetPath;
+                            if (ConfigAttribute.AssetPath.StartsWith("Assets/"))
+                            {
+                                assetPath = ConfigAttribute.AssetPath + niceName + ".asset";
+                            }
+                            else
+                            {
+                                assetPath = "Assets/" + ConfigAttribute.AssetPath + niceName + ".asset";
+                            }
 
                             if (File.Exists(fullPath))
                             {
@@ -176,10 +189,16 @@ namespace Sirenix.Utilities
             else
             {
                 string niceName = typeof(T).GetNiceName();
-                GlobalConfig<T>.instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>("Assets/" + ConfigAttribute.AssetPath + niceName + ".asset");
+                GlobalConfig<T>.instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>(ConfigAttribute.AssetPath + niceName + ".asset");
+
+                // It could be a package and not located in the Assets folder:
+                if (GlobalConfig<T>.instance == null)
+                {
+                    GlobalConfig<T>.instance = UnityEditor.AssetDatabase.LoadAssetAtPath<T>("Assets/" + ConfigAttribute.AssetPath + niceName + ".asset");
+                }
             }
 
-            // If it was relocated
+            // If it is relocated
             if (GlobalConfig<T>.instance == null)
             {
                 var relocatedScriptableObject = UnityEditor.AssetDatabase.FindAssets("t:" + typeof(T).Name);
@@ -197,7 +216,7 @@ namespace Sirenix.Utilities
         public void OpenInEditor()
         {
 #if UNITY_EDITOR
-            
+
             var windowType = AssemblyUtilities.GetTypeByCachedFullName("Sirenix.OdinInspector.Editor.SirenixPreferencesWindow");
             if (windowType != null)
             {

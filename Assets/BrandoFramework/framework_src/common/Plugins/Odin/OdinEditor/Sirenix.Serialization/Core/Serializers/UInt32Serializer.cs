@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="uint"/> type.
     /// </summary>
-    /// <seealso cref="uint" />
+    /// <seealso cref="Serializer{System.UInt32}" />
     public sealed class UInt32Serializer : Serializer<uint>
     {
         /// <summary>

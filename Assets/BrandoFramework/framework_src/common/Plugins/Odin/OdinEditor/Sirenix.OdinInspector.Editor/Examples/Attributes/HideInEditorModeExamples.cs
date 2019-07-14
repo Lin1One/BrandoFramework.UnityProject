@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(HideInEditorModeAttribute))]
-    public class HideInEditorModeExamples
+    internal class HideInEditorModeExamples
     {
         [Title("Hidden in editor mode")]
         [HideInEditorMode]

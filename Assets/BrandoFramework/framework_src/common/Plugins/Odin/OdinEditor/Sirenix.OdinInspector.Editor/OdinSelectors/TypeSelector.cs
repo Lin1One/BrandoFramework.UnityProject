@@ -37,9 +37,37 @@ namespace Sirenix.OdinInspector.Editor
     /// }
     /// </code>
     /// </example>
+    /// <example>
+    /// <code>
+    /// private static Type currentSelectedType;
+    /// private static IEnumerable&lt;Type&gt; currentSource;
+    /// private static Func&lt;Rect, OdinSelector&lt;Type&gt;&gt; createTypeSelector = (rect) =>
+    /// {
+    ///     TypeSelector selector = new TypeSelector(currentSource, false);
+    ///     selector.SetSelection(currentSelectedType);
+    ///     selector.ShowInPopup(rect);
+    ///     return selector;
+    /// };
+    /// 
+    /// public static Type DrawTypeSelectorDropdown(GUIContent label, Type selectedType, IEnumerable&lt;Type&gt; source)
+    /// {
+    ///     currentSource = source;
+    ///     currentSelectedType = selectedType;
+    /// 
+    ///     var dropdownText = selectedType == null ? "None" : selectedType.GetNiceName();
+    ///     var selected = TypeSelector.DrawSelectorDropdown(label, dropdownText, createTypeSelector);
+    ///     if (selected != null &amp;&amp; selected.Any())
+    ///     {
+    ///         selectedType = selected.FirstOrDefault();
+    ///     }
+    ///     return selectedType;
+    /// }
+    /// </code>
+    /// </example>
     public class TypeSelector : OdinSelector<Type>
     {
         private static Dictionary<AssemblyTypeFlags, List<OdinMenuItem>> cachedAllTypesMenuItems = new Dictionary<AssemblyTypeFlags, List<OdinMenuItem>>();
+
         private IEnumerable<Type> types;
         private AssemblyTypeFlags assemblyTypeFlags;
         private bool supportsMultiSelect;
@@ -93,7 +121,14 @@ namespace Sirenix.OdinInspector.Editor
                 }
                 else
                 {
-                    var assemblyTypes = OrderTypes(AssemblyUtilities.GetTypes(this.assemblyTypeFlags).Where(x => char.IsLetter(x.Name.Trim()[0])));
+                    var assemblyTypes = OrderTypes(AssemblyUtilities.GetTypes(this.assemblyTypeFlags).Where(x =>
+                    {
+                        if (x.Name == null) return false;
+                        var trimmedName = x.Name.TrimStart();
+                        if (trimmedName.Length == 0) return false;
+                        return char.IsLetter(trimmedName[0]);
+                    }));
+
                     foreach (var t in assemblyTypes)
                     {
                         var niceName = t.GetNiceName();
@@ -222,38 +257,6 @@ namespace Sirenix.OdinInspector.Editor
             this.SelectionTree.Selection.SelectMany(x => x.GetParentMenuItemsRecursive(false))
                 .ForEach(x => x.Toggled = true);
         }
-
-        //internal static Type DrawTypeField(GUIContent label, AssemblyTypeFlags flags, Type value)
-        //{
-        //    int id;
-        //    bool hasFocus;
-        //    Rect rect;
-        //    Action<TypeSelector> bindSelector;
-        //    Func<IEnumerable<Type>> resultGetter;
-
-        //    var display = value == null ? "" : (EditorGUI.showMixedValue ? SirenixEditorGUI.MixedValueDashChar : value.ToString());
-        //    SirenixEditorGUI.GetFeatureRichControlRect(label, out id, out hasFocus, out rect);
-
-        //    if (DrawSelectorButton(rect, display, EditorStyles.popup, id, out bindSelector, out resultGetter))
-        //    {
-        //        var selector = new TypeSelector(flags, false);
-        //        if (!EditorGUI.showMixedValue)
-        //        {
-        //            selector.SetSelection(value);
-        //        }
-
-        //        selector.ShowInPopup(new Vector2(rect.xMin, rect.yMax));
-        //        bindSelector(selector);
-        //    }
-
-        //    if (resultGetter != null)
-        //    {
-        //        value = resultGetter().FirstOrDefault();
-        //        GUI.changed = true;
-        //    }
-
-        //    return value;
-        //}
     }
 }
 #endif

@@ -48,19 +48,31 @@ namespace Sirenix.OdinInspector.Editor.Windows
             SirenixPreferencesWindow.OpenSirenixPreferences();
         }
 
-        [MenuItem("Tools/Odin Inspector/Help", priority = Group3 + 1)]
-        private static void Help()
+        [MenuItem("Tools/Odin Inspector/Help/Discord", priority = Group3 + 1)]
+        private static void Discord()
+        {
+            Application.OpenURL("https://discord.gg/WTYJEra");
+        }
+
+        [MenuItem("Tools/Odin Inspector/Help/Report An Issue", priority = Group3 + 2)]
+        private static void ReportAnIssue()
+        {
+            Application.OpenURL("https://bitbucket.org/sirenix/odin-inspector/issues");
+        }
+
+        [MenuItem("Tools/Odin Inspector/Help/Contact", priority = Group3 + 3)]
+        private static void Contact()
         {
             Application.OpenURL("http://sirenix.net/support");
         }
 
-        [MenuItem("Tools/Odin Inspector/Release Notes", priority = Group3 + 2)]
+        [MenuItem("Tools/Odin Inspector/Release Notes", priority = Group3 + 4)]
         private static void OpenReleaseNotes()
         {
             Application.OpenURL("http://sirenix.net/odininspector/releasenotes");
         }
 
-        [MenuItem("Tools/Odin Inspector/About", priority = Group3 + 3)]
+        [MenuItem("Tools/Odin Inspector/About", priority = Group3 + 5)]
         private static void ShowAboutOdinInspector()
         {
 #if ODIN_TRIAL_VERSION

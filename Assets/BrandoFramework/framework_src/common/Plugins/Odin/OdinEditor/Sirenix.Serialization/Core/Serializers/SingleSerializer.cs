@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="float"/> type.
     /// </summary>
-    /// <seealso cref="float" />
+    /// <seealso cref="Serializer{System.Single}" />
     public sealed class SingleSerializer : Serializer<float>
     {
         /// <summary>

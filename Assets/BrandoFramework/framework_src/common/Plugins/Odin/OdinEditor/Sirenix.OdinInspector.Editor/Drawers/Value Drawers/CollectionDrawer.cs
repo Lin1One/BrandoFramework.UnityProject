@@ -8,11 +8,12 @@
 
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
+    using Sirenix.Serialization;
     using System;
+    using System.Collections;
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using Sirenix.Serialization;
     using UnityEditor;
     using UnityEngine;
     using Utilities;
@@ -34,10 +35,37 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         internal static Action NextCustomAddFunction;
     }
 
+    internal class CollectionSizeDialogue
+    {
+        public int Size;
+        private Action<int> confirm;
+        private Action cancel;
+
+        public CollectionSizeDialogue(Action<int> confirm, Action cancel, int size)
+        {
+            this.confirm = confirm;
+            this.cancel = cancel;
+            this.Size = size;
+        }
+
+        [Button(ButtonSizes.Medium), HorizontalGroup(0.5f)]
+        public void Confirm()
+        {
+            this.confirm(this.Size);
+        }
+
+        [Button(ButtonSizes.Medium), HorizontalGroup]
+        public void Cancel()
+        {
+            this.cancel();
+        }
+    }
+
     /// <summary>
     /// Property drawer for anything that has a <see cref="ICollectionResolver"/>.
     /// </summary>
     [AllowGUIEnabledForReadonly]
+    [DrawerPriority(0, 0, 0.9)]
     public class CollectionDrawer<T> : OdinValueDrawer<T>, IDefinesGenericMenuItems
     {
         private static GUILayoutOption[] listItemOptions = GUILayoutOptions.MinHeight(25).ExpandWidth(true);
@@ -64,11 +92,49 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             bool isEditable = isReadOnly == false && property.ValueEntry.IsEditable && (config == null || (!config.IsReadOnlyHasValue) || (config.IsReadOnlyHasValue && config.IsReadOnly == false));
             bool pasteElement = isEditable && Clipboard.CanPaste(resolver.ElementType);
             bool clearList = isEditable && property.Children.Count > 0;
+            bool setCollectionLength = isEditable && property.ChildResolver is IOrderedCollectionResolver && typeof(IList).IsAssignableFrom(typeof(T));
 
             //if (genericMenu.GetItemCount() > 0 && (pasteElement || clearList))
             //{
             //    genericMenu.AddSeparator(null);
             //}
+
+            var windowWidth = 300;
+            var rect = property.LastDrawnValueRect.AlignTop(1);
+            rect.y += 14;
+            rect.xMin += rect.width * 0.5f - (windowWidth * 0.5f);
+            rect.position = GUIUtility.GUIToScreenPoint(rect.position);
+            rect.width = 1;
+
+            if (setCollectionLength)
+            {
+                if (this.info.GetCustomAddFunctionVoid != null)
+                {
+                    genericMenu.AddDisabledItem(new GUIContent("Set Collection Size - disabled by 'void " + info.CustomListDrawerOptions.CustomAddFunction + "'"));
+                }
+                else
+                {
+                    genericMenu.AddItem(new GUIContent("Set Collection Size"), false, () =>
+                    {
+                        EditorWindow window = null;
+
+                        Action cancel = () =>
+                        {
+                            EditorApplication.delayCall += window.Close;
+                        };
+
+                        Action<int> confirm = (size) =>
+                        {
+                            EditorApplication.delayCall += window.Close;
+                            SetCollectionSize(property, size);
+                        };
+
+                        var sizer = new CollectionSizeDialogue(confirm, cancel, property.ChildResolver.MaxChildCountSeen);
+                        window = OdinEditorWindow.InspectObjectInDropDown(sizer, rect, windowWidth);
+                        GUIHelper.RequestRepaint();
+                    });
+                }
+            }
 
             if (pasteElement)
             {
@@ -81,6 +147,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
             if (clearList)
             {
+                genericMenu.AddSeparator("");
                 genericMenu.AddItem(new GUIContent("Clear Collection"), false, () =>
                 {
                     (property.ChildResolver as ICollectionResolver).QueueClear();
@@ -89,7 +156,103 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             }
             else
             {
+                genericMenu.AddSeparator("");
                 genericMenu.AddDisabledItem(new GUIContent("Clear Collection"));
+            }
+        }
+
+        private void SetCollectionSize(InspectorProperty p, int targetSize)
+        {
+            var resolver = p.ChildResolver as IOrderedCollectionResolver;
+
+            for (int i = 0; i < p.ParentValues.Count; i++)
+            {
+                var collection = p.ValueEntry.WeakValues[i] as IList;
+                var size = collection.Count;
+                var delta = Math.Abs(targetSize - size);
+
+                if (targetSize > size)
+                {
+                    for (int j = 0; j < delta; j++)
+                    {
+                        var value = this.GetValueToAdd(i);
+                        resolver.QueueAdd(value, i);
+                    }
+                }
+                else
+                {
+                    for (int j = 0; j < delta; j++)
+                    {
+                        resolver.QueueRemoveAt(size - (1 + j), i);
+                    }
+                }
+            }
+        }
+
+        private object GetValueToAdd(int selectionIndex)
+        {
+            bool wasFallback;
+            return this.GetValueToAdd(selectionIndex, out wasFallback);
+        }
+
+        private object GetValueToAdd(int selectionIndex, out bool wasFallback)
+        {
+            wasFallback = false;
+
+            if (this.info.GetCustomAddFunction != null)
+            {
+                return this.info.GetCustomAddFunction(this.info.Property.ParentValues[selectionIndex]);
+            }
+            else if (this.info.CustomListDrawerOptions.AlwaysAddDefaultValue)
+            {
+                if (this.info.Property.ValueEntry.SerializationBackend == SerializationBackend.Unity)
+                {
+                    return UnitySerializationUtility.CreateDefaultUnityInitializedObject(this.info.CollectionResolver.ElementType);
+                }
+                else if (this.info.CollectionResolver.ElementType.IsValueType)
+                {
+                    return Activator.CreateInstance(this.info.CollectionResolver.ElementType);
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else if (this.info.CustomListDrawerOptions.AddCopiesLastElement && this.info.Count > 0)
+            {
+                object lastObject = null;
+                var lastElementProperty = this.info.Property.Children.Last().ValueEntry;
+
+                var collection = this.info.Property.ValueEntry.WeakValues[selectionIndex] as IEnumerable;
+                if (collection != null)
+                {
+                    // Yes, it's intended.
+                    foreach (var item in collection)
+                    {
+                        lastObject = item;
+                    }
+                }
+                else
+                {
+                    lastObject = lastElementProperty.WeakValues[selectionIndex];
+                }
+
+                return SerializationUtility.CreateCopy(lastObject);
+            }
+            else if (this.info.CollectionResolver.ElementType.InheritsFrom<UnityEngine.Object>() && Event.current.modifiers == EventModifiers.Control)
+            {
+                return null;
+            }
+
+            wasFallback = true;
+            var elementType = (this.Property.ChildResolver as ICollectionResolver).ElementType;
+            if (this.ValueEntry.SerializationBackend == SerializationBackend.Unity)
+            {
+                return UnitySerializationUtility.CreateDefaultUnityInitializedObject(elementType);
+            }
+            else
+            {
+                return elementType.IsValueType ? Activator.CreateInstance(elementType) : null;
             }
         }
 
@@ -104,7 +267,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             var customListDrawerOptions = this.Property.GetAttribute<ListDrawerSettingsAttribute>() ?? new ListDrawerSettingsAttribute();
             isReadOnly = this.ValueEntry.IsEditable == false || isReadOnly || customListDrawerOptions.IsReadOnlyHasValue && customListDrawerOptions.IsReadOnly;
 
-            info = new ListDrawerConfigInfo()
+            this.info = new ListDrawerConfigInfo()
             {
                 StartIndex = 0,
                 Toggled = this.ValueEntry.Context.GetPersistent<bool>(this, "ListDrawerToggled", customListDrawerOptions.ExpandedHasValue ? customListDrawerOptions.Expanded : GeneralDrawerConfig.Instance.OpenListsByDefault),
@@ -121,26 +284,26 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 HideRemoveButton = isReadOnly || customListDrawerOptions.HideRemoveButton,
             };
 
-            info.ListConfig = GeneralDrawerConfig.Instance;
-            info.Property = this.Property;
+            this.info.ListConfig = GeneralDrawerConfig.Instance;
+            this.info.Property = this.Property;
 
             if (customListDrawerOptions.DraggableHasValue && !customListDrawerOptions.DraggableItems)
             {
-                info.Draggable = false;
+                this.info.Draggable = false;
             }
 
             if (!(this.Property.ChildResolver is IOrderedCollectionResolver))
             {
-                info.Draggable = false;
+                this.info.Draggable = false;
             }
 
-            if (info.CustomListDrawerOptions.OnBeginListElementGUI != null)
+            if (this.info.CustomListDrawerOptions.OnBeginListElementGUI != null)
             {
                 string error;
                 MemberInfo memberInfo = this.Property.ParentType
                     .FindMember()
                     .IsMethod()
-                    .IsNamed(info.CustomListDrawerOptions.OnBeginListElementGUI)
+                    .IsNamed(this.info.CustomListDrawerOptions.OnBeginListElementGUI)
                     .HasParameters<int>()
                     .ReturnsVoid()
                     .GetMember<MethodInfo>(out error);
@@ -153,17 +316,17 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 }
                 else
                 {
-                    info.OnBeginListElementGUI = EmitUtilities.CreateWeakInstanceMethodCaller<int>(memberInfo as MethodInfo);
+                    this.info.OnBeginListElementGUI = EmitUtilities.CreateWeakInstanceMethodCaller<int>(memberInfo as MethodInfo);
                 }
             }
 
-            if (info.CustomListDrawerOptions.OnEndListElementGUI != null)
+            if (this.info.CustomListDrawerOptions.OnEndListElementGUI != null)
             {
                 string error;
                 MemberInfo memberInfo = this.Property.ParentType
                     .FindMember()
                     .IsMethod()
-                    .IsNamed(info.CustomListDrawerOptions.OnEndListElementGUI)
+                    .IsNamed(this.info.CustomListDrawerOptions.OnEndListElementGUI)
                     .HasParameters<int>()
                     .ReturnsVoid()
                     .GetMember<MethodInfo>(out error);
@@ -176,17 +339,17 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 }
                 else
                 {
-                    info.OnEndListElementGUI = EmitUtilities.CreateWeakInstanceMethodCaller<int>(memberInfo as MethodInfo);
+                    this.info.OnEndListElementGUI = EmitUtilities.CreateWeakInstanceMethodCaller<int>(memberInfo as MethodInfo);
                 }
             }
 
-            if (info.CustomListDrawerOptions.OnTitleBarGUI != null)
+            if (this.info.CustomListDrawerOptions.OnTitleBarGUI != null)
             {
                 string error;
                 MemberInfo memberInfo = this.Property.ParentType
                     .FindMember()
                     .IsMethod()
-                    .IsNamed(info.CustomListDrawerOptions.OnTitleBarGUI)
+                    .IsNamed(this.info.CustomListDrawerOptions.OnTitleBarGUI)
                     .HasNoParameters()
                     .ReturnsVoid()
                     .GetMember<MethodInfo>(out error);
@@ -199,17 +362,17 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 }
                 else
                 {
-                    info.OnTitleBarGUI = EmitUtilities.CreateWeakInstanceMethodCaller(memberInfo as MethodInfo);
+                    this.info.OnTitleBarGUI = EmitUtilities.CreateWeakInstanceMethodCaller(memberInfo as MethodInfo);
                 }
             }
 
-            if (info.CustomListDrawerOptions.ListElementLabelName != null)
+            if (this.info.CustomListDrawerOptions.ListElementLabelName != null)
             {
                 string error;
                 MemberInfo memberInfo = resolver.ElementType
                     .FindMember()
                     .HasNoParameters()
-                    .IsNamed(info.CustomListDrawerOptions.ListElementLabelName)
+                    .IsNamed(this.info.CustomListDrawerOptions.ListElementLabelName)
                     .HasReturnType<object>(true)
                     .GetMember(out error);
 
@@ -222,18 +385,18 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 else
                 {
                     string methodSuffix = memberInfo as MethodInfo == null ? "" : "()";
-                    info.GetListElementLabelText = DeepReflection.CreateWeakInstanceValueGetter(resolver.ElementType, typeof(object), info.CustomListDrawerOptions.ListElementLabelName + methodSuffix);
+                    this.info.GetListElementLabelText = DeepReflection.CreateWeakInstanceValueGetter(resolver.ElementType, typeof(object), this.info.CustomListDrawerOptions.ListElementLabelName + methodSuffix);
                 }
             }
 
             // Resolve custom add method member reference.
-            if (info.CustomListDrawerOptions.CustomAddFunction != null)
+            if (this.info.CustomListDrawerOptions.CustomAddFunction != null)
             {
                 string error;
                 MemberInfo memberInfo = this.Property.ParentType
                     .FindMember()
                     .HasNoParameters()
-                    .IsNamed(info.CustomListDrawerOptions.CustomAddFunction)
+                    .IsNamed(this.info.CustomListDrawerOptions.CustomAddFunction)
                     .IsInstance()
                     .HasReturnType(resolver.ElementType)
                     .GetMember(out error);
@@ -246,7 +409,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                        .FindMember()
                        .IsMethod()
                        .HasNoParameters()
-                       .IsNamed(info.CustomListDrawerOptions.CustomAddFunction)
+                       .IsNamed(this.info.CustomListDrawerOptions.CustomAddFunction)
                        .IsInstance()
                        .ReturnsVoid()
                        .GetMember(out error2);
@@ -257,22 +420,22 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     }
                     else
                     {
-                        info.GetCustomAddFunctionVoid = EmitUtilities.CreateWeakInstanceMethodCaller(memberInfo as MethodInfo);
+                        this.info.GetCustomAddFunctionVoid = EmitUtilities.CreateWeakInstanceMethodCaller(memberInfo as MethodInfo);
                     }
                 }
                 else
                 {
                     string methodSuffix = memberInfo as MethodInfo == null ? "" : "()";
-                    info.GetCustomAddFunction = DeepReflection.CreateWeakInstanceValueGetter(
+                    this.info.GetCustomAddFunction = DeepReflection.CreateWeakInstanceValueGetter(
                         this.Property.ParentType,
                         resolver.ElementType,
-                        info.CustomListDrawerOptions.CustomAddFunction + methodSuffix
+                        this.info.CustomListDrawerOptions.CustomAddFunction + methodSuffix
                     );
                 }
             }
 
             // Resolve custom remove index method member reference.
-            if (info.CustomListDrawerOptions.CustomRemoveIndexFunction != null)
+            if (this.info.CustomListDrawerOptions.CustomRemoveIndexFunction != null)
             {
                 if (this.Property.ChildResolver is IOrderedCollectionResolver == false)
                 {
@@ -282,7 +445,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 {
                     MethodInfo method = this.Property.ParentType
                         .FindMember()
-                        .IsNamed(info.CustomListDrawerOptions.CustomRemoveIndexFunction)
+                        .IsNamed(this.info.CustomListDrawerOptions.CustomRemoveIndexFunction)
                         .IsMethod()
                         .IsInstance()
                         .HasParameters<int>()
@@ -291,18 +454,18 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
                     if (method != null)
                     {
-                        info.CustomRemoveIndexFunction = EmitUtilities.CreateWeakInstanceMethodCaller<int>(method);
+                        this.info.CustomRemoveIndexFunction = EmitUtilities.CreateWeakInstanceMethodCaller<int>(method);
                     }
                 }
             }
             // Resolve custom remove element method member reference.
-            else if (info.CustomListDrawerOptions.CustomRemoveElementFunction != null)
+            else if (this.info.CustomListDrawerOptions.CustomRemoveElementFunction != null)
             {
                 var element = (this.Property.ChildResolver as ICollectionResolver).ElementType;
 
                 MethodInfo method = this.Property.ParentType
                     .FindMember()
-                    .IsNamed(info.CustomListDrawerOptions.CustomRemoveElementFunction)
+                    .IsNamed(this.info.CustomListDrawerOptions.CustomRemoveElementFunction)
                     .IsMethod()
                     .IsInstance()
                     .HasParameters(element)
@@ -312,7 +475,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 if (method != null)
                 {
                     // TOOD: Emit dis.
-                    info.CustomRemoveElementFunction = (o, e) => method.Invoke(o, new object[] { e });
+                    this.info.CustomRemoveElementFunction = (o, e) => method.Invoke(o, new object[] { e });
                 }
             }
         }
@@ -324,39 +487,39 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         {
             var resolver = this.Property.ChildResolver as ICollectionResolver;
             bool isReadOnly = resolver.IsReadOnly;
-            
+
             if (this.errorMessage != null)
             {
-                SirenixEditorGUI.ErrorMessageBox(errorMessage);
+                SirenixEditorGUI.ErrorMessageBox(this.errorMessage);
             }
-            
-            if (info.Label == null || (label != null && label.text != info.Label.text))
+
+            if (this.info.Label == null || (label != null && label.text != this.info.Label.text))
             {
-                info.Label = new GUIContent(label == null || string.IsNullOrEmpty(label.text) ? Property.ValueEntry.TypeOfValue.GetNiceName() : label.text, label == null ? string.Empty : label.tooltip);
+                this.info.Label = new GUIContent(label == null || string.IsNullOrEmpty(label.text) ? this.Property.ValueEntry.TypeOfValue.GetNiceName() : label.text, label == null ? string.Empty : label.tooltip);
             }
 
-            info.IsReadOnly = resolver.IsReadOnly;
+            this.info.IsReadOnly = resolver.IsReadOnly;
 
-            info.ListItemStyle.padding.left = info.Draggable ? 25 : 7;
-            info.ListItemStyle.padding.right = info.IsReadOnly || info.HideRemoveButton ? 4 : 20;
+            this.info.ListItemStyle.padding.left = this.info.Draggable ? 25 : 7;
+            this.info.ListItemStyle.padding.right = this.info.IsReadOnly || this.info.HideRemoveButton ? 4 : 20;
 
             if (Event.current.type == EventType.Repaint)
             {
-                info.DropZoneTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(0, 0));
+                this.info.DropZoneTopLeft = GUIUtility.GUIToScreenPoint(new Vector2(0, 0));
             }
 
-            info.CollectionResolver = Property.ChildResolver as ICollectionResolver;
-            info.OrderedCollectionResolver = Property.ChildResolver as IOrderedCollectionResolver;
-            info.Count = Property.Children.Count;
-            info.IsEmpty = Property.Children.Count == 0;
+            this.info.CollectionResolver = this.Property.ChildResolver as ICollectionResolver;
+            this.info.OrderedCollectionResolver = this.Property.ChildResolver as IOrderedCollectionResolver;
+            this.info.Count = this.Property.Children.Count;
+            this.info.IsEmpty = this.Property.Children.Count == 0;
 
             SirenixEditorGUI.BeginIndentedVertical(SirenixGUIStyles.PropertyPadding);
             this.BeginDropZone();
             {
                 this.DrawToolbar();
-                if (SirenixEditorGUI.BeginFadeGroup(UniqueDrawerKey.Create(Property, this), info.Toggled.Value))
+                if (SirenixEditorGUI.BeginFadeGroup(UniqueDrawerKey.Create(this.Property, this), this.info.Toggled.Value))
                 {
-                    GUIHelper.PushLabelWidth(GUIHelper.BetterLabelWidth - info.ListItemStyle.padding.left);
+                    GUIHelper.PushLabelWidth(GUIHelper.BetterLabelWidth - this.info.ListItemStyle.padding.left);
                     this.DrawItems();
                     GUIHelper.PopLabelWidth();
                 }
@@ -365,80 +528,80 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             this.EndDropZone();
             SirenixEditorGUI.EndIndentedVertical();
 
-            if (info.OrderedCollectionResolver != null)
+            if (this.info.OrderedCollectionResolver != null)
             {
-                if (info.RemoveAt >= 0 && Event.current.type == EventType.Repaint)
+                if (this.info.RemoveAt >= 0 && Event.current.type == EventType.Repaint)
                 {
                     try
                     {
-                        if (info.CustomRemoveIndexFunction != null)
+                        if (this.info.CustomRemoveIndexFunction != null)
                         {
                             foreach (var parent in this.Property.ParentValues)
                             {
-                                info.CustomRemoveIndexFunction(
+                                this.info.CustomRemoveIndexFunction(
                                     parent,
-                                    info.RemoveAt);
+                                    this.info.RemoveAt);
                             }
                         }
-                        else if (info.CustomRemoveElementFunction != null)
+                        else if (this.info.CustomRemoveElementFunction != null)
                         {
                             for (int i = 0; i < this.Property.ParentValues.Count; i++)
                             {
-                                info.CustomRemoveElementFunction(
+                                this.info.CustomRemoveElementFunction(
                                     this.Property.ParentValues[i],
-                                    this.Property.Children[info.RemoveAt].ValueEntry.WeakValues[i]);
+                                    this.Property.Children[this.info.RemoveAt].ValueEntry.WeakValues[i]);
                             }
                         }
                         else
                         {
-                            info.OrderedCollectionResolver.QueueRemoveAt(info.RemoveAt);
+                            this.info.OrderedCollectionResolver.QueueRemoveAt(this.info.RemoveAt);
                         }
                     }
                     finally
                     {
 
-                        info.RemoveAt = -1;
+                        this.info.RemoveAt = -1;
                     }
 
                     GUIHelper.RequestRepaint();
                 }
             }
-            else if (info.RemoveValues != null && Event.current.type == EventType.Repaint)
+            else if (this.info.RemoveValues != null && Event.current.type == EventType.Repaint)
             {
                 try
                 {
-                    if (info.CustomRemoveElementFunction != null)
+                    if (this.info.CustomRemoveElementFunction != null)
                     {
                         for (int i = 0; i < this.Property.ParentValues.Count; i++)
                         {
-                            info.CustomRemoveElementFunction(
+                            this.info.CustomRemoveElementFunction(
                                 this.Property.ParentValues[i],
                                 this.info.RemoveValues[i]);
                         }
                     }
                     else
                     {
-                        info.CollectionResolver.QueueRemove(info.RemoveValues);
+                        this.info.CollectionResolver.QueueRemove(this.info.RemoveValues);
                     }
                 }
                 finally
                 {
 
-                    info.RemoveValues = null;
+                    this.info.RemoveValues = null;
                 }
                 GUIHelper.RequestRepaint();
             }
 
-            if (info.ObjectPicker != null && info.ObjectPicker.IsReadyToClaim && Event.current.type == EventType.Repaint)
+            if (this.info.ObjectPicker != null && this.info.ObjectPicker.IsReadyToClaim && Event.current.type == EventType.Repaint)
             {
-                var value = info.ObjectPicker.ClaimObject();
+                var value = this.info.ObjectPicker.ClaimObject();
 
-                if (info.JumpToNextPageOnAdd)
+                if (this.info.JumpToNextPageOnAdd)
                 {
-                    info.StartIndex = int.MaxValue;
+                    this.info.StartIndex = int.MaxValue;
                 }
 
-                object[] values = new object[info.Property.Tree.WeakTargets.Count];
+                object[] values = new object[this.info.Property.Tree.WeakTargets.Count];
 
                 values[0] = value;
                 for (int j = 1; j < values.Length; j++)
@@ -446,15 +609,15 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     values[j] = SerializationUtility.CreateCopy(value);
                 }
 
-                info.CollectionResolver.QueueAdd(values);
+                this.info.CollectionResolver.QueueAdd(values);
             }
         }
 
         private DropZoneHandle BeginDropZone()
         {
-            if (info.OrderedCollectionResolver == null) return null;
+            if (this.info.OrderedCollectionResolver == null) return null;
 
-            var dropZone = DragAndDropManager.BeginDropZone(info.Property.Tree.GetHashCode() + "-" + info.Property.Path, info.CollectionResolver.ElementType, true);
+            var dropZone = DragAndDropManager.BeginDropZone(this.info.Property.Tree.GetHashCode() + "-" + this.info.Property.Path, this.info.CollectionResolver.ElementType, true);
 
             if (Event.current.type == EventType.Repaint && DragAndDropManager.IsDragInProgress)
             {
@@ -462,8 +625,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 dropZone.Rect = rect;
             }
 
-            dropZone.Enabled = info.IsReadOnly == false;
-            info.DropZone = dropZone;
+            dropZone.Enabled = this.info.IsReadOnly == false;
+            this.info.DropZone = dropZone;
             return dropZone;
         }
 
@@ -521,50 +684,50 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
         private void EndDropZone()
         {
-            if (info.OrderedCollectionResolver == null) return;
+            if (this.info.OrderedCollectionResolver == null) return;
 
-            if (info.DropZone.IsReadyToClaim)
+            if (this.info.DropZone.IsReadyToClaim)
             {
                 CollectionDrawerStaticInfo.CurrentDraggingPropertyInfo = null;
-                CollectionDrawerStaticInfo.CurrentDroppingPropertyInfo = info.Property;
-                object droppedObject = info.DropZone.ClaimObject();
+                CollectionDrawerStaticInfo.CurrentDroppingPropertyInfo = this.info.Property;
+                object droppedObject = this.info.DropZone.ClaimObject();
 
-                object[] values = new object[info.Property.Tree.WeakTargets.Count];
+                object[] values = new object[this.info.Property.Tree.WeakTargets.Count];
 
                 for (int i = 0; i < values.Length; i++)
                 {
                     values[i] = droppedObject;
                 }
 
-                if (info.DropZone.IsCrossWindowDrag)
+                if (this.info.DropZone.IsCrossWindowDrag)
                 {
                     // If it's a cross-window drag, the changes will for some reason be lost if we don't do this.
                     GUIHelper.RequestRepaint();
                     EditorApplication.delayCall += () =>
                     {
-                        info.OrderedCollectionResolver.QueueInsertAt(Mathf.Clamp(info.InsertAt, 0, info.Property.Children.Count), values);
+                        this.info.OrderedCollectionResolver.QueueInsertAt(Mathf.Clamp(this.info.InsertAt, 0, this.info.Property.Children.Count), values);
                     };
                 }
                 else
                 {
-                    info.OrderedCollectionResolver.QueueInsertAt(Mathf.Clamp(info.InsertAt, 0, info.Property.Children.Count), values);
+                    this.info.OrderedCollectionResolver.QueueInsertAt(Mathf.Clamp(this.info.InsertAt, 0, this.info.Property.Children.Count), values);
                 }
             }
-            else
+            else if (this.info.IsReadOnly == false)
             {
-                UnityEngine.Object[] droppedObjects = HandleUnityObjectsDrop(info);
+                UnityEngine.Object[] droppedObjects = HandleUnityObjectsDrop(this.info);
                 if (droppedObjects != null)
                 {
                     foreach (var obj in droppedObjects)
                     {
-                        object[] values = new object[info.Property.Tree.WeakTargets.Count];
+                        object[] values = new object[this.info.Property.Tree.WeakTargets.Count];
 
                         for (int i = 0; i < values.Length; i++)
                         {
                             values[i] = obj;
                         }
 
-                        info.OrderedCollectionResolver.QueueInsertAt(Mathf.Clamp(info.InsertAt, 0, info.Property.Children.Count), values);
+                        this.info.OrderedCollectionResolver.QueueInsertAt(Mathf.Clamp(this.info.InsertAt, 0, this.info.Property.Children.Count), values);
                     }
                 }
             }
@@ -576,36 +739,36 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             SirenixEditorGUI.BeginHorizontalToolbar();
             {
                 // Label
-                if (info.DropZone != null && DragAndDropManager.IsDragInProgress && info.DropZone.IsAccepted == false)
+                if (this.info.DropZone != null && DragAndDropManager.IsDragInProgress && this.info.DropZone.IsAccepted == false)
                 {
                     GUIHelper.PushGUIEnabled(false);
                 }
 
-                if (info.Property.ValueEntry.ListLengthChangedFromPrefab)
+                if (this.info.Property.ValueEntry.ListLengthChangedFromPrefab)
                 {
                     GUIHelper.PushIsBoldLabel(true);
                 }
 
-                if (info.ListConfig.HideFoldoutWhileEmpty && info.IsEmpty || info.CustomListDrawerOptions.Expanded)
+                if (this.info.ListConfig.HideFoldoutWhileEmpty && this.info.IsEmpty || this.info.CustomListDrawerOptions.Expanded)
                 {
-                    GUILayout.Label(info.Label, GUILayoutOptions.ExpandWidth(false));
+                    GUILayout.Label(this.info.Label, GUILayoutOptions.ExpandWidth(false));
                 }
                 else
                 {
-                    info.Toggled.Value = SirenixEditorGUI.Foldout(info.Toggled.Value, info.Label ?? GUIContent.none);
+                    this.info.Toggled.Value = SirenixEditorGUI.Foldout(this.info.Toggled.Value, this.info.Label ?? GUIContent.none);
                 }
 
-                if (info.Property.ValueEntry.ListLengthChangedFromPrefab)
+                if (this.info.Property.ValueEntry.ListLengthChangedFromPrefab)
                 {
                     GUIHelper.PopIsBoldLabel();
                 }
 
-                if (info.CustomListDrawerOptions.Expanded)
+                if (this.info.CustomListDrawerOptions.Expanded)
                 {
-                    info.Toggled.Value = true;
+                    this.info.Toggled.Value = true;
                 }
 
-                if (info.DropZone != null && DragAndDropManager.IsDragInProgress && info.DropZone.IsAccepted == false)
+                if (this.info.DropZone != null && DragAndDropManager.IsDragInProgress && this.info.DropZone.IsAccepted == false)
                 {
                     GUIHelper.PopGUIEnabled();
                 }
@@ -613,31 +776,31 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 GUILayout.FlexibleSpace();
 
                 // Item Count
-                if (info.CustomListDrawerOptions.ShowItemCountHasValue ? info.CustomListDrawerOptions.ShowItemCount : info.ListConfig.ShowItemCount)
+                if (this.info.CustomListDrawerOptions.ShowItemCountHasValue ? this.info.CustomListDrawerOptions.ShowItemCount : this.info.ListConfig.ShowItemCount)
                 {
-                    if (info.Property.ValueEntry.ValueState == PropertyValueState.CollectionLengthConflict)
+                    if (this.info.Property.ValueEntry.ValueState == PropertyValueState.CollectionLengthConflict)
                     {
-                        GUILayout.Label(info.Count + " / " + info.CollectionResolver.MaxCollectionLength + " items", EditorStyles.centeredGreyMiniLabel);
+                        GUILayout.Label(this.info.Count + " / " + this.info.CollectionResolver.MaxCollectionLength + " items", EditorStyles.centeredGreyMiniLabel);
                     }
                     else
                     {
-                        GUILayout.Label(info.IsEmpty ? "Empty" : info.Count + " items", EditorStyles.centeredGreyMiniLabel);
+                        GUILayout.Label(this.info.IsEmpty ? "Empty" : this.info.Count + " items", EditorStyles.centeredGreyMiniLabel);
                     }
                 }
 
-                bool paging = info.CustomListDrawerOptions.PagingHasValue ? info.CustomListDrawerOptions.ShowPaging : true;
+                bool paging = this.info.CustomListDrawerOptions.PagingHasValue ? this.info.CustomListDrawerOptions.ShowPaging : true;
                 bool hidePaging =
-                        info.ListConfig.HidePagingWhileCollapsed && info.Toggled.Value == false ||
-                        info.ListConfig.HidePagingWhileOnlyOnePage && info.Count <= info.NumberOfItemsPerPage;
+                        this.info.ListConfig.HidePagingWhileCollapsed && this.info.Toggled.Value == false ||
+                        this.info.ListConfig.HidePagingWhileOnlyOnePage && this.info.Count <= this.info.NumberOfItemsPerPage;
 
-                int numberOfItemsPrPage = Math.Max(1, info.NumberOfItemsPerPage);
-                int numberOfPages = Mathf.CeilToInt(info.Count / (float)numberOfItemsPrPage);
-                int pageIndex = info.Count == 0 ? 0 : (info.StartIndex / numberOfItemsPrPage) % info.Count;
+                int numberOfItemsPrPage = Math.Max(1, this.info.NumberOfItemsPerPage);
+                int numberOfPages = Mathf.CeilToInt(this.info.Count / (float)numberOfItemsPrPage);
+                int pageIndex = this.info.Count == 0 ? 0 : (this.info.StartIndex / numberOfItemsPrPage) % this.info.Count;
 
                 // Paging
                 if (paging)
                 {
-                    bool disablePaging = paging && !hidePaging && (DragAndDropManager.IsDragInProgress || info.ShowAllWhilePaging || info.Toggled.Value == false);
+                    bool disablePaging = paging && !hidePaging && (DragAndDropManager.IsDragInProgress || this.info.ShowAllWhilePaging || this.info.Toggled.Value == false);
                     if (disablePaging)
                     {
                         GUIHelper.PushGUIEnabled(false);
@@ -651,11 +814,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         {
                             if (Event.current.button == 0)
                             {
-                                info.StartIndex -= numberOfItemsPrPage;
+                                this.info.StartIndex -= numberOfItemsPrPage;
                             }
                             else
                             {
-                                info.StartIndex = 0;
+                                this.info.StartIndex = 0;
                             }
                         }
                         if (pageIndex == 0) { GUIHelper.PopGUIEnabled(); }
@@ -663,7 +826,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         var userPageIndex = EditorGUILayout.IntField((numberOfPages == 0 ? 0 : (pageIndex + 1)), GUILayoutOptions.Width(10 + numberOfPages.ToString(CultureInfo.InvariantCulture).Length * 10)) - 1;
                         if (pageIndex != userPageIndex)
                         {
-                            info.StartIndex = userPageIndex * numberOfItemsPrPage;
+                            this.info.StartIndex = userPageIndex * numberOfItemsPrPage;
                         }
 
                         GUILayout.Label("/ " + numberOfPages);
@@ -674,31 +837,31 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         {
                             if (Event.current.button == 0)
                             {
-                                info.StartIndex += numberOfItemsPrPage;
+                                this.info.StartIndex += numberOfItemsPrPage;
                             }
                             else
                             {
-                                info.StartIndex = numberOfItemsPrPage * numberOfPages;
+                                this.info.StartIndex = numberOfItemsPrPage * numberOfPages;
                             }
                         }
                         if (pageIndex == numberOfPages - 1) { GUIHelper.PopGUIEnabled(); }
                     }
 
-                    pageIndex = info.Count == 0 ? 0 : (info.StartIndex / numberOfItemsPrPage) % info.Count;
+                    pageIndex = this.info.Count == 0 ? 0 : (this.info.StartIndex / numberOfItemsPrPage) % this.info.Count;
 
-                    var newStartIndex = Mathf.Clamp(pageIndex * numberOfItemsPrPage, 0, Mathf.Max(0, info.Count - 1));
-                    if (newStartIndex != info.StartIndex)
+                    var newStartIndex = Mathf.Clamp(pageIndex * numberOfItemsPrPage, 0, Mathf.Max(0, this.info.Count - 1));
+                    if (newStartIndex != this.info.StartIndex)
                     {
-                        info.StartIndex = newStartIndex;
-                        var newPageIndex = info.Count == 0 ? 0 : (info.StartIndex / numberOfItemsPrPage) % info.Count;
+                        this.info.StartIndex = newStartIndex;
+                        var newPageIndex = this.info.Count == 0 ? 0 : (this.info.StartIndex / numberOfItemsPrPage) % this.info.Count;
                         if (pageIndex != newPageIndex)
                         {
                             pageIndex = newPageIndex;
-                            info.StartIndex = Mathf.Clamp(pageIndex * numberOfItemsPrPage, 0, Mathf.Max(0, info.Count - 1));
+                            this.info.StartIndex = Mathf.Clamp(pageIndex * numberOfItemsPrPage, 0, Mathf.Max(0, this.info.Count - 1));
                         }
                     }
 
-                    info.EndIndex = Mathf.Min(info.StartIndex + numberOfItemsPrPage, info.Count);
+                    this.info.EndIndex = Mathf.Min(this.info.StartIndex + numberOfItemsPrPage, this.info.Count);
 
                     if (disablePaging)
                     {
@@ -707,29 +870,29 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 }
                 else
                 {
-                    info.StartIndex = 0;
-                    info.EndIndex = info.Count;
+                    this.info.StartIndex = 0;
+                    this.info.EndIndex = this.info.Count;
                 }
 
-                if (paging && hidePaging == false && info.ListConfig.ShowExpandButton)
+                if (paging && hidePaging == false && this.info.ListConfig.ShowExpandButton)
                 {
-                    if (info.Count < 300)
+                    if (this.info.Count < 300)
                     {
-                        if (SirenixEditorGUI.ToolbarButton(info.ShowAllWhilePaging ? EditorIcons.TriangleUp : EditorIcons.TriangleDown, true))
+                        if (SirenixEditorGUI.ToolbarButton(this.info.ShowAllWhilePaging ? EditorIcons.TriangleUp : EditorIcons.TriangleDown, true))
                         {
-                            info.ShowAllWhilePaging = !info.ShowAllWhilePaging;
+                            this.info.ShowAllWhilePaging = !this.info.ShowAllWhilePaging;
                         }
                     }
                     else
                     {
-                        info.ShowAllWhilePaging = false;
+                        this.info.ShowAllWhilePaging = false;
                     }
                 }
 
                 // Add Button
-                if (info.IsReadOnly == false && !info.HideAddButton)
+                if (this.info.IsReadOnly == false && !this.info.HideAddButton)
                 {
-                    info.ObjectPicker = ObjectPicker.GetObjectPicker(info, info.CollectionResolver.ElementType);
+                    this.info.ObjectPicker = ObjectPicker.GetObjectPicker(this.info, this.info.CollectionResolver.ElementType);
                     var superHackyAddFunctionWeSeriouslyNeedANewListDrawer = CollectionDrawerStaticInfo.NextCustomAddFunction;
                     CollectionDrawerStaticInfo.NextCustomAddFunction = null;
 
@@ -739,73 +902,46 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         {
                             superHackyAddFunctionWeSeriouslyNeedANewListDrawer();
                         }
-                        else if (info.GetCustomAddFunction != null)
+                        else if (this.info.GetCustomAddFunctionVoid != null)
                         {
-                            var objs = new object[info.Property.Tree.WeakTargets.Count];
+                            this.info.GetCustomAddFunctionVoid(this.info.Property.ParentValues[0]);
 
-                            for (int i = 0; i < objs.Length; i++)
-                            {
-                                objs[i] = info.GetCustomAddFunction(info.Property.ParentValues[i]);
-                            }
-
-                            info.CollectionResolver.QueueAdd(objs);
-                        }
-                        else if (info.GetCustomAddFunctionVoid != null)
-                        {
-                            info.GetCustomAddFunctionVoid(info.Property.ParentValues[0]);
-
-                            info.Property.Tree.WeakTargets.OfType<UnityEngine.Object>()
-                                .ForEach(x => EditorUtility.SetDirty(x));
-                        }
-                        else if (info.CustomListDrawerOptions.AlwaysAddDefaultValue)
-                        {
-                            var objs = new object[info.Property.Tree.WeakTargets.Count];
-
-                            if (info.Property.ValueEntry.SerializationBackend == SerializationBackend.Unity)
-                            {
-                                for (int i = 0; i < objs.Length; i++)
-                                {
-                                    objs[i] = UnitySerializationUtility.CreateDefaultUnityInitializedObject(info.CollectionResolver.ElementType);
-                                }
-                            }
-                            else
-                            {
-                                for (int i = 0; i < objs.Length; i++)
-                                {
-                                    if (info.CollectionResolver.ElementType.IsValueType)
-                                    {
-                                        objs[i] = Activator.CreateInstance(info.CollectionResolver.ElementType);
-                                    }
-                                    else
-                                    {
-                                        objs[i] = null;
-                                    }
-                                }
-                            }
-
-                            //info.ListValueChanger.AddListElement(objs, "Add default value");
-                            info.CollectionResolver.QueueAdd(objs);
-                        }
-                        else if (info.CollectionResolver.ElementType.InheritsFrom<UnityEngine.Object>() && Event.current.modifiers == EventModifiers.Control)
-                        {
-                            info.CollectionResolver.QueueAdd(new object[info.Property.Tree.WeakTargets.Count]);
+                            this.Property.ValueEntry.WeakValues.ForceMarkDirty();
                         }
                         else
                         {
-                            info.ObjectPicker.ShowObjectPicker(
-                                null,
-                                info.Property.GetAttribute<AssetsOnlyAttribute>() == null,
-                                GUIHelper.GetCurrentLayoutRect(),
-                                info.Property.ValueEntry.SerializationBackend == SerializationBackend.Unity);
+                            object[] objs = new object[this.info.Property.ValueEntry.ValueCount];
+
+                            bool wasFallback;
+
+                            objs[0] = this.GetValueToAdd(0, out wasFallback);
+
+                            if (wasFallback)
+                            {
+                                this.info.ObjectPicker.ShowObjectPicker(
+                                    null,
+                                    this.info.Property.GetAttribute<AssetsOnlyAttribute>() == null,
+                                    GUIHelper.GetCurrentLayoutRect(),
+                                    this.info.Property.ValueEntry.SerializationBackend == SerializationBackend.Unity);
+                            }
+                            else
+                            {
+                                for (int i = 1; i < objs.Length; i++)
+                                {
+                                    objs[i] = this.GetValueToAdd(i);
+                                }
+
+                                this.info.CollectionResolver.QueueAdd(objs);
+                            }
                         }
                     }
 
-                    info.JumpToNextPageOnAdd = paging && (info.Count % numberOfItemsPrPage == 0) && (pageIndex + 1 == numberOfPages);
+                    this.info.JumpToNextPageOnAdd = paging && (this.info.Count % numberOfItemsPrPage == 0) && (pageIndex + 1 == numberOfPages);
                 }
 
-                if (info.OnTitleBarGUI != null)
+                if (this.info.OnTitleBarGUI != null)
                 {
-                    info.OnTitleBarGUI(info.Property.ParentValues[0]);
+                    this.info.OnTitleBarGUI(this.info.Property.ParentValues[0]);
                 }
             }
             SirenixEditorGUI.EndHorizontalToolbar();
@@ -814,16 +950,16 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         private void DrawItems()
         {
             int from = 0;
-            int to = info.Count;
-            bool paging = info.CustomListDrawerOptions.PagingHasValue ? info.CustomListDrawerOptions.ShowPaging : true;
-            if (paging && info.ShowAllWhilePaging == false)
+            int to = this.info.Count;
+            bool paging = this.info.CustomListDrawerOptions.PagingHasValue ? this.info.CustomListDrawerOptions.ShowPaging : true;
+            if (paging && this.info.ShowAllWhilePaging == false)
             {
-                from = Mathf.Clamp(info.StartIndex, 0, info.Count);
-                to = Mathf.Clamp(info.EndIndex, 0, info.Count);
+                from = Mathf.Clamp(this.info.StartIndex, 0, this.info.Count);
+                to = Mathf.Clamp(this.info.EndIndex, 0, this.info.Count);
             }
 
-            var drawEmptySpace = info.DropZone != null && info.DropZone.IsBeingHovered || info.IsDroppingUnityObjects;
-            float height = drawEmptySpace ? info.IsDroppingUnityObjects ? 16 : (DragAndDropManager.CurrentDraggingHandle.Rect.height - 3) : 0;
+            var drawEmptySpace = this.info.DropZone != null && this.info.DropZone.IsBeingHovered || this.info.IsDroppingUnityObjects;
+            float height = drawEmptySpace ? this.info.IsDroppingUnityObjects ? 16 : (DragAndDropManager.CurrentDraggingHandle.Rect.height - 3) : 0;
             var rect = SirenixEditorGUI.BeginVerticalList();
             {
                 for (int i = 0, j = from, k = from; j < to; i++, j++)
@@ -834,25 +970,25 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         {
                             var topHalf = dragHandle.Rect;
                             topHalf.height /= 2;
-                            if (topHalf.Contains(info.LayoutMousePosition) || topHalf.y > info.LayoutMousePosition.y && i == 0)
+                            if (topHalf.Contains(this.info.LayoutMousePosition) || topHalf.y > this.info.LayoutMousePosition.y && i == 0)
                             {
                                 GUILayout.Space(height);
                                 drawEmptySpace = false;
-                                info.InsertAt = k;
+                                this.info.InsertAt = k;
                             }
                         }
 
                         if (dragHandle.IsDragging == false)
                         {
                             k++;
-                            this.DrawItem(info.Property.Children[j], dragHandle, j);
+                            this.DrawItem(this.info.Property.Children[j], dragHandle, j);
                         }
                         else
                         {
                             GUILayout.Space(3);
                             CollectionDrawerStaticInfo.DelayedGUIDrawer.Begin(dragHandle.Rect.width, dragHandle.Rect.height, dragHandle.CurrentMethod != DragAndDropMethods.Move);
                             DragAndDropManager.AllowDrop = false;
-                            this.DrawItem(info.Property.Children[j], dragHandle, j);
+                            this.DrawItem(this.info.Property.Children[j], dragHandle, j);
                             DragAndDropManager.AllowDrop = true;
                             CollectionDrawerStaticInfo.DelayedGUIDrawer.End();
                             if (dragHandle.CurrentMethod != DragAndDropMethods.Move)
@@ -867,11 +1003,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                             bottomHalf.height /= 2;
                             bottomHalf.y += bottomHalf.height;
 
-                            if (bottomHalf.Contains(info.LayoutMousePosition) || bottomHalf.yMax < info.LayoutMousePosition.y && j + 1 == to)
+                            if (bottomHalf.Contains(this.info.LayoutMousePosition) || bottomHalf.yMax < this.info.LayoutMousePosition.y && j + 1 == to)
                             {
                                 GUILayout.Space(height);
                                 drawEmptySpace = false;
-                                info.InsertAt = Mathf.Min(k, to);
+                                this.info.InsertAt = Mathf.Min(k, to);
                             }
                         }
                     }
@@ -881,10 +1017,10 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 if (drawEmptySpace)
                 {
                     GUILayout.Space(height);
-                    info.InsertAt = Event.current.mousePosition.y > rect.center.y ? to : from;
+                    this.info.InsertAt = Event.current.mousePosition.y > rect.center.y ? to : from;
                 }
 
-                if (to == info.Property.Children.Count && info.Property.ValueEntry.ValueState == PropertyValueState.CollectionLengthConflict)
+                if (to == this.info.Property.Children.Count && this.info.Property.ValueEntry.ValueState == PropertyValueState.CollectionLengthConflict)
                 {
                     SirenixEditorGUI.BeginListItem(false);
                     GUILayout.Label(GUIHelper.TempContent("------"), EditorStyles.centeredGreyMiniLabel);
@@ -895,7 +1031,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
             if (Event.current.type == EventType.Repaint)
             {
-                info.LayoutMousePosition = Event.current.mousePosition;
+                this.info.LayoutMousePosition = Event.current.mousePosition;
             }
         }
 
@@ -905,7 +1041,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
             if (handle.IsDragging)
             {
-                info.Property.Tree.DelayAction(() =>
+                this.info.Property.Tree.DelayAction(() =>
                 {
                     if (DragAndDropManager.CurrentDraggingHandle != null)
                     {
@@ -917,31 +1053,31 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
         private DragHandle BeginDragHandle(int j, int i)
         {
-            var child = info.Property.Children[j];
-            var dragHandle = DragAndDropManager.BeginDragHandle(child, child.ValueEntry.WeakSmartValue, info.IsReadOnly ? DragAndDropMethods.Reference : DragAndDropMethods.Move);
-            dragHandle.Enabled = info.Draggable;
+            var child = this.info.Property.Children[j];
+            var dragHandle = DragAndDropManager.BeginDragHandle(child, child.ValueEntry.WeakSmartValue, this.info.IsReadOnly ? DragAndDropMethods.Reference : DragAndDropMethods.Move);
+            dragHandle.Enabled = this.info.Draggable;
 
             if (dragHandle.OnDragStarted)
             {
                 CollectionDrawerStaticInfo.CurrentDroppingPropertyInfo = null;
-                CollectionDrawerStaticInfo.CurrentDraggingPropertyInfo = info.Property.Children[j];
+                CollectionDrawerStaticInfo.CurrentDraggingPropertyInfo = this.info.Property.Children[j];
                 dragHandle.OnDragFinnished = dropEvent =>
                 {
                     if (dropEvent == DropEvents.Moved)
                     {
-                        if (dragHandle.IsCrossWindowDrag || (CollectionDrawerStaticInfo.CurrentDroppingPropertyInfo != null && CollectionDrawerStaticInfo.CurrentDroppingPropertyInfo.Tree != info.Property.Tree))
+                        if (dragHandle.IsCrossWindowDrag || (CollectionDrawerStaticInfo.CurrentDroppingPropertyInfo != null && CollectionDrawerStaticInfo.CurrentDroppingPropertyInfo.Tree != this.info.Property.Tree))
                         {
                             // Make sure drop happens a bit later, as deserialization and other things sometimes
                             // can override the change.
                             GUIHelper.RequestRepaint();
                             EditorApplication.delayCall += () =>
                             {
-                                info.OrderedCollectionResolver.QueueRemoveAt(j);
+                                this.info.OrderedCollectionResolver.QueueRemoveAt(j);
                             };
                         }
                         else
                         {
-                            info.OrderedCollectionResolver.QueueRemoveAt(j);
+                            this.info.OrderedCollectionResolver.QueueRemoveAt(j);
                         }
                     }
 
@@ -957,20 +1093,20 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             var listItemInfo = itemProperty.Context.Get<ListItemInfo>(this, "listItemInfo");
 
             Rect rect;
-            rect = SirenixEditorGUI.BeginListItem(false, info.ListItemStyle, listItemOptions);
+            rect = SirenixEditorGUI.BeginListItem(false, this.info.ListItemStyle, listItemOptions);
             {
-                if (Event.current.type == EventType.Repaint && !info.IsReadOnly)
+                if (Event.current.type == EventType.Repaint && !this.info.IsReadOnly)
                 {
                     listItemInfo.Value.Width = rect.width;
                     dragHandle.DragHandleRect = new Rect(rect.x + 4, rect.y, 20, rect.height);
                     listItemInfo.Value.DragHandleRect = new Rect(rect.x + 4, rect.y + 2 + ((int)rect.height - 23) / 2, 20, 20);
                     listItemInfo.Value.RemoveBtnRect = new Rect(listItemInfo.Value.DragHandleRect.x + rect.width - 22, listItemInfo.Value.DragHandleRect.y + 1, 14, 14);
 
-                    if (info.HideRemoveButton == false)
+                    if (this.info.HideRemoveButton == false)
                     {
 
                     }
-                    if (info.Draggable)
+                    if (this.info.Draggable)
                     {
                         GUI.Label(listItemInfo.Value.DragHandleRect, EditorIcons.List.Inactive, GUIStyle.none);
                     }
@@ -979,19 +1115,19 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 GUIHelper.PushHierarchyMode(false);
                 GUIContent label = null;
 
-                if (info.CustomListDrawerOptions.ShowIndexLabelsHasValue)
+                if (this.info.CustomListDrawerOptions.ShowIndexLabelsHasValue)
                 {
-                    if (info.CustomListDrawerOptions.ShowIndexLabels)
+                    if (this.info.CustomListDrawerOptions.ShowIndexLabels)
                     {
                         label = new GUIContent(index.ToString());
                     }
                 }
-                else if (info.ListConfig.ShowIndexLabels)
+                else if (this.info.ListConfig.ShowIndexLabels)
                 {
                     label = new GUIContent(index.ToString());
                 }
 
-                if (info.GetListElementLabelText != null)
+                if (this.info.GetListElementLabelText != null)
                 {
                     var value = itemProperty.ValueEntry.WeakSmartValue;
 
@@ -1011,33 +1147,33 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         label = label ?? new GUIContent("");
                         if (label.text != "") label.text += " : ";
 
-                        object text = info.GetListElementLabelText(value);
+                        object text = this.info.GetListElementLabelText(value);
                         label.text += (text == null ? "" : text.ToString());
                     }
                 }
 
-                if (info.OnBeginListElementGUI != null)
+                if (this.info.OnBeginListElementGUI != null)
                 {
-                    info.OnBeginListElementGUI(info.Property.ParentValues[0], index);
+                    this.info.OnBeginListElementGUI(this.info.Property.ParentValues[0], index);
                 }
                 itemProperty.Draw(label);
 
-                if (info.OnEndListElementGUI != null)
+                if (this.info.OnEndListElementGUI != null)
                 {
-                    info.OnEndListElementGUI(info.Property.ParentValues[0], index);
+                    this.info.OnEndListElementGUI(this.info.Property.ParentValues[0], index);
                 }
 
                 GUIHelper.PopHierarchyMode();
 
-                if (info.IsReadOnly == false && info.HideRemoveButton == false)
+                if (this.info.IsReadOnly == false && this.info.HideRemoveButton == false)
                 {
                     if (SirenixEditorGUI.IconButton(listItemInfo.Value.RemoveBtnRect, EditorIcons.X))
                     {
-                        if (info.OrderedCollectionResolver != null)
+                        if (this.info.OrderedCollectionResolver != null)
                         {
                             if (index >= 0)
                             {
-                                info.RemoveAt = index;
+                                this.info.RemoveAt = index;
                             }
                         }
                         else
@@ -1049,7 +1185,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                                 values[i] = itemProperty.ValueEntry.WeakValues[i];
                             }
 
-                            info.RemoveValues = values;
+                            this.info.RemoveValues = values;
                         }
                     }
                 }

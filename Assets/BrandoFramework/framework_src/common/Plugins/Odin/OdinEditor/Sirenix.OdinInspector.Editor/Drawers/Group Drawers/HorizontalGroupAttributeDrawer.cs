@@ -51,7 +51,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 context.Value = new Context();
                 if (attribute.Title != null)
                 {
-                    context.Value.TitleHelper = new StringMemberHelper(property.ParentType, attribute.Title);
+                    context.Value.TitleHelper = new StringMemberHelper(property, attribute.Title);
                 }
 
                 context.Value.Widths = new float[property.Children.Count];

@@ -7,7 +7,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
 
     [AttributeExample(typeof(MinValueAttribute))]
     [AttributeExample(typeof(MaxValueAttribute))]
-    public class MinMaxValueValueExamples
+    internal class MinMaxValueValueExamples
     {
         // Ints
         [Title("Int")]

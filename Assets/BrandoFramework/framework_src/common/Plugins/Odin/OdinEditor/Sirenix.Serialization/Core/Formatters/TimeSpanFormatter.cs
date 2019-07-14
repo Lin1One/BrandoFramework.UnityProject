@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="TimeSpan"/> type.
     /// </summary>
-    /// <seealso cref="TimeSpan" />
+    /// <seealso cref="MinimalBaseFormatter{System.TimeSpan}" />
     public sealed class TimeSpanFormatter : MinimalBaseFormatter<TimeSpan>
     {
         /// <summary>

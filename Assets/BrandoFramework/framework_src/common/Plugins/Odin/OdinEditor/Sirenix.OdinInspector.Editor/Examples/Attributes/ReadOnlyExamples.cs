@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(ReadOnlyAttribute), "ReadOnly disables properties in the inspector.")]
-    public class ReadOnlyExamples
+    internal class ReadOnlyExamples
     {
         [ReadOnly]
         public string MyString = "This is displayed as text";

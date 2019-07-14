@@ -33,8 +33,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
                 var showLabels = SirenixEditorFields.ResponsiveVectorComponentFields && contentRect.width >= 185;
                 GUIHelper.PushLabelWidth(SirenixEditorFields.SingleLetterStructLabelWidth);
-                this.ValueEntry.Property.Children[0].Draw(showLabels ? GUIHelper.TempContent("X") : null);
-                this.ValueEntry.Property.Children[1].Draw(showLabels ? GUIHelper.TempContent("Y") : null);
+                this.Property.Children[0].Draw(showLabels ? GUIHelper.TempContent("X") : null);
+                this.Property.Children[1].Draw(showLabels ? GUIHelper.TempContent("Y") : null);
                 GUIHelper.PopLabelWidth();
 
             }

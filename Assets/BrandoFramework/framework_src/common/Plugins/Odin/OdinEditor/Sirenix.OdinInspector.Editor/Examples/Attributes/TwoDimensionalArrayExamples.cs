@@ -8,8 +8,9 @@ namespace Sirenix.OdinInspector.Editor.Examples
 
     // Inheriting from SerializedMonoBehaviour is only needed if you want Odin to serialize the multi-dimensional arrays for you.
     // If you prefer doing that yourself, you can still make Odin show them in the inspector using the ShowInInspector attribute.
+    [ShowOdinSerializedPropertiesInInspector]
     [AttributeExample(typeof(TableMatrixAttribute))]
-    public class TwoDimensionalArrayExamples// : SerializedMonoBehaviour
+    internal class TwoDimensionalArrayExamples
     {
         // Unity does not serialize multi-dimensional arrays.
         // By inheriting from something like SerializedMonoBehaviour you can have Odin serialize multi-dimensional arrays for you.

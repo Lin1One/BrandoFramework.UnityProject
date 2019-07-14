@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(EnableIfAttribute))]
-    public class EnableIfExamples
+    internal class EnableIfExamples
     {
         public UnityEngine.Object SomeObject;
 

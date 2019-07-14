@@ -51,7 +51,7 @@ namespace Sirenix.Utilities.Editor
 
         public void PushPage(T obj, string name)
         {
-            var tab = this.tabGroup.RegisterTab(name);
+            var tab = this.tabGroup.RegisterTab(Guid.NewGuid().ToString());
             var page = new Page(obj, tab, name);
             this.pages.Add(page);
             this.tabGroup.GoToPage(page.Tab);
@@ -99,11 +99,11 @@ namespace Sirenix.Utilities.Editor
             for (int i = this.pages.Count - 1; i >= 0; i--)
             {
                 var p = this.pages[i];
-                if (!p.TitleWidth.HasValue) p.TitleWidth = (int)SirenixGUIStyles.BoldLabel.CalcSize(new GUIContent(p.Name)).x + 7;
+                if (!p.TitleWidth.HasValue) p.TitleWidth = (int)SirenixGUIStyles.Label.CalcSize(new GUIContent(p.Name)).x + 7;
                 totalLength += p.TitleWidth.Value;
             }
 
-            rect.width -= 10;
+            rect.width -= 8;
 
             var cut = rect.xMin;
             if (totalLength > rect.width)
@@ -114,7 +114,7 @@ namespace Sirenix.Utilities.Editor
             for (int i = 0; i < this.pages.Count; i++)
             {
                 var p = this.pages[i];
-                if (!p.TitleWidth.HasValue) p.TitleWidth = (int)SirenixGUIStyles.BoldLabel.CalcSize(new GUIContent(p.Name)).x + 7;
+                if (!p.TitleWidth.HasValue) p.TitleWidth = (int)SirenixGUIStyles.Label.CalcSize(new GUIContent(p.Name)).x + 7;
                 rect.width = p.TitleWidth.Value;
 
                 var btnRect = rect;
@@ -130,7 +130,7 @@ namespace Sirenix.Utilities.Editor
                 if (i != this.pages.Count - 1)
                 {
                     var lblRect = btnRect.AlignRight(10);
-                    lblRect.x += 10;
+                    lblRect.x += 8;
                     lblRect.xMin = Mathf.Max(cut, lblRect.xMin);
                     GUI.Label(lblRect, "/", SirenixGUIStyles.LabelCentered);
                 }

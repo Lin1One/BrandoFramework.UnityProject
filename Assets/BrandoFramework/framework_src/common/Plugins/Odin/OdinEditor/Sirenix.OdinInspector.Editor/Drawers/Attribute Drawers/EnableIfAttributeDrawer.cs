@@ -13,6 +13,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     using Utilities.Editor;
     using UnityEngine;
     using Utilities;
+    using Sirenix.Utilities.Editor.Expressions;
 
     internal static class IfAttributesHelper
     {
@@ -22,6 +23,10 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             public Func<object, bool> InstanceMemberGetter;
             public Func<object> StaticObjectMemberGetter;
             public Func<object, object> InstanceObjectMemberGetter;
+
+            // TODO: Expressions temporarily disabled.
+            //public Delegate ExpressionMethod;
+            //public bool expressionIsStatic;
             public string ErrorMessage;
             public bool Result;
             public bool UseNullComparison;
@@ -33,48 +38,63 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
             if (context.Value == null)
             {
+                Type returnType;
+
                 context.Value = new IfAttributesContext();
-                MemberInfo memberInfo = property.ParentType
-                    .FindMember()
-                    .IsNamed(memberName)
-                    .HasNoParameters()
-                    .GetMember(out context.Value.ErrorMessage);
 
-                if (memberInfo != null)
+                // TODO: Expressions temporarily disabled.
+                //if (memberName != null && memberName.Length > 0 && memberName[0] == '$')
+                //{
+                //    var expression = memberName.Substring(1);
+
+                //    context.Value.expressionIsStatic = property.ParentValueProperty == null && property.Tree.IsStatic;
+                //    context.Value.ExpressionMethod = ExpressionCompilerUtility.CompileExpression(expression, context.Value.expressionIsStatic, property.ParentType, out context.Value.ErrorMessage);
+
+                //    returnType = context.Value.ExpressionMethod != null ? context.Value.ExpressionMethod.Method.ReturnType : null;
+                //}
+                //else
                 {
-                    string name = (memberInfo is MethodInfo) ? memberInfo.Name + "()" : memberInfo.Name;
+                    returnType = null;
+                    MemberInfo memberInfo = property.ParentType
+                        .FindMember()
+                        .IsNamed(memberName)
+                        .HasNoParameters()
+                        .GetMember(out context.Value.ErrorMessage);
 
-                    if (memberInfo.GetReturnType() == typeof(bool))
+                    if (memberInfo != null)
                     {
-                        if (memberInfo.IsStatic())
+                        string name = (memberInfo is MethodInfo) ? memberInfo.Name + "()" : memberInfo.Name;
+
+                        if (memberInfo.GetReturnType() == typeof(bool))
                         {
-                            context.Value.StaticMemberGetter = DeepReflection.CreateValueGetter<bool>(property.ParentType, name);
+                            if (memberInfo.IsStatic())
+                            {
+                                context.Value.StaticMemberGetter = DeepReflection.CreateValueGetter<bool>(property.ParentType, name);
+                            }
+                            else
+                            {
+                                context.Value.InstanceMemberGetter = DeepReflection.CreateWeakInstanceValueGetter<bool>(property.ParentType, name);
+                            }
                         }
                         else
                         {
-                            context.Value.InstanceMemberGetter = DeepReflection.CreateWeakInstanceValueGetter<bool>(property.ParentType, name);
+                            if (memberInfo.IsStatic())
+                            {
+                                context.Value.StaticObjectMemberGetter = DeepReflection.CreateValueGetter<object>(property.ParentType, name);
+                            }
+                            else
+                            {
+                                context.Value.InstanceObjectMemberGetter = DeepReflection.CreateWeakInstanceValueGetter<object>(property.ParentType, name);
+                            }
                         }
-                    }
-                    else
-                    {
-                        //if (value == null)
-                        //{
-                        //    context.Value.ErrorMessage = "An member with a non-bool value was referenced, but no value was specified in the EnabledIf attribute.";
-                        //}
-                        //else
-                        //{
-                        if (memberInfo.IsStatic())
-                        {
-                            context.Value.StaticObjectMemberGetter = DeepReflection.CreateValueGetter<object>(property.ParentType, name);
-                        }
-                        else
-                        {
-                            context.Value.InstanceObjectMemberGetter = DeepReflection.CreateWeakInstanceValueGetter<object>(property.ParentType, name);
-                        }
-                        //}
 
-                        context.Value.UseNullComparison = memberInfo.GetReturnType() != typeof(string) && (memberInfo.GetReturnType().IsClass || memberInfo.GetReturnType().IsInterface);
+                        returnType = memberInfo.GetReturnType();
                     }
+                }
+
+                if (returnType != null) // Should only be null in case of errors.
+                {
+                    context.Value.UseNullComparison = returnType != typeof(string) && (returnType.IsClass || returnType.IsInterface);
                 }
             }
             errorMessage = context.Value.ErrorMessage;
@@ -89,6 +109,51 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
             if (context.Value.ErrorMessage == null)
             {
+                // TODO: Expressions temporarily disabled.
+                //if (context.Value.ExpressionMethod != null)
+                //{
+                //    for (int i = 0; i < property.ParentValues.Count; i++)
+                //    {
+                //        object val;
+                //        if (context.Value.expressionIsStatic)
+                //        {
+                //            val = context.Value.ExpressionMethod.DynamicInvoke();
+                //        }
+                //        else
+                //        {
+                //            val = context.Value.ExpressionMethod.DynamicInvoke(property.ParentValues[i]);
+                //        }
+
+                //        if (context.Value.UseNullComparison)
+                //        {
+                //            if (val is UnityEngine.Object)
+                //            {
+                //                // Unity objects can be 'fake null', and to detect that we have to test the value as a Unity object.
+                //                if (((UnityEngine.Object)val) != null)
+                //                {
+                //                    context.Value.Result = true;
+                //                    break;
+                //                }
+                //            }
+                //            else if (val != null)
+                //            {
+                //                context.Value.Result = true;
+                //                break;
+                //            }
+                //        }
+                //        else if (val is bool)
+                //        {
+                //            context.Value.Result = (bool)val;
+                //            break;
+                //        }
+                //        else if (Equals(val, value))
+                //        {
+                //            context.Value.Result = true;
+                //            break;
+                //        }
+                //    }
+                //}
+                //else 
                 if (context.Value.InstanceMemberGetter != null)
                 {
                     for (int i = 0; i < property.ParentValues.Count; i++)

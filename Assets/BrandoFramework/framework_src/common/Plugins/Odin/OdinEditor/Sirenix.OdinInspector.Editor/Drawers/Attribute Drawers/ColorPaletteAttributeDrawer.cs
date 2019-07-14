@@ -49,7 +49,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             }
             else
             {
-                this.NameGetter = new StringMemberHelper(this.ValueEntry.ParentType, this.Attribute.PaletteName);
+                this.NameGetter = new StringMemberHelper(this.Property, this.Attribute.PaletteName);
             }
 
         }

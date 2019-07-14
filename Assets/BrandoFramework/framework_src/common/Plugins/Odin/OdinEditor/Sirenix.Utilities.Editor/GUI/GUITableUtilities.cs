@@ -12,8 +12,54 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Sirenix.OdinInspector.Editor.Drawers
+namespace Sirenix.OdinInspector.Editor
 {
+    public class ResizableColumn : IResizableColumn
+    {
+        public float ColWidth;
+        public float MinWidth;
+        public bool PreserveWidth;
+        public bool Resizable = true;
+
+        public static ResizableColumn FixedColumn(float width)
+        {
+            return new ResizableColumn()
+            {
+                ColWidth = width,
+                PreserveWidth = true,
+                MinWidth = width,
+                Resizable = false,
+            };
+        }
+
+        public static ResizableColumn FlexibleColumn(float width = 0, float minWidth = 0)
+        {
+            return new ResizableColumn()
+            {
+                ColWidth = width,
+                PreserveWidth = true,
+                MinWidth = minWidth,
+                Resizable = true,
+            };
+        }
+
+        public static ResizableColumn DynamicColumn(float width = 0, float minWidth = 0)
+        {
+            return new ResizableColumn()
+            {
+                ColWidth = width,
+                PreserveWidth = false,
+                MinWidth = minWidth,
+                Resizable = true,
+            };
+        }
+
+        bool IResizableColumn.Resizable { get { return this.Resizable; } }
+        float IResizableColumn.ColWidth { get { return this.ColWidth; } set { this.ColWidth = value; } }
+        float IResizableColumn.MinWidth { get { return this.MinWidth; } }
+        bool IResizableColumn.PreserveWidth { get { return this.PreserveWidth; } }
+    }
+
     public interface IResizableColumn
     {
         /// <summary>

@@ -1,5 +1,3 @@
-using Sirenix.OdinInspector;
-
 #if UNITY_EDITOR
 //-----------------------------------------------------------------------// <copyright file="ObjectFieldAlignment.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
 //-----------------------------------------------------------------------

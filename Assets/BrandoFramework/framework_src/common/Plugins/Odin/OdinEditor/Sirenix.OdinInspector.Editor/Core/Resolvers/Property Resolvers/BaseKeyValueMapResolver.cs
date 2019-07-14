@@ -23,9 +23,13 @@ namespace Sirenix.OdinInspector.Editor
 
             for (int i = 0; i < keys.Length; i++)
             {
-                int capture = i;
-                this.EnqueueChange(() => this.RemoveKey((TMap)this.Property.BaseValueEntry.WeakValues[capture], keys[capture]));
+                this.QueueRemoveKey(keys[i], i);
             }
+        }
+
+        public void QueueRemoveKey(object key, int selectionIndex)
+        {
+            this.EnqueueChange(() => this.RemoveKey((TMap)this.Property.BaseValueEntry.WeakValues[selectionIndex], key));
         }
 
         public void QueueSet(object[] keys, object[] values)
@@ -38,9 +42,13 @@ namespace Sirenix.OdinInspector.Editor
 
             for (int i = 0; i < values.Length; i++)
             {
-                int capture = i;
-                this.EnqueueChange(() => this.Set((TMap)this.Property.BaseValueEntry.WeakValues[capture], keys[capture], values[capture]));
+                this.QueueSet(keys[i], values[i], i);
             }
+        }
+
+        public void QueueSet(object key, object value, int selectionIndex)
+        {
+            this.EnqueueChange(() => this.Set((TMap)this.Property.BaseValueEntry.WeakValues[selectionIndex], key, value));
         }
 
         protected abstract void Set(TMap map, object key, object value);

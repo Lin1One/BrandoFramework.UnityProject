@@ -5,7 +5,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using System;
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, AllowMultiple = false, Inherited = true)]
-    public class AttributeExampleDescriptionAttribute : Attribute
+    internal class AttributeExampleDescriptionAttribute : Attribute
     {
         public string Description;
 

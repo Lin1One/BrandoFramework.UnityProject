@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(MultilineAttribute))]
-    public class MultiLinePropertyExamples
+    internal class MultiLinePropertyExamples
     {
         [Multiline(10)]
         public string UnityMultilineField = "";

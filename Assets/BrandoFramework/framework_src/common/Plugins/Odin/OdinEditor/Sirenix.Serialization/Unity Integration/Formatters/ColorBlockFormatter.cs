@@ -11,7 +11,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="ColorBlock"/> type.
     /// </summary>
-    /// <seealso cref="ColorBlock" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.UI.ColorBlock}" />
     public class ColorBlockFormatter : MinimalBaseFormatter<ColorBlock>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();

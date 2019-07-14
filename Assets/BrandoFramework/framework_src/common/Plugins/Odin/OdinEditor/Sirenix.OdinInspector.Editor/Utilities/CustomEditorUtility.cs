@@ -32,6 +32,8 @@ namespace Sirenix.OdinInspector.Editor
         private static readonly FieldInfo MonoEditorType_EditorForChildClasses;
         private static readonly FieldInfo MonoEditorType_IsFallback;
 
+        private static readonly MethodInfo CustomEditorAttributesType_Rebuild;
+
         private static readonly bool IsBackedByADictionary;
 
         private static bool IsValid;
@@ -48,6 +50,7 @@ namespace Sirenix.OdinInspector.Editor
                 CustomEditorAttributesType_CachedMultiEditorForType = CustomEditorAttributesType.GetField("kCachedMultiEditorForType", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                 CustomEditorAttributesType_CustomEditors = CustomEditorAttributesType.GetField("kSCustomEditors", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                 CustomEditorAttributesType_CustomMultiEditors = CustomEditorAttributesType.GetField("kSCustomMultiEditors", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+                CustomEditorAttributesType_Rebuild = CustomEditorAttributesType.GetMethod("Rebuild", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
                 MonoEditorType_InspectedType = MonoEditorType.GetField("m_InspectedType", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 MonoEditorType_InspectorType = MonoEditorType.GetField("m_InspectorType", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                 MonoEditorType_EditorForChildClasses = MonoEditorType.GetField("m_EditorForChildClasses", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -102,7 +105,16 @@ namespace Sirenix.OdinInspector.Editor
                 ((IList)CustomEditorAttributesType_CustomMultiEditors.GetValue(null)).Clear();
             }
 
-            CustomEditorAttributesType_Initialized.SetValue(null, false);
+            if (UnityVersion.IsVersionOrGreater(2019, 1))
+            {
+                // Manually trigger a Rebuild instead of setting Initialized to false.
+                CustomEditorAttributesType_Rebuild.Invoke(null, null);
+                CustomEditorAttributesType_Initialized.SetValue(null, true); // Ensure Unity doesn't do a second rebuild again.
+            }
+            else
+            {
+                CustomEditorAttributesType_Initialized.SetValue(null, false);
+            }
         }
 
         public static void SetCustomEditor(Type inspectedType, Type editorType)

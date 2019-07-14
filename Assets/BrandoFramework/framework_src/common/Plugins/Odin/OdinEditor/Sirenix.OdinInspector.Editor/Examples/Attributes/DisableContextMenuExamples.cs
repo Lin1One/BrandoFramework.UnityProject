@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(DisableContextMenuAttribute))]
-    public class DisableContextMenuExamples
+    internal class DisableContextMenuExamples
     {
         [InfoBox("DisableContextMenu disables all right-click context menus provided by Odin. It does not disable Unity's context menu.", InfoMessageType.Warning)]
         [DisableContextMenu]

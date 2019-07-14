@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(TitleGroupAttribute))]
-    public class TitleGroupExamples
+    internal class TitleGroupExamples
     {
         [TitleGroup("Ints")]
         public int SomeInt1;

@@ -6,6 +6,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+#pragma warning disable
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     using System;
@@ -13,7 +14,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     /// <summary>
     /// Descripes an attribute example.
     /// </summary>
-    public class AttributeExampleInfo
+    internal class AttributeExampleInfo
     {
         /// <summary>
         /// The type of the example object.

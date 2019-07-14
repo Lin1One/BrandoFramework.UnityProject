@@ -55,6 +55,7 @@ namespace Sirenix.OdinInspector.Editor
 
         static DrawerUtilities()
         {
+            //Profiler.BeginSample("DrawerUtilities.cctor");
             // This method is *very* expensive performance-wise and generates lots of garbage due to liberal use of LINQ for readability.
             // This is acceptable, as it only runs once per AppDomain reload, and only ever in the editor.
 
@@ -64,7 +65,7 @@ namespace Sirenix.OdinInspector.Editor
 
             var typesToSearch = AssemblyUtilities.GetTypes(AssemblyTypeFlags.CustomTypes | AssemblyTypeFlags.UnityEditorTypes)
                             .Where(type => !type.IsAbstract && type.IsClass && !type.IsDefined(typeof(OdinDontRegisterAttribute), false) && (typeof(OdinDrawer).IsAssignableFrom(type) || (typeof(GUIDrawer).IsAssignableFrom(type) && (!(type.Namespace ?? "").StartsWith("Unity", StringComparison.InvariantCulture) || !ExcludeUnityDrawers.Contains(type.Name)))))
-                            .ToArray();
+                            .ToList();
 
             //
             // Find all regular Unity property and decorator drawers and create alias drawers for them
@@ -194,8 +195,10 @@ namespace Sirenix.OdinInspector.Editor
                     if (targets.Length != 1) return null;
                     if (!info.Targets[0].IsGenericTypeDefinition) return null;
 
-                    bool abstractUnityValueDrawer = info.MatchType == typeof(AbstractTypeUnityPropertyDrawer<,,>);
-                    bool plainUnityValueDrawer = info.MatchType == typeof(UnityPropertyDrawer<,>);
+                    var baseDef = info.MatchType.GetGenericTypeDefinition();
+
+                    bool abstractUnityValueDrawer = baseDef == typeof(AbstractTypeUnityPropertyDrawer<,,>);
+                    bool plainUnityValueDrawer = baseDef == typeof(UnityPropertyDrawer<,>);
 
                     if (!(abstractUnityValueDrawer || plainUnityValueDrawer)) return null;
 
@@ -262,6 +265,13 @@ namespace Sirenix.OdinInspector.Editor
                         return info;
                     })
             );
+
+            foreach (var type in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetAttributes<StaticInitializeBeforeDrawingAttribute>()).SelectMany(a => a.Types ?? Type.EmptyTypes).Where(t => t != null))
+            {
+                System.Runtime.CompilerServices.RuntimeHelpers.RunClassConstructor(type.TypeHandle);
+            }
+
+            //Profiler.EndSample();
         }
 
         public static void GetDefaultPropertyDrawers(InspectorProperty property, List<TypeSearchResult> resultList)
@@ -615,6 +625,11 @@ namespace Sirenix.OdinInspector.Editor
 
             private static bool CalculateShowInvalidAttributeErrorFor(Type attribute, Type value)
             {
+                if (attribute == typeof(DelayedAttribute) || attribute == typeof(DelayedPropertyAttribute))
+                {
+                    return false;
+                }
+
                 var validTargets = GetValidTargets(attribute);
 
                 if (validTargets.Count == 0) return false;

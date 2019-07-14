@@ -9,7 +9,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     // Note that you can also reference methods and properties. You are not limited to fields.
     [AttributeExample(typeof(ShowIfAttribute))]
     [AttributeExample(typeof(HideIfAttribute))]
-    public class ShowAndHideIfExamples
+    internal class ShowAndHideIfExamples
     {
         public UnityEngine.Object SomeObject;
 

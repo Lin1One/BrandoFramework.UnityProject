@@ -758,11 +758,16 @@ namespace Sirenix.Serialization
             }
 
             using (var stream = new System.IO.MemoryStream())
+            using (var serContext = Cache<SerializationContext>.Claim())
+            using (var deserContext = Cache<DeserializationContext>.Claim())
             {
+                serContext.Value.Config.SerializationPolicy = SerializationPolicies.Everything;
+                deserContext.Value.Config.SerializationPolicy = SerializationPolicies.Everything;
+
                 List<UnityEngine.Object> unityReferences;
-                SerializeValue(obj, stream, DataFormat.Binary, out unityReferences);
+                SerializeValue(obj, stream, DataFormat.Binary, out unityReferences, serContext);
                 stream.Position = 0;
-                return DeserializeValue<object>(stream, DataFormat.Binary, unityReferences);
+                return DeserializeValue<object>(stream, DataFormat.Binary, unityReferences, deserContext);
             }
         }
     }

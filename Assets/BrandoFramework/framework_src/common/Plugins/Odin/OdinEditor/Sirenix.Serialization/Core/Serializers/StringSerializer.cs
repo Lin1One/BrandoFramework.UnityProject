@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="string"/> type.
     /// </summary>
-    /// <seealso cref="string" />
+    /// <seealso cref="Serializer{System.String}" />
     public sealed class StringSerializer : Serializer<string>
     {
         /// <summary>

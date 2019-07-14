@@ -456,24 +456,20 @@ namespace Sirenix.Serialization.Utilities
         /// <param name="requireImplicitCast">if set to <c>true</c> an implicit or explicit operator must be defined on the given type.</param>
         public static MethodInfo GetCastMethod(this Type from, Type to, bool requireImplicitCast = false)
         {
-            var fromMethods = from.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+            var fromMethods = from.GetAllMembers<MethodInfo>(BindingFlags.Public | BindingFlags.Static);
 
-            for (int i = 0; i < fromMethods.Length; i++)
+            foreach (var method in fromMethods)
             {
-                MethodInfo method = fromMethods[i];
-
                 if ((method.Name == "op_Implicit" || (requireImplicitCast == false && method.Name == "op_Explicit")) && to.IsAssignableFrom(method.ReturnType))
                 {
                     return method;
                 }
             }
 
-            var toMethods = to.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy);
+            var toMethods = to.GetAllMembers<MethodInfo>(BindingFlags.Public | BindingFlags.Static);
 
-            for (int i = 0; i < toMethods.Length; i++)
+            foreach (var method in toMethods)
             {
-                MethodInfo method = toMethods[i];
-
                 if ((method.Name == "op_Implicit" || (requireImplicitCast == false && method.Name == "op_Explicit")) && method.GetParameters()[0].ParameterType.IsAssignableFrom(from))
                 {
                     return method;
@@ -943,7 +939,7 @@ namespace Sirenix.Serialization.Utilities
                     throw new NotImplementedException();
             }
 
-            return type.GetMethod(methodName, Flags.StaticAnyVisibility);
+            return type.GetAllMembers<MethodInfo>(Flags.StaticAnyVisibility).FirstOrDefault(m => m.Name == methodName);
         }
 
         /// <summary>
@@ -1035,8 +1031,8 @@ namespace Sirenix.Serialization.Utilities
                 default:
                     throw new NotImplementedException();
             }
-
-            return type.GetMethods(Flags.StaticAnyVisibility).Where(x => x.Name == methodName).ToArray();
+            
+            return type.GetAllMembers<MethodInfo>(Flags.StaticAnyVisibility).Where(x => x.Name == methodName).ToArray();
         }
 
         /// <summary>

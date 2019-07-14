@@ -39,8 +39,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             if (context.Value == null)
             {
                 context.Value = new TitleContext();
-                context.Value.TitleHelper = new StringMemberHelper(property.ParentType, attribute.Title, ref context.Value.ErrorMessage);
-                context.Value.SubtitleHelper = new StringMemberHelper(property.ParentType, attribute.Subtitle, ref context.Value.ErrorMessage);
+                context.Value.TitleHelper = new StringMemberHelper(property, attribute.Title, ref context.Value.ErrorMessage);
+                context.Value.SubtitleHelper = new StringMemberHelper(property, attribute.Subtitle, ref context.Value.ErrorMessage);
             }
 
             // Don't draw added emtpy space for the first property.

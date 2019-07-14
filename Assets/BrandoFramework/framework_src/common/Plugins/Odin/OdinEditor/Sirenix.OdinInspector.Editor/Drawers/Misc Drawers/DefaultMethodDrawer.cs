@@ -59,7 +59,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
                 if (!string.IsNullOrEmpty(this.buttonAttribute.Name))
                 {
-                    this.mh = new StringMemberHelper(this.Property.ParentType, this.buttonAttribute.Name);
+                    this.mh = new StringMemberHelper(this.Property, this.buttonAttribute.Name);
                 }
 
                 if (this.buttonHeight == 0 && buttonAttribute.ButtonHeight > 0)
@@ -285,9 +285,21 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             GUIHelper.RemoveFocusControl();
             GUIHelper.RequestRepaint();
 
-            foreach (var target in this.Property.Tree.WeakTargets.OfType<UnityEngine.Object>())
+            foreach (var target in this.Property.SerializationRoot.ValueEntry.WeakValues.OfType<UnityEngine.Object>())
             {
-                EditorUtility.SetDirty(target);
+                InspectorUtilities.RegisterUnityObjectDirty(target);
+                Undo.RecordObject(target, "Button click " + this.Property.NiceName + " on " + target.name);
+            }
+
+            var serializationRoot = this.Property.SerializationRoot;
+
+            for (int j = 0; j < serializationRoot.ValueEntry.ValueCount; j++)
+            {
+                UnityEngine.Object unityObj = serializationRoot.ValueEntry.WeakValues[j] as UnityEngine.Object;
+
+                if (unityObj != null)
+                {
+                }
             }
 
             var methodInfo = (MethodInfo)this.Property.Info.GetMemberInfo();

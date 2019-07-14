@@ -138,6 +138,7 @@ namespace Sirenix.Utilities.Editor
         private static EditorIcon upload;
         private static EditorIcon wifiSignal;
         private static EditorIcon x;
+        private static Texture2D unityGameObjectIcon;
 
         /// <summary>
         /// Gets an icon of an airplane symbol.
@@ -1793,7 +1794,7 @@ namespace Sirenix.Utilities.Editor
             {
                 if (triangleRight == null)
                 {
-                    triangleRight = new LazyEditorIcon(34, 34, "iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAABP0lEQVRYCe2WPW4CMRCFWZRQUJI2FMkpoIIWOEMOAbfYcyS5AlDCJUiXFOk5Ass3SEZoBGvjH7GFR3rYnhl7HuOx10VVVa0mSLsJJIRDJqJ3ImckZ0RnQI9daqRkUldPjD6WC80CzCeZ8/sMbP5e9kIWtoh2+MD/G2i9ZZl6sw8Rs+KUzhpEIeRSIyawbpcoDmCiDT7jECImnhD6BQOj8GlDtuZavD+UM/BzzVini5GRy/XfGOzABrwCZ4lNxAQe0fkHn6BnlHVt7K25FUtO2OqWUfSpMmJibum8gFoS4pyKiBDogzHYA6s8WT3uc3j4qRECQ/AO7j668l9jZCTKVR9SI/Lxk/lSiBUIEh8iCyJ2wBcIJnBm7/C+wOUkSd8jLo+YEhpd4OLr7eNys56zl7LjUyNJ+GQiOq05I43NyBFnkGlj1s4p2AAAAABJRU5ErkJggg==");
+                    triangleRight = new LazyEditorIcon(34, 34, "iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAABFElEQVRYCe1XSxLBQBAVhYWltQ2nYGXPFTgEt8g5cAUsuQQrZcE9xmtVk0q1VKUnPalk0V31mOn053nzSUmcc502WLcNJIiDEeErYYqYIlwBPrc9UlWRFIlDnhx1Tle8AAj52RaffUCSExSTUFGB8aANco4A9wtKFYdUJeKrLTG4AGpC2lNzAoknMANUplUk3/yFyQp45J3SsVaRfJ8JJnfgCoyBIItJxDdeYPAG9sDIO8u+6yBS1rPwea/Qq3PekL4GPiFlYhJpfLMSgTkwBSqdGFJOq0jjFxpd8bTRz4AD1BZ6anboOAAOQBQC2S8QvklTxA2FsUFvXV9TesVnxOsahC5NXTzsn96fsrY0XBJThCvyBWod+Lp+vcreAAAAAElFTkSuQmCC");
                 }
 
                 return triangleRight;
@@ -2032,7 +2033,23 @@ namespace Sirenix.Utilities.Editor
                 return unityLogo;
             }
         }
-        
+
+        /// <summary>
+        /// Gets an icon representing a GameObject.
+        /// </summary>
+        public static Texture2D UnityGameObjectIcon
+        {
+            get
+            {
+                if (unityGameObjectIcon == null)
+                {
+                    unityGameObjectIcon = EditorGUIUtility.FindTexture("GameObject Icon");
+                }
+
+                return unityGameObjectIcon;
+            }
+        }
+
         /// <summary>
         /// Gets an icon of a unity info icon.
         /// </summary>

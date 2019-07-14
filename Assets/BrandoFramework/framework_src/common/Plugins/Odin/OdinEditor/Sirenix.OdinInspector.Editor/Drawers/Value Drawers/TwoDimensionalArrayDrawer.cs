@@ -5,6 +5,9 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
+[assembly: Sirenix.OdinInspector.Editor.StaticInitializeBeforeDrawing(typeof(Sirenix.OdinInspector.Editor.Drawers.TwoDimensionalEnumArrayDrawerLocator))]
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
     using Sirenix.Utilities;
@@ -17,7 +20,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     using System.Reflection;
 
     /// <summary>
-    /// Base class for two-dimentional array drawers.
+    /// Base class for two-dimensional array drawers.
     /// </summary>
     public abstract class TwoDimensionalArrayDrawer<TArray, TElement> : OdinValueDrawer<TArray> where TArray : IList
     {
@@ -76,17 +79,24 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         protected override void DrawPropertyLayout(IPropertyValueEntry<TArray> entry, GUIContent label)
         {
             TElement[,] value = entry.Values[0] as TElement[,];
-            bool rowLengthConflic = false;
-            bool colLengthConflic = false;
-            int colCount = value.GetLength(0);
-            int rowCount = value.GetLength(1);
+            bool rowLengthConflict = false;
+            bool colLengthConflict = false;
+
+            var attribute = entry.Property.GetAttribute<TableMatrixAttribute>() ??
+                            this.GetDefaultTableMatrixAttributeSettings();
+
+            var colIndex = attribute.Transpose ? 1 : 0;
+            var rowIndex = 1 - colIndex;
+            int colCount = value.GetLength(colIndex);
+            int rowCount = value.GetLength(rowIndex);
+
             for (int i = 1; i < entry.Values.Count; i++)
             {
                 var arr = entry.Values[i] as TElement[,];
-                colLengthConflic = colLengthConflic || arr.GetLength(0) != colCount;
-                rowLengthConflic = rowLengthConflic || arr.GetLength(1) != rowCount;
-                colCount = Mathf.Min(colCount, arr.GetLength(0));
-                rowCount = Mathf.Min(rowCount, arr.GetLength(1));
+                colLengthConflict = colLengthConflict || arr.GetLength(colIndex) != colCount;
+                rowLengthConflict = rowLengthConflict || arr.GetLength(rowIndex) != rowCount;
+                colCount = Mathf.Min(colCount, arr.GetLength(colIndex));
+                rowCount = Mathf.Min(rowCount, arr.GetLength(rowIndex));
             }
 
             var context = entry.Context.Get(this, "context", (Context)null);
@@ -96,7 +106,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 context.Value.Value = value;
                 context.Value.ColCount = colCount;
                 context.Value.RowCount = rowCount;
-                context.Value.Attribute = entry.Property.GetAttribute<TableMatrixAttribute>() ?? this.GetDefaultTableMatrixAttributeSettings();
+                context.Value.Attribute = attribute;
 
                 if (context.Value.Attribute.DrawElementMethod != null)
                 {
@@ -119,11 +129,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     }
                 }
 
-                context.Value.HorizontalTitleGetter = new StringMemberHelper(entry.ParentType, context.Value.Attribute.HorizontalTitle);
-                context.Value.VerticalTitleGetter = new StringMemberHelper(entry.ParentType, context.Value.Attribute.VerticalTitle);
+                context.Value.HorizontalTitleGetter = new StringMemberHelper(this.Property, context.Value.Attribute.HorizontalTitle);
+                context.Value.VerticalTitleGetter = new StringMemberHelper(this.Property, context.Value.Attribute.VerticalTitle);
 
                 context.Value.Table = GUITable.Create(
-                    Mathf.Max(colCount, 1) + (colLengthConflic ? 1 : 0), Mathf.Max(rowCount, 1) + (rowLengthConflic ? 1 : 0),
+                    Mathf.Max(colCount, 1) + (colLengthConflict ? 1 : 0), Mathf.Max(rowCount, 1) + (rowLengthConflict ? 1 : 0),
                     (rect, x, y) => this.DrawElement(rect, entry, context.Value, x, y),
                     context.Value.HorizontalTitleGetter.GetString(entry),
                     context.Value.Attribute.HideColumnIndices ? (Action<Rect, int>)null : (rect, x) => this.DrawColumn(rect, entry, context.Value, x),
@@ -131,6 +141,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     context.Value.Attribute.HideRowIndices ? (Action<Rect, int>)null : (rect, y) => this.DrawRows(rect, entry, context.Value, y),
                     context.Value.Attribute.ResizableColumns
                 );
+
+                context.Value.Table.RespectIndentLevel = context.Value.Attribute.RespectIndentLevel;
 
                 if (context.Value.Attribute.RowHeight != 0)
                 {
@@ -149,12 +161,12 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     }
                 }
 
-                if (colLengthConflic)
+                if (colLengthConflict)
                 {
                     context.Value.Table[context.Value.Table.ColumnCount - 1, 1].Width = 15;
                 }
 
-                if (colLengthConflic)
+                if (colLengthConflict)
                 {
                     for (int x = 0; x < context.Value.Table.ColumnCount; x++)
                     {
@@ -280,7 +292,15 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                             Event.current.Use();
                             context.IsDraggingRow = false;
 
-                            ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.MoveRow(arr, context.RowDragFrom, context.RowDragTo));
+
+                            if (context.Attribute.Transpose)
+                            {
+                                ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.MoveColumn(arr, context.RowDragFrom, context.RowDragTo));
+                            }
+                            else
+                            {
+                                ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.MoveRow(arr, context.RowDragFrom, context.RowDragTo));
+                            }
                         }
                     }
 
@@ -343,11 +363,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             {
                 Event.current.Use();
                 GenericMenu menu = new GenericMenu();
-                menu.AddItem(new GUIContent("Insert 1 above"), false, () => ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.InsertOneRowAbove(arr, rowIndex)));
-                menu.AddItem(new GUIContent("Insert 1 below"), false, () => ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.InsertOneRowBelow(arr, rowIndex)));
-                menu.AddItem(new GUIContent("Duplicate"), false, () => ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.DuplicateRow(arr, rowIndex)));
+                menu.AddItem(new GUIContent("Insert 1 above"), false, () => ApplyArrayModifications(entry, arr => this.TableMatrixAttribute.Transpose ? MultiDimArrayUtilities.InsertOneColumnLeft(arr, rowIndex) : MultiDimArrayUtilities.InsertOneRowAbove(arr, rowIndex)));
+                menu.AddItem(new GUIContent("Insert 1 below"), false, () => ApplyArrayModifications(entry, arr => this.TableMatrixAttribute.Transpose ? MultiDimArrayUtilities.InsertOneColumnRight(arr, rowIndex) : MultiDimArrayUtilities.InsertOneRowBelow(arr, rowIndex)));
+                menu.AddItem(new GUIContent("Duplicate"), false, () => ApplyArrayModifications(entry, arr => this.TableMatrixAttribute.Transpose ? MultiDimArrayUtilities.DuplicateColumn(arr, rowIndex) : MultiDimArrayUtilities.DuplicateRow(arr, rowIndex)));
                 menu.AddSeparator("");
-                menu.AddItem(new GUIContent("Delete"), false, () => ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.DeleteRow(arr, rowIndex)));
+                menu.AddItem(new GUIContent("Delete"), false, () => ApplyArrayModifications(entry, arr => this.TableMatrixAttribute.Transpose ? MultiDimArrayUtilities.DeleteColumn(arr, rowIndex) : MultiDimArrayUtilities.DeleteRow(arr, rowIndex)));
                 menu.ShowAsContext();
             }
         }
@@ -389,7 +409,14 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                             Event.current.Use();
                             context.IsDraggingColumn = false;
 
-                            ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.MoveColumn(arr, context.ColumnDragFrom, context.ColumnDragTo));
+                            if (context.Attribute.Transpose)
+                            {
+                                ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.MoveRow(arr, context.ColumnDragFrom, context.ColumnDragTo));
+                            }
+                            else
+                            {
+                                ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.MoveColumn(arr, context.ColumnDragFrom, context.ColumnDragTo));
+                            }
                         }
                     }
 
@@ -453,11 +480,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             {
                 Event.current.Use();
                 GenericMenu menu = new GenericMenu();
-                menu.AddItem(new GUIContent("Insert 1 left"), false, () => ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.InsertOneColumnLeft(arr, columnIndex)));
-                menu.AddItem(new GUIContent("Insert 1 right"), false, () => ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.InsertOneColumnRight(arr, columnIndex)));
-                menu.AddItem(new GUIContent("Duplicate"), false, () => ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.DuplicateColumn(arr, columnIndex)));
+                menu.AddItem(new GUIContent("Insert 1 left"), false, () => ApplyArrayModifications(entry, arr => this.TableMatrixAttribute.Transpose ? MultiDimArrayUtilities.InsertOneRowAbove(arr, columnIndex) : MultiDimArrayUtilities.InsertOneColumnLeft(arr, columnIndex)));
+                menu.AddItem(new GUIContent("Insert 1 right"), false, () => ApplyArrayModifications(entry, arr => this.TableMatrixAttribute.Transpose ? MultiDimArrayUtilities.InsertOneRowBelow(arr, columnIndex) : MultiDimArrayUtilities.InsertOneColumnRight(arr, columnIndex)));
+                menu.AddItem(new GUIContent("Duplicate"), false, () => ApplyArrayModifications(entry, arr => this.TableMatrixAttribute.Transpose ? MultiDimArrayUtilities.DuplicateRow(arr, columnIndex) : MultiDimArrayUtilities.DuplicateColumn(arr, columnIndex)));
                 menu.AddSeparator("");
-                menu.AddItem(new GUIContent("Delete"), false, () => ApplyArrayModifications(entry, arr => MultiDimArrayUtilities.DeleteColumn(arr, columnIndex)));
+                menu.AddItem(new GUIContent("Delete"), false, () => ApplyArrayModifications(entry, arr => this.TableMatrixAttribute.Transpose ? MultiDimArrayUtilities.DeleteRow(arr, columnIndex) : MultiDimArrayUtilities.DeleteColumn(arr, columnIndex)));
                 menu.ShowAsContext();
             }
         }
@@ -479,13 +506,16 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         {
             if (x < context.ColCount && y < context.RowCount)
             {
+                var row = context.Attribute.Transpose ? x : y;
+                var col = context.Attribute.Transpose ? y : x;
+
                 bool showMixedValue = false;
                 if (entry.Values.Count != 1)
                 {
                     for (int i = 1; i < entry.Values.Count; i++)
                     {
-                        var a = (entry.Values[i] as TElement[,])[x, y];
-                        var b = (entry.Values[i - 1] as TElement[,])[x, y];
+                        var a = (entry.Values[i] as TElement[,])[col, row];
+                        var b = (entry.Values[i - 1] as TElement[,])[col, row];
 
                         if (!CompareElement(a, b))
                         {
@@ -497,7 +527,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
                 EditorGUI.showMixedValue = showMixedValue;
                 EditorGUI.BeginChangeCheck();
-                var prevValue = context.Value[x, y];
+                var prevValue = context.Value[col, row];
                 TElement value;
 
                 if (context.DrawElement != null)
@@ -513,7 +543,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 {
                     for (int i = 0; i < entry.Values.Count; i++)
                     {
-                        (entry.Values[i] as TElement[,])[x, y] = value;
+                        (entry.Values[i] as TElement[,])[col, row] = value;
                     }
 
                     entry.Values.ForceMarkDirty();
@@ -540,7 +570,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
     internal static class TwoDimensionalEnumArrayDrawerLocator
     {
-        [InitializeOnLoadMethod]
+        static TwoDimensionalEnumArrayDrawerLocator()
+        {
+            RegisterDrawer();
+        }
+
         private static void RegisterDrawer()
         {
             HashSet<Type> canMatch = new HashSet<Type>()

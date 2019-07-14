@@ -27,7 +27,7 @@ namespace Sirenix.Utilities.Editor
         private Vector2 nextScrollPos;
         private Rect contentRect;
         private bool ignoreScrollView;
-        private bool isDirty;
+        private int isDirty = 3;
 
         /// <summary>
         /// Whether to draw a draw scroll view.
@@ -94,7 +94,7 @@ namespace Sirenix.Utilities.Editor
 
             if (this.rowCount != rowCount)
             {
-                this.isDirty = true;
+                this.isDirty = 3;
                 this.rowCount = rowCount;
             }
 
@@ -115,7 +115,7 @@ namespace Sirenix.Utilities.Editor
                     {
                         if (row.rowHeight != row.tmpRowHeight)
                         {
-                            this.isDirty = true;
+                            this.isDirty = 3;
                             row.rowHeight = row.tmpRowHeight;
                         }
 
@@ -124,10 +124,9 @@ namespace Sirenix.Utilities.Editor
                     }
                 }
 
-                if (this.isDirty)
+                if (this.isDirty > 0)
                 {
                     this.UpdateSpaceAllocation();
-                    this.isDirty = false;
                     GUIHelper.RequestRepaint();
                 }
             }
@@ -138,7 +137,7 @@ namespace Sirenix.Utilities.Editor
                 if (this.outerVisibleRect != p)
                 {
                     this.outerVisibleRect = p;
-                    this.isDirty = true;
+                    this.isDirty = 3;
                 }
             }
 
@@ -148,7 +147,7 @@ namespace Sirenix.Utilities.Editor
             {
                 if (this.OuterRect != outerRect)
                 {
-                    this.isDirty = true;
+                    this.isDirty = 3;
                     this.OuterRect = outerRect;
                 }
             }
@@ -156,7 +155,6 @@ namespace Sirenix.Utilities.Editor
             Vector2 newScrollPos;
             if (this.DrawScrollBars())
             {
-                this.ignoreScrollView = false;
                 newScrollPos = GUILayout.BeginScrollView(this.ScrollPos, false, false, this.GetScrollViewOptions(true));
             }
             else
@@ -167,15 +165,14 @@ namespace Sirenix.Utilities.Editor
                 if (this.ignoreScrollView)
                 {
                     GUIHelper.PopEventType();
-                    GUIHelper.RequestRepaint(3);
-                    this.isDirty = true;
+                    this.isDirty = 3;
                 }
             }
 
             if (newScrollPos != this.ScrollPos)
             {
                 this.nextScrollPos = newScrollPos;
-                this.isDirty = true;
+                this.isDirty = 3;
             }
 
             var rect = GUILayoutUtility.GetRect(0, this.totalHeight);
@@ -190,24 +187,33 @@ namespace Sirenix.Utilities.Editor
 
                     if (scrollDelta != Vector2.zero)
                     {
-                        this.isDirty = true;
-                        GUIHelper.RequestRepaint(2);
+                        this.isDirty = 3;
                     }
                 }
 
                 if (rect != this.contentRect)
                 {
-                    this.isDirty = true;
-                    GUIHelper.RequestRepaint(2);
+                    this.isDirty = 3;
                 }
 
                 if (this.contentRect != rect)
                 {
-                    this.isDirty = true;
+                    this.isDirty = 3;
                 }
 
                 this.contentRect = rect;
             }
+
+            if (this.isDirty > 0)
+            {
+                GUIHelper.RequestRepaint();
+
+                if (Event.current.type == EventType.Repaint)
+                {
+                    this.isDirty--;
+                }
+            }
+
         }
 
         private bool DrawScrollBars()

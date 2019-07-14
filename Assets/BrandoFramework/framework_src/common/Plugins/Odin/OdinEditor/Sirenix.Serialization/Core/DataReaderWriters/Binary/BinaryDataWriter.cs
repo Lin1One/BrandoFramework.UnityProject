@@ -642,6 +642,30 @@ namespace Sirenix.Serialization
             this.types.Clear();
         }
 
+        public override string GetDataDump()
+        {
+            if (!this.Stream.CanRead)
+            {
+                return "Binary data stream for writing cannot be read; cannot dump data.";
+            }
+
+            if (!this.Stream.CanSeek)
+            {
+                return "Binary data stream cannot seek; cannot dump data.";
+            }
+
+            var oldPosition = this.Stream.Position;
+
+            var bytes = new byte[oldPosition];
+
+            this.Stream.Position = 0;
+            this.Stream.Read(bytes, 0, (int)oldPosition);
+
+            this.Stream.Position = oldPosition;
+
+            return "Binary hex dump: " + ProperBitConverter.BytesToHexString(bytes);
+        }
+
         private void WriteType(Type type)
         {
             if (type == null)
@@ -663,7 +687,7 @@ namespace Sirenix.Serialization
                     this.types.Add(type, id);
                     this.Stream.WriteByte((byte)BinaryEntryType.TypeName);
                     this.WriteIntValue(id);
-                    this.WriteStringValue(this.Binder.BindToName(type, this.Context.Config.DebugContext));
+                    this.WriteStringValue(this.Context.Binder.BindToName(type, this.Context.Config.DebugContext));
                 }
             }
         }

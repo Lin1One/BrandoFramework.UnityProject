@@ -38,7 +38,7 @@ namespace Sirenix.OdinInspector
     /// <seealso cref="PropertyRangeAttribute"/>
     /// <seealso cref="PropertyTooltipAttribute"/>
     /// <seealso cref="PropertyOrderAttribute"/>
-    [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true), DontApplyToListElements]
     public class PropertySpaceAttribute : Attribute
     {
         /// <summary>

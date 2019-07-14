@@ -21,7 +21,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     /// This drawer will display a warning message if the OdinSerialize attribute is potentially used in such cases.
     /// </para>
     /// </summary>
-    /// <seealso cref="OdinSerializeAttribute" />
+    /// <seealso cref="Sirenix.OdinInspector.Editor.OdinAttributeDrawer{Sirenix.Serialization.OdinSerializeAttribute}" />
     [DrawerPriority(1000, 0, 0)]
     public sealed class OdinSerializeAttributeWarningDrawer : OdinAttributeDrawer<OdinSerializeAttribute>
     {

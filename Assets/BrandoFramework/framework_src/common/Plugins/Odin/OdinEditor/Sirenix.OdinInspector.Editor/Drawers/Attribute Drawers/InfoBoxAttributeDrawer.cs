@@ -5,6 +5,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
     using System;
@@ -21,7 +22,6 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     /// <seealso cref="DetailedInfoBoxAttribute"/>
     /// <seealso cref="RequiredAttribute"/>
     /// <seealso cref="ValidateInputAttribute"/>
-
     [DrawerPriority(0, 10001, 0)]
     public sealed class InfoBoxAttributeDrawer : OdinAttributeDrawer<InfoBoxAttribute>
     {
@@ -52,7 +52,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             {
                 context.Value = new InfoBoxContext()
                 {
-                    MessageHelper = new StringMemberHelper(property.ParentType, attribute.Message)
+                    MessageHelper = new StringMemberHelper(property, attribute.Message)
                 };
 
                 context.Value.ErrorMessage = context.Value.MessageHelper.ErrorMessage;
@@ -140,6 +140,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 }
             }
 
+            if (this.Attribute.GUIAlwaysEnabled)
+            {
+                GUIHelper.PushGUIEnabled(true);
+            }
+
             if (context.Value.ErrorMessage != null)
             {
                 SirenixEditorGUI.ErrorMessageBox(context.Value.ErrorMessage);
@@ -155,7 +160,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         context.Value.DrawMessageBox =
                             attribute.VisibleIf == null ||
                             (context.Value.StaticValidationParameterMethod != null && (bool)context.Value.StaticValidationParameterMethod.Invoke(null, new object[] { property.ValueEntry.WeakSmartValue })) ||
-                            (context.Value.InstanceValidationParameterMethod != null && (bool)context.Value.InstanceValidationParameterMethod.Invoke(null, new object[] { property.ParentValues[0], property.ValueEntry.WeakSmartValue })) ||
+                            (context.Value.InstanceValidationParameterMethod != null && (bool)context.Value.InstanceValidationParameterMethod.Invoke(property.ParentValues[0], new object[] { property.ValueEntry.WeakSmartValue })) ||
                             (context.Value.InstanceValidationMethodCaller != null && context.Value.InstanceValidationMethodCaller(property.ParentValues[0])) ||
                             (context.Value.InstanceValueGetter != null && (bool)context.Value.InstanceValueGetter(ref parentValue)) ||
                             (context.Value.StaticValidationCaller != null && context.Value.StaticValidationCaller());
@@ -191,6 +196,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                             break;
                     }
                 }
+            }
+
+            if (this.Attribute.GUIAlwaysEnabled)
+            {
+                GUIHelper.PopGUIEnabled();
             }
 
             this.CallNextDrawer(label);

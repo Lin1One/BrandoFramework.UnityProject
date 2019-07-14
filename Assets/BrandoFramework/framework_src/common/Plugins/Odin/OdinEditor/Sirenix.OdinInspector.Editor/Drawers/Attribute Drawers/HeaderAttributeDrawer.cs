@@ -45,7 +45,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             var headerContext = property.Context.Get<StringMemberHelper>(this, "Header", (StringMemberHelper)null);
             if (headerContext.Value == null)
             {
-                headerContext.Value = new StringMemberHelper(property.ParentType, this.Attribute.header);
+                //headerContext.Value = new StringMemberHelper(property.ParentType, this.Attribute.header);
+                headerContext.Value = new StringMemberHelper(property, this.Attribute.header);
             }
 
             EditorGUILayout.LabelField(headerContext.Value.GetString(property), EditorStyles.boldLabel);

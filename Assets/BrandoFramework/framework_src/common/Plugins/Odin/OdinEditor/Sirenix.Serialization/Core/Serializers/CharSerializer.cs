@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="char"/> type.
     /// </summary>
-    /// <seealso cref="char" />
+    /// <seealso cref="Serializer{System.Char}" />
     public sealed class CharSerializer : Serializer<char>
     {
         /// <summary>

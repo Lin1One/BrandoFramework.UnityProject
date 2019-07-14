@@ -5,11 +5,6 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-// The cached version sacrifices a bit of load-time (100-200ms on PC) to get super fast and reliable type lookups while working in the Unity Editor.
-// But at runtime we're likely doing far fewer type lookups, so the sacrifice may not be worth it. 
-// And we may also want to reduce the amount of memory allocated on the device.
-#define USE_CACHED_VERSION
-
 namespace Sirenix.Utilities
 {
     using System;
@@ -18,13 +13,13 @@ namespace Sirenix.Utilities
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using UnityEngine;
 
     /// <summary>
     /// A utility class for finding types in various asssembly.
     /// </summary>
 #if UNITY_EDITOR
-
     [UnityEditor.InitializeOnLoad]
 #endif
     public static class AssemblyUtilities
@@ -49,15 +44,22 @@ namespace Sirenix.Utilities
             "Assembly-Boo-Editor-firstpass",
         };
 
+        private static readonly Dictionary<Assembly, bool> IsDynamicCache = new Dictionary<Assembly, bool>();
+        private static readonly object IS_DYNAMIC_CACHE_LOCK = new object();
+        private static readonly object ASSEMBLY_LOAD_QUEUE_LOCK = new object();
+        private static readonly object ASSEMBLY_TYPE_FLAG_LOOKUP_LOCK = new object();
+        private static Thread LoadThread;
+
+        private static readonly List<Assembly> AssemblyLoadQueue = new List<Assembly>();
+        private static bool AssemblyLoadQueueContainsItems = false;
+
         private static Assembly unityEngineAssembly;
-
-        private static readonly object LOCK = new object();
-
 #if UNITY_EDITOR
         private static Assembly unityEditorAssembly;
 #endif
         private static DirectoryInfo projectFolderDirectory;
         private static DirectoryInfo scriptAssembliesDirectory;
+        private static Dictionary<string, Type> stringTypeLookup;
         private static Dictionary<Assembly, AssemblyTypeFlags> assemblyTypeFlagLookup;
         private static List<Assembly> allAssemblies;
         private static ImmutableList<Assembly> allAssembliesImmutable;
@@ -68,8 +70,6 @@ namespace Sirenix.Utilities
         private static List<Assembly> unityAssemblies;
         private static List<Assembly> unityEditorAssemblies;
         private static List<Assembly> otherAssemblies;
-#if USE_CACHED_VERSION
-        private static Dictionary<string, Type> stringTypeLookup;
         private static List<Type> userTypes;
         private static List<Type> userEditorTypes;
         private static List<Type> pluginTypes;
@@ -77,14 +77,101 @@ namespace Sirenix.Utilities
         private static List<Type> unityTypes;
         private static List<Type> unityEditorTypes;
         private static List<Type> otherTypes;
-#endif
         private static string dataPath;
         private static string scriptAssembliesPath;
 
         /// <summary>
+        /// Initializes the <see cref="AssemblyUtilities"/> class.
+        /// </summary>
+        static AssemblyUtilities()
+        {
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
+            {
+                var assembly = args.LoadedAssembly;
+                var isDynamic = assembly.GetType().FullName.EndsWith("AssemblyBuilder") || assembly.Location == null || assembly.Location == "";
+
+                if (!isDynamic && !args.LoadedAssembly.ReflectionOnly)
+                {
+                    lock (ASSEMBLY_LOAD_QUEUE_LOCK)
+                    {
+                        AssemblyLoadQueue.Add(assembly);
+                        AssemblyLoadQueueContainsItems = true;
+                    }
+                }
+            };
+            
+            bool didStartThreadSuccessfully = false;
+            try
+            {
+                LoadThread = new Thread(() => Load(assemblies));
+                LoadThread.Start();
+                didStartThreadSuccessfully = true;
+            }
+            catch (Exception)
+            {
+                LoadThread = null;
+                // If this fails, we are probably on WebGL
+            }
+
+            // If the threaded version didn't work, then try again in the current thread.
+            if (!didStartThreadSuccessfully)
+            {
+                try
+                {
+                    Load(assemblies);
+                }
+                catch (Exception) { }
+            }
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void DoNothing()
+        {
+            // The static constructor has now been invoked!
+        }
+
+        private static void EnsureIsFullyInitialized()
+        {
+            if (Thread.CurrentThread == LoadThread)
+            {
+                // This should ensure that we can always safely call this from the initializer thread during initialization
+                return;
+            }
+
+            var loadThreadLocal = LoadThread;
+
+            if (loadThreadLocal != null)
+            {
+                loadThreadLocal.Join();
+                LoadThread = null;
+            }
+
+            while (AssemblyLoadQueueContainsItems)
+            {
+                List<Assembly> newlyLoadedAssemblies;
+                lock (ASSEMBLY_LOAD_QUEUE_LOCK)
+                {
+                    newlyLoadedAssemblies = AssemblyLoadQueue.ToList();
+                    AssemblyLoadQueue.Clear();
+                    AssemblyLoadQueueContainsItems = false;
+                }
+
+                // AssemblyLoadQueueContainsItems can be set to true while the following is happning:
+                for (int i = 0; i < newlyLoadedAssemblies.Count; i++)
+                {
+                    RegisterAssembly(newlyLoadedAssemblies[i]);
+                }
+            }
+        }
+
+        [Obsolete("Reload is no longer supported.")]
+        public static void Reload() { }
+
+        /// <summary>
         /// Re-scans the entire AppDomain.
         /// </summary>
-        public static void Reload()
+        private static void Load(Assembly[] assemblies)
         {
             dataPath = Environment.CurrentDirectory.Replace("\\", "//").Replace("//", "/").TrimEnd('/') + "/Assets";
             scriptAssembliesPath = Environment.CurrentDirectory.Replace("\\", "//").Replace("//", "/").TrimEnd('/') + "/Library/ScriptAssemblies";
@@ -95,18 +182,15 @@ namespace Sirenix.Utilities
             unityAssemblies = new List<Assembly>();
             unityEditorAssemblies = new List<Assembly>();
             otherAssemblies = new List<Assembly>();
-
-#if USE_CACHED_VERSION
-            stringTypeLookup = new Dictionary<string, Type>();
-            userTypes = new List<Type>();
-            userEditorTypes = new List<Type>();
-            pluginTypes = new List<Type>();
-            pluginEditorTypes = new List<Type>();
-            unityTypes = new List<Type>();
-            unityEditorTypes = new List<Type>();
-            otherTypes = new List<Type>();
-#endif
-            assemblyTypeFlagLookup = new Dictionary<Assembly, AssemblyTypeFlags>();
+            userTypes = new List<Type>(100);
+            userEditorTypes = new List<Type>(100);
+            pluginTypes = new List<Type>(100);
+            pluginEditorTypes = new List<Type>(100);
+            unityTypes = new List<Type>(100);
+            unityEditorTypes = new List<Type>(100);
+            otherTypes = new List<Type>(100);
+            stringTypeLookup = new Dictionary<string, Type>(100);
+            assemblyTypeFlagLookup = new Dictionary<Assembly, AssemblyTypeFlags>(100);
             unityEngineAssembly = typeof(Vector3).Assembly;
 
 #if UNITY_EDITOR
@@ -119,119 +203,65 @@ namespace Sirenix.Utilities
             allAssemblies = new List<Assembly>();
             allAssembliesImmutable = new ImmutableList<Assembly>(allAssemblies);
 
-            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-
-            for (int i = 0; i < loadedAssemblies.Length; i++)
+            for (int i = 0; i < assemblies.Length; i++)
             {
-                RegisterAssembly(loadedAssemblies[i]);
+                RegisterAssembly(assemblies[i]);
             }
         }
 
         private static void RegisterAssembly(Assembly assembly)
         {
-            try
+            if (allAssemblies.Contains(assembly)) return;
+            allAssemblies.Add(assembly);
+
+            var assemblyFlag = GetAssemblyTypeFlag(assembly);
+
+            Type[] types = assembly.SafeGetTypes();
+            for (int j = 0; j < types.Length; j++)
             {
-                lock (LOCK)
-                {
-                    if (allAssemblies.Contains(assembly)) return;
-                    allAssemblies.Add(assembly);
-                }
-
-                var assemblyFlag = GetAssemblyTypeFlag(assembly);
-
-#if USE_CACHED_VERSION
-                Type[] types = assembly.SafeGetTypes();
-                for (int j = 0; j < types.Length; j++)
-                {
-                    Type type = types[j];
-
-                    if (type.Namespace != null)
-                    {
-                        stringTypeLookup[type.Namespace + "." + type.Name] = type;
-                    }
-                    else
-                    {
-                        stringTypeLookup[type.Name] = type;
-                    }
-                }
-#endif
-
-                if (assemblyFlag == AssemblyTypeFlags.UserTypes)
-                {
-                    userAssemblies.Add(assembly);
-#if USE_CACHED_VERSION
-                    userTypes.AddRange(assembly.SafeGetTypes());
-#endif
-                }
-                else if (assemblyFlag == AssemblyTypeFlags.UserEditorTypes)
-                {
-                    userEditorAssemblies.Add(assembly);
-#if USE_CACHED_VERSION
-                    userEditorTypes.AddRange(assembly.SafeGetTypes());
-#endif
-                }
-                else if (assemblyFlag == AssemblyTypeFlags.PluginTypes)
-                {
-                    pluginAssemblies.Add(assembly);
-#if USE_CACHED_VERSION
-                    pluginTypes.AddRange(assembly.SafeGetTypes());
-#endif
-                }
-                else if (assemblyFlag == AssemblyTypeFlags.PluginEditorTypes)
-                {
-                    pluginEditorAssemblies.Add(assembly);
-#if USE_CACHED_VERSION
-                    pluginEditorTypes.AddRange(assembly.SafeGetTypes());
-#endif
-                }
-                else if (assemblyFlag == AssemblyTypeFlags.UnityTypes)
-                {
-                    unityAssemblies.Add(assembly);
-#if USE_CACHED_VERSION
-                    unityTypes.AddRange(assembly.SafeGetTypes());
-#endif
-                }
-                else if (assemblyFlag == AssemblyTypeFlags.UnityEditorTypes)
-                {
-                    unityEditorAssemblies.Add(assembly);
-#if USE_CACHED_VERSION
-                    unityEditorTypes.AddRange(assembly.SafeGetTypes());
-#endif
-                }
-                else if (assemblyFlag == AssemblyTypeFlags.OtherTypes)
-                {
-                    otherAssemblies.Add(assembly);
-#if USE_CACHED_VERSION
-                    otherTypes.AddRange(assembly.SafeGetTypes());
-#endif
-                }
-                else
-                {
-                    throw new NotImplementedException();
-                }
+                Type type = types[j];
+                stringTypeLookup[type.FullName] = type;
             }
-            catch (ReflectionTypeLoadException)
+
+            if (assemblyFlag == AssemblyTypeFlags.UserTypes)
             {
-                // This happens in builds if people are compiling with a subset of .NET
-                // It means we simply skip this assembly and its types completely when scanning for formatter types
+                userAssemblies.Add(assembly);
+                userTypes.AddRange(types);
             }
-        }
-
-        /// <summary>
-        /// Initializes the <see cref="AssemblyUtilities"/> class.
-        /// </summary>
-        static AssemblyUtilities()
-        {
-            AppDomain.CurrentDomain.AssemblyLoad += (sender, args) =>
+            else if (assemblyFlag == AssemblyTypeFlags.UserEditorTypes)
             {
-                if (!args.LoadedAssembly.IsDynamic() && !args.LoadedAssembly.ReflectionOnly)
-                {
-                    //Debug.Log("Loading assembly " + args.LoadedAssembly.GetName().Name + " late");
-                    RegisterAssembly(args.LoadedAssembly);
-                }
-            };
-
-            Reload();
+                userEditorAssemblies.Add(assembly);
+                userEditorTypes.AddRange(types);
+            }
+            else if (assemblyFlag == AssemblyTypeFlags.PluginTypes)
+            {
+                pluginAssemblies.Add(assembly);
+                pluginTypes.AddRange(types);
+            }
+            else if (assemblyFlag == AssemblyTypeFlags.PluginEditorTypes)
+            {
+                pluginEditorAssemblies.Add(assembly);
+                pluginEditorTypes.AddRange(types);
+            }
+            else if (assemblyFlag == AssemblyTypeFlags.UnityTypes)
+            {
+                unityAssemblies.Add(assembly);
+                unityTypes.AddRange(types);
+            }
+            else if (assemblyFlag == AssemblyTypeFlags.UnityEditorTypes)
+            {
+                unityEditorAssemblies.Add(assembly);
+                unityEditorTypes.AddRange(types);
+            }
+            else if (assemblyFlag == AssemblyTypeFlags.OtherTypes)
+            {
+                otherAssemblies.Add(assembly);
+                otherTypes.AddRange(types);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         /// <summary>
@@ -240,7 +270,8 @@ namespace Sirenix.Utilities
         /// <returns>An <see cref="ImmutableList"/> of all assemblies in the current <see cref="AppDomain"/>.</returns>
         public static ImmutableList<Assembly> GetAllAssemblies()
         {
-            return allAssembliesImmutable;
+            var array = allAssembliesImmutable.ToArray();
+            return new ImmutableList<Assembly>(array);
         }
 
         /// <summary>
@@ -253,16 +284,21 @@ namespace Sirenix.Utilities
         {
             if (assembly == null) throw new NullReferenceException("assembly");
 
-            AssemblyTypeFlags result;
+            EnsureIsFullyInitialized();
 
-            if (assemblyTypeFlagLookup.TryGetValue(assembly, out result) == false)
+            lock (ASSEMBLY_TYPE_FLAG_LOOKUP_LOCK)
             {
-                result = GetAssemblyTypeFlagNoLookup(assembly);
+                AssemblyTypeFlags result;
 
-                assemblyTypeFlagLookup[assembly] = result;
+                if (assemblyTypeFlagLookup.TryGetValue(assembly, out result) == false)
+                {
+                    result = GetAssemblyTypeFlagNoLookup(assembly);
+
+                    assemblyTypeFlagLookup[assembly] = result;
+                }
+
+                return result;
             }
-
-            return result;
         }
 
         private static AssemblyTypeFlags GetAssemblyTypeFlagNoLookup(Assembly assembly)
@@ -284,9 +320,20 @@ namespace Sirenix.Utilities
 
             bool isUserScriptAssembly = name.StartsWithAnyOf(userAssemblyPrefixes, StringComparison.InvariantCultureIgnoreCase);
             bool isPluginScriptAssembly = name.StartsWithAnyOf(pluginAssemblyPrefixes, StringComparison.InvariantCultureIgnoreCase);
-
             bool isGame = assembly.IsDependentOn(unityEngineAssembly);
             bool isPlugin = isPluginScriptAssembly || isInProject || (!isUserScriptAssembly && isInScriptAssemblies);
+
+            // HACK: Odin and other assemblies, but easpecially Odin, needs to be registered as a plugin if it's installed as a package from the Unity PackageManager.
+            // However there doesn't seemt to be any good way of figuring that out.
+
+            // TODO: Find a good way of figuring if it's a plugin when located installed as a package.
+            // Maybe it would be easier to figure out whether something was a Unity type, and then have plugin as fallback, instead of ther other way around, which
+            // is how it works now.
+            if (!isPlugin && name.StartsWith("sirenix."))
+            {
+                isPlugin = true;
+            }
+
             bool isUser = !isPlugin && isUserScriptAssembly;
 
 #if UNITY_EDITOR
@@ -343,16 +390,14 @@ namespace Sirenix.Utilities
         /// Gets the type.
         /// </summary>
         /// <param name="fullName">The full name of the type without any assembly information.</param>
-#if !USE_CACHED_VERSION
-        [Obsolete("Use AssemblyUtilities.GetType() instead")]
-#endif
         public static Type GetTypeByCachedFullName(string fullName)
         {
-#if USE_CACHED_VERSION
             if (string.IsNullOrEmpty(fullName))
             {
                 return null;
             }
+
+            EnsureIsFullyInitialized();
 
             Type type;
             if (stringTypeLookup.TryGetValue(fullName, out type))
@@ -361,32 +406,25 @@ namespace Sirenix.Utilities
             }
 
             return null;
-#else
-            for (int i = 0; i < allAssemblies.Count; i++)
-            {
-                var t = allAssemblies[i].GetType(fullName, false, false);
-                if (t != null)
-                {
-                    return t;
-                }
-            }
-
-            return null;
-#endif
         }
 
         /// <summary>
-        /// Looks in all assemblies for for the given type.
+        /// Gets the type.
         /// </summary>
+        [Obsolete("This method was renamed. Use GetTypeByCachedFullName instead.")]
         public static Type GetType(string fullName)
         {
-            for (int i = 0; i < allAssemblies.Count; i++)
+            if (string.IsNullOrEmpty(fullName))
             {
-                var t = allAssemblies[i].GetType(fullName, false, false);
-                if (t != null)
-                {
-                    return t;
-                }
+                return null;
+            }
+
+            EnsureIsFullyInitialized();
+
+            Type type;
+            if (stringTypeLookup.TryGetValue(fullName, out type))
+            {
+                return type;
             }
 
             return null;
@@ -413,7 +451,6 @@ namespace Sirenix.Utilities
             }
 
             var otherName = otherAssembly.GetName().ToString();
-
             var referencedAsssemblies = assembly.GetReferencedAssemblies();
 
             for (int i = 0; i < referencedAsssemblies.Length; i++)
@@ -438,15 +475,28 @@ namespace Sirenix.Utilities
         public static bool IsDynamic(this Assembly assembly)
         {
             if (assembly == null) throw new ArgumentNullException("assembly");
-            try
+
+            bool result;
+
+            lock (IS_DYNAMIC_CACHE_LOCK)
             {
-                // Will cover both System.Reflection.Emit.AssemblyBuilder and System.Reflection.Emit.InternalAssemblyBuilder
-                return assembly.GetType().FullName.EndsWith("AssemblyBuilder") || assembly.Location == null || assembly.Location == "";
+                if (!IsDynamicCache.TryGetValue(assembly, out result))
+                {
+                    try
+                    {
+                        // Will cover both System.Reflection.Emit.AssemblyBuilder and System.Reflection.Emit.InternalAssemblyBuilder
+                        result = assembly.GetType().FullName.EndsWith("AssemblyBuilder") || assembly.Location == null || assembly.Location == "";
+                    }
+                    catch
+                    {
+                        result = true;
+                    }
+
+                    IsDynamicCache.Add(assembly, result);
+                }
             }
-            catch
-            {
-                return true;
-            }
+
+            return result;
         }
 
         /// <summary>
@@ -548,6 +598,8 @@ namespace Sirenix.Utilities
         /// <returns>Types from the current AppDomain with the specified <see cref="AssemblyTypeFlags"/> filters.</returns>
         public static IEnumerable<Type> GetTypes(AssemblyTypeFlags assemblyTypeFlags)
         {
+            EnsureIsFullyInitialized();
+
             bool includeUserTypes = (assemblyTypeFlags & AssemblyTypeFlags.UserTypes) == AssemblyTypeFlags.UserTypes;
             bool includeUserEditorTypes = (assemblyTypeFlags & AssemblyTypeFlags.UserEditorTypes) == AssemblyTypeFlags.UserEditorTypes;
             bool includePluginTypes = (assemblyTypeFlags & AssemblyTypeFlags.PluginTypes) == AssemblyTypeFlags.PluginTypes;
@@ -556,7 +608,6 @@ namespace Sirenix.Utilities
             bool includeUnityEditorTypes = (assemblyTypeFlags & AssemblyTypeFlags.UnityEditorTypes) == AssemblyTypeFlags.UnityEditorTypes;
             bool includeOtherTypes = (assemblyTypeFlags & AssemblyTypeFlags.OtherTypes) == AssemblyTypeFlags.OtherTypes;
 
-#if USE_CACHED_VERSION
             if (includeUserTypes) for (int i = 0; i < userTypes.Count; i++) yield return userTypes[i];
             if (includeUserEditorTypes) for (int i = 0; i < userEditorTypes.Count; i++) yield return userEditorTypes[i];
             if (includePluginTypes) for (int i = 0; i < pluginTypes.Count; i++) yield return pluginTypes[i];
@@ -564,85 +615,7 @@ namespace Sirenix.Utilities
             if (includeUnityTypes) for (int i = 0; i < unityTypes.Count; i++) yield return unityTypes[i];
             if (includeUnityEditorTypes) for (int i = 0; i < unityEditorTypes.Count; i++) yield return unityEditorTypes[i];
             if (includeOtherTypes) for (int i = 0; i < otherTypes.Count; i++) yield return otherTypes[i];
-#else
-            if (includeUserTypes)
-            {
-                for (int i = 0; i < userAssemblies.Count; i++)
-                {
-                    var types = userAssemblies[i].SafeGetTypes();
-                    for (int j = 0; j < types.Length; j++)
-                    {
-                        yield return types[j];
-                    }
-                }
-            }
-            if (includeUserEditorTypes)
-            {
-                for (int i = 0; i < userEditorAssemblies.Count; i++)
-                {
-                    var types = userEditorAssemblies[i].SafeGetTypes();
-                    for (int j = 0; j < types.Length; j++)
-                    {
-                        yield return types[j];
-                    }
-                }
-            }
-            if (includePluginTypes)
-            {
-                for (int i = 0; i < pluginAssemblies.Count; i++)
-                {
-                    var types = pluginAssemblies[i].SafeGetTypes();
-                    for (int j = 0; j < types.Length; j++)
-                    {
-                        yield return types[j];
-                    }
-                }
-            }
-            if (includePluginEditorTypes)
-            {
-                for (int i = 0; i < pluginEditorAssemblies.Count; i++)
-                {
-                    var types = pluginEditorAssemblies[i].SafeGetTypes();
-                    for (int j = 0; j < types.Length; j++)
-                    {
-                        yield return types[j];
-                    }
-                }
-            }
-            if (includeUnityTypes)
-            {
-                for (int i = 0; i < unityAssemblies.Count; i++)
-                {
-                    var types = unityAssemblies[i].SafeGetTypes();
-                    for (int j = 0; j < types.Length; j++)
-                    {
-                        yield return types[j];
-                    }
-                }
-            }
-            if (includeUnityEditorTypes)
-            {
-                for (int i = 0; i < unityEditorAssemblies.Count; i++)
-                {
-                    var types = unityEditorAssemblies[i].SafeGetTypes();
-                    for (int j = 0; j < types.Length; j++)
-                    {
-                        yield return types[j];
-                    }
-                }
-            }
-            if (includeOtherTypes)
-            {
-                for (int i = 0; i < otherAssemblies.Count; i++)
-                {
-                    var types = otherAssemblies[i].SafeGetTypes();
-                    for (int j = 0; j < types.Length; j++)
-                    {
-                        yield return types[j];
-                    }
-                }
-            }
-#endif
+
         }
 
         public static Type[] SafeGetTypes(this Assembly assembly)

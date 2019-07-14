@@ -12,7 +12,7 @@ namespace Sirenix.Serialization
     /// </summary>
     /// <typeparam name="TKey">The type of the key.</typeparam>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <seealso cref="KeyValuePair{TKey,TValue}" />
+    /// <seealso cref="BaseFormatter{System.Collections.Generic.KeyValuePair{TKey, TValue}}" />
     public sealed class KeyValuePairFormatter<TKey, TValue> : BaseFormatter<KeyValuePair<TKey, TValue>>
     {
         private static readonly Serializer<TKey> KeySerializer = Serializer.Get<TKey>();

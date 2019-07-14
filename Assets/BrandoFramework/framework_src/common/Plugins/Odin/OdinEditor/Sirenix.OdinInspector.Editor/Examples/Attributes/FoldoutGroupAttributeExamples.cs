@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(FoldoutGroupAttribute))]
-    public class FoldoutGroupAttributeExamples
+    internal class FoldoutGroupAttributeExamples
     {
         [FoldoutGroup("Group 1")]
         public int A;

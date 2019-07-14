@@ -9,8 +9,9 @@ namespace Sirenix.OdinInspector.Editor.Examples
 
     // Inheriting from SerializedMonoBehaviour is only needed if you want Odin to serialize the multi-dimensional arrays for you.
     // If you prefer doing that yourself, you can still make Odin show them in the inspector using the ShowInInspector attribute.
+    [ShowOdinSerializedPropertiesInInspector]
     [AttributeExample(typeof(TableMatrixAttribute), "Right-click and drag the column and row labels in order to modify the tables.")]
-    public class TableMatrixExamples
+    internal class TableMatrixExamples
     {
         [TableMatrix(SquareCells = true)]
         public GameObject[,] PrefabMatrix = new GameObject[8, 4];
@@ -26,6 +27,9 @@ namespace Sirenix.OdinInspector.Editor.Examples
 
         [TableMatrix(HorizontalTitle = "Custom Cell Drawing", DrawElementMethod = "DrawColoredEnumElement", ResizableColumns = false, RowHeight = 16)]
         public bool[,] CustomCellDrawing = new bool[30, 30];
+
+        [TableMatrix(HorizontalTitle = "Transposed Custom Cell Drawing", DrawElementMethod = "DrawColoredEnumElement", ResizableColumns = false, RowHeight = 16, Transpose = true), ShowInInspector, DoNotDrawAsReference]
+        public bool[,] Transposed { get { return CustomCellDrawing; } set { CustomCellDrawing = value; } }
 
         private static bool DrawColoredEnumElement(Rect rect, bool value)
         {

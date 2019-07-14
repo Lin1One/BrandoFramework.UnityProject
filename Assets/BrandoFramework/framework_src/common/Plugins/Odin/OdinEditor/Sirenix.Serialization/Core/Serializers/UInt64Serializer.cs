@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="ulong"/> type.
     /// </summary>
-    /// <seealso cref="ulong" />
+    /// <seealso cref="Serializer{System.UInt64}" />
     public sealed class UInt64Serializer : Serializer<ulong>
     {
         /// <summary>

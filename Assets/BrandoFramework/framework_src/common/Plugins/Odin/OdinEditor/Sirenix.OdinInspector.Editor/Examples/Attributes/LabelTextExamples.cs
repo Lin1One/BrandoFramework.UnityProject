@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(LabelTextAttribute), "Specify a different label text for your properties.")]
-    public class LabelTextExamples
+    internal class LabelTextExamples
     {
         [LabelText("1")]
         public int MyInt1;

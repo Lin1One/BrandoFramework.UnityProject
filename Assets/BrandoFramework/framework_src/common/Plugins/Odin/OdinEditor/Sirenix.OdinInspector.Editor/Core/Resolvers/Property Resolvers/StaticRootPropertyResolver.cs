@@ -5,6 +5,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor
 {
     using System;
@@ -12,7 +13,6 @@ namespace Sirenix.OdinInspector.Editor
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using Sirenix.Serialization;
     using Sirenix.Utilities;
 
     [OdinDontRegister] // DefaultOdinPropertyResolverLocator handles putting this on static tree root properties

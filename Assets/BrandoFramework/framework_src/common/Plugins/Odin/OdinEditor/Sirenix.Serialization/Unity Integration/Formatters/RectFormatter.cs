@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="Rect"/> type.
     /// </summary>
-    /// <seealso cref="Rect" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Rect}" />
     public class RectFormatter : MinimalBaseFormatter<Rect>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();

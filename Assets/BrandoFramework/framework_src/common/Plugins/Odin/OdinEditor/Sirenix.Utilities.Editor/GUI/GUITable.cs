@@ -139,6 +139,11 @@ namespace Sirenix.Utilities.Editor
         public Rect TableRect { get { return this.tableRect; } }
 
         /// <summary>
+        /// Whether to respect the current GUI indent level.
+        /// </summary>
+        public bool RespectIndentLevel = true;
+
+        /// <summary>
         /// Gets or sets a <see cref="GUITableCell"/> from the <see cref="GUITable"/>.
         /// </summary>
         public GUITableCell this[int x, int y]
@@ -199,6 +204,11 @@ namespace Sirenix.Utilities.Editor
             }
 
             var newRect = GUILayoutUtility.GetRect(0, this.minTalbeSize.y > 0 ? this.minTalbeSize.y : 10, guiLayoutOptions);
+
+            if (this.RespectIndentLevel)
+            {
+                newRect = UnityEditor.EditorGUI.IndentedRect(newRect);
+            }
 
             // Recalcualte sizes if resized.
             if (e == EventType.Repaint)
@@ -305,6 +315,8 @@ namespace Sirenix.Utilities.Editor
                 }
             }
 
+            GUIHelper.PushIndentLevel(0);
+
             // Draw Cells:
             for (int x = 0; x < this.ColumnCount; x++)
             {
@@ -317,6 +329,8 @@ namespace Sirenix.Utilities.Editor
                     }
                 }
             }
+
+            GUIHelper.PopIndentLevel();
         }
 
         /// <summary>

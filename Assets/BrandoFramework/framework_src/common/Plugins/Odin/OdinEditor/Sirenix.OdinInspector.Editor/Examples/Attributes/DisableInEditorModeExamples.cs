@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(DisableInEditorModeAttribute))]
-    public class DisableInEditorModeExamples
+    internal class DisableInEditorModeExamples
     {
         [Title("Disabled in edit mode")]
         [DisableInEditorMode]

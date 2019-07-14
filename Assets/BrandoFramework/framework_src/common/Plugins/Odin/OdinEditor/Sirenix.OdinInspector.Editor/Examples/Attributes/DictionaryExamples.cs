@@ -6,8 +6,9 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
     using System.Collections.Generic;
 
+    [ShowOdinSerializedPropertiesInInspector]
     [AttributeExample(typeof(DictionaryDrawerSettings))]
-    public class DictionaryExamples
+    internal class DictionaryExamples
     {
         [InfoBox("In order to serialize dictionaries, all we need to do is to inherit our class from SerializedMonoBehaviour.")]
         public Dictionary<int, Material> IntMaterialLookup;

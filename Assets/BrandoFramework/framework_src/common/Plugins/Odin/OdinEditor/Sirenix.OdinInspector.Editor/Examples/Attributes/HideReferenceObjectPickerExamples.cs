@@ -3,10 +3,11 @@
 #pragma warning disable
 namespace Sirenix.OdinInspector.Editor.Examples
 {
+    [ShowOdinSerializedPropertiesInInspector]
     [AttributeExample(typeof(HideReferenceObjectPickerAttribute),
         "When the object picker is hidden, you can right click and set the instance to null, in order to set a new value.\n\n" +
         "If you don't want this behavior, you can use DisableContextMenu attribute to ensure people can't change the value.")]
-    public class HideReferenceObjectPickerExamples
+    internal class HideReferenceObjectPickerExamples
     {
         [Title("Hidden Object Pickers")]
         [HideReferenceObjectPicker]

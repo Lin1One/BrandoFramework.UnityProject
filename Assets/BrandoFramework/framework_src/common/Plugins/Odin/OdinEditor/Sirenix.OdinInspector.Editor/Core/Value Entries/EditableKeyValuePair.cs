@@ -30,16 +30,20 @@ namespace Sirenix.OdinInspector.Editor
         public TValue Value;
 
         [NonSerialized]
+        public bool IsTempKey;
+
+        [NonSerialized]
         public bool IsInvalidKey;
 
         /// <summary>
         /// Not yet documented.
         /// </summary>
-        public EditableKeyValuePair(TKey key, TValue value, bool isInvalidKey)
+        public EditableKeyValuePair(TKey key, TValue value, bool isInvalidKey, bool isTempKey)
         {
             this.Key = key;
             this.Value = value;
             this.IsInvalidKey = isInvalidKey;
+            this.IsTempKey = isTempKey;
         }
 
         /// <summary>

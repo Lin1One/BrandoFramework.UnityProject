@@ -5,7 +5,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(ShowInInspectorAttribute),
         "ShowInInspector is used to display properties that otherwise wouldn't be shown in the inspector. Such as non-serialized fields or properties.")]
-    public class ShowInInspectorExamples
+    internal class ShowInInspectorExamples
     {
         [ShowInInspector]
         private int myPrivateInt;

@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     [AttributeExample(typeof(FolderPathAttribute),
         "FolderPath attribute provides a neat interface for assigning paths to strings.\n" +
         "It also supports drag and drop from the project folder.")]
-	public sealed class FolderPathExamples
+    internal sealed class FolderPathExamples
 	{
 		// By default, FolderPath provides a path relative to the Unity project.
 		[FolderPath]

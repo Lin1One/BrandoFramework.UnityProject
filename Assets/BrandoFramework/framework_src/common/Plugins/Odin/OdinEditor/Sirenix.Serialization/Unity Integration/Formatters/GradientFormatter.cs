@@ -5,13 +5,14 @@ using Sirenix.Serialization;
 
 namespace Sirenix.Serialization
 {
+    using System;
     using System.Reflection;
     using UnityEngine;
 
     /// <summary>
     /// Custom formatter for the <see cref="Gradient"/> type.
     /// </summary>
-    /// <seealso cref="Gradient" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Gradient}" />
     public class GradientFormatter : MinimalBaseFormatter<Gradient>
     {
         private static readonly Serializer<GradientAlphaKey[]> AlphaKeysSerializer = Serializer.Get<GradientAlphaKey[]>();
@@ -43,13 +44,20 @@ namespace Sirenix.Serialization
 
             if (name == "mode")
             {
-                if (ModeProperty != null)
+                try
                 {
-                    ModeProperty.SetValue(value, EnumSerializer.ReadValue(reader), null);
+                    if (ModeProperty != null)
+                    {
+                        ModeProperty.SetValue(value, EnumSerializer.ReadValue(reader), null);
+                    }
+                    else
+                    {
+                        reader.SkipEntry();
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    reader.SkipEntry();
+                    reader.Context.Config.DebugContext.LogWarning("Failed to read Gradient.mode, due to Unity's API disallowing setting of this member on other threads than the main thread. Gradient.mode value will have been lost.");
                 }
             }
         }
@@ -66,7 +74,15 @@ namespace Sirenix.Serialization
 
             if (ModeProperty != null)
             {
-                EnumSerializer.WriteValue("mode", ModeProperty.GetValue(value, null), writer);
+                try
+                {
+                    EnumSerializer.WriteValue("mode", ModeProperty.GetValue(value, null), writer);
+                }
+                catch (Exception)
+                {
+                    writer.Context.Config.DebugContext.LogWarning("Failed to write Gradient.mode, due to Unity's API disallowing setting of this member on other threads than the main thread. Gradient.mode will have been lost upon deserialization.");
+                }
+
             }
         }
     }

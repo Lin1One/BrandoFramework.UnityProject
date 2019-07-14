@@ -16,7 +16,7 @@ namespace Sirenix.OdinInspector.Editor
     using Utilities.Editor;
     using UnityEditor;
     using UnityEngine;
-    using UnityEngine.Networking;
+    using Sirenix.OdinInspector.Internal;
 
     /// <summary>
     /// Not yet documented.
@@ -197,6 +197,7 @@ namespace Sirenix.OdinInspector.Editor
                 }
             }
         }
+
         private void DrawOdinInspector()
         {
             EnsureInitialized();
@@ -233,12 +234,21 @@ namespace Sirenix.OdinInspector.Editor
 
             this.DrawTree();
 
-            NetworkBehaviour networkBehaviour = this.target as NetworkBehaviour;
+            //NetworkBehaviour networkBehaviour = this.target as NetworkBehaviour;
 
-            if (networkBehaviour != null && !networkBehaviour.GetType().IsDefined(typeof(HideNetworkBehaviourFieldsAttribute), true))
+            //if (networkBehaviour != null && !networkBehaviour.GetType().IsDefined(typeof(HideNetworkBehaviourFieldsAttribute), true))
+            //{
+            //    EditorGUILayout.LabelField(networkChannelLabel, GUIHelper.TempContent(networkBehaviour.GetNetworkChannel().ToString()));
+            //    EditorGUILayout.LabelField(networkSendIntervalLabel, GUIHelper.TempContent(networkBehaviour.GetNetworkSendInterval().ToString()));
+            //}
+
+            if (UnityNetworkingUtility.NetworkBehaviourType != null && UnityNetworkingUtility.NetworkBehaviourType.IsAssignableFrom(this.target.GetType()))
             {
-                EditorGUILayout.LabelField(networkChannelLabel, GUIHelper.TempContent(networkBehaviour.GetNetworkChannel().ToString()));
-                EditorGUILayout.LabelField(networkSendIntervalLabel, GUIHelper.TempContent(networkBehaviour.GetNetworkSendInterval().ToString()));
+                if (this.target.GetType().IsDefined<HideNetworkBehaviourFieldsAttribute>(true) == false)
+                {
+                    EditorGUILayout.LabelField(networkChannelLabel, GUIHelper.TempContent(UnityNetworkingUtility.GetNetworkChannel(this.target as MonoBehaviour).ToString()));
+                    EditorGUILayout.LabelField(networkSendIntervalLabel, GUIHelper.TempContent(UnityNetworkingUtility.GetNetworkingInterval(this.target as MonoBehaviour).ToString()));
+                }
             }
 
             this.RepaintWarmup();

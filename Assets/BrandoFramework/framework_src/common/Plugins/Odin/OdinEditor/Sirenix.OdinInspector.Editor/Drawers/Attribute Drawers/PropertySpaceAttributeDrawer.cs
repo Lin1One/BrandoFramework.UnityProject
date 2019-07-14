@@ -8,7 +8,6 @@
 
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
-    using UnityEditor;
     using UnityEngine;
 
     /// <summary>
@@ -43,24 +42,14 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            if (this.drawSpace)
+            if (this.drawSpace && this.Attribute.SpaceBefore != 0f)
             {
-                var attribute = this.Attribute;
-
-
-                if (attribute.SpaceBefore == 0)
-                {
-                    EditorGUILayout.Space();
-                }
-                else
-                {
-                    GUILayout.Space(attribute.SpaceBefore);
-                }
+                GUILayout.Space(this.Attribute.SpaceBefore);
             }
 
             this.CallNextDrawer(label);
 
-            if (this.Attribute.SpaceAfter != 0)
+            if (this.Attribute.SpaceAfter != 0f)
             {
                 GUILayout.Space(this.Attribute.SpaceAfter);
             }

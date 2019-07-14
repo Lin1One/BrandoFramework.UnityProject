@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(OnInspectorGUIAttribute))]
-    public class OnInspectorGUIExamples
+    internal class OnInspectorGUIExamples
     {
         [OnInspectorGUI("DrawPreview", append: true)]
         public Texture2D Texture;

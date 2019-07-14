@@ -7,10 +7,11 @@
 //-----------------------------------------------------------------------
 namespace Sirenix.OdinInspector.Editor
 {
-    using Sirenix.Utilities;
-    using System.Reflection;
     using System;
     using UnityEngine;
+    using Sirenix.Utilities.Editor.Expressions;
+    using Sirenix.Utilities;
+    using System.Reflection;
 
     /// <summary>
     ///	Helper class to handle strings for labels and other similar purposes.
@@ -22,9 +23,15 @@ namespace Sirenix.OdinInspector.Editor
         private string buffer;
         private string rawString;
         private string errorMessage;
+        private readonly Type objectType;
+
+        // TODO: Expression temporarily disabled.
+        //private Delegate method;
+        //private bool isStatic;
+
+        // Obsolete:
         private Func<object> staticValueGetter;
         private Func<object, object> instanceValueGetter;
-        private readonly Type objectType;
 
         /// <summary>
         /// If any error occurred while looking for members, it will be stored here.
@@ -38,6 +45,11 @@ namespace Sirenix.OdinInspector.Editor
         /// <param name="path">The input string. If the first character is a '$', then StringMemberHelper will look for a member string field, property or method.</param>
         /// <param name="allowInstanceMember">If <c>true</c>, then StringMemberHelper will look for instance members.</param>
         /// <param name="allowStaticMember">If <c>true</c>, then StringMemberHelper will look for static members.</param>
+        [Obsolete("Use the contructor with the InspectorProperty argument instead."
+//#if SIRENIX_INTERNAL
+//            , true
+//#endif
+            )]
         public StringMemberHelper(Type objectType, string path, bool allowInstanceMember = true, bool allowStaticMember = true)
         {
             this.rawString = path;
@@ -46,7 +58,6 @@ namespace Sirenix.OdinInspector.Editor
             if (path != null && objectType != null && path.Length > 0 && path[0] == '$')
             {
                 path = path.Substring(1);
-                MemberInfo member;
 
                 var finder = MemberFinder.Start(objectType)
                     .HasReturnType<object>(true)
@@ -66,6 +77,7 @@ namespace Sirenix.OdinInspector.Editor
                     finder.IsInstance();
                 }
 
+                MemberInfo member;
                 if (finder.TryGetMember(out member, out this.errorMessage))
                 {
                     if (member is MethodInfo)
@@ -93,6 +105,11 @@ namespace Sirenix.OdinInspector.Editor
         /// <param name="errorMessage">Error message buffer. If the string is not equal to <c>null</c>, the StringMemberHelper will not run.</param>
         /// <param name="allowInstanceMember">If <c>true</c>, then StringMemberHelper will look for instance members.</param>
         /// <param name="allowStaticMember">If <c>true</c>, then StringMemberHelper will look for static members.</param>
+        [Obsolete("Use the contructor with the InspectorProperty argument instead."
+//#if SIRENIX_INTERNAL
+//            , true
+//#endif
+            )]
         public StringMemberHelper(Type objectType, string path, ref string errorMessage, bool allowInstanceMember = true, bool allowStaticMember = true)
             : this(objectType, path, allowInstanceMember, allowStaticMember)
         {
@@ -102,12 +119,39 @@ namespace Sirenix.OdinInspector.Editor
             }
         }
 
+        public StringMemberHelper(InspectorProperty property, string expression) : this(property.ParentType, property.ParentValueProperty == null && property.Tree.IsStatic, expression)
+        {
+        }
+
+        public StringMemberHelper(InspectorProperty property, string expression, ref string errorMessage) : this(property, expression)
+        {
+            if (errorMessage == null)
+            {
+                errorMessage = this.ErrorMessage;
+            }
+        }
+#pragma warning disable 0618
+        // TODO: Expression temporarily disabled. Remove call to this(type, string, bool, bool) constructor, and restore method body.
+        public StringMemberHelper(Type objectType, bool isStatic, string expression) : this(objectType, expression, isStatic == false, true)
+#pragma warning restore 0618
+        {
+            // DO NOT DELETE.
+            //this.rawString = expression;
+            //if (expression != null && expression.Length > 0 && expression[0] == '$')
+            //{
+            //    expression = expression.Substring(1);
+            //    this.isStatic = isStatic;
+            //    this.method = ExpressionCompilerUtility.CompileExpression(expression, this.isStatic, objectType, out this.errorMessage);
+            //}
+        }
+
         /// <summary>
         /// Gets a value indicating whether or not the string is retrived from a from a member. 
         /// </summary>
         public bool IsDynamicString
         {
-            get { return this.instanceValueGetter != null || this.staticValueGetter != null; }
+            // TODO: Expression temporarily disabled.
+            get { return /*this.method != null ||*/ this.instanceValueGetter != null || this.staticValueGetter != null; }
         }
 
         /// <summary>
@@ -184,6 +228,22 @@ namespace Sirenix.OdinInspector.Editor
             {
                 return "Error";
             }
+
+            // TODO: Expression temporarily disabled.
+            //if (this.method != null)
+            //{
+            //    object o;
+            //    if (this.isStatic)
+            //    {
+            //        o = this.method.DynamicInvoke();
+            //    }
+            //    else
+            //    {
+            //        o = this.method.DynamicInvoke(instance);
+            //    }
+
+            //    return (o == null) ? "Null" : o.ToString();
+            //}
 
             if (this.staticValueGetter != null)
             {

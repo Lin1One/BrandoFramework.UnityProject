@@ -554,7 +554,7 @@ namespace Sirenix.Utilities
         }
 
         /// <summary>
-        /// Adds the elements of the specified collection to the end of the IList<T>.
+        /// Adds the elements of the specified collection to the end of the IList&lt;T&gt;.
         /// </summary>
         public static void AddRange<T>(this IList<T> list, IEnumerable<T> collection)
         {

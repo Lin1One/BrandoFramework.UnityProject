@@ -156,9 +156,9 @@ namespace Sirenix.OdinInspector.Editor
                 throw new InvalidOperationException("Editor Only Mode enabled.");
             }
 
-            string assemblyPath = Path.Combine("Assets", SirenixAssetPaths.SirenixAssembliesPath);
-            var aotAssemblies = Directory.GetFiles(Path.Combine(assemblyPath, AOTAssemblyFolder), "*.dll");
-            var jitAssemblies = Directory.GetFiles(Path.Combine(assemblyPath, JITAssemblyFolder), "*.dll");
+            string assemblyPath = SirenixAssetPaths.SirenixAssembliesPath;
+            var aotAssemblies = Directory.GetFiles(assemblyPath + AOTAssemblyFolder, "*.dll");
+            var jitAssemblies = Directory.GetFiles(assemblyPath + JITAssemblyFolder, "*.dll");
 
             var option = this.currentOption;
             if (option == OdinAssemblyOptions.Recommended)
@@ -195,7 +195,8 @@ namespace Sirenix.OdinInspector.Editor
         {
             foreach (var path in assemblyPaths)
             {
-                AssemblyImportSettingsUtilities.SetAssemblyImportSettings(platform, path, importSettings);
+                var p = path.Replace('\\', '/');
+                AssemblyImportSettingsUtilities.SetAssemblyImportSettings(platform, p, importSettings);
             }
         }
 

@@ -22,7 +22,14 @@ namespace Sirenix.Utilities
         /// </summary>
         public static bool IsDefined<T>(this ICustomAttributeProvider member, bool inherit) where T : Attribute
         {
-            return member.IsDefined(typeof(T), inherit);
+            try
+            {
+                return member.IsDefined(typeof(T), inherit);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -40,7 +47,7 @@ namespace Sirenix.Utilities
         public static T GetAttribute<T>(this ICustomAttributeProvider member, bool inherit) where T : Attribute
         {
             var all = GetAttributes<T>(member, inherit).ToArray();
-            return all.IsNullOrEmpty() ? null : all[0];
+            return (all == null || all.Length == 0) ? null : all[0];
         }
 
         /// <summary>
@@ -68,7 +75,14 @@ namespace Sirenix.Utilities
         /// <param name="inherit">If true, specifies to also search the ancestors of element for custom attributes.</param>
         public static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider member, bool inherit) where T : Attribute
         {
-            return member.GetCustomAttributes(typeof(T), inherit).Cast<T>();
+            try
+            {
+                return member.GetCustomAttributes(typeof(T), inherit).Cast<T>();
+            }
+            catch
+            {
+                return new T[0];
+            }
         }
 
         /// <summary>
@@ -77,7 +91,14 @@ namespace Sirenix.Utilities
         /// <param name="member">The member.</param>
         public static Attribute[] GetAttributes(this ICustomAttributeProvider member)
         {
-            return member.GetAttributes<Attribute>().ToArray();
+            try
+            {
+                return member.GetAttributes<Attribute>().ToArray();
+            }
+            catch
+            {
+                return new Attribute[0];
+            }
         }
 
         /// <summary>
@@ -87,7 +108,14 @@ namespace Sirenix.Utilities
         /// <param name="inherit">If true, specifies to also search the ancestors of element for custom attributes.</param>
         public static Attribute[] GetAttributes(this ICustomAttributeProvider member, bool inherit)
         {
-            return member.GetAttributes<Attribute>(inherit).ToArray();
+            try
+            {
+                return member.GetAttributes<Attribute>(inherit).ToArray();
+            }
+            catch
+            {
+                return new Attribute[0];
+            }
         }
 
         /// <summary>

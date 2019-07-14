@@ -45,6 +45,11 @@ namespace Sirenix.OdinInspector.Editor
         private bool? supportsPrefabModifications = null;
 
         /// <summary>
+        /// Gets the property which is the ultimate root of this property's serialization.
+        /// </summary>
+        public InspectorProperty SerializationRoot { get; private set; }
+
+        /// <summary>
         /// The name of the property.
         /// </summary>
         public string Name { get; private set; }
@@ -175,11 +180,11 @@ namespace Sirenix.OdinInspector.Editor
                     }
                     else if (this.Tree.PrefabModificationHandler.HasNestedOdinPrefabData)
                     {
-                        return false;
+                        this.supportsPrefabModifications = false;
                     }
                     else if (this == this.Tree.SecretRootProperty)
                     {
-                        return false;
+                        this.supportsPrefabModifications = false;
                     }
                     else if (this.ValueEntry == null || (this.ParentValueProperty != null && !this.ParentValueProperty.SupportsPrefabModifications))
                     {
@@ -287,7 +292,7 @@ namespace Sirenix.OdinInspector.Editor
         /// </summary>
         public ImmutableList ParentValues { get; private set; }
 
-        internal InspectorProperty ParentValueProperty { get; private set; }
+        public InspectorProperty ParentValueProperty { get; private set; }
 
         /// <summary>
         /// <para>The full Unity property path of this property; note that this is merely a converted version of <see cref="Path"/>, and not necessarily a path to an actual Unity property.</para>
@@ -462,9 +467,9 @@ namespace Sirenix.OdinInspector.Editor
         }
 
         /// <summary>
-        /// Draws this property in the inspector with a given label.
+        /// Draws this property in the inspector with a given default label. This default label may be overridden by attributes on the drawn property.
         /// </summary>
-        public void Draw(GUIContent label)
+        public void Draw(GUIContent defaultLabel)
         {
             this.Update();
 
@@ -534,7 +539,7 @@ namespace Sirenix.OdinInspector.Editor
                                 GUIHelper.PushGUIEnabled(false);
                             }
                             
-                            chain.Current.DrawProperty(label);
+                            chain.Current.DrawProperty(defaultLabel);
 
                             if (popPushGUIEnabled)
                             {
@@ -896,36 +901,36 @@ namespace Sirenix.OdinInspector.Editor
             return false;
         }
 
-        internal void ForceUpdatePropertyNameAndPath(int? newIndex)
-        {
-            if (newIndex != null)
-            {
-                this.Index = newIndex.Value;
-            }
+        //internal void ForceUpdatePropertyNameAndPath(int? newIndex)
+        //{
+        //    if (newIndex != null)
+        //    {
+        //        this.Index = newIndex.Value;
+        //    }
 
-            this.unityPropertyPath = null;
-            this.prefabModificationPath = null;
+        //    this.unityPropertyPath = null;
+        //    this.prefabModificationPath = null;
 
-            if (this.Parent != null)
-            {
-                this.Path = this.Parent.Children.GetPath(this.Index);
-            }
-            else
-            {
-                this.Path = this.Info.PropertyName;
-            }
+        //    if (this.Parent != null)
+        //    {
+        //        this.Path = this.Parent.Children.GetPath(this.Index);
+        //    }
+        //    else
+        //    {
+        //        this.Path = this.Info.PropertyName;
+        //    }
 
-            // Children may be null, as this may be called before the property has ever updated itself
-            if (this.Children != null)
-            {
-                this.Children.ClearCaches();
+        //    // Children may be null, as this may be called before the property has ever updated itself
+        //    if (this.Children != null)
+        //    {
+        //        this.Children.ClearCaches();
 
-                for (int i = 0; i < this.Children.Count; i++)
-                {
-                    this.Children[i].ForceUpdatePropertyNameAndPath(null);
-                }
-            }
-        }
+        //        for (int i = 0; i < this.Children.Count; i++)
+        //        {
+        //            this.Children[i].ForceUpdatePropertyNameAndPath(null);
+        //        }
+        //    }
+        //}
 
         internal static InspectorProperty Create(PropertyTree tree, InspectorProperty parent, InspectorPropertyInfo info, int index, bool isSecretRoot)
         {
@@ -956,27 +961,31 @@ namespace Sirenix.OdinInspector.Editor
             // Now start building a property
             InspectorProperty property = new InspectorProperty();
 
+            // Set some basic values
             property.Tree = tree;
-
-            if (parent != null)
-            {
-                property.Path = parent.Children.GetPath(index);
-            }
-            else
-            {
-                property.Path = info.PropertyName;
-            }
-
+            property.Info = info;
             property.Parent = parent;
-
             property.Index = index;
             property.Context = new PropertyContextContainer(property);
 
-            if (property.Path == null)
+            // Find property path
             {
-                Debug.Log("Property path is null for property " + ObjectNames.NicifyVariableName(info.PropertyName.TrimStart('#', '$')) + "!");
+                if (parent != null)
+                {
+                    property.Path = parent.Children.GetPath(index);
+                }
+                else
+                {
+                    property.Path = info.PropertyName;
+                }
+
+                if (property.Path == null)
+                {
+                    Debug.Log("Property path is null for property " + ObjectNames.NicifyVariableName(info.PropertyName.TrimStart('#', '$')) + "!");
+                }
             }
 
+            // Find parent value property
             if (parent != null)
             {
                 InspectorProperty current = property;
@@ -990,6 +999,7 @@ namespace Sirenix.OdinInspector.Editor
                 property.ParentValueProperty = current;
             }
 
+            // Set parent type and values
             if (property.ParentValueProperty != null)
             {
                 property.ParentType = property.ParentValueProperty.ValueEntry.TypeOfValue;
@@ -1001,29 +1011,51 @@ namespace Sirenix.OdinInspector.Editor
                 property.ParentValues = new ImmutableList(tree.WeakTargets);
             }
 
-            property.Info = info;
-            property.Name = info.PropertyName;
-
-            var mi = property.Info.GetMemberInfo() as MethodInfo;
-            if (mi != null)
+            // Find serializing/owning property
             {
-                var name = property.Name;
-                var parensIndex = name.IndexOf('(');
+                InspectorProperty current = property.ParentValueProperty;
 
-                if (parensIndex >= 0)
+                while (current != null && !current.ValueEntry.TypeOfValue.InheritsFrom(typeof(UnityEngine.Object)))
                 {
-                    name = name.Substring(0, parensIndex);
+                    current = current.ParentValueProperty;
                 }
 
-                property.NiceName = name.TrimStart('#', '$').SplitPascalCase();
+                if (current != null)
+                {
+                    property.SerializationRoot = current;
+                }
+                else
+                {
+                    property.SerializationRoot = isSecretRoot ? property : tree.SecretRootProperty;
+                }
             }
-            else
+
+            // Set name and label
             {
-                property.NiceName = ObjectNames.NicifyVariableName(property.Name.TrimStart('#', '$'));
+                property.Name = info.PropertyName;
+
+                var mi = property.Info.GetMemberInfo() as MethodInfo;
+                if (mi != null)
+                {
+                    var name = property.Name;
+                    var parensIndex = name.IndexOf('(');
+
+                    if (parensIndex >= 0)
+                    {
+                        name = name.Substring(0, parensIndex);
+                    }
+
+                    property.NiceName = name.TrimStart('#', '$').SplitPascalCase();
+                }
+                else
+                {
+                    property.NiceName = ObjectNames.NicifyVariableName(property.Name.TrimStart('#', '$'));
+                }
+
+                property.Label = new GUIContent(property.NiceName);
             }
 
-            property.Label = new GUIContent(property.NiceName);
-
+            // Create a value entry if necessary
             if (property.Info.PropertyType == PropertyType.Value)
             {
                 property.BaseValueEntry = PropertyValueEntry.Create(property, info.TypeOfValue, isSecretRoot);
@@ -1101,27 +1133,60 @@ namespace Sirenix.OdinInspector.Editor
                 foreach (var drawer in drawerChain.BakedDrawerArray)
                 {
                     IDisposable disposable = drawer as IDisposable;
-                    if (disposable != null) disposable.Dispose();
+                    if (disposable != null)
+                    {
+                        try
+                        {
+                            disposable.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.LogException(ex);
+                        }
+                    }
                 }
             }
 
             if (this.ChildResolver is IDisposable)
             {
-                (this.ChildResolver as IDisposable).Dispose();
+                try
+                {
+                    (this.ChildResolver as IDisposable).Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
             }
 
             if (this.ValueEntry != null)
             {
-                this.ValueEntry.Dispose();
+                try
+                {
+                    this.ValueEntry.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
             }
 
             if (this.Children != null)
             {
                 foreach (var child in this.Children.GetExistingChildren())
                 {
-                    child.Dispose();
+                    try
+                    {
+                        child.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
                 }
             }
+
+            this.Tree.NotifyPropertyDisposed(this);
         }
     }
 }

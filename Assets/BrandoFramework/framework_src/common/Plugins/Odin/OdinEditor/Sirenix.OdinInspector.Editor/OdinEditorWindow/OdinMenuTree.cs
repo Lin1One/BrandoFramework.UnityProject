@@ -83,6 +83,7 @@ namespace Sirenix.OdinInspector.Editor
         private OdinMenuItem scrollToWhenReady;
         private string searchFieldControlName;
         private bool isDirty;
+        private bool updateSearchResults;
         private bool regainFocusWhenWindowFocus;
         private bool currWindowHasFocus;
         internal static Rect VisibleRect;
@@ -218,7 +219,7 @@ namespace Sirenix.OdinInspector.Editor
         {
             get
             {
-                this.defaultConfig = defaultConfig ?? new OdinMenuTreeDrawingConfig()
+                this.defaultConfig = this.defaultConfig ?? new OdinMenuTreeDrawingConfig()
                 {
                     DrawScrollView = true,
                     DrawSearchToolbar = false,
@@ -286,11 +287,11 @@ namespace Sirenix.OdinInspector.Editor
 
                     if (this.isFirstFrame)
                     {
-                        ScrollToMenuItem(this.selection.LastOrDefault(), true);
+                        this.ScrollToMenuItem(this.selection.LastOrDefault(), true);
                     }
                     else
                     {
-                        ScrollToMenuItem(this.selection.LastOrDefault(), false);
+                        this.ScrollToMenuItem(this.selection.LastOrDefault(), false);
                     }
                 }
             };
@@ -325,7 +326,7 @@ namespace Sirenix.OdinInspector.Editor
                     return;
                 }
 
-                if (Event.current.type != EventType.Repaint)
+                if (Event.current.type == EventType.Layout)
                 {
                     return;
                 }
@@ -344,8 +345,11 @@ namespace Sirenix.OdinInspector.Editor
                 }
                 else
                 {
-                    a = rect.yMin - (this.innerScrollViewRect.y + config.ScrollPos.y - this.outerScrollViewRect.y);
-                    b = (rect.yMax - this.outerScrollViewRect.height + this.innerScrollViewRect.y) - (config.ScrollPos.y + this.outerScrollViewRect.y);
+                    var viewRect = this.outerScrollViewRect;
+                    viewRect.y = 0;
+
+                    a = rect.yMin - (this.innerScrollViewRect.y + config.ScrollPos.y) - 1;
+                    b = (rect.yMax - this.outerScrollViewRect.height + this.innerScrollViewRect.y) - config.ScrollPos.y;
                     a -= rect.height;
                     b += rect.height;
                 }
@@ -415,7 +419,7 @@ namespace Sirenix.OdinInspector.Editor
 
             if (config.DrawSearchToolbar)
             {
-                DrawSearchToolbar();
+                this.DrawSearchToolbar();
             }
 
             var outerRect = EditorGUILayout.BeginVertical();
@@ -564,7 +568,7 @@ namespace Sirenix.OdinInspector.Editor
                 }
             }
 
-            MenuTreeActivationZone(outerRect);
+            this.MenuTreeActivationZone(outerRect);
         }
 
         internal void MenuTreeActivationZone(Rect rect)
@@ -590,6 +594,7 @@ namespace Sirenix.OdinInspector.Editor
         public void MarkDirty()
         {
             this.isDirty = true;
+            this.updateSearchResults = true;
         }
 
         /// <summary>
@@ -613,8 +618,10 @@ namespace Sirenix.OdinInspector.Editor
             config.SearchTerm = this.DrawSearchField(searchFieldRect, config.SearchTerm, config.AutoFocusSearchBar);
             var changed = EditorGUI.EndChangeCheck();
 
-            if (changed && this.hasRepaintedCurrentSearchResult)
+            if ((changed || this.updateSearchResults) && this.hasRepaintedCurrentSearchResult)
             {
+                this.updateSearchResults = false;
+
                 // We want fast visual search feedback. If the user is typing faster than the window can repaint,
                 // then no results will be visible while he's typing. this.hasRepaintedCurrentSearchResult fixes that.
 

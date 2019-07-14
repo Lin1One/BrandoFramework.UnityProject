@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="Bounds"/> type.
     /// </summary>
-    /// <seealso cref="Bounds" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Bounds}" />
     public class BoundsFormatter : MinimalBaseFormatter<Bounds>
     {
         private static readonly Serializer<Vector3> Vector3Serializer = Serializer.Get<Vector3>();

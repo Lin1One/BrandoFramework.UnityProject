@@ -6,7 +6,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="IntPtr"/> type.
     /// </summary>
-    /// <seealso cref="IntPtr" />
+    /// <seealso cref="Serializer{System.IntPtr}" />
     public sealed class IntPtrSerializer : Serializer<IntPtr>
     {
         /// <summary>

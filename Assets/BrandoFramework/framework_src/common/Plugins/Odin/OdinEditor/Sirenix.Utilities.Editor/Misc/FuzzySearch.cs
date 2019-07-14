@@ -156,6 +156,8 @@ namespace Sirenix.Utilities.Editor
         /// </summary>
         /// <param name="source">The source string.</param>
         /// <param name="target">The target string.</param>
+        /// <param name="ignoreCase"></param>
+        /// <param name="abbreviation"></param>
         /// <returns>Distance score. 0 is no match, and 1 is exact match.</returns>
         [System.Obsolete("Use FuzzySearch.Contains(searchTerm, text, out score) instead.")]
         public static float Compare(ref string source, ref string target, bool ignoreCase = true, bool abbreviation = true)

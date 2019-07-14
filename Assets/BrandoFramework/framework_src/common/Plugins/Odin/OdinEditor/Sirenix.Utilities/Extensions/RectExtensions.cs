@@ -385,11 +385,6 @@ namespace Sirenix.Utilities
         /// <summary>
         /// Splits a Rect into a grid from left to right and then down.
         /// </summary>
-        /// <param name="rect">The original rect.</param>
-        /// <param name="width">The width of a grid cell.</param>
-        /// <param name="height">The height of a grid cell.</param>
-        /// <param name="index">The index of the grid cell.</param>
-        /// <returns></returns>
         public static Rect SplitTableGrid(this Rect rect, int columnCount, float rowHeight, int index)
         {
             int column = index % columnCount;

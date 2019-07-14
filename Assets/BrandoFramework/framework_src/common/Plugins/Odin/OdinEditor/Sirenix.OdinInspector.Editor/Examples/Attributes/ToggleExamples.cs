@@ -7,7 +7,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(ToggleGroupAttribute))]
-    public class ToggleExamples
+    internal class ToggleExamples
     {
         // Simple Toggle Group
         [ToggleGroup("MyToggle")]

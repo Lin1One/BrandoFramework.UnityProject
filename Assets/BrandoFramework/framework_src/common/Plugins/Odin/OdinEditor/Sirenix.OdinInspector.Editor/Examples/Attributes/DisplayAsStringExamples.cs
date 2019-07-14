@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(DisplayAsStringAttribute))]
-    public class DisplayAsStringExamples
+    internal class DisplayAsStringExamples
     {
         [InfoBox(
             "Instead of disabling values in the inspector in order to show some information or debug a value. " +

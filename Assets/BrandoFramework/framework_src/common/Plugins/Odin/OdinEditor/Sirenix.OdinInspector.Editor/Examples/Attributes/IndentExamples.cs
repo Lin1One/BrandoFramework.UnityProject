@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(IndentAttribute))]
-    public class IndentExamples
+    internal class IndentExamples
     {
         [Title("Nicely organize your properties.")]
         [Indent]

@@ -72,7 +72,7 @@ namespace Sirenix.Serialization.Utilities.Editor
 #else
             BuildTarget.StandaloneOSXIntel,
             BuildTarget.StandaloneOSXIntel64,
-            BuildTarget.StandaloneOSX,
+            BuildTarget.StandaloneOSXUniversal,
 #endif
 
             BuildTarget.StandaloneWindows,

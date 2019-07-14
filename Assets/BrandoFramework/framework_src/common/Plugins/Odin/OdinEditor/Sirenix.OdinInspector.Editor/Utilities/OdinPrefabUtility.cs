@@ -19,12 +19,10 @@ namespace Sirenix.OdinInspector.Editor
     {
         public static void UpdatePrefabInstancePropertyModifications(UnityEngine.Object prefabInstance, bool withUndo)
         {
-            var prefabType = PrefabUtility.GetPrefabType(prefabInstance);
-
             if (prefabInstance == null) throw new ArgumentNullException("prefabInstance");
             if (!(prefabInstance is ISupportsPrefabSerialization)) throw new ArgumentException("Type must implement ISupportsPrefabSerialization");
             if (!(prefabInstance is ISerializationCallbackReceiver)) throw new ArgumentException("Type must implement ISerializationCallbackReceiver");
-            if (!(prefabType == PrefabType.PrefabInstance || prefabType == PrefabType.ModelPrefabInstance)) throw new ArgumentException("Value must be a prefab instance");
+            if (!OdinPrefabSerializationEditorUtility.ObjectIsPrefabInstance(prefabInstance)) throw new ArgumentException("Value must be a prefab instance");
 
             Action action = null;
 

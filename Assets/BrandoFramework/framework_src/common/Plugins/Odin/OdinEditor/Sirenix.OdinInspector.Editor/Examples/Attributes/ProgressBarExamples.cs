@@ -10,7 +10,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
         "The ProgressBar attribute draws a horizontal colored bar, which can also be clicked to change the value." +
         "\n\nIt can be used to show how full an inventory might be, or to make a visual indicator for a healthbar. " +
         "It can even be used to make fighting game style health bars, that stack multiple layers of health.")]
-    public sealed class ProgressBarExamples
+    internal sealed class ProgressBarExamples
     {
         [ProgressBar(0, 100)]
         public int ProgressBar = 50;
@@ -28,18 +28,20 @@ namespace Sirenix.OdinInspector.Editor.Examples
         [BoxGroup("Dynamic Range")]
         [ProgressBar("Min", "Max")]
         public float DynamicProgressBar = 50;
+
         [BoxGroup("Dynamic Range")]
         public float Min;
+
         [BoxGroup("Dynamic Range")]
         public float Max = 100;
 
         [Range(0, 300)]
-        [BoxGroup("Stacked")]
-        public float StackedHealth;
+        [BoxGroup("Stacked Health"), HideLabel]
+        public float StackedHealth = 150;
 
         [HideLabel, ShowInInspector]
         [ProgressBar(0, 100, ColorMember = "GetStackedHealthColor", BackgroundColorMember = "GetStackHealthBackgroundColor", DrawValueLabel = false)]
-        [BoxGroup("Stacked")]
+        [BoxGroup("Stacked Health")]
         private float StackedHealthProgressBar
         {
             get { return this.StackedHealth % 100.01f; }
@@ -65,7 +67,6 @@ namespace Sirenix.OdinInspector.Editor.Examples
                 this.StackedHealth > 100 ? Color.red :
                 new Color(0.16f, 0.16f, 0.16f, 1f);
         }
-
     }
 }
 #endif

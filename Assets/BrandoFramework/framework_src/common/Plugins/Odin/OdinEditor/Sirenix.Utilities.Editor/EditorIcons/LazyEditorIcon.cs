@@ -172,7 +172,6 @@ Shader ""Hidden/Sirenix/Editor/GUIIcon""
 
         private Texture RenderIcon(Color color)
         {
-
             if (iconMat == null || iconMat.shader == null)
             {
                 iconMat = new Material(ShaderUtil.CreateShaderAsset(iconShader));
@@ -191,15 +190,13 @@ Shader ""Hidden/Sirenix/Editor/GUIIcon""
             Texture2D texture = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, false, true);
             texture.filterMode = FilterMode.Bilinear;
             texture.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
-            //texture. = true;
+            texture.alphaIsTransparency = true;
             texture.Apply();
 
             RenderTexture.ReleaseTemporary(rt);
             RenderTexture.active = prev;
             GL.sRGBWrite = prevSRGB;
             return texture;
-
-
         }
     }
 }

@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 //-----------------------------------------------------------------------// <copyright file="PrefabModificationHandler.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
-// <copyright file="PropertyTree.cs" company="Sirenix IVS">
+// <copyright file="PrefabModificationHandler.cs" company="Sirenix IVS">
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
@@ -293,7 +293,8 @@ namespace Sirenix.OdinInspector.Editor
                                     isArraySize = true;
                                 }
 
-                                var prop = this.Tree.GetPropertyAtUnityPath(path);
+                                InspectorProperty closestProperty;
+                                var prop = this.Tree.GetPropertyAtUnityPath(path, out closestProperty);
 
                                 if (prop != null)
                                 {
@@ -305,6 +306,10 @@ namespace Sirenix.OdinInspector.Editor
                                     {
                                         prop.BaseValueEntry.ValueChangedFromPrefab = true;
                                     }
+                                }
+                                else if (closestProperty != null && closestProperty.ValueEntry != null && closestProperty.ValueEntry.IsMarkedAtomic)
+                                {
+                                    closestProperty.BaseValueEntry.ValueChangedFromPrefab = true;
                                 }
                             }
                         }
@@ -352,6 +357,7 @@ namespace Sirenix.OdinInspector.Editor
         /// Gets the prefab modification type of a given property, if any.
         /// </summary>
         /// <param name="property">The property to check.</param>
+        /// <param name="forceAutoRegister"></param>
         /// <returns>
         /// The prefab modification type of the property if it has one, otherwise null.
         /// </returns>
@@ -595,8 +601,8 @@ namespace Sirenix.OdinInspector.Editor
                     // One is null while the other is not, since the references didn't match
                     return PrefabModificationType.Value;
                 }
-
-                var instanceParentAsset = PrefabUtility.GetCorrespondingObjectFromSource(instanceValue);
+                
+                var instanceParentAsset = OdinPrefabSerializationEditorUtility.GetCorrespondingObjectFromSource(instanceValue);
 
                 if (instanceParentAsset != prefabValue)
                 {

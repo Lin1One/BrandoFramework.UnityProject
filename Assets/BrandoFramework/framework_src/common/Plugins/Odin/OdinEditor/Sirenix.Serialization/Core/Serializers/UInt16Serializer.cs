@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="ushort"/> type.
     /// </summary>
-    /// <seealso cref="ushort" />
+    /// <seealso cref="Serializer{System.UInt16}" />
     public sealed class UInt16Serializer : Serializer<ushort>
     {
         /// <summary>

@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="long"/> type.
     /// </summary>
-    /// <seealso cref="long" />
+    /// <seealso cref="Serializer{System.Int64}" />
     public sealed class Int64Serializer : Serializer<long>
     {
         /// <summary>

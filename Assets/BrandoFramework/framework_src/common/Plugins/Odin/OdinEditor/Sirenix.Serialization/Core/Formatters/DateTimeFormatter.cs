@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="DateTime"/> type.
     /// </summary>
-    /// <seealso cref="DateTime" />
+    /// <seealso cref="MinimalBaseFormatter{System.DateTime}" />
     public sealed class DateTimeFormatter : MinimalBaseFormatter<DateTime>
     {
         /// <summary>

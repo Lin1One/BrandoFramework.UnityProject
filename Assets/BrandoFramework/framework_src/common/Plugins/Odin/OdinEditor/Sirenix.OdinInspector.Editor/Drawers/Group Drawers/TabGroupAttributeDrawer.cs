@@ -63,7 +63,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                             Tab tab = new Tab();
 
                             tab.TabName = child.NiceName;
-                            tab.Title = new StringMemberHelper(property.ParentType, child.Name.TrimStart('#'));
+                            tab.Title = new StringMemberHelper(property, child.Name.TrimStart('#'));
                             for (int i = 0; i < child.Children.Count; i++)
                             {
                                 tab.InspectorProperties.Add(child.Children[i]);
@@ -81,7 +81,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                         Tab tab = new Tab();
 
                         tab.TabName = child.NiceName;
-                        tab.Title = new StringMemberHelper(property.ParentType, child.Name.TrimStart('#'));
+                        tab.Title = new StringMemberHelper(property, child.Name.TrimStart('#'));
                         tab.InspectorProperties.Add(child);
 
                         addLastTabs.Add(tab);

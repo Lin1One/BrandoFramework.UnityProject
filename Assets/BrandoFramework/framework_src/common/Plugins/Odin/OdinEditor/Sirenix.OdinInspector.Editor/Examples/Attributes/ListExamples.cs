@@ -9,7 +9,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(ListDrawerSettingsAttribute))]
-    public class ListExamples
+    internal class ListExamples
     {
         [PropertyOrder(int.MinValue), OnInspectorGUI]
         private void DrawIntroInfoBox()

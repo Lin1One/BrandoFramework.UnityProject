@@ -13,6 +13,7 @@ namespace Sirenix.OdinInspector.Editor
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
     using UnityEditor;
     using UnityEngine;
     using Utilities;
@@ -68,6 +69,7 @@ namespace Sirenix.OdinInspector.Editor
         /// <summary>
         /// Whether this property tree also represents members that are specially serialized by Odin.
         /// </summary>
+        [Obsolete("This value is no longer guaranteed to be correct, as it may have different answers for different properties in the tree. Instead look at InspectorProperty.SerializationRoot to determine whether specially serialized members might be included.", true)]
         public abstract bool IncludesSpeciallySerializedMembers { get; }
 
         /// <summary>
@@ -209,6 +211,10 @@ namespace Sirenix.OdinInspector.Editor
         /// </summary>
         public abstract InspectorProperty SecretRootProperty { get; }
 
+        internal abstract void NotifyPropertyCreated(InspectorProperty property);
+        internal abstract void NotifyPropertyDisposed(InspectorProperty property);
+        internal abstract void ClearPathCaches();
+
         /// <summary>
         /// Registers that a given property is dirty and needs its changes to be applied at the end of the current frame.
         /// </summary>
@@ -240,10 +246,24 @@ namespace Sirenix.OdinInspector.Editor
         public abstract InspectorProperty GetPropertyAtPath(string path);
 
         /// <summary>
+        /// Gets the property at the given path. Note that this is the path found in <see cref="InspectorProperty.Path" />, not the Unity path.
+        /// </summary>
+        /// <param name="path">The path of the property to get.</param>
+        /// <param name="closestProperty"></param>
+        public abstract InspectorProperty GetPropertyAtPath(string path, out InspectorProperty closestProperty);
+
+        /// <summary>
         /// Gets the property at the given Unity path.
         /// </summary>
         /// <param name="path">The Unity path of the property to get.</param>
         public abstract InspectorProperty GetPropertyAtUnityPath(string path);
+
+        /// <summary>
+        /// Gets the property at the given Unity path.
+        /// </summary>
+        /// <param name="path">The Unity path of the property to get.</param>
+        /// <param name="closestProperty"></param>
+        public abstract InspectorProperty GetPropertyAtUnityPath(string path, out InspectorProperty closestProperty);
 
         /// <summary>
         /// Gets the property at the given deep reflection path.
@@ -260,6 +280,13 @@ namespace Sirenix.OdinInspector.Editor
         /// </summary>
         /// <param name="path">The prefab modification path of the property to get.</param>
         public abstract InspectorProperty GetPropertyAtPrefabModificationPath(string path);
+
+        /// <summary>
+        /// Gets the property at the given Odin prefab modification path.
+        /// </summary>
+        /// <param name="path">The prefab modification path of the property to get.</param>
+        /// <param name="closestProperty"></param>
+        public abstract InspectorProperty GetPropertyAtPrefabModificationPath(string path, out InspectorProperty closestProperty);
 
         /// <summary>
         /// <para>Draw the property tree, and handles management of undo, as well as marking scenes and drawn assets dirty.</para>
@@ -330,7 +357,7 @@ namespace Sirenix.OdinInspector.Editor
         public abstract void InvokeDelayedActions();
 
         /// <summary>
-        /// Applies all changes made with properties to the inspected target tree values.
+        /// Applies all changes made with properties to the inspected target tree values, and marks all changed Unity objects dirty.
         /// </summary>
         /// <returns>true if any values were changed, otherwise false</returns>
         public abstract bool ApplyChanges();
@@ -620,17 +647,25 @@ namespace Sirenix.OdinInspector.Editor
     /// </summary>
     public sealed class PropertyTree<T> : PropertyTree
     {
+        private struct PropertyPathResult
+        {
+            public InspectorProperty Property;
+            public InspectorProperty ClosestProperty;
+        }
+
         private static readonly bool TargetIsValueType = typeof(T).IsValueType;
         private static readonly bool TargetIsUnityObject = typeof(UnityEngine.Object).IsAssignableFrom(typeof(T));
 
         private Dictionary<object, int> objectReferenceCounts = new Dictionary<object, int>(ReferenceEqualityComparer<object>.Default);
         private Dictionary<object, string> objectReferences = new Dictionary<object, string>(ReferenceEqualityComparer<object>.Default);
 
-        private Dictionary<string, InspectorProperty> propertiesCache = new Dictionary<string, InspectorProperty>();
-        private Dictionary<string, InspectorProperty> propertiesUnityPathCache = new Dictionary<string, InspectorProperty>();
-        private Dictionary<string, InspectorProperty> propertiesPrefabModificationPathCache = new Dictionary<string, InspectorProperty>();
+        private Dictionary<string, PropertyPathResult> propertiesPathCache = new Dictionary<string, PropertyPathResult>();
+        private Dictionary<string, PropertyPathResult> propertiesUnityPathCache = new Dictionary<string, PropertyPathResult>();
+        private Dictionary<string, PropertyPathResult> propertiesPrefabModificationPathCache = new Dictionary<string, PropertyPathResult>();
 
         private Dictionary<string, Dictionary<Type, SerializedProperty>> emittedUnityPropertyCache = new Dictionary<string, Dictionary<Type, SerializedProperty>>();
+        //private Dictionary<string, Dictionary<Type, UnityPropertyEmitter.Handle>> emittedUnityGameObjectPropertyCache = new Dictionary<string, Dictionary<Type, UnityPropertyEmitter.Handle>>();
+
         private List<Action> delayedActions = new List<Action>();
         private List<Action> delayedRepaintActions = new List<Action>();
 
@@ -723,7 +758,8 @@ namespace Sirenix.OdinInspector.Editor
         /// <summary>
         /// Whether this property tree also represents members that are specially serialized by Odin.
         /// </summary>
-        public override bool IncludesSpeciallySerializedMembers { get { return this.includesSpeciallySerializedMembers; } }
+        [Obsolete("This value is no longer guaranteed to be correct, as it may have different answers for different properties in the tree. Instead look at InspectorProperty.SerializationRoot to determine whether specially serialized members might be included.", true)]
+        public override bool IncludesSpeciallySerializedMembers { get { throw new NotSupportedException(); } }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyTree{T}"/> class, inspecting only the target (<see cref="T"/>) type's static members.
@@ -866,6 +902,21 @@ namespace Sirenix.OdinInspector.Editor
                             changed = true;
                         }
                     }
+
+                    if (changed)
+                    {
+                        var serializationRoot = property.SerializationRoot;
+
+                        for (int j = 0; j < serializationRoot.ValueEntry.ValueCount; j++)
+                        {
+                            UnityEngine.Object unityObj = serializationRoot.ValueEntry.WeakValues[j] as UnityEngine.Object;
+
+                            if (unityObj != null)
+                            {
+                                InspectorUtilities.RegisterUnityObjectDirty(unityObj);
+                            }
+                        }
+                    }
                 }
 
                 this.dirtyProperties.Clear();
@@ -917,6 +968,10 @@ namespace Sirenix.OdinInspector.Editor
         /// </summary>
         public override void UpdateTree()
         {
+            // Changes might have been set since the last frame, during event calls that occurred outside of IMGUI.
+            // Those changes should be applied before we do anything else, so they don't get lost.
+            this.ApplyChanges();
+
             unchecked
             {
                 this.updateID++;
@@ -924,9 +979,6 @@ namespace Sirenix.OdinInspector.Editor
 
             this.objectReferences.Clear();
             this.objectReferenceCounts.Clear();
-            this.propertiesCache.Clear();
-            this.propertiesUnityPathCache.Clear();
-            this.propertiesPrefabModificationPathCache.Clear();
 
             if (TargetIsUnityObject)
             {
@@ -934,6 +986,27 @@ namespace Sirenix.OdinInspector.Editor
             }
 
             this.secretRootProperty.Update();
+        }
+
+        internal override void NotifyPropertyCreated(InspectorProperty property)
+        {
+            var result = new PropertyPathResult { Property = property, ClosestProperty = property };
+
+            this.propertiesPathCache[property.Path] = result;
+            this.propertiesUnityPathCache[property.UnityPropertyPath] = result;
+            this.propertiesPrefabModificationPathCache[property.PrefabModificationPath] = result;
+        }
+
+        internal override void NotifyPropertyDisposed(InspectorProperty property)
+        {
+            this.ClearPathCaches();
+        }
+
+        internal override void ClearPathCaches()
+        {
+            this.propertiesPathCache.Clear();
+            this.propertiesUnityPathCache.Clear();
+            this.propertiesPrefabModificationPathCache.Clear();
         }
 
         /// <summary>
@@ -963,22 +1036,57 @@ namespace Sirenix.OdinInspector.Editor
         /// <param name="path">The path of the property to get.</param>
         public override InspectorProperty GetPropertyAtPath(string path)
         {
-            InspectorProperty result;
-            if (!this.propertiesCache.TryGetValue(path, out result))
+            InspectorProperty closest;
+            return this.GetPropertyAtPath(path, out closest);
+        }
+
+        /// <summary>
+        /// Gets the property at the given path. Note that this is the path found in <see cref="InspectorProperty.Path" />, not the Unity path.
+        /// </summary>
+        /// <param name="path">The path of the property to get.</param>
+        /// <param name="closestProperty"></param>
+        public override InspectorProperty GetPropertyAtPath(string path, out InspectorProperty closestProperty)
+        {
+            closestProperty = null;
+            PropertyPathResult result;
+            if (!this.propertiesPathCache.TryGetValue(path, out result))
             {
-                var steps = path.Split('.');
-
-                var current = this.secretRootProperty;
-
-                for (int i = 0; i < steps.Length; i++)
+                using (var sbCache = Cache<StringBuilder>.Claim())
                 {
-                    current = current.Children[steps[i]];
-                    if (current == null) return null;
+                    var sb = sbCache.Value;
+                    sb.Length = 0;
+
+                    var steps = path.Split('.');
+                    var current = this.secretRootProperty;
+
+                    for (int i = 0; i < steps.Length; i++)
+                    {
+                        var step = steps[i];
+
+                        if (i != 0) sb.Append('.');
+                        sb.Append(step);
+
+                        result.ClosestProperty = current;
+                        current = current.Children[step];
+
+                        var currentPath = sb.ToString();
+                        if (!this.propertiesPathCache.ContainsKey(currentPath))
+                            this.propertiesPathCache[currentPath] = new PropertyPathResult() { Property = current, ClosestProperty = current != null ? current : result.ClosestProperty };
+
+                        if (current == null) break;
+                    }
+
+                    result.Property = current;
+                    this.propertiesPathCache[path] = result;
                 }
-                result = current;
-                this.propertiesCache[path] = result;
             }
-            return result;
+
+            closestProperty = result.ClosestProperty;
+
+            if (closestProperty != null) closestProperty.Update();
+            if (result.Property != null) result.Property.Update();
+
+            return result.Property;
         }
 
         /// <summary>
@@ -988,48 +1096,86 @@ namespace Sirenix.OdinInspector.Editor
         /// <returns>The property found at the path.</returns>
         public override InspectorProperty GetPropertyAtUnityPath(string path)
         {
-            InspectorProperty result;
+            InspectorProperty closest;
+            return this.GetPropertyAtUnityPath(path, out closest);
+        }
+
+        /// <summary>
+        /// Finds the property at the specified unity path.
+        /// </summary>
+        /// <param name="path">The unity path for the property.</param>
+        /// <param name="closestProperty"></param>
+        /// <returns>The property found at the path.</returns>
+        public override InspectorProperty GetPropertyAtUnityPath(string path, out InspectorProperty closestProperty)
+        {
+            closestProperty = null;
+            PropertyPathResult result;
             if (!this.propertiesUnityPathCache.TryGetValue(path, out result))
             {
                 var steps = path.Split('.');
                 var current = this.secretRootProperty;
 
-                for (int i = 0; i < steps.Length; i++)
+                using (var sbCache = Cache<StringBuilder>.Claim())
                 {
-                    var step = steps[i];
-                    var next = current.Children[step];
+                    var sb = sbCache.Value;
+                    sb.Length = 0;
 
-                    // Copy with Unity's annoying array syntax
-                    if (next == null && i + 1 < steps.Length && step == "Array" && steps[i + 1].StartsWith("data["))
+                    for (int i = 0; i < steps.Length; i++)
                     {
-                        var indexStr = steps[i + 1];
-                        indexStr = indexStr.Substring(5, indexStr.Length - 6);
+                        var step = steps[i];
+                        var next = current.Children[step];
 
-                        int index;
-                        if (!int.TryParse(indexStr, out index)) continue;
+                        if (i != 0)
+                            sb.Append('.');
 
-                        // The standard for prefab collection supporting collections is "$index" for naming elements.
-                        step = CollectionResolverUtilities.DefaultIndexToChildName(index);
-                        i++; // Consume an extra "step"
+                        sb.Append(step);
 
-                        next = current.Children[step];
+                        // Copy with Unity's annoying array syntax
+                        if (next == null && i + 1 < steps.Length && step == "Array" && steps[i + 1].StartsWith("data["))
+                        {
+                            var indexStr = steps[i + 1];
+                            indexStr = indexStr.Substring(5, indexStr.Length - 6);
+
+                            int index;
+                            if (!int.TryParse(indexStr, out index)) continue;
+
+                            // The standard for prefab collection supporting collections is "$index" for naming elements.
+                            step = CollectionResolverUtilities.DefaultIndexToChildName(index);
+                            i++; // Consume an extra "step"
+
+                            sb.Append('.');
+                            sb.Append(steps[i]);
+                            next = current.Children[step];
+                        }
+                        else if (next == null && !(current.ChildResolver is ICollectionResolver))
+                        {
+                            // If the above lookup failed, perhaps due to the concrete member being hidden in a group somewhere,
+                            // recursively look through all groups in this property for concrete members with a matching name.
+
+                            next = this.TryFindChildMemberPropertyWithNameFromGroups(step, current);
+                        }
+
+                        var currentPath = sb.ToString();
+
+                        if (!this.propertiesUnityPathCache.ContainsKey(currentPath))
+                            this.propertiesUnityPathCache[currentPath] = new PropertyPathResult() { Property = next, ClosestProperty = next != null ? next : result.ClosestProperty };
+
+                        current = next;
+                        if (next == null) break;
+                        result.ClosestProperty = current;
                     }
-                    else if (next == null && !(current.ChildResolver is ICollectionResolver))
-                    {
-                        // If the above lookup failed, perhaps due to the concrete member being hidden in a group somewhere,
-                        // recursively look through all groups in this property for concrete members with a matching name.
-
-                        next = this.TryFindChildMemberPropertyWithNameFromGroups(step, current);
-                    }
-
-                    if (next == null) return null;
-                    current = next;
                 }
 
-                result = current;
-                this.propertiesCache[path] = result;
+                result.Property = current;
+                this.propertiesUnityPathCache[path] = result;
             }
-            return result;
+            
+            closestProperty = result.ClosestProperty;
+
+            if (closestProperty != null) closestProperty.Update();
+            if (result.Property != null) result.Property.Update();
+
+            return result.Property;
         }
 
         /// <summary>
@@ -1039,34 +1185,67 @@ namespace Sirenix.OdinInspector.Editor
         /// <returns>The property found at the path.</returns>
         public override InspectorProperty GetPropertyAtPrefabModificationPath(string path)
         {
-            InspectorProperty result;
+            InspectorProperty closest;
+            return this.GetPropertyAtPrefabModificationPath(path, out closest);
+        }
+
+        /// <summary>
+        /// Finds the property at the specified modification path.
+        /// </summary>
+        /// <param name="path">The prefab modification path for the property.</param>
+        /// <param name="closestProperty"></param>
+        /// <returns>The property found at the path.</returns>
+        public override InspectorProperty GetPropertyAtPrefabModificationPath(string path, out InspectorProperty closestProperty)
+        {
+            closestProperty = null;
+            PropertyPathResult result;
             if (!this.propertiesPrefabModificationPathCache.TryGetValue(path, out result))
             {
-                var steps = path.Split('.');
-                var current = this.secretRootProperty;
-
-                for (int i = 0; i < steps.Length; i++)
+                using (var sbCache = Cache<StringBuilder>.Claim())
                 {
-                    var step = steps[i];
+                    var sb = sbCache.Value;
+                    sb.Length = 0;
 
-                    var next = current.Children[step];
+                    var steps = path.Split('.');
+                    var current = this.secretRootProperty;
 
-                    if (next == null && !(current.ChildResolver is ICollectionResolver))
+                    for (int i = 0; i < steps.Length; i++)
                     {
-                        // If the above lookup failed, perhaps due to the concrete member being hidden in a group somewhere,
-                        // recursively look through all groups in this property for concrete members with a matching name.
+                        var step = steps[i];
 
-                        next = this.TryFindChildMemberPropertyWithNameFromGroups(step, current);
+                        if (i != 0) sb.Append('.');
+                        sb.Append(step);
+
+                        var next = current.Children[step];
+
+                        if (next == null && !(current.ChildResolver is ICollectionResolver))
+                        {
+                            // If the above lookup failed, perhaps due to the concrete member being hidden in a group somewhere,
+                            // recursively look through all groups in this property for concrete members with a matching name.
+
+                            next = this.TryFindChildMemberPropertyWithNameFromGroups(step, current);
+                        }
+
+                        var currentPath = sb.ToString();
+                        if (!this.propertiesPrefabModificationPathCache.ContainsKey(currentPath))
+                            this.propertiesPrefabModificationPathCache[currentPath] = new PropertyPathResult() { Property = next, ClosestProperty = next != null ? next : result.ClosestProperty };
+
+                        current = next;
+                        if (next == null) break;
+                        result.ClosestProperty = current;
                     }
 
-                    if (next == null) return null;
-                    current = next;
+                    result.Property = current;
+                    this.propertiesPrefabModificationPathCache[path] = result;
                 }
-
-                result = current;
-                this.propertiesCache[path] = result;
             }
-            return result;
+
+            closestProperty = result.ClosestProperty;
+
+            if (closestProperty != null) closestProperty.Update();
+            if (result.Property != null) result.Property.Update();
+
+            return result.Property;
         }
 
         private InspectorProperty TryFindChildMemberPropertyWithNameFromGroups(string name, InspectorProperty property)
@@ -1149,7 +1328,7 @@ namespace Sirenix.OdinInspector.Editor
 
                 if (!this.emittedUnityPropertyCache.TryGetValue(path, out innerDict))
                 {
-                    innerDict = new Dictionary<Type, SerializedProperty>();
+                    innerDict = new Dictionary<Type, SerializedProperty>(FastTypeComparer.Instance);
                     this.emittedUnityPropertyCache.Add(path, innerDict);
                 }
 
@@ -1164,6 +1343,34 @@ namespace Sirenix.OdinInspector.Editor
                     result = UnityPropertyEmitter.CreateEmittedScriptableObjectProperty(prop.Info.PropertyName, prop.ValueEntry.TypeOfValue, this.targets.Length);
                     innerDict[prop.ValueEntry.TypeOfValue] = result;
                 }
+                //else if (result == null)
+                //{
+                //    Dictionary<Type, UnityPropertyEmitter.Handle> innerGoDict;
+                //    GameObject go = null;
+
+                //    if (!this.emittedUnityGameObjectPropertyCache.TryGetValue(path, out innerGoDict))
+                //    {
+                //        innerGoDict = new Dictionary<Type, UnityPropertyEmitter.Handle>(FastTypeComparer.Instance);
+                //        this.emittedUnityGameObjectPropertyCache.Add(path, innerGoDict);
+                //    }
+
+                //    UnityPropertyEmitter.Handle handle;
+
+                //    if (!innerGoDict.TryGetValue(prop.ValueEntry.TypeOfValue, out handle))
+                //    {
+                //        handle = UnityPropertyEmitter.CreateEmittedMonoBehaviourProperty(prop.Info.PropertyName, prop.ValueEntry.TypeOfValue, this.targets.Length, ref go);
+                //        innerGoDict.Add(prop.ValueEntry.TypeOfValue, handle);
+                //    }
+                //    else if (handle != null && handle.UnityProperty.serializedObject.targetObject == null)
+                //    {
+                //        handle.Dispose();
+                //        handle = UnityPropertyEmitter.CreateEmittedMonoBehaviourProperty(prop.Info.PropertyName, prop.ValueEntry.TypeOfValue, this.targets.Length, ref go);
+                //        innerGoDict[prop.ValueEntry.TypeOfValue] = handle;
+                //    }
+
+                //    if (handle != null && handle.UnityProperty != null)
+                //        result = handle.UnityProperty;
+                //}
 
                 if (result != null)
                 {
@@ -1249,74 +1456,7 @@ namespace Sirenix.OdinInspector.Editor
 
             this.objectReferences[reference] = property.Path;
         }
-
-        private void UpdateProperty(InspectorProperty property)
-        {
-            try
-            {
-                property.ClearDrawCount();
-                property.Update();
-
-                var propertyType = property.Info.PropertyType;
-
-                this.propertiesCache.Add(property.Path, property);
-
-                if (propertyType != PropertyType.Group && propertyType != PropertyType.Method)
-                {
-                    if (!this.propertiesUnityPathCache.ContainsKey(property.UnityPropertyPath))
-                    {
-                        this.propertiesUnityPathCache.Add(property.UnityPropertyPath, property);
-                    }
-
-                    if (!this.propertiesPrefabModificationPathCache.ContainsKey(property.PrefabModificationPath))
-                    {
-                        this.propertiesPrefabModificationPathCache.Add(property.PrefabModificationPath, property);
-                    }
-                }
-
-                // Register object references and their paths the first time we see each of them
-                if (propertyType == PropertyType.Value && !property.Info.TypeOfValue.IsValueType)
-                {
-                    var valueEntry = property.ValueEntry;
-
-                    for (int i = 0; i < valueEntry.ValueCount; i++)
-                    {
-                        object reference = valueEntry.WeakValues[i];
-
-                        // Also remember to check that it's not null
-                        if (object.ReferenceEquals(reference, null) == false)
-                        {
-                            var type = reference.GetType();
-
-                            if (type.IsValueType || type == typeof(string) || type.IsEnum)
-                            {
-                                // We do not allow references to boxed value types or primitives
-                                continue;
-                            }
-
-                            this.objectReferenceCounts[reference] = this.GetReferenceCount(reference) + 1;
-
-                            if (this.objectReferences.ContainsKey(reference) == false)
-                            {
-                                this.objectReferences.Add(reference, property.Path);
-                            }
-                        }
-                    }
-                }
-
-                for (int i = 0; i < property.Children.Count; i++)
-                {
-                    InspectorProperty child = property.Children.Get(i);
-                    this.UpdateProperty(child);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.Log("An exception was thrown while trying to update the property at path: " + property.Path + ".");
-                Debug.LogException(ex);
-            }
-        }
-
+        
         /// <summary>
         /// Gets the root tree property at a given index.
         /// </summary>

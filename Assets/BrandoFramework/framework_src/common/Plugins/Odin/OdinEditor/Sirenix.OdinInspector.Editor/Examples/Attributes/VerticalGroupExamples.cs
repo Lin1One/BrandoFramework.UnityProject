@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     [AttributeExample(typeof(VerticalGroupAttribute),
         "VerticalGroup, similar to HorizontalGroup, groups properties together vertically in the inspector.\n" +
         "By itself it doesn't do much, but combined with other groups, like HorizontalGroup, it can be very useful. It can also be used in TableLists to create columns.")]
-	public class VerticalGroupExamples
+    internal class VerticalGroupExamples
 	{
 		[HorizontalGroup("Split")]
 		[VerticalGroup("Split/Left")]

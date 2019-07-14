@@ -8,7 +8,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using Sirenix.OdinInspector.Editor;
 
     [AttributeExample(typeof(ResponsiveButtonGroupAttribute))]
-    public class ResponsiveButtonGroupExample
+    internal class ResponsiveButtonGroupExample
     {
         [Button(ButtonSizes.Large), GUIColor(0, 1, 0)]
         private void OpenDockableWindowExample()
@@ -49,7 +49,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
         [ResponsiveButtonGroup("SomeOtherGroup/SomeBtnGroup")] public void Baz3() { }
     }
 
-    public class MyDockableGameDashboard : OdinEditorWindow
+    internal class MyDockableGameDashboard : OdinEditorWindow
     {
         const string DEFAULT_GROUP = "TabGroup/Default/BtnGroup";
         const string UNIFORM_GROUP = "TabGroup/Uniform/BtnGroup";

@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="LayerMask"/> type.
     /// </summary>
-    /// <seealso cref="LayerMask" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.LayerMask}" />
     public class LayerMaskFormatter : MinimalBaseFormatter<LayerMask>
     {
         private static readonly Serializer<int> IntSerializer = Serializer.Get<int>();

@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(OnValueChangedAttribute), "OnValueChanged is used here to create a material for a shader, when the shader is changed.")]
-    public class OnValueChangedExamples
+    internal class OnValueChangedExamples
     {
         [OnValueChanged("CreateMaterial")]
         public Shader Shader;

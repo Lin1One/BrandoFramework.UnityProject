@@ -7,7 +7,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(ShowDrawerChainAttribute))]
-    public class ShowDrawerChainExamples
+    internal class ShowDrawerChainExamples
     {
 #if UNITY_EDITOR
         [HorizontalGroup(PaddingRight = -1)]
@@ -18,6 +18,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
         [ShowInInspector, HideLabel, ProgressBar(0, 1.5f)]
         private double Animate { get { return Math.Abs(UnityEditor.EditorApplication.timeSinceStartup % 3 - 1.5f); } }
 #endif
+
         [InfoBox(
             "Any drawer not used in the draw chain will be greyed out in the drawer chain so that you can more easily debug the draw chain. You can see this by toggling the above toggle field.\n\n" +
             "If you have any custom drawers they will show up with green names in the drawer chain.")]

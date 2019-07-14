@@ -8,7 +8,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     [AttributeExample(typeof(InfoBoxAttribute),
         "This example demonstrates the use of the InfoBox attribute.\n" +
         "Any info box with a warning or error drawn in the inspector will also be found by the Scene Validation tool.")]
-    public class InfoBoxExamples
+    internal class InfoBoxExamples
     {
         [Title("InfoBox message types")]
         [InfoBox("Default info box.")]

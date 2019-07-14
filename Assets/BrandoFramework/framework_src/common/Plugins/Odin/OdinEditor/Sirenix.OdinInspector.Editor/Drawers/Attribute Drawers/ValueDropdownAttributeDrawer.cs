@@ -61,7 +61,9 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             this.getSelection = () => this.Property.ValueEntry.WeakValues.Cast<object>();
             this.getValues = () =>
             {
-                return (this.rawGetter.GetValue() as IEnumerable)
+                var value = this.rawGetter.GetValue();
+
+                return value == null ? null : (this.rawGetter.GetValue() as IEnumerable)
                     .Cast<object>()
                     .Where(x => x != null)
                     .Select(x =>
@@ -86,7 +88,18 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
         private void ReloadDropdownCollections()
         {
-            var first = (this.rawGetter.GetValue() as IEnumerable).Cast<object>().FirstOrDefault();
+            if (this.error != null)
+            {
+                return;
+            }
+
+            object first = null;
+            var value = this.rawGetter.GetValue();
+            if (value != null)
+            {
+                first = (this.rawGetter.GetValue() as IEnumerable).Cast<object>().FirstOrDefault();
+            }
+
             var isNamedValueDropdownItems = first is IValueDropdownItem;
 
             if (isNamedValueDropdownItems)
@@ -347,7 +360,14 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             // TODO: Attribute is now cached, could that become a problem here?
             this.Attribute.IsUniqueList = this.Attribute.IsUniqueList || this.Attribute.ExcludeExistingValuesInList;
             IEnumerable<ValueDropdownItem> query = this.getValues();
-            var isEmpty = query.Any() == false;
+
+            if (query == null)
+            {
+                // God damm it bjarke.
+                query = Enumerable.Empty<ValueDropdownItem>();
+            }
+
+            var isEmpty = query == null || query.Any() == false;
 
             if (!isEmpty)
             {
@@ -368,7 +388,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 }
             }
 
-            var enableSearch = query.Take(this.Attribute.NumberOfItemsBeforeEnablingSearch).Count() == this.Attribute.NumberOfItemsBeforeEnablingSearch;
+            var enableSearch = this.Attribute.NumberOfItemsBeforeEnablingSearch == 0 || (query != null && query.Take(this.Attribute.NumberOfItemsBeforeEnablingSearch).Count() == this.Attribute.NumberOfItemsBeforeEnablingSearch);
 
             GenericSelector<object> selector = new GenericSelector<object>(this.Attribute.DropdownTitle, false, query.Select(x => new GenericSelectorItem<object>(x.Text, x.Value)));
 

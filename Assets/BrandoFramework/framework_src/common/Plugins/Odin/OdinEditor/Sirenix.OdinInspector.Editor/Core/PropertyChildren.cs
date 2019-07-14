@@ -82,11 +82,18 @@ namespace Sirenix.OdinInspector.Editor
             }
         }
 
-        internal void ClearCaches()
+        internal void ClearAndDisposeChildren()
         {
+            foreach (var child in this.childrenByIndex.Values)
+            {
+                child.Dispose();
+            }
+
             this.infosByIndex.Clear();
             this.childrenByIndex.Clear();
             this.pathsByIndex.Clear();
+
+            this.property.Tree.ClearPathCaches();
         }
 
         /// <summary>
@@ -167,6 +174,13 @@ namespace Sirenix.OdinInspector.Editor
 
             if (!this.childrenByIndex.TryGetValue(index, out result) || this.NeedsRefresh(index))
             {
+                // A property already exists and must be refreshed, so it must be disposed immediately
+                if (result != null)
+                {
+                    result.Dispose();
+                    this.childrenByIndex.Remove(index);
+                }
+
                 // The order of operations here is very important. Calling result.Update() can cause all sorts of things to happen.
                 // Including trying to get this very same child, resulting in an infinite loop because it hasn't
                 // been set yet, so a new child will be created, ad infinitum.
@@ -176,6 +190,7 @@ namespace Sirenix.OdinInspector.Editor
                 var parent = this.property == this.property.Tree.SecretRootProperty ? null : this.property;
                 result = InspectorProperty.Create(this.property.Tree, parent, this.GetInfo(index), index, false);
                 this.childrenByIndex[index] = result;
+                this.property.Tree.NotifyPropertyCreated(result);
             }
 
             result.Update();

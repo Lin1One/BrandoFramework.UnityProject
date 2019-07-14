@@ -28,6 +28,7 @@ namespace Sirenix.OdinInspector.Editor
     [SirenixEditorConfig]
     public class InspectorConfig : GlobalConfig<InspectorConfig>, ISerializationCallbackReceiver
     {
+        // TODO: Generated ODin Editor DLLs might be soo old now that this can be removed?
         [InitializeOnLoadMethod]
         private static void RemoveObsoleteGeneratedOdinEditorsDLL()
         {
@@ -46,7 +47,7 @@ namespace Sirenix.OdinInspector.Editor
                         return;
                     }
 
-                    var generatedOdinEditorsFolder = "Assets/" + SirenixAssetPaths.SirenixAssembliesPath + "Editor";
+                    var generatedOdinEditorsFolder = SirenixAssetPaths.SirenixAssembliesPath + "Editor";
                     var generatedOdinEditorsDLL = generatedOdinEditorsFolder + "/GeneratedOdinEditors.dll";
 
                     if (File.Exists(generatedOdinEditorsDLL))

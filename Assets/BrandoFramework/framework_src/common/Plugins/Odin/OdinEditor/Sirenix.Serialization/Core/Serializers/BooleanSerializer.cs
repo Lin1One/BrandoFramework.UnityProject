@@ -4,7 +4,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="bool"/> type.
     /// </summary>
-    /// <seealso cref="bool" />
+    /// <seealso cref="Serializer{System.Boolean}" />
     public sealed class BooleanSerializer : Serializer<bool>
     {
         /// <summary>

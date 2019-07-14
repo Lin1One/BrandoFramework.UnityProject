@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(PropertyOrderAttribute))]
-	public class PropertyOrderExamples
+    internal class PropertyOrderExamples
     {
 		[PropertyOrder(1)]
 		public int Second;

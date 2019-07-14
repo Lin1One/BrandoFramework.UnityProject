@@ -40,8 +40,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         protected override void Initialize()
         {
             this.hideDetailedMessage = true;
-            this.messageHelper = new StringMemberHelper(this.Property.ParentType, this.Attribute.Message);
-            this.detailsHelper = new StringMemberHelper(this.Property.ParentType, this.Attribute.Details);
+            this.messageHelper = new StringMemberHelper(this.Property, this.Attribute.Message);
+            this.detailsHelper = new StringMemberHelper(this.Property, this.Attribute.Details);
             this.errorMessage = this.messageHelper.ErrorMessage ?? this.detailsHelper.ErrorMessage;
 
             if (this.Attribute.VisibleIf != null)

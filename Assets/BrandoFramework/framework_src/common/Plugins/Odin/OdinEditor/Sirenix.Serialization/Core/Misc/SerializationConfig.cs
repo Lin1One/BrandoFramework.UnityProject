@@ -1,8 +1,8 @@
 //-----------------------------------------------------------------------// <copyright file="SerializationConfig.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
-using System;
-
 namespace Sirenix.Serialization
 {
+    using System;
+
     /// <summary>
     /// Defines the configuration during serialization and deserialization. This class is thread-safe.
     /// </summary>

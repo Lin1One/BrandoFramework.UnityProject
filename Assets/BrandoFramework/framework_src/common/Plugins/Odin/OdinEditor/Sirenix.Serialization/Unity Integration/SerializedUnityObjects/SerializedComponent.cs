@@ -23,8 +23,8 @@ namespace Sirenix.OdinInspector
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
-            UnitySerializationUtility.SerializeUnityObject(this, ref this.serializationData);
             this.OnBeforeSerialize();
+            UnitySerializationUtility.SerializeUnityObject(this, ref this.serializationData);
         }
 
         /// <summary>
@@ -43,6 +43,7 @@ namespace Sirenix.OdinInspector
 
 #if UNITY_EDITOR
 
+        [HideInTables]
         [OnInspectorGUI, PropertyOrder(int.MinValue)]
         private void InternalOnInspectorGUI()
         {

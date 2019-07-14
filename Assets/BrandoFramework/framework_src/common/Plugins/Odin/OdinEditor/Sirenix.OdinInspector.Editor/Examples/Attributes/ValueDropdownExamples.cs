@@ -10,7 +10,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(ValueDropdownAttribute))]
-    public class ValueDropdownExamples
+    internal class ValueDropdownExamples
     {
         [ValueDropdown("TextureSizes")]
         public int SomeSize1;

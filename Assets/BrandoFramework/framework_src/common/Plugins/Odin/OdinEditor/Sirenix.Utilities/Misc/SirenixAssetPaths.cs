@@ -1,9 +1,11 @@
 //-----------------------------------------------------------------------// <copyright file="SirenixAssetPaths.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------// <copyright file="SirenixAssetPaths.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
 // <copyright file="SirenixAssetPaths.cs" company="Sirenix IVS">
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.Utilities
 {
     using System.IO;
@@ -15,7 +17,9 @@ namespace Sirenix.Utilities
     /// </summary>
     public static class SirenixAssetPaths
     {
-        private static readonly string DefaultSirenixPluginPath = "Plugins/Sirenix/";
+        private static readonly string DefaultSirenixPluginPath = "Assets/Plugins/Sirenix/";
+
+        public const string SirenixAssetPathsSOGuid = "08379ccefc05200459f90a1c0711a340";
 
         /// <summary>
         /// Path to Odin Inspector folder.
@@ -42,16 +46,6 @@ namespace Sirenix.Utilities
         /// </summary>
         public static readonly string OdinResourcesPath;
 
-        ///// <summary>
-        ///// Path to Odin Inspector generated editors DLL.
-        ///// </summary>
-        //public static readonly string OdinGeneratedEditorsPath;
-
-        ///// <summary>
-        ///// Odin Inspector generated editors assembly name.
-        ///// </summary>
-        //public static readonly string OdinGeneratedEditorsAssemblyName;
-
         /// <summary>
         /// Path to Odin Inspector configuration folder.
         /// </summary>
@@ -70,67 +64,46 @@ namespace Sirenix.Utilities
         static SirenixAssetPaths()
         {
 #if UNITY_EDITOR
-
-            ProjectPathFinder finder = ScriptableObject.CreateInstance<ProjectPathFinder>();
-            UnityEditor.MonoScript script = UnityEditor.MonoScript.FromScriptableObject(finder);
-            UnityEngine.Object.DestroyImmediate(finder);
-
-            bool foundPath = false;
-
-            if (script == null)
+            var log = false;
+            var sb = new System.Text.StringBuilder();
+            if (File.Exists("Assets/Plugins/Sirenix/Odin Inspector/Assets/Editor/PathLookup.asset"))
             {
-                string path = FindFolderPattern();
-
-                if (path != null)
-                {
-                    foundPath = true;
-                    SirenixPluginPath = path;
-                }
-                else
-                {
-                    Debug.LogError("Could not find folder pattern, 'Sirenix/Odin Inspector' anywhere in the project. Defaulting to path '" + DefaultSirenixPluginPath + "'. Something will probably break.");
-                }
+                // Default:
+                SirenixPluginPath = DefaultSirenixPluginPath;
             }
             else
             {
-                string scriptPath = UnityEditor.AssetDatabase.GetAssetPath(script);
-                string[] pathSteps = scriptPath.Split('/', '\\'); ;
-
-                int sirenixIndex = -1;
-
-                for (int i = pathSteps.Length - 1; i >= 0; i--)
+                sb.AppendLine("There were some problems trying to locate where Odin was installed, please read the messages below.");
+                sb.AppendLine("- Odin was not found in it's default location: 'Assets/Plugins/Sirenix/'.");
+                var pathLookupAssetPath = UnityEditor.AssetDatabase.GUIDToAssetPath(SirenixAssetPathsSOGuid);
+                if (string.IsNullOrEmpty(pathLookupAssetPath))
                 {
-                    if (pathSteps[i] == "Sirenix")
+                    log = true;
+                    sb.AppendLine("- No SirenixPathLookupScriptableObject with the Guid: '" + SirenixAssetPathsSOGuid + "' was found.");
+                    var results = UnityEditor.AssetDatabase.FindAssets("t:SirenixPathLookupScriptableObject") ?? new string[0];
+                    var newPath = results.FirstOrDefault(x => x != null && x.Contains("Sirenix/"));
+                    if (newPath == null)
                     {
-                        sirenixIndex = i;
-                        break;
-                    }
-                }
-
-                if (sirenixIndex >= 0)
-                {
-                    int startIndex;
-
-                    if (pathSteps[0] == "Assets")
-                    {
-                        startIndex = 1;
+                        sb.AppendLine("- We were unable to find it else where. Please re-import Odin and make sure the PathLookup.asset is included.");
                     }
                     else
                     {
-                        startIndex = 0;
-                        sirenixIndex++;
+                        sb.AppendLine("- The SirenixPathLookupScriptableObject was found, but must have had its Guid changed. Please report this issue with details about how your project setup. You should be able to fix it by re-importing Odin.");
+                        pathLookupAssetPath = newPath;
                     }
-
-                    string path = string.Join("/", pathSteps, startIndex, sirenixIndex) + "/";
-
-                    foundPath = true;
-                    SirenixPluginPath = path;
                 }
-            }
 
-            if (!foundPath)
-            {
-                SirenixPluginPath = DefaultSirenixPluginPath;
+                if (!string.IsNullOrEmpty(pathLookupAssetPath))
+                {
+                    var i = pathLookupAssetPath.LastIndexOf("Sirenix/", System.StringComparison.CurrentCultureIgnoreCase);
+                    pathLookupAssetPath = pathLookupAssetPath.Substring(0, i + "Sirenix/".Length);
+                    SirenixPluginPath = pathLookupAssetPath;
+                }
+
+                if (string.IsNullOrEmpty(pathLookupAssetPath) || log)
+                {
+                    Debug.LogError(sb.ToString());
+                }
             }
 
             var companyName = ToPathSafeString(UnityEditor.PlayerSettings.companyName);
@@ -145,8 +118,6 @@ namespace Sirenix.Utilities
             OdinPath = SirenixPluginPath + "Odin Inspector/";
             SirenixAssetsPath = SirenixPluginPath + "Assets/";
             SirenixAssembliesPath = SirenixPluginPath + "Assemblies/";
-            //OdinGeneratedEditorsAssemblyName = "GeneratedOdinEditors";
-            //OdinGeneratedEditorsPath = SirenixAssembliesPath + "Editor/" + OdinGeneratedEditorsAssemblyName + ".dll";
             OdinResourcesPath = OdinPath + "Config/Resources/Sirenix/";
             OdinEditorConfigsPath = OdinPath + "Config/Editor/";
             OdinResourcesConfigsPath = OdinResourcesPath;
@@ -157,25 +128,5 @@ namespace Sirenix.Utilities
             char[] invalids = Path.GetInvalidFileNameChars();
             return new string(name.Select(c => invalids.Contains(c) ? replace : c).ToArray());
         }
-
-#if UNITY_EDITOR
-
-        private static string FindFolderPattern()
-        {
-            var unityDir = new DirectoryInfo(Application.dataPath);
-
-            var assetDir = unityDir
-                .GetDirectories("*", SearchOption.AllDirectories)
-                .FirstOrDefault(x => x.Name == "Odin Inspector" && x.Parent.Name == "Sirenix");
-
-            if (assetDir == null)
-            {
-                return null;
-            }
-
-            return assetDir.Parent.FullName.Substring(unityDir.FullName.Length).Replace("\\", "/").TrimStart('/').TrimEnd('/') + "/";
-        }
-
-#endif
     }
 }

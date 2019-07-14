@@ -196,6 +196,7 @@ namespace Sirenix.Serialization.Utilities.Editor
         public static ScriptingImplementation GetCurrentScriptingBackend()
         {
             var buildGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+			
             if (getScriptingBackendMethod != null)
             {
                 return (ScriptingImplementation)getScriptingBackendMethod.Invoke(null, new object[] { buildGroup });

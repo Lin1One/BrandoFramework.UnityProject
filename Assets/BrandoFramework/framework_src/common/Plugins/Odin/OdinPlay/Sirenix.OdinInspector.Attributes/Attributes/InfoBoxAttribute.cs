@@ -114,6 +114,11 @@ namespace Sirenix.OdinInspector
         public string VisibleIf;
 
         /// <summary>
+        /// When <c>true</c> the InfoBox will ignore the GUI.enable flag and always draw as enabled.
+        /// </summary>
+        public bool GUIAlwaysEnabled;
+
+        /// <summary>
         /// Displays an info box above the property.
         /// </summary>
         /// <param name="message">The message for the message box. Supports referencing a member string field, property or method by using $.</param>

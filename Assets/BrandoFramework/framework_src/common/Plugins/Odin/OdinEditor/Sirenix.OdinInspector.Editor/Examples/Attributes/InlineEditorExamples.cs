@@ -7,7 +7,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using Sirenix.OdinInspector;
 
     [AttributeExample(typeof(InlineEditorAttribute))]
-    public class InlineEditorExamples
+    internal class InlineEditorExamples
     {
         [DisableInInlineEditors]
         public Vector3 DisabledInInlineEditors;

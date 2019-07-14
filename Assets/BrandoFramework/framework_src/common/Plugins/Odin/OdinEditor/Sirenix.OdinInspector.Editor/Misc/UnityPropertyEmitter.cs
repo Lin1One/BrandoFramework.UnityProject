@@ -104,10 +104,10 @@ namespace Sirenix.OdinInspector.Editor
             /// </summary>
             ~Handle()
             {
-                (this as IDisposable).Dispose();
+                this.Dispose();
             }
 
-            void IDisposable.Dispose()
+            public void Dispose()
             {
                 //Debug.Log("Dispose trigger");
 
@@ -154,6 +154,8 @@ namespace Sirenix.OdinInspector.Editor
         /// <exception cref="System.ArgumentException">Target count must be equal to or higher than 1.</exception>
         public static Handle CreateEmittedMonoBehaviourProperty(string fieldName, Type valueType, int targetCount, ref GameObject gameObject)
         {
+            DestroyMarkedObjects();
+
             if (fieldName == null)
             {
                 throw new ArgumentNullException("fieldName");
@@ -208,6 +210,8 @@ namespace Sirenix.OdinInspector.Editor
         /// <exception cref="System.ArgumentException">Target count must be equal to or higher than 1.</exception>
         public static SerializedProperty CreateEmittedScriptableObjectProperty(string fieldName, Type valueType, int targetCount)
         {
+            DestroyMarkedObjects();
+
             if (fieldName == null)
             {
                 throw new ArgumentNullException("fieldName");

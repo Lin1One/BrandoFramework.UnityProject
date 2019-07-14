@@ -5,6 +5,7 @@ namespace Sirenix.Serialization
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
 
     /// <summary>
     /// Not yet documented.
@@ -100,7 +101,7 @@ namespace Sirenix.Serialization
             {
                 Name = name,
                 Entry = EntryType.StartOfNode,
-                Data = type != null ? (id.ToString(CultureInfo.InvariantCulture) + SerializationNodeDataReaderWriterConfig.NodeIdSeparator + this.Binder.BindToName(type, this.Context.Config.DebugContext)) : id.ToString(CultureInfo.InvariantCulture)
+                Data = type != null ? (id.ToString(CultureInfo.InvariantCulture) + SerializationNodeDataReaderWriterConfig.NodeIdSeparator + this.Context.Binder.BindToName(type, this.Context.Config.DebugContext)) : id.ToString(CultureInfo.InvariantCulture)
             });
 
             this.PushNode(name, id, type);
@@ -115,7 +116,7 @@ namespace Sirenix.Serialization
             {
                 Name = name,
                 Entry = EntryType.StartOfNode,
-                Data = type != null ? this.Binder.BindToName(type, this.Context.Config.DebugContext) : ""
+                Data = type != null ? this.Context.Binder.BindToName(type, this.Context.Config.DebugContext) : ""
             });
 
             this.PushNode(name, -1, type);
@@ -476,6 +477,24 @@ namespace Sirenix.Serialization
         public override void FlushToStream()
         {
             // Do nothing
+        }
+
+        public override string GetDataDump()
+        {
+            var sb = new System.Text.StringBuilder();
+
+            sb.Append("Nodes: \n\n");
+
+            for (int i = 0; i < this.nodes.Count; i++)
+            {
+                var node = this.nodes[i];
+
+                sb.AppendLine("    - Name: " + node.Name);
+                sb.AppendLine("      Entry: " + (int)node.Entry);
+                sb.AppendLine("      Data: " + node.Data);
+            }
+
+            return sb.ToString();
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using System;
 
     [AttributeExample(typeof(ColorPaletteAttribute))]
-    public class ColorPaletteExamples
+    internal class ColorPaletteExamples
     {
         [ColorPalette]
         public Color ColorOptions;

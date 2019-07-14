@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using Sirenix.OdinInspector;
 
     [AttributeExample(typeof(EnumPagingAttribute))]
-    public class EnumPagingExamples
+    internal class EnumPagingExamples
     {
         [EnumPaging]
         public SomeEnum SomeEnumField;

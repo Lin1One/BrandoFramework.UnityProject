@@ -17,7 +17,7 @@ namespace Sirenix.OdinInspector.Editor
     using UnityEditor;
     using UnityEngine;
     using UnityEngine.Events;
-    using UnityEngine.Networking;
+    //using UnityEngine.Networking;
     using Utilities;
 
     public static class InspectorPropertyInfoUtility
@@ -157,11 +157,11 @@ namespace Sirenix.OdinInspector.Editor
             List<Attribute> attributes = new List<Attribute>();
             ProcessAttributes(parentProperty, member, attributes);
 
-            bool showInInspectorAttribute = attributes.Contains<ShowInInspectorAttribute>();
+            bool showInInspector = attributes.Contains<ShowInInspectorAttribute>();
 
             // Don't make properties for any members marked with or HideInInspector attributes.
             // ShowInInspector attribute overrules HideInInspector attribute.
-            if (showInInspectorAttribute == false && attributes.Contains<HideInInspector>())
+            if (showInInspector == false && attributes.Contains<HideInInspector>())
             {
                 result = null;
                 return false;
@@ -170,7 +170,7 @@ namespace Sirenix.OdinInspector.Editor
             // Only show static members if they're marked with the ShowInInspector attribute.
             if (member.IsStatic())
             {
-                if (showInInspectorAttribute)
+                if (showInInspector)
                 {
                     return TryCreate(member, SerializationBackend.None, true, out result, attributes);
                 }
@@ -181,25 +181,23 @@ namespace Sirenix.OdinInspector.Editor
                 }
             }
 
-            // Make a backend determination based solely on the member itself.
-            // This backend will be used when deciding whether or not to make an InspectorPropertyInfo, but will not be passed to the created Info.
-            SerializationBackend backend = SerializationBackend.None;
-
-            if (showInInspectorAttribute == false)
+            var parentBackend = GetSerializationBackendOfProperty(parentProperty);
+            var actualBackend = GetSerializationBackend(parentProperty, member, parentBackend);
+            
+            if (showInInspector == false && parentBackend == SerializationBackend.None)
             {
-                if (includeSpeciallySerializedMembers && UnitySerializationUtility.OdinWillSerialize(member, false))
+                // If the parent has no backend, we show properties that *would have been* serialized by Odin, if it had an Odin backend.
+                var potentialBackend = GetSerializationBackend(parentProperty, member, SerializationBackend.Odin);
+
+                if (potentialBackend != SerializationBackend.None)
                 {
-                    backend = SerializationBackend.Odin;
-                }
-                else if (UnitySerializationUtility.GuessIfUnityWillSerialize(member))
-                {
-                    backend = SerializationBackend.Unity;
+                    showInInspector = true;
                 }
             }
 
-            if (showInInspectorAttribute || backend != SerializationBackend.None)
+            if (showInInspector || actualBackend != SerializationBackend.None)
             {
-                return TryCreate(member, GetSerializationBackend(parentProperty, member), true, out result, attributes);
+                return TryCreate(member, actualBackend, true, out result, attributes);
             }
             else
             {
@@ -221,18 +219,11 @@ namespace Sirenix.OdinInspector.Editor
                 PropertyInfo propInfo = member as PropertyInfo;
                 PropertyInfo nonAliasedPropInfo = propInfo.DeAliasProperty();
 
-                bool valid = false;
+                bool valid = true;
 
-                if (backend == SerializationBackend.Odin)
+                if (!nonAliasedPropInfo.CanRead || !propInfo.CanRead)
                 {
-                    if (attributes.Contains<ShowInInspectorAttribute>() || nonAliasedPropInfo.IsAutoProperty())
-                    {
-                        valid = true;
-                    }
-                }
-                else if (propInfo.CanRead)
-                {
-                    valid = true;
+                    valid = false;
                 }
 
                 if (valid)
@@ -313,7 +304,6 @@ namespace Sirenix.OdinInspector.Editor
             throw new NotImplementedException();
         }
 
-
         public static List<InspectorPropertyInfo> CreateMemberProperties(InspectorProperty parentProperty, Type type, bool includeSpeciallySerializedMembers)
         {
             List<InspectorPropertyInfo> rootProperties = new List<InspectorPropertyInfo>();
@@ -324,7 +314,7 @@ namespace Sirenix.OdinInspector.Editor
 
             if (isUnityType
                 && !NeverProcessUnityPropertiesFor.Contains(type)
-                && !type.ImplementsOpenGenericClass(typeof(SyncList<>))
+                && !(UnityNetworkingUtility.SyncListType != null && type.ImplementsOpenGenericClass(UnityNetworkingUtility.SyncListType))
                 && !typeof(UnityAction).IsAssignableFrom(type)
                 && !type.ImplementsOpenGenericClass(typeof(UnityAction<>))
                 && !type.ImplementsOpenGenericClass(typeof(UnityAction<,>))
@@ -591,7 +581,7 @@ namespace Sirenix.OdinInspector.Editor
 
             // Consolidate the various group attributes into a single group attribute
             {
-                groupData.ConsolidatedAttribute = groupData.Attributes[0].Attribute;
+                groupData.ConsolidatedAttribute = (PropertyGroupAttribute)SerializationUtility.CreateCopy(groupData.Attributes[0].Attribute);
                 Type groupAttrType = groupData.ConsolidatedAttribute.GetType();
 
                 for (int i = 1; i < groupData.Attributes.Count; i++)
@@ -1181,31 +1171,91 @@ namespace Sirenix.OdinInspector.Editor
             }
         }
 
+        private static SerializationBackend GetSerializationBackendOfProperty(InspectorProperty property)
+        {
+            // Find the nearest parent property that has a value, if that exists
+            if (property.ValueEntry == null) property = property.ParentValueProperty ?? property;
+
+            return property.Info.SerializationBackend;
+        }
+
         public static SerializationBackend GetSerializationBackend(InspectorProperty parentProperty, MemberInfo member)
         {
-            var backend = parentProperty.Info.SerializationBackend;
+            return GetSerializationBackend(parentProperty, member, GetSerializationBackendOfProperty(parentProperty));
+        }
 
-            if (backend != SerializationBackend.None && member != null &&
-                (member is FieldInfo
-                || (member is PropertyInfo && (member as PropertyInfo).IsAutoProperty())))
+        private static SerializationBackend GetSerializationBackend(InspectorProperty parentProperty, MemberInfo member, SerializationBackend parentBackend)
+        {
+            if (!(member is FieldInfo || member is PropertyInfo)) return SerializationBackend.None;
+
+            InspectorProperty serializationRoot;
+
+            if (parentProperty.ValueEntry == null)
+                parentProperty = parentProperty.ParentValueProperty ?? parentProperty;
+
+            // Determine the serialization root
             {
-                if (backend == SerializationBackend.Odin)
+                if (parentProperty.ValueEntry != null && typeof(UnityEngine.Object).IsAssignableFrom(parentProperty.ValueEntry.TypeOfValue))
                 {
-                    bool unityContext = typeof(UnityEngine.Object).IsAssignableFrom(parentProperty.Info.TypeOfValue);
-                    backend = UnitySerializationUtility.OdinWillSerialize(member, unityContext == false) ? SerializationBackend.Odin : (unityContext ? SerializationBackend.Unity : SerializationBackend.None);
+                    serializationRoot = parentProperty;
+                }
+                else
+                {
+                    serializationRoot = parentProperty.SerializationRoot;
+                }
+            }
+            
+            // Early out for properties whose serialization root has no value (statically inspected property trees, for example).
+            if (serializationRoot.ValueEntry == null) return SerializationBackend.None;
+
+            if (parentBackend == SerializationBackend.None && serializationRoot != parentProperty)
+            {
+                // Early out for all properties that are children of a non-serialized property that is not a serialization root.
+                return SerializationBackend.None;
+            }
+
+            
+            ISerializationPolicy policy = SerializationPolicies.Unity;
+            bool includeSpeciallySerializedMembers = serializationRoot.ValueEntry.TypeOfValue.IsDefined(typeof(ShowOdinSerializedPropertiesInInspectorAttribute), true);
+            IOverridesSerializationPolicy policyOverride = serializationRoot.ValueEntry.WeakValues[0] as IOverridesSerializationPolicy;
+
+            if (includeSpeciallySerializedMembers && policyOverride != null)
+            {
+                policy = policyOverride.SerializationPolicy ?? SerializationPolicies.Unity;
+            }
+
+            if (serializationRoot != parentProperty)
+            {
+                // This is not the immediate child of a serialization root, meaning the serialization is dependent on the serialization of the parent value property
+                if (parentBackend == SerializationBackend.Odin)
+                {
+                    return UnitySerializationUtility.OdinWillSerialize(member, true, policy) ? SerializationBackend.Odin : SerializationBackend.None;
                 }
 
-                if (backend == SerializationBackend.Unity)
+                if (parentBackend == SerializationBackend.Unity)
                 {
-                    backend = UnitySerializationUtility.GuessIfUnityWillSerialize(member) ? SerializationBackend.Unity : SerializationBackend.None;
+                    return UnitySerializationUtility.GuessIfUnityWillSerialize(member) ? SerializationBackend.Unity : SerializationBackend.None;
                 }
             }
             else
             {
-                backend = SerializationBackend.None;
+                // This is the immediate child of a serialization root
+                if (includeSpeciallySerializedMembers)
+                {
+                    // The root has Odin serialization
+                    bool serializeUnityFields = false;
+
+                    if (policyOverride != null) serializeUnityFields = policyOverride.OdinSerializesUnityFields;
+
+                    if (UnitySerializationUtility.OdinWillSerialize(member, serializeUnityFields, policy))
+                        return SerializationBackend.Odin;
+                }
+
+                if (UnitySerializationUtility.GuessIfUnityWillSerialize(member))
+                    return SerializationBackend.Unity;
             }
 
-            return backend;
+            return SerializationBackend.None;
         }
 
         public static void ProcessAttributes(InspectorProperty parentProperty, MemberInfo member, List<Attribute> attributes)

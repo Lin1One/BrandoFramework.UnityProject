@@ -7,7 +7,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
 
     [AttributeExample(typeof(ValidateInputAttribute), 
         "ValidateInput is used to display error boxes in case of invalid values.\nIn this case the GameObject must have a MeshRenderer component.")]
-    public class ValidateInputExamples
+    internal class ValidateInputExamples
     {
         [HideLabel]
         [Title("Default message", "You can just provide a default message that is always used")]

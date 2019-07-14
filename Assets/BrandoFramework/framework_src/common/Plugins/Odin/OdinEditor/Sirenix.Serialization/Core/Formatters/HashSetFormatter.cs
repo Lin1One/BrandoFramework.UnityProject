@@ -12,7 +12,7 @@ namespace Sirenix.Serialization
     /// Custom generic formatter for the generic type definition <see cref="HashSet{T}"/>.
     /// </summary>
     /// <typeparam name="T">The element type of the formatted list.</typeparam>
-    /// <seealso cref="HashSet{T}" />
+    /// <seealso cref="BaseFormatter{System.Collections.Generic.HashSet{T}}" />
     public class HashSetFormatter<T> : BaseFormatter<HashSet<T>>
     {
         private static readonly Serializer<T> TSerializer = Serializer.Get<T>();
@@ -76,7 +76,7 @@ namespace Sirenix.Serialization
                         if (reader.IsInArrayNode == false)
                         {
                             // Something has gone wrong
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong at position " + reader.Stream.Position + ".");
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
                             break;
                         }
                     }

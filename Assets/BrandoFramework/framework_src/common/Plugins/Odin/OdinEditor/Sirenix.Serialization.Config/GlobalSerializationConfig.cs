@@ -4,6 +4,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.Serialization
 {
     using UnityEngine;
@@ -36,10 +37,7 @@ namespace Sirenix.Serialization
             "\n\n" +
             "*For those on AOT platforms* \n" +
             "Additionally, if you are building to AOT platforms, you should be aware that Odin's serialization currently makes use of " +
-            "reflection behind the scenes on all AOT platforms, which may result in lag spikes in your game if you make heavy use of it. " +
-            "\n\n" +
-            "Our number one priority right now is extending our serialization protocol so that it " +
-            "works without reflection on all platforms. This should be ready for you very soon.";
+            "reflection behind the scenes on all AOT platforms, which may result in lag spikes in your game if you make heavy use of it.";
 
         /// <summary>
         /// Text for the hide button for the cautionary serialization warning shown in the inspector.

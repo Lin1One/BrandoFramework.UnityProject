@@ -23,6 +23,7 @@ namespace Sirenix.Utilities.Editor
         /// <summary>
         /// Gets all assets of the specified type.
         /// </summary>
+        [Obsolete("This will eventually be removed. Use the AssetDatabase manually instead.")]
         public static IEnumerable<T> GetAllAssetsOfType<T>() where T : UnityEngine.Object
         {
             foreach (var item in GetAllAssetsOfType(typeof(T)))
@@ -37,6 +38,7 @@ namespace Sirenix.Utilities.Editor
         /// Gets all assets of the specified type.
         /// </summary>
 		/// <param name="type">The type of assets to find.</param>
+        [Obsolete("This will eventually be removed. Use the AssetDatabase manually instead.")]
         public static IEnumerable<UnityEngine.Object> GetAllAssetsOfType(Type type)
         {
             if (type.InheritsFrom(typeof(Component)))
@@ -73,12 +75,14 @@ namespace Sirenix.Utilities.Editor
         /// </summary>
         /// <param name="type">The type of assets to find.</param>
         /// <param name="folderPath">The asset folder path.</param>
+        [Obsolete("This will eventually be removed and is only used by the AssetList attribute drawer. Use the AssetDatabase manually instead.")]
         public static IEnumerable<AssetSearchResult> GetAllAssetsOfTypeWithProgress(Type type, string folderPath = null)
         {
             AssetSearchResult item = new AssetSearchResult();
 
             if (folderPath != null)
             {
+                // It's okay to use 'Assets/' here as it's only used by the AssetList attribute drawer.
                 folderPath = folderPath.Trim('/');
                 if (folderPath.StartsWith("Assets/", StringComparison.InvariantCultureIgnoreCase) == false)
                 {
@@ -204,6 +208,7 @@ namespace Sirenix.Utilities.Editor
         /// <typeparam name="T">The type of the asset.</typeparam>
         /// <param name="path">Project path to the new asset.</param>
         /// <param name="assetName">The name of the asset.</param>
+        [Obsolete("This will eventually be removed and is only used by the AssetList attribute drawer. Use the AssetDatabase manually instead.")]
         public static void CreateNewAsset<T>(string path, string assetName) where T : UnityEngine.Object
         {
             Type assetBaseType;

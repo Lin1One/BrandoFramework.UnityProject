@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(HideLabelAttribute))]
-    public class HideLabelExamples
+    internal class HideLabelExamples
     {
         [Title("Wide Colors")]
         [HideLabel]

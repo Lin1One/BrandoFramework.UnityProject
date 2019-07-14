@@ -1,9 +1,8 @@
 //-----------------------------------------------------------------------// <copyright file="SerializationAbortException.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
-using System;
-using System.Runtime.Serialization;
-
 namespace Sirenix.Serialization
 {
+    using System;
+
     /// <summary>
     /// An exception thrown when the serialization system has encountered an issue so severe that serialization is being aborted. If this exception is caught in the serialization system somewhere, it should be rethrown.
     /// </summary>

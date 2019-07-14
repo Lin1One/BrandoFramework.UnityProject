@@ -13,7 +13,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     [AttributeExample(typeof(DisableInPrefabInstancesAttribute))]
     [AttributeExample(typeof(DisableInPrefabsAttribute))]
     [AttributeExample(typeof(DisableInNonPrefabsAttribute))]
-    public class PrefabRelatedAttributesExamples
+    internal class PrefabRelatedAttributesExamples
     {
         [HideInPrefabAssets]
         public GameObject HiddenInPrefabAssets;

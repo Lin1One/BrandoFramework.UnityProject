@@ -5,6 +5,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.Utilities.Editor
 {
     using System;
@@ -33,7 +34,7 @@ namespace Sirenix.Utilities.Editor
 		 */
 
         private const int DEFAULT_PREVIEW_OBJECT_FIELD_HEIGHT = 30;
-        private static readonly int slideKnobWidth = 12;
+        private static readonly int slideKnobWidth = 14;
         private static readonly Color delayedActiveColor = Color.yellow;
         private static Vector4 vectorNormalBuffer;
         private static float vectorLengthBuffer;
@@ -47,7 +48,6 @@ namespace Sirenix.Utilities.Editor
         private static GUIStyle minMaxSliderStyle = null;
         private static GUIStyle sliderBackground = null;
         private static GUIStyle minMaxFloatingLabelStyle = null;
-        private static GUIStyle slideKnobStyle = null;
         private static List<int> layerNumbers = new List<int>();
         private static bool? responsiveVectorComponentFields;
         private static bool currentEnumControlHasValue = false;
@@ -193,14 +193,10 @@ namespace Sirenix.Utilities.Editor
             // TODO: Add overloads
             var id = DragAndDropUtilities.GetDragAndDropId(rect);
             DragAndDropUtilities.DrawDropZone(rect, value, null, id);
-
+            
             if (!dragOnly)
             {
                 value = DragAndDropUtilities.DropZone(rect, value, id);
-            }
-
-            if (!dragOnly)
-            {
                 value = DragAndDropUtilities.ObjectPickerZone(rect, value, allowSceneObjects, id);
             }
 
@@ -245,12 +241,6 @@ namespace Sirenix.Utilities.Editor
         public static UnityEngine.Object UnityPreviewObjectField(Rect rect, GUIContent label, UnityEngine.Object value, Type type, ObjectFieldAlignment alignment, bool dragOnly = false, bool allowMove = true, bool allowSwap = true, bool allowSceneObjects = true)
         {
             var id = DragAndDropUtilities.GetDragAndDropId(rect);
-
-            //if (Event.current.type == EventType.MouseUp && EditorGUIUtility.keyboardControl == id && rect.Contains(Event.current.mousePosition) && value as UnityEngine.Object)
-            //{
-            //    var uObj = value as UnityEngine.Object;
-            //    EditorGUIUtility.PingObject(value as UnityEngine.Object);
-            //}
 
             if (label != null)
             {
@@ -407,17 +397,45 @@ namespace Sirenix.Utilities.Editor
         public static object PolymorphicObjectField(GUIContent label, object value, Type type, bool allowSceneObjects, params GUILayoutOption[] options)
         {
             Rect rect;
-            bool hasKeyboadFocus;
+            bool hasKeyboardFocus;
             int id;
-            SirenixEditorGUI.GetFeatureRichControlRect(label, out id, out hasKeyboadFocus, out rect);
+            SirenixEditorGUI.GetFeatureRichControlRect(label, out id, out hasKeyboardFocus, out rect);
 
-            return PolymorphicObjectField(rect, value, type, allowSceneObjects, hasKeyboadFocus, id);
+            return PolymorphicObjectField(rect, value, type, allowSceneObjects, hasKeyboardFocus, id);
         }
 
         /// <summary>
         /// Draws a polymorphic ObjectField.
         /// </summary>
-        public static object PolymorphicObjectField(Rect rect, object value, Type type, bool allowSceneObjects, bool hasKeyboadFocus, int id)
+        public static object PolymorphicObjectField(Rect rect, GUIContent label, object value, Type type, bool allowSceneObjects)
+        {
+            var totalRect = rect;
+            var valueRect = rect;
+            var controlId = GUIUtility.GetControlID(FocusType.Keyboard);
+
+            if (label == null)
+            {
+                valueRect = EditorGUI.IndentedRect(valueRect);
+            }
+            else
+            {
+                totalRect.xMin += EditorGUI.indentLevel * 15f;
+                valueRect = EditorGUI.PrefixLabel(valueRect, controlId, label);
+            }
+
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && totalRect.Contains(Event.current.mousePosition))
+            {
+                GUIUtility.keyboardControl = controlId;
+            }
+
+            var hasKeyboardFocus = GUIUtility.keyboardControl == controlId && GUIHelper.CurrentWindow == EditorWindow.focusedWindow;
+            return PolymorphicObjectField(rect, value, type, allowSceneObjects, hasKeyboardFocus, controlId);
+        }
+
+        /// <summary>
+        /// Draws a polymorphic ObjectField.
+        /// </summary>
+        public static object PolymorphicObjectField(Rect rect, object value, Type type, bool allowSceneObjects, bool hasKeyboardFocus, int id)
         {
             var e = Event.current.type;
 
@@ -521,7 +539,7 @@ namespace Sirenix.Utilities.Editor
 
             value = DragAndDropUtilities.DropZone(rect, value, type, true, dropId);
 
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && rect.Contains(Event.current.mousePosition) || hasKeyboadFocus && Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyDown)
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && rect.Contains(Event.current.mousePosition) || hasKeyboardFocus && Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyDown)
             {
                 var forceOpenPicker = rect.AlignRight(16).Contains(Event.current.mousePosition);
 
@@ -910,6 +928,7 @@ namespace Sirenix.Utilities.Editor
             int control = EditorGUIUtility.GetControlID(FocusType.Passive);
             if (OnLocalControlRelease(rect, control))
             {
+                GUI.changed = true;
                 value = delayedIntBuffer;
             }
 
@@ -931,6 +950,7 @@ namespace Sirenix.Utilities.Editor
 
             if (EditorGUI.EndChangeCheck())
             {
+                GUI.changed = false;
                 localHotControl = control;
                 delayedIntBuffer = buffer;
             }
@@ -2150,6 +2170,7 @@ namespace Sirenix.Utilities.Editor
             if (OnLocalControlRelease(rect, control))
             {
                 value = delayedFloatBuffer;
+                GUI.changed = true;
             }
 
             // Value buffer
@@ -2172,6 +2193,7 @@ namespace Sirenix.Utilities.Editor
             {
                 localHotControl = control;
                 delayedFloatBuffer = buffer;
+                GUI.changed = false;
             }
 
             return value;
@@ -2497,6 +2519,7 @@ namespace Sirenix.Utilities.Editor
             if (OnLocalControlRelease(rect, control))
             {
                 value = delayedDoubleBuffer;
+                GUI.changed = true;
             }
 
             // Value buffer
@@ -2517,6 +2540,7 @@ namespace Sirenix.Utilities.Editor
             {
                 localHotControl = control;
                 delayedDoubleBuffer = buffer;
+                GUI.changed = false;
             }
 
             return value;
@@ -2852,54 +2876,86 @@ namespace Sirenix.Utilities.Editor
         /// <returns>Value assigned to the field.</returns>
         public static string DelayedTextField(Rect rect, GUIContent label, string value, GUIStyle style)
         {
-            int controlID = EditorGUIUtility.GetControlID(FocusType.Passive);
-
-            string text = value;
-            if (controlID == localHotControl)
+            int control = EditorGUIUtility.GetControlID(FocusType.Passive);
+            if (OnLocalControlRelease(rect, control))
             {
+                GUI.changed = true;
+                value = delayedTextBuffer;
+            }
+
+            // Value buffer
+            string buffer = value;
+            if (localHotControl == control)
+            {   
                 GUIHelper.PushColor(delayedActiveColor);
-                text = delayedTextBuffer;
+                buffer = delayedTextBuffer;
             }
-
-            if (label != null)
-            {
-                rect = EditorGUI.PrefixLabel(rect, label);
-            }
-
-            bool cancelEvent = Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape;
-            bool confirmEvent = Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return;
 
             EditorGUI.BeginChangeCheck();
-            text = EditorGUI.TextField(rect, text);
+            buffer = TextField(rect, label, buffer, style);
 
-            if (controlID == localHotControl)
+            if (localHotControl == control)
             {
                 GUIHelper.PopColor();
             }
 
             if (EditorGUI.EndChangeCheck())
             {
-                localHotControl = controlID;
-                delayedTextBuffer = text;
+                GUI.changed = false;
+                localHotControl = control;
+                delayedTextBuffer = buffer;
             }
 
-            if (controlID == localHotControl && confirmEvent)
-            {
-                localHotControl = 0;
-                GUI.changed = true;
-                Event.current.Use();
-                return text;
-            }
-            else if (controlID == localHotControl && cancelEvent)
-            {
-                localHotControl = 0;
-                Event.current.Use();
-                return value;
-            }
-            else
-            {
-                return value;
-            }
+            return value;
+
+            //int controlID = EditorGUIUtility.GetControlID(FocusType.Passive);
+
+            //string text = value;
+            //if (controlID == localHotControl)
+            //{
+            //    GUIHelper.PushColor(delayedActiveColor);
+            //    text = delayedTextBuffer;
+            //}
+
+            //if (label != null)
+            //{
+            //    rect = EditorGUI.PrefixLabel(rect, label);
+            //}
+
+            //bool cancelEvent = Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Escape;
+            //bool confirmEvent = Event.current.type == EventType.KeyDown && Event.current.keyCode == KeyCode.Return;
+
+            //EditorGUI.BeginChangeCheck();
+            //text = EditorGUI.TextField(rect, text);
+
+            //if (controlID == localHotControl)
+            //{
+            //    GUIHelper.PopColor();
+            //}
+
+            //if (EditorGUI.EndChangeCheck())
+            //{
+            //    localHotControl = controlID;
+            //    delayedTextBuffer = text;
+            //}
+
+            //if (controlID == localHotControl && confirmEvent)
+            //{
+            //    localHotControl = 0;
+            //    GUI.changed = true;
+            //    Event.current.Use();
+            //    return text;
+            //}
+            //else if (controlID == localHotControl && cancelEvent)
+            //{
+            //    localHotControl = 0;
+            //    Event.current.Use();
+            //    return value;
+            //}
+            //else
+            //{
+            //    return value;
+            //}
         }
 
         /// <summary>
@@ -5711,8 +5767,6 @@ namespace Sirenix.Utilities.Editor
                 return;
             }
 
-            slideKnobStyle = slideKnobStyle ?? new GUIStyle("IN Popup");
-
             var show = GUIUtility.hotControl == id || rect.Contains(Event.current.mousePosition);
 
             if (show && Event.current.type == EventType.MouseMove)
@@ -5722,9 +5776,16 @@ namespace Sirenix.Utilities.Editor
 
             if (Event.current.type == EventType.Repaint && show)
             {
-                var slideKnob = rect.AlignRight(slideKnobWidth);
+                var slideKnob = rect.AlignRight(slideKnobWidth - 2);
+                slideKnob.y = slideKnob.center.y;
+                slideKnob.y -= 9;
+                slideKnob.x -= 2;
+                slideKnob.height = 18;
+                var s = slideKnobWidth / 2;
                 GUIHelper.PushColor(GUIUtility.hotControl == id || slideKnob.Contains(Event.current.mousePosition) ? Color.white : new Color(1f, 1f, 1f, 0.35f));
-                slideKnobStyle.Draw(rect.AddX(1).AddY(1), GUIContent.none, id);
+                GUI.DrawTexture(slideKnob.AlignLeft(s), EditorIcons.TriangleLeft.Active);
+                GUI.DrawTexture(slideKnob.AlignRight(s), EditorIcons.TriangleRight.Active);
+                //slideKnobStyle.Draw(rect.AddX(-3), GUIContent.none, id);
                 GUIHelper.PopColor();
             }
         }

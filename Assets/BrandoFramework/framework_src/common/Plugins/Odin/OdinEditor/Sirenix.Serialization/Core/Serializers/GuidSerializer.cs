@@ -8,7 +8,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Serializer for the <see cref="Guid"/> type.
     /// </summary>
-    /// <seealso cref="Guid" />
+    /// <seealso cref="Serializer{System.Guid}" />
     public sealed class GuidSerializer : Serializer<Guid>
     {
         /// <summary>

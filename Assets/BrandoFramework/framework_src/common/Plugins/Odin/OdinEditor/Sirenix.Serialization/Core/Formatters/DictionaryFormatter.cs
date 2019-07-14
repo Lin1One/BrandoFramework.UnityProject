@@ -13,7 +13,7 @@ namespace Sirenix.Serialization
     /// </summary>
     /// <typeparam name="TKey">The type of the dictionary key.</typeparam>
     /// <typeparam name="TValue">The type of the dictionary value.</typeparam>
-    /// <seealso cref="Dictionary{TKey,TValue}" />
+    /// <seealso cref="BaseFormatter{System.Collections.Generic.Dictionary{TKey, TValue}}" />
     public sealed class DictionaryFormatter<TKey, TValue> : BaseFormatter<Dictionary<TKey, TValue>>
     {
         private static readonly bool KeyIsValueType = typeof(TKey).IsValueType;
@@ -129,7 +129,7 @@ namespace Sirenix.Serialization
 
                         if (reader.IsInArrayNode == false)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong at position " + reader.Stream.Position + ".");
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
                             break;
                         }
                     }
@@ -168,8 +168,8 @@ namespace Sirenix.Serialization
                     try
                     {
                         writer.BeginStructNode(null, null);
-                        KeyReaderWriter.WriteValue(pair.Key, writer);
-                        ValueReaderWriter.WriteValue(pair.Value, writer);
+                        KeyReaderWriter.WriteValue("$k", pair.Key, writer);
+                        ValueReaderWriter.WriteValue("$v", pair.Value, writer);
                     }
                     catch (SerializationAbortException ex)
                     {

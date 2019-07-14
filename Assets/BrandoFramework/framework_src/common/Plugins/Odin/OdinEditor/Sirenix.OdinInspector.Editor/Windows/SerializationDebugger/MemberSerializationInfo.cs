@@ -7,6 +7,7 @@ namespace Sirenix.OdinInspector.Editor
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using Sirenix.OdinInspector.Internal;
     using Sirenix.Serialization;
     using Sirenix.Utilities;
     using UnityEngine;
@@ -73,18 +74,21 @@ namespace Sirenix.OdinInspector.Editor
             this.UnityMessageType = InfoMessageType.None;
 
             // Should the member be serialized, but isn't?
-            if (flags.HasNone(SerializationFlags.SerializedByUnity | SerializationFlags.SerializedByOdin | SerializationFlags.NonSerializedAttribute) &&
-                flags.HasAny(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute) &&
-                (flags.HasAll(SerializationFlags.Field) || flags.HasAll(SerializationFlags.AutoProperty)))
+            if (flags.HasAll(SerializationFlags.DefaultSerializationPolicy))
             {
-                if (serializationBackend.HasNone(SerializationBackendFlags.Odin))
+                if (flags.HasNone(SerializationFlags.SerializedByUnity | SerializationFlags.SerializedByOdin | SerializationFlags.NonSerializedAttribute) &&
+                    flags.HasAny(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute) &&
+                    (flags.HasAll(SerializationFlags.Field) || flags.HasAll(SerializationFlags.AutoProperty)))
                 {
-                    this.OdinMessageType = InfoMessageType.Info;
-                }
+                    if (serializationBackend.HasNone(SerializationBackendFlags.Odin))
+                    {
+                        this.OdinMessageType = InfoMessageType.Info;
+                    }
 
-                if (flags.HasNone(SerializationFlags.Property) && UnitySerializationUtility.GuessIfUnityWillSerialize(member.GetReturnType()) == false)
-                {
-                    this.UnityMessageType = InfoMessageType.Info;
+                    if (flags.HasNone(SerializationFlags.Property) && UnitySerializationUtility.GuessIfUnityWillSerialize(member.GetReturnType()) == false)
+                    {
+                        this.UnityMessageType = InfoMessageType.Info;
+                    }
                 }
             }
 
@@ -127,7 +131,7 @@ namespace Sirenix.OdinInspector.Editor
             }
 
             // Does the member have OdinSerialize attribute, but is not serialized by Odin?
-            if (this.Info.HasAny(SerializationFlags.OdinSerializeAttribute) && !this.Info.HasAny(SerializationFlags.SerializedByOdin))
+            if (this.Info.HasAll(SerializationFlags.DefaultSerializationPolicy) && this.Info.HasAny(SerializationFlags.OdinSerializeAttribute) && !this.Info.HasAny(SerializationFlags.SerializedByOdin))
             {
                 this.OdinMessageType = InfoMessageType.Error;
             }
@@ -152,7 +156,7 @@ namespace Sirenix.OdinInspector.Editor
                 !this.Info.HasAny(SerializationFlags.NonSerializedAttribute) &&
                 !this.Info.HasAny(SerializationFlags.SerializedByUnity | SerializationFlags.SerializedByOdin))
             {
-                if (serializationBackend.HasAll(SerializationBackendFlags.Odin))
+                if (this.Info.HasAll(SerializationFlags.DefaultSerializationPolicy) && serializationBackend.HasAll(SerializationBackendFlags.Odin))
                 {
                     this.OdinMessageType = InfoMessageType.Error;
                 }
@@ -166,12 +170,15 @@ namespace Sirenix.OdinInspector.Editor
 
         public static List<MemberSerializationInfo> CreateSerializationOverview(Type type, SerializationBackendFlags serializationBackend, bool includeBaseTypes)
         {
+            bool serializeUnityFields;
+            var serializationPolicy = GetSerializationPolicy(type, out serializeUnityFields);
+
             return type.GetAllMembers(includeBaseTypes ? Flags.InstanceAnyVisibility : Flags.InstanceAnyDeclaredOnly)
                 .Where(x => x is FieldInfo || x is PropertyInfo)
                 .Where(x => !x.Name.StartsWith("<")) // Excludes backing fields.
                 .Where(x => (x.DeclaringType.Assembly.GetAssemblyTypeFlag() & (AssemblyTypeFlags.UnityEditorTypes | AssemblyTypeFlags.UnityTypes)) == 0) // Exclude members from UnityEngine types
                 .Where(x => !x.DeclaringType.Assembly.FullName.StartsWith("Sirenix."))
-                .Select(x => CreateInfoFor(x, serializationBackend)) // Creates MemberSerializationInfo
+                .Select(x => CreateInfoFor(x, serializationBackend, serializeUnityFields, serializationPolicy)) // Creates MemberSerializationInfo
                 .OrderByDescending(x => x.OdinMessageType == InfoMessageType.Error)
                 .ThenByDescending(x => x.UnityMessageType == InfoMessageType.Error)
                 .ThenByDescending(x => x.OdinMessageType == InfoMessageType.Warning)
@@ -184,7 +191,41 @@ namespace Sirenix.OdinInspector.Editor
                 .ToList();
         }
 
-        private static MemberSerializationInfo CreateInfoFor(MemberInfo member, SerializationBackendFlags serializationBackend)
+        private static ISerializationPolicy GetSerializationPolicy(Type type, out bool serializeUnityFields)
+        {
+            serializeUnityFields = false;
+            if (!typeof(IOverridesSerializationPolicy).IsAssignableFrom(type)) return SerializationPolicies.Unity;
+
+            IOverridesSerializationPolicy policyOverride = null;
+
+            var objects = Resources.FindObjectsOfTypeAll(type);
+
+            for (int i = 0; i < objects.Length; i++)
+            {
+                var obj = objects[i];
+                if (!object.ReferenceEquals(obj, null))
+                {
+                    policyOverride = obj as IOverridesSerializationPolicy;
+                    break;
+                }
+            }
+
+            if (!type.IsAbstract && !type.IsGenericTypeDefinition)
+            {
+                var inst = System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type);
+                policyOverride = inst as IOverridesSerializationPolicy;
+            }
+
+            if (policyOverride != null)
+            {
+                serializeUnityFields = policyOverride.OdinSerializesUnityFields;
+                return policyOverride.SerializationPolicy ?? SerializationPolicies.Unity;
+            }
+
+            return SerializationPolicies.Unity;
+        }
+
+        private static MemberSerializationInfo CreateInfoFor(MemberInfo member, SerializationBackendFlags serializationBackend, bool serializeUnityFields, ISerializationPolicy serializationPolicy)
         {
             SerializationFlags flags = 0;
 
@@ -214,6 +255,12 @@ namespace Sirenix.OdinInspector.Editor
                 }
             }
 
+            // Is the default serialization policy in use?
+            if (serializationPolicy != null && serializationPolicy.ID == SerializationPolicies.Unity.ID)
+            {
+                flags |= SerializationFlags.DefaultSerializationPolicy;
+            }
+
             // Will Unity serialize the member?
             if ((serializationBackend & SerializationBackendFlags.Unity) != 0 && UnitySerializationUtility.GuessIfUnityWillSerialize(member))
             {
@@ -221,7 +268,7 @@ namespace Sirenix.OdinInspector.Editor
             }
 
             // Will Odin serialize the member?
-            if ((serializationBackend & SerializationBackendFlags.Odin) != 0 && UnitySerializationUtility.OdinWillSerialize(member, false))
+            if ((serializationBackend & SerializationBackendFlags.Odin) != 0 && UnitySerializationUtility.OdinWillSerialize(member, serializeUnityFields, serializationPolicy))
             {
                 flags |= SerializationFlags.SerializedByOdin;
             }
@@ -250,267 +297,107 @@ namespace Sirenix.OdinInspector.Editor
                 flags |= SerializationFlags.TypeSupportedByUnity;
             }
 
-            return new MemberSerializationInfo(member, CreateNotes(member, flags, serializationBackend), flags, serializationBackend);
+            return new MemberSerializationInfo(member, CreateNotes(member, flags, serializationBackend, serializationPolicy.ID), flags, serializationBackend);
         }
 
-        private static string[] CreateNotes(MemberInfo member, SerializationFlags flags, SerializationBackendFlags serializationBackend)
+        private static string[] CreateNotes(MemberInfo member, SerializationFlags flags, SerializationBackendFlags serializationBackend, string serializationPolicyId)
         {
             List<string> notes = new List<string>();
-
             StringBuilder buffer = new StringBuilder();
 
-            // Member type
-            if (flags.HasAll(SerializationFlags.Property | SerializationFlags.AutoProperty))
+            // Handle the default serialization policy.
+            if (serializationBackend.HasNone(SerializationBackendFlags.Odin) || flags.HasAll(SerializationFlags.DefaultSerializationPolicy))
             {
-                buffer.AppendFormat("The auto property {0} ", member.GetNiceName());
-            }
-            else if (flags.HasAll(SerializationFlags.Property))
-            {
-                buffer.AppendFormat("The non-auto property {0} ", member.GetNiceName());
-            }
-            else
-            {
-                if (flags.HasAll(SerializationFlags.Public))
+                // Member type
+                if (flags.HasAll(SerializationFlags.Property | SerializationFlags.AutoProperty))
                 {
-                    buffer.AppendFormat("The public field {0} ", member.GetNiceName());
+                    buffer.AppendFormat("The auto property {0} ", member.GetNiceName());
                 }
-                else
-                {
-                    buffer.AppendFormat("The field {0} ", member.GetNiceName());
-                }
-            }
-
-            // Is the member serialized?
-            if (flags.HasAny(SerializationFlags.SerializedByOdin | SerializationFlags.SerializedByUnity))
-            {
-                buffer.Append("is serialized by ");
-
-                // Who?
-                if (flags.HasAll(SerializationFlags.SerializedByUnity | SerializationFlags.SerializedByOdin))
-                {
-                    buffer.Append("both Unity and Odin ");
-                }
-                else if (flags.HasAll(SerializationFlags.SerializedByUnity))
-                {
-                    buffer.Append("Unity ");
-                }
-                else
-                {
-                    buffer.Append("Odin ");
-                }
-
-                buffer.Append("because ");
-
-                // Why?
-                var relevant = flags & (SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute | SerializationFlags.NonSerializedAttribute);
-
-                if (flags.HasAll(SerializationFlags.OdinSerializeAttribute) && serializationBackend.HasAll(SerializationBackendFlags.Odin)) // The OdinSerialize attribute is only relevant when the Odin serialization backend is available.
-                {
-                    relevant |= SerializationFlags.OdinSerializeAttribute;
-                }
-
-                switch (relevant)
-                {
-                    case SerializationFlags.Public:
-                        buffer.Append("its access modifier is public. ");
-                        break;
-
-                    case SerializationFlags.SerializeFieldAttribute:
-                        buffer.Append("it has the [SerializeField] attribute. ");
-                        break;
-
-                    case SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute:
-                        buffer.Append("it has the [SerializeField] attribute, and it's public. ");
-                        break;
-
-                    case SerializationFlags.OdinSerializeAttribute:
-                        buffer.Append("it has the [OdinSerialize] attribute. ");
-                        break;
-
-                    case SerializationFlags.Public | SerializationFlags.OdinSerializeAttribute:
-                        buffer.Append("it has the [OdinSerialize] attribute, and it's public.");
-                        break;
-
-                    case SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute:
-                        buffer.Append("it has the [SerializeField] and [OdinSerialize] attribute. ");
-                        break;
-
-                    case SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute:
-                        buffer.Append("its access modifier is public and has the [SerializeField] and [OdinSerialize] attribute. ");
-                        break;
-
-                    case SerializationFlags.OdinSerializeAttribute | SerializationFlags.NonSerializedAttribute:
-                    case SerializationFlags.Public | SerializationFlags.OdinSerializeAttribute | SerializationFlags.NonSerializedAttribute:
-                    case SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute | SerializationFlags.NonSerializedAttribute:
-                    case SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute | SerializationFlags.NonSerializedAttribute:
-                        buffer.Append("it has the [OdinSerialize] and [NonSerialized] attribute. ");
-                        break;
-
-                    default:
-                        buffer.Append("(MISSING CASE: " + relevant.ToString() + ")");
-                        break;
-                }
-
-                // Empty the buffer.
-                if (buffer.Length > 0)
-                {
-                    notes.Add(buffer.ToString());
-                    buffer.Length = 0;
-                }
-
-                // Why is the value not serialized by Unity?
-                if (serializationBackend.HasAll(SerializationBackendFlags.Unity) && flags.HasNone(SerializationFlags.SerializedByUnity))
-                {
-                    buffer.Append("The member is not being serialized by Unity since ");
-
-                    if (flags.HasAll(SerializationFlags.Property))
-                    {
-                        buffer.Append("Unity does not serialize properties.");
-                    }
-                    else if (UnitySerializationUtility.GuessIfUnityWillSerialize(member.GetReturnType()) == false)
-                    {
-                        buffer.Append("Unity does not support the type.");
-                    }
-                    else if (flags.HasAll(SerializationFlags.NonSerializedAttribute))
-                    {
-                        buffer.Append("the [NonSerialized] attribute is defined.");
-                    }
-                    else if (flags.HasAny(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute) == false)
-                    {
-                        buffer.Append("it is neither a public field or has the [SerializeField] attribute.");
-                    }
-                    else
-                    {
-                        buffer.Append("# Missing case, please report: " + flags.ToString());
-                    }
-                }
-
-                // Empty the buffer.
-                if (buffer.Length > 0)
-                {
-                    notes.Add(buffer.ToString());
-                    buffer.Length = 0;
-                }
-
-                // Why is the value not serialized by Odin?
-                if (flags.HasAll(SerializationFlags.SerializedByOdin) == false)
-                {
-                    buffer.Append("Member is not serialized by Odin because ");
-
-                    if ((serializationBackend & SerializationBackendFlags.Odin) != 0)
-                    {
-                        if (flags.HasAll(SerializationFlags.SerializedByUnity))
-                        {
-                            buffer.Append("the member is already serialized by Unity. ");
-                        }
-                    }
-                    else
-                    {
-                        buffer.Append("Odin serialization is not implemented. ");
-
-                        if (flags.HasAll(SerializationFlags.OdinSerializeAttribute))
-                        {
-                            buffer.Append("The use of [OdinSerialize] attribute is invalid.");
-                        }
-                    }
-                }
-            }
-            else // Why not?
-            {
-                // Property members with Odin implementation.
-                if (flags.HasAll(SerializationFlags.Property) && serializationBackend.HasAll(SerializationBackendFlags.Odin))
-                {
-                    if (flags.HasAll(SerializationFlags.AutoProperty) == false)
-                    {
-                        buffer.Append("is skipped by Odin because non-auto properties are not serialized. ");
-
-                        if (flags.HasAll(SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute))
-                        {
-                            buffer.Append("The use of [SerializeField] and [OdinSerialize] attributes is invalid. ");
-                        }
-                        else if (flags.HasAll(SerializationFlags.OdinSerializeAttribute))
-                        {
-                            buffer.Append("The use of [OdinSerialize] attribute is invalid. ");
-                        }
-                        else if (flags.HasAll(SerializationFlags.SerializeFieldAttribute))
-                        {
-                            buffer.Append("The use of [SerializeField] attribute is invalid. ");
-                        }
-                        else if (flags.HasAll(SerializationFlags.NonSerializedAttribute))
-                        {
-                            buffer.Append("The use of [NonSerialized] attribute is unnecessary. ");
-                        }
-                    }
-                    else
-                    {
-                        buffer.Append("Auto property member is skipped by Odin because ");
-
-                        if (flags.HasNone(SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute))
-                        {
-                            buffer.Append("neither [SerializeField] nor [OdinSerialize] attributes have been used.");
-                        }
-                    }
-                }
-                // Property members without Odin implementation.
                 else if (flags.HasAll(SerializationFlags.Property))
                 {
-                    buffer.Append("is skipped by Unity because Unity does not serialize properties. ");
-
-                    if (flags.HasAll(SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute))
-                    {
-                        buffer.Append("The use of [SerializeField] and [OdinSerialize] attributes is invalid. ");
-                    }
-                    else if (flags.HasAll(SerializationFlags.OdinSerializeAttribute))
-                    {
-                        buffer.Append("The use of [OdinSerialize] attribute is invalid. ");
-                    }
-                    else if (flags.HasAny(SerializationFlags.SerializeFieldAttribute))
-                    {
-                        buffer.Append("The use of [SerializeField] attribute is invalid. ");
-                    }
-
-                    if (flags.HasAny(SerializationFlags.NonSerializedAttribute))
-                    {
-                        buffer.Append("The use of [NonSerialized] attribute is unnecessary.");
-                    }
+                    buffer.AppendFormat("The non-auto property {0} ", member.GetNiceName());
                 }
-                // Field members.
                 else
                 {
-                    // Backend ?
-                    buffer.Append("is skipped by ");
-                    switch (serializationBackend)
+                    if (flags.HasAll(SerializationFlags.Public))
                     {
-                        case SerializationBackendFlags.Unity:
-                            buffer.Append("Unity ");
-                            break;
+                        buffer.AppendFormat("The public field {0} ", member.GetNiceName());
+                    }
+                    else
+                    {
+                        buffer.AppendFormat("The field {0} ", member.GetNiceName());
+                    }
+                }
 
-                        case SerializationBackendFlags.Odin:
-                            buffer.Append("Odin ");
-                            break;
+                // Is the member serialized?
+                if (flags.HasAny(SerializationFlags.SerializedByOdin | SerializationFlags.SerializedByUnity))
+                {
+                    buffer.Append("is serialized by ");
 
-                        case SerializationBackendFlags.UnityAndOdin:
-                            buffer.Append("both Unity and Odin ");
-                            break;
+                    // Who?
+                    if (flags.HasAll(SerializationFlags.SerializedByUnity | SerializationFlags.SerializedByOdin))
+                    {
+                        buffer.Append("both Unity and Odin ");
+                    }
+                    else if (flags.HasAll(SerializationFlags.SerializedByUnity))
+                    {
+                        buffer.Append("Unity ");
+                    }
+                    else
+                    {
+                        buffer.Append("Odin ");
                     }
 
                     buffer.Append("because ");
 
-                    if (serializationBackend == SerializationBackendFlags.None)
+                    // Why?
+                    var relevant = flags & (SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute | SerializationFlags.NonSerializedAttribute);
+
+                    if (flags.HasAll(SerializationFlags.OdinSerializeAttribute) && serializationBackend.HasAll(SerializationBackendFlags.Odin)) // The OdinSerialize attribute is only relevant when the Odin serialization backend is available.
                     {
-                        buffer.Append("there is no serialization backend? ");
+                        relevant |= SerializationFlags.OdinSerializeAttribute;
                     }
-                    else if (flags.HasAll(SerializationFlags.NonSerializedAttribute))
+
+                    switch (relevant)
                     {
-                        buffer.Append("the [NonSerialized] attribute is defined. ");
-                    }
-                    else if (flags.HasNone(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute))
-                    {
-                        buffer.Append("the field is neither public nor a [SerializeField] attribute. ");
-                    }
-                    else if (serializationBackend == SerializationBackendFlags.Unity && flags.HasAny(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute))
-                    {
-                        buffer.Append("Unity does not support the type " + member.GetReturnType().GetNiceName());
+                        case SerializationFlags.Public:
+                            buffer.Append("its access modifier is public. ");
+                            break;
+
+                        case SerializationFlags.SerializeFieldAttribute:
+                            buffer.Append("it the [SerializeField] attribute is defined. ");
+                            break;
+
+                        case SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute:
+                            buffer.Append("it the [SerializeField] attribute is defined, and it's public. ");
+                            break;
+
+                        case SerializationFlags.OdinSerializeAttribute:
+                            buffer.Append("it the [OdinSerialize] attribute is defined. ");
+                            break;
+
+                        case SerializationFlags.Public | SerializationFlags.OdinSerializeAttribute:
+                            buffer.Append("it the [OdinSerialize] attribute is defined, and it's public.");
+                            break;
+
+                        case SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute:
+                            buffer.Append("it the [SerializeField] and [OdinSerialize] attributes are defined. ");
+                            break;
+
+                        case SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute:
+                            buffer.Append("its access modifier is public and the [SerializeField] and [OdinSerialize] attribute are defined. ");
+                            break;
+
+                        case SerializationFlags.OdinSerializeAttribute | SerializationFlags.NonSerializedAttribute:
+                        case SerializationFlags.Public | SerializationFlags.OdinSerializeAttribute | SerializationFlags.NonSerializedAttribute:
+                        case SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute | SerializationFlags.NonSerializedAttribute:
+                        case SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute | SerializationFlags.NonSerializedAttribute:
+                            buffer.Append("the [OdinSerialize] and [NonSerialized] attribute are defined. ");
+                            break;
+
+                        default:
+                            buffer.Append("(MISSING CASE: " + relevant.ToString() + ")");
+                            break;
                     }
 
                     // Empty the buffer.
@@ -520,17 +407,299 @@ namespace Sirenix.OdinInspector.Editor
                         buffer.Length = 0;
                     }
 
-                    // Invalid use of OdinSerialize.
-                    if ((serializationBackend & SerializationBackendFlags.Odin) == 0 && flags.HasAll(SerializationFlags.OdinSerializeAttribute))
+                    // Why is the value not serialized by Unity?
+                    if (serializationBackend.HasAll(SerializationBackendFlags.Unity) && flags.HasNone(SerializationFlags.SerializedByUnity))
                     {
-                        notes.Add("Odin serialization is not implemented. The use of [OdinSerialize] attribute is invalid."); // Just add this line directly to the notes list.
+                        buffer.Append("The member is not being serialized by Unity since ");
+
+                        if (flags.HasAll(SerializationFlags.Property))
+                        {
+                            buffer.Append("Unity does not serialize properties.");
+                        }
+                        else if (UnitySerializationUtility.GuessIfUnityWillSerialize(member.GetReturnType()) == false)
+                        {
+                            buffer.Append("Unity does not support the type.");
+                        }
+                        else if (flags.HasAll(SerializationFlags.NonSerializedAttribute))
+                        {
+                            buffer.Append("the [NonSerialized] attribute is defined.");
+                        }
+                        else if (flags.HasAny(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute) == false)
+                        {
+                            buffer.Append("it is neither a public field or has the [SerializeField] attribute.");
+                        }
+                        else
+                        {
+                            buffer.Append("# Missing case, please report: " + flags.ToString());
+                        }
+                    }
+
+                    // Empty the buffer.
+                    if (buffer.Length > 0)
+                    {
+                        notes.Add(buffer.ToString());
+                        buffer.Length = 0;
+                    }
+
+                    // Why is the value not serialized by Odin?
+                    if (flags.HasAll(SerializationFlags.SerializedByOdin) == false)
+                    {
+                        buffer.Append("Member is not serialized by Odin because ");
+
+                        if ((serializationBackend & SerializationBackendFlags.Odin) != 0)
+                        {
+                            if (flags.HasAll(SerializationFlags.SerializedByUnity))
+                            {
+                                buffer.Append("the member is already serialized by Unity. ");
+                            }
+                        }
+                        else
+                        {
+                            buffer.Append("Odin serialization is not implemented. ");
+
+                            if (flags.HasAll(SerializationFlags.OdinSerializeAttribute))
+                            {
+                                buffer.Append("The use of [OdinSerialize] attribute is invalid.");
+                            }
+                        }
+                    }
+                }
+                else // Why not?
+                {
+                    // Property members with Odin implementation.
+                    if (flags.HasAll(SerializationFlags.Property) && serializationBackend.HasAll(SerializationBackendFlags.Odin))
+                    {
+                        if (flags.HasAll(SerializationFlags.AutoProperty) == false)
+                        {
+                            buffer.Append("is skipped by Odin because non-auto properties are not serialized. ");
+
+                            if (flags.HasAll(SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute))
+                            {
+                                buffer.Append("The use of [SerializeField] and [OdinSerialize] attributes is invalid. ");
+                            }
+                            else if (flags.HasAll(SerializationFlags.OdinSerializeAttribute))
+                            {
+                                buffer.Append("The use of [OdinSerialize] attribute is invalid. ");
+                            }
+                            else if (flags.HasAll(SerializationFlags.SerializeFieldAttribute))
+                            {
+                                buffer.Append("The use of [SerializeField] attribute is invalid. ");
+                            }
+                            else if (flags.HasAll(SerializationFlags.NonSerializedAttribute))
+                            {
+                                buffer.Append("The use of [NonSerialized] attribute is unnecessary. ");
+                            }
+                        }
+                        else
+                        {
+                            buffer.Append("Auto property member is skipped by Odin because ");
+
+                            if (flags.HasNone(SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute))
+                            {
+                                buffer.Append("neither [SerializeField] nor [OdinSerialize] attributes have been used.");
+                            }
+                        }
+                    }
+                    // Property members without Odin implementation.
+                    else if (flags.HasAll(SerializationFlags.Property))
+                    {
+                        buffer.Append("is skipped by Unity because Unity does not serialize properties. ");
+
+                        if (flags.HasAll(SerializationFlags.SerializeFieldAttribute | SerializationFlags.OdinSerializeAttribute))
+                        {
+                            buffer.Append("The use of [SerializeField] and [OdinSerialize] attributes is invalid. ");
+                        }
+                        else if (flags.HasAll(SerializationFlags.OdinSerializeAttribute))
+                        {
+                            buffer.Append("The use of [OdinSerialize] attribute is invalid. ");
+                        }
+                        else if (flags.HasAny(SerializationFlags.SerializeFieldAttribute))
+                        {
+                            buffer.Append("The use of [SerializeField] attribute is invalid. ");
+                        }
+
+                        if (flags.HasAny(SerializationFlags.NonSerializedAttribute))
+                        {
+                            buffer.Append("The use of [NonSerialized] attribute is unnecessary.");
+                        }
+                    }
+                    // Field members.
+                    else
+                    {
+                        // Backend ?
+                        buffer.Append("is skipped by ");
+                        switch (serializationBackend)
+                        {
+                            case SerializationBackendFlags.Unity:
+                                buffer.Append("Unity ");
+                                break;
+
+                            case SerializationBackendFlags.Odin:
+                                buffer.Append("Odin ");
+                                break;
+
+                            case SerializationBackendFlags.UnityAndOdin:
+                                buffer.Append("both Unity and Odin ");
+                                break;
+                        }
+
+                        buffer.Append("because ");
+
+                        if (serializationBackend == SerializationBackendFlags.None)
+                        {
+                            buffer.Append("there is no serialization backend? ");
+                        }
+                        else if (flags.HasAll(SerializationFlags.NonSerializedAttribute))
+                        {
+                            buffer.Append("the [NonSerialized] attribute is defined. ");
+                        }
+                        else if (flags.HasNone(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute))
+                        {
+                            buffer.Append("the field is neither public nor is the [SerializeField] attribute defined. ");
+                        }
+                        else if (serializationBackend == SerializationBackendFlags.Unity && flags.HasAny(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute))
+                        {
+                            buffer.Append("Unity does not support the type " + member.GetReturnType().GetNiceName());
+                        }
+
+                        // Empty the buffer.
+                        if (buffer.Length > 0)
+                        {
+                            notes.Add(buffer.ToString());
+                            buffer.Length = 0;
+                        }
+
+                        // Invalid use of OdinSerialize.
+                        if ((serializationBackend & SerializationBackendFlags.Odin) == 0 && flags.HasAll(SerializationFlags.OdinSerializeAttribute))
+                        {
+                            notes.Add("Odin serialization is not implemented. The use of [OdinSerialize] attribute is invalid."); // Just add this line directly to the notes list.
+                        }
+                    }
+
+                    // Using both [SerializeField] and [NonSerialized] attributes.
+                    if (flags.HasAll(SerializationFlags.SerializeFieldAttribute | SerializationFlags.NonSerializedAttribute) && flags.HasNone(SerializationFlags.OdinSerializeAttribute))
+                    {
+                        notes.Add("Use of [SerializeField] along with [NonSerialized] attributes is weird. Remove either the [SerializeField] or [NonSerialized] attribute.");
+                    }
+                }
+            }
+            else // Custom serialization policy.
+            {
+                if (flags.HasAll(SerializationFlags.AutoProperty))
+                {
+                    buffer.Append(flags.HasAll(SerializationFlags.Public) ? "The public auto property " : "The auto property ");
+                }
+                else if (flags.HasAll(SerializationFlags.Property))
+                {
+                    buffer.Append(flags.HasAll(SerializationFlags.Public) ? "The public property " : "The property ");
+                }
+                else
+                {
+                    buffer.Append(flags.HasAll(SerializationFlags.Public) ? "The public field " : "The field ");
+                }
+                buffer.AppendFormat("{0} ", member.GetNiceName());
+
+                // Serialized by Unity.
+                if (flags.HasAll(SerializationFlags.SerializedByUnity))
+                {
+                    buffer.Append("is serialized by Unity since ");
+
+                    if (flags.HasAll(SerializationFlags.Field))
+                    {
+                        switch (flags & (SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute))
+                        {
+                            case SerializationFlags.Public:
+                                buffer.Append("its access modifier is public. ");
+                                break;
+
+                            case SerializationFlags.SerializeFieldAttribute:
+                                buffer.Append("it the [SerializeField] attribute is defined. ");
+                                break;
+
+                            case SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute:
+                                buffer.Append("it the [SerializeField] attribute is defined, and it's public. ");
+                                break;
+
+                            default:
+                                buffer.Append("(MISSING CASE: " + flags.ToString() + ")");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        buffer.Append("is serialized by Unity? Unity should not be serializing any properties? ");
+                    }
+                }
+                else
+                {
+                    buffer.Append("is skipped by Unity ");
+
+                    if (flags.HasAll(SerializationFlags.Field))
+                    {
+                        if (flags.HasNone(SerializationFlags.TypeSupportedByUnity))
+                        {
+                            buffer.Append("because Unity does not support the type " + member.GetReturnType().GetNiceName());
+                        }
+                        else if (flags.HasAll(SerializationFlags.NonSerializedAttribute))
+                        {
+                            buffer.Append("because the [NonSerialized] attribute is defined. ");
+                        }
+                        else if (flags.HasNone(SerializationFlags.Public | SerializationFlags.SerializeFieldAttribute))
+                        {
+                            buffer.Append("because the field is not public nor is the [SerializeField] attribute is not defined. ");
+                        }
+                        else
+                        {
+                            buffer.Append("(MISSING CASE: " + flags.ToString() + ")");
+                        }
+                    }
+                    else
+                    {
+                        buffer.Append("because Unity does not serialize properties. ");
                     }
                 }
 
-                // Using both [SerializeField] and [NonSerialized] attributes.
-                if (flags.HasAll(SerializationFlags.SerializeFieldAttribute | SerializationFlags.NonSerializedAttribute) && flags.HasNone(SerializationFlags.OdinSerializeAttribute))
+                // Empty the buffer.
+                if (buffer.Length > 0)
                 {
-                    notes.Add("Use of [SerializeField] along with [NonSerialized] attributes is weird. Remove either the [SerializeField] or [NonSerialized] attribute.");
+                    notes.Add(buffer.ToString());
+                    buffer.Length = 0;
+                }
+
+                // Serialized by Odin with custom serialization policy.
+                if (flags.HasAll(SerializationFlags.AutoProperty))
+                {
+                    buffer.Append("The auto property ");
+                }
+                else if (flags.HasAll(SerializationFlags.Property))
+                {
+                    buffer.Append("The property ");
+                }
+                else
+                {
+                    buffer.Append("The field ");
+                }
+
+                if (flags.HasAll(SerializationFlags.SerializedByOdin))
+                {
+                    buffer.Append("is serialized by Odin because of custom serialization policy: " + serializationPolicyId);
+                }
+                else
+                {
+                    buffer.Append("is skipped by Odin because of custom serialization policy: " + serializationPolicyId);
+                }
+
+                // Empty the buffer.
+                if (buffer.Length > 0)
+                {
+                    notes.Add(buffer.ToString());
+                    buffer.Length = 0;
+                }
+
+                // Serialized by both Unity and Odin.
+                if (flags.HasAll(SerializationFlags.SerializedByOdin | SerializationFlags.SerializedByUnity))
+                {
+                    notes.Add("The member is serialized by both Unity and Odin. Consider ensuring that only one serializer is in use.");
                 }
             }
 
@@ -578,9 +747,9 @@ namespace Sirenix.OdinInspector.Editor
                 {
                     buffer.Append(inheritFrom + typeof(SerializedMonoBehaviour).GetNiceName());
                 }
-                else if (typeof(UnityEngine.Networking.NetworkBehaviour).IsAssignableFrom(member.DeclaringType))
+                else if (UnityNetworkingUtility.NetworkBehaviourType != null && UnityNetworkingUtility.NetworkBehaviourType.IsAssignableFrom(member.DeclaringType))
                 {
-                    buffer.Append(inheritFrom + typeof(SerializedNetworkBehaviour).GetNiceName());
+                    buffer.Append(inheritFrom + " SerializedNetworkBehaviour");
                 }
                 else if (typeof(Behaviour).IsAssignableFrom(member.DeclaringType))
                 {
@@ -707,8 +876,9 @@ namespace Sirenix.OdinInspector.Editor
         }
     }
 
+    // TOOD: Make internal again.
     [Flags]
-    internal enum SerializationFlags
+    public enum SerializationFlags
     {
         Public = 1 << 1,
         Field = 1 << 2,
@@ -720,10 +890,12 @@ namespace Sirenix.OdinInspector.Editor
         OdinSerializeAttribute = 1 << 8,
         NonSerializedAttribute = 1 << 9,
         TypeSupportedByUnity = 1 << 10,
+        DefaultSerializationPolicy = 1 << 11,
     }
 
+    // TOOD: Make internal again.
     [Flags]
-    internal enum SerializationBackendFlags
+    public enum SerializationBackendFlags
     {
         None = 0,
         Unity = 1,

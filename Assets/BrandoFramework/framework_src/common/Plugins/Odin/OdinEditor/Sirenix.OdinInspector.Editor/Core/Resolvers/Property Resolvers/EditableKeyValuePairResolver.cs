@@ -9,11 +9,13 @@ namespace Sirenix.OdinInspector.Editor
 {
     using Sirenix.Serialization;
     using System;
+    using System.Collections.Generic;
 
     [ResolverPriority(-1)]
     public class EditableKeyValuePairResolver<TKey, TValue> : OdinPropertyResolver<EditableKeyValuePair<TKey, TValue>>, IHasSpecialPropertyPaths, IMaySupportPrefabModifications
     {
-        private static InspectorPropertyInfo[] ChildInfos;
+        private static Dictionary<SerializationBackend, InspectorPropertyInfo[]> ChildInfos = new Dictionary<SerializationBackend, InspectorPropertyInfo[]>();
+        private SerializationBackend backend;
 
         public bool MaySupportPrefabModifications { get { return DictionaryKeyUtility.KeyTypeSupportsPersistentPaths(typeof(TKey)); } }
 
@@ -50,20 +52,22 @@ namespace Sirenix.OdinInspector.Editor
 
         protected override void Initialize()
         {
-            if (ChildInfos == null)
+            this.backend = this.Property.ValueEntry.SerializationBackend;
+
+            if (!ChildInfos.ContainsKey(backend))
             {
-                ChildInfos = InspectorPropertyInfoUtility.GetDefaultPropertiesForType(this.Property, typeof(EditableKeyValuePair<TKey, TValue>), false);
+                ChildInfos[backend] = InspectorPropertyInfoUtility.GetDefaultPropertiesForType(this.Property, typeof(EditableKeyValuePair<TKey, TValue>), false);
             }
         }
 
         public override InspectorPropertyInfo GetChildInfo(int childIndex)
         {
-            return ChildInfos[childIndex];
+            return ChildInfos[this.backend][childIndex];
         }
 
         protected override int GetChildCount(EditableKeyValuePair<TKey, TValue> value)
         {
-            return ChildInfos.Length;
+            return ChildInfos[this.backend].Length;
         }
 
         public override int ChildNameToIndex(string name)

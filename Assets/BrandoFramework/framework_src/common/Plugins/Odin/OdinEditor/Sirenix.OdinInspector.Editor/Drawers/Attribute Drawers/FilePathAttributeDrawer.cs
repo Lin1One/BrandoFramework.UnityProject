@@ -5,6 +5,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
     using Sirenix.OdinInspector;
@@ -45,8 +46,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 #pragma warning restore CS0618 // Type or member is obsolete.
 
             this.parentProperty = this.Property.FindParent(p => p.Info.HasSingleBackingMember, true);
-            this.parent = new StringMemberHelper(this.parentProperty.ParentType, this.Attribute.ParentFolder, ref this.errorMessage);
-            this.extensions = new StringMemberHelper(this.parentProperty.ParentType, this.Attribute.Extensions, ref this.errorMessage);
+            this.parent = new StringMemberHelper(this.parentProperty, this.Attribute.ParentFolder, ref this.errorMessage);
+            this.extensions = new StringMemberHelper(this.parentProperty, this.Attribute.Extensions, ref this.errorMessage);
 
             this.exists = this.PathExists(this.ValueEntry.SmartValue, this.parent.GetString(this.Property));
         }

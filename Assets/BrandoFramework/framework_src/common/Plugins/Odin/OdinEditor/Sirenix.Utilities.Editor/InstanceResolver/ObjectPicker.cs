@@ -90,6 +90,7 @@ namespace Sirenix.Utilities.Editor
     /// </summary>
     public sealed class ObjectPicker
     {
+        private static EditorWindow WindowPickedFrom;
         private static readonly object objectPickerConfigKey = new object();
 
         private readonly bool isUnityObject;
@@ -104,6 +105,7 @@ namespace Sirenix.Utilities.Editor
         private int controlId;
         private bool isPickerOpen;
         private bool isUnitySerialized;
+        private EditorWindow window;
 
         /// <summary>
         /// Not yet documented.
@@ -118,6 +120,7 @@ namespace Sirenix.Utilities.Editor
                 objectPicker.Value = new ObjectPicker(type);
             }
 
+            objectPicker.Value.window = GUIHelper.CurrentWindow;
             objectPicker.Value.Update();
             return objectPicker;
         }
@@ -134,6 +137,7 @@ namespace Sirenix.Utilities.Editor
 
             this.isUnityComponent = this.type.InheritsFrom(typeof(UnityEngine.Component));
         }
+
 
         /// <summary>
         /// Not yet documented.
@@ -207,6 +211,7 @@ namespace Sirenix.Utilities.Editor
                         .MakeGenericMethod(this.type)
                         .Invoke(null, new object[] { currValue, allowSceneObjects, null, this.controlId });
 
+                    WindowPickedFrom = GUIHelper.CurrentWindow;
                     this.CurrentSelectedObject = currValue;
                 }
             }
@@ -305,7 +310,7 @@ namespace Sirenix.Utilities.Editor
                     //current.Use();
                     //return obj4;
 
-                    if (Event.current.commandName == "ObjectSelectorUpdated" && EditorGUIUtility.GetObjectPickerControlID() == this.controlId && this.controlId > 0)
+                    if (Event.current.commandName == "ObjectSelectorUpdated" && EditorGUIUtility.GetObjectPickerControlID() == this.controlId && this.controlId > 0 && this.window == WindowPickedFrom)
                     {
                         var val = EditorGUIUtility.GetObjectPickerObject();
                         if (val == null)
@@ -324,7 +329,7 @@ namespace Sirenix.Utilities.Editor
                         this.IsReadyToClaim = false;
                         Event.current.Use();
                     }
-                    else if (Event.current.commandName == "ObjectSelectorClosed" && EditorGUIUtility.GetObjectPickerControlID() == this.controlId && this.controlId > 0)
+                    else if (Event.current.commandName == "ObjectSelectorClosed" && EditorGUIUtility.GetObjectPickerControlID() == this.controlId && this.controlId > 0 && this.window == WindowPickedFrom)
                     {
                         GUI.changed = true;
                         this.IsReadyToClaim = true;

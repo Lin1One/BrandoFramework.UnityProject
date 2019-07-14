@@ -10,8 +10,9 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using Sirenix.Utilities;
     using UnityEngine;
 
+    [ShowOdinSerializedPropertiesInInspector]
     [AttributeExample(typeof(TypeFilterAttribute), "The TypeFilter will instantiate the given type directly, It will also draw all child members in a foldout below the dropdown.")]
-    public class TypeFilterExamples
+    internal class TypeFilterExamples
     {
         [TypeFilter("GetFilteredTypeList")]
         public BaseClass A, B, C, D;

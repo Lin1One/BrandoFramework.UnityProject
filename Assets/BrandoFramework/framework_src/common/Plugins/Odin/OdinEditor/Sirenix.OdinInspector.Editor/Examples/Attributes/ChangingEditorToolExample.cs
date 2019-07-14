@@ -8,7 +8,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     [AttributeExampleDescription("Example of using EnumPaging together with OnValueChanged.")]
     [AttributeExample(typeof(EnumPagingAttribute), Order = 10)]
     [AttributeExample(typeof(OnValueChangedAttribute), Order = 10)]
-    public class ChangingEditorToolExample
+    internal class ChangingEditorToolExample
     {
         [ShowInInspector]
         [EnumPaging, OnValueChanged("SetCurrentTool")]

@@ -140,7 +140,7 @@ namespace Sirenix.Utilities.Editor
         public static object ObjectPickerZone(Rect rect, object value, Type type, bool allowSceneObjects, int id)
         {
             var btnId = GUIUtility.GetControlID(FocusType.Passive);
-            var objectPicker = ObjectPicker.GetObjectPicker(type.FullName + "+" + btnId, type);
+            var objectPicker = ObjectPicker.GetObjectPicker(type.FullName + "+" + GUIHelper.CurrentWindowInstanceID.ToString() +"+" + id, type);
             var selectRect = rect.AlignBottom(15).AlignCenter(45);
             var uObj = value as UnityEngine.Object;
             selectRect.xMin = Mathf.Max(selectRect.xMin, rect.xMin);
@@ -212,9 +212,16 @@ namespace Sirenix.Utilities.Editor
                 return null;
             }
 
-            if (uObj && Event.current.type == EventType.MouseUp && rect.Contains(Event.current.mousePosition) && EditorGUIUtility.hotControl == id && Event.current.button == 0)
+            if (uObj && Event.current.rawType == EventType.MouseUp && rect.Contains(Event.current.mousePosition) && Event.current.button == 0)
             {
-                EditorGUIUtility.PingObject(uObj);
+                // For components ping the attached game object instead, because then Unity can figure out to ping prefabs in the project window too.
+                UnityEngine.Object pingObj = uObj;
+                if (pingObj is Component)
+                {
+                    pingObj = (pingObj as Component).gameObject;
+                }
+
+                EditorGUIUtility.PingObject(pingObj);
             }
 
             return value;
@@ -237,7 +244,7 @@ namespace Sirenix.Utilities.Editor
 
             if (Event.current.type == EventType.Repaint)
             {
-                var unityObject = value as UnityEngine.Object;
+                var objectToPaint = value as UnityEngine.Object;
                 var objectFieldThumb = EditorStyles.objectFieldThumb;
                 var on = GUI.enabled && hoveringAcceptedDropZone == id && rect.Contains(Event.current.mousePosition) && isDragging;
 
@@ -247,19 +254,32 @@ namespace Sirenix.Utilities.Editor
                 {
                     GUI.Label(rect, SirenixEditorGUI.MixedValueDashChar, SirenixGUIStyles.LabelCentered);
                 }
-                else if (unityObject)
+                else if (objectToPaint)
                 {
-                    //if (unityObject is Component)
-                    //{
-                    //    unityObject = (unityObject as Component).gameObject;
-                    //}
+                    Texture image = null;
 
-                    Texture image = GUIHelper.GetAssetThumbnail(unityObject, unityObject.GetType(), true);
-                    //image = AssetPreview.GetAssetPreview(unityObject);
-                    //if (image == null)
-                    //{
-                    //    image = AssetPreview.GetMiniThumbnail(unityObject);
-                    //}
+                    var rt =  objectToPaint as RenderTexture;
+                    if (rt)
+                    {
+                        image = rt;
+                    }
+
+                    var img = objectToPaint as UnityEngine.UI.Image;
+                    if (img)
+                    {
+                        objectToPaint = img.sprite;
+                    }
+
+                    var rawImg = objectToPaint as UnityEngine.UI.RawImage;
+                    if (rawImg)
+                    {
+                        image = rawImg.texture;
+                    }
+
+                    if (image == null)
+                    {
+                        image = GUIHelper.GetAssetThumbnail(objectToPaint, objectToPaint.GetType(), true);   
+                    }
 
                     rect = rect.Padding(2);
                     float size = Mathf.Min(rect.width, rect.height);

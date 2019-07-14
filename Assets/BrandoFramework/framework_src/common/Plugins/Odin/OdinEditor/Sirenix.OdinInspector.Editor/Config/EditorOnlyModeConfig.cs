@@ -29,6 +29,12 @@ namespace Sirenix.OdinInspector.Editor
 
         private const string SOURCE_CODE_NOT_SUPPORTED_MESSAGE = "Enabling and disabling Editor Only Mode is not supported when using Odin with source code.";
 
+        private static readonly string[] SerializerScriptFiles = new string[]
+        {
+            "VectorIntFormatters.cs",
+            "SerializedNetworkBehaviour.cs",
+        };
+
         private static string ExcludeFromEverything = @"PluginImporter:
   serializedVersion: 1
   iconMap: {}
@@ -142,8 +148,7 @@ namespace Sirenix.OdinInspector.Editor
         /// </summary>
         public void Update()
         {
-            var unityDir = new DirectoryInfo(Application.dataPath).FullName;
-            var assemblyPath = "Assets/" + SirenixAssetPaths.SirenixAssembliesPath;
+            var assemblyPath = SirenixAssetPaths.SirenixAssembliesPath;
             if (!Directory.Exists(assemblyPath))
             {
                 this.isInEditorOnlyMode = false;
@@ -151,17 +156,14 @@ namespace Sirenix.OdinInspector.Editor
                 return;
             }
 
-            var assemblyDir = new DirectoryInfo(assemblyPath);
-
             // All globalAssemblies that will get inlcuded normally in builds, except the Sirenix.OdinInspector.Attributes assmbly.
-            this.globalAssemblyFiles = new string[] { "Assets/" + SirenixAssetPaths.SirenixAssembliesPath + "Sirenix.Serialization.Config.dll" };
+            this.globalAssemblyFiles = new string[] { SirenixAssetPaths.SirenixAssembliesPath + "Sirenix.Serialization.Config.dll" };
 
             // Finds all platform specific assemblies which are located in special folders, These files are never active in the Editor.
-            this.platformSpecificAssemblyFiles = assemblyDir
-                .GetFiles("Sirenix.Serialization.dll", SearchOption.AllDirectories)
-                .Concat(assemblyDir.GetFiles("Sirenix.Utilities.dll", SearchOption.AllDirectories))
-                .Where(x => !x.DirectoryName.EndsWith("Assemblies"))
-                .Select(x => "Assets" + x.FullName.Substring(unityDir.Length).Replace("\\", "/"))
+            this.platformSpecificAssemblyFiles = AssetDatabase.GetAllAssetPaths()
+                .Where(p => p.StartsWith(SirenixAssetPaths.SirenixAssembliesPath))
+                .Where(p => p.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase))
+                .Where(p => p.StartsWith(SirenixAssetPaths.SirenixAssembliesPath + "NoEditor/") || p.StartsWith(SirenixAssetPaths.SirenixAssembliesPath + "NoEmitAndNoEditor/"))
                 .ToArray();
 
             if (this.platformSpecificAssemblyFiles.Length + this.globalAssemblyFiles.Length == 0)
@@ -238,7 +240,7 @@ namespace Sirenix.OdinInspector.Editor
                 }
 
                 // Rename link files
-                var linkFiles = AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension("link.xml" + BACKUP_FILE_SUFFIX), new string[] { "Assets/" + SirenixAssetPaths.SirenixAssembliesPath.TrimEnd('/') });
+                var linkFiles = AssetDatabase.FindAssets(Path.GetFileNameWithoutExtension("link.xml" + BACKUP_FILE_SUFFIX), new string[] { SirenixAssetPaths.SirenixAssembliesPath.TrimEnd('/') });
                 for (int i = 0; i < linkFiles.Length; i++)
                 {
                     var path = AssetDatabase.GUIDToAssetPath(linkFiles[i]);
@@ -250,21 +252,35 @@ namespace Sirenix.OdinInspector.Editor
                 var attribute = typeof(GlobalSerializationConfig).BaseType.GetProperty("ConfigAttribute", Flags.AllMembers).GetValue(null, null) as GlobalConfigAttribute;
                 var serializationConfigPath = AssetDatabase.GetAssetPath(GlobalSerializationConfig.Instance);
                 var fileName = Path.GetFileName(serializationConfigPath);
-                var destPath = "Assets/" + attribute.AssetPath.TrimEnd('/');
+                var destPath = attribute.AssetPath.TrimEnd('/');
                 if (!Directory.Exists(destPath))
                 {
                     Directory.CreateDirectory(destPath);
                     AssetDatabase.Refresh();
                 }
 
-                // Rename Vector2IntFormatter.cs to editor folder
+                // Move script files out of editor folder.
                 {
-                    var folder = "Assets/" + SirenixAssetPaths.OdinPath + "Scripts/";
-                    var from = folder + "Editor/VectorIntFormatters.cs";
-                    var to = folder + "VectorIntFormatters.cs";
-                    if (File.Exists(from))
+                    //var folder = SirenixAssetPaths.OdinPath + "Scripts/";
+                    //var from = folder + "Editor/VectorIntFormatters.cs";
+                    //var to = folder + "VectorIntFormatters.cs";
+                    //if (File.Exists(from))
+                    //{
+                    //    AssetDatabase.MoveAsset(from, to);
+                    //}
+
+                    var targetFolder = SirenixAssetPaths.OdinPath + "Scripts/";
+                    var sourceFolder = targetFolder + "Editor/";
+
+                    foreach (var f in SerializerScriptFiles)
                     {
-                        AssetDatabase.MoveAsset(from, to);
+                        var from = sourceFolder + f;
+                        var to = targetFolder + f;
+                        if (File.Exists(from))
+                        {
+                            File.Move(from, to);
+                            File.Delete(from + ".meta");
+                        }
                     }
                 }
 
@@ -292,7 +308,7 @@ namespace Sirenix.OdinInspector.Editor
             }
 
             AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
+            //AssetDatabase.Refresh();
             if (!this.SerializationModeIsForceText)
             {
                 Debug.LogError("In order to make make the proper modification to the assembly import settings, the serializationMode in the EditorSettings must be set to ForceText.");
@@ -313,7 +329,7 @@ namespace Sirenix.OdinInspector.Editor
             }
 
             // Rename link files
-            var linkFiles = AssetDatabase.FindAssets("link", new string[] { "Assets/" + SirenixAssetPaths.SirenixAssembliesPath.TrimEnd('/') });
+            var linkFiles = AssetDatabase.FindAssets("link", new string[] { SirenixAssetPaths.SirenixAssembliesPath.TrimEnd('/') });
             for (int i = 0; i < linkFiles.Length; i++)
             {
                 var path = AssetDatabase.GUIDToAssetPath(linkFiles[i]);
@@ -332,21 +348,27 @@ namespace Sirenix.OdinInspector.Editor
             {
                 var serializationConfigPath = AssetDatabase.GetAssetPath(GlobalSerializationConfig.Instance);
                 var fileName = Path.GetFileName(serializationConfigPath);
-                if (!File.Exists("Assets/" + SirenixAssetPaths.OdinEditorConfigsPath + fileName))
+                if (!File.Exists(SirenixAssetPaths.OdinEditorConfigsPath + fileName))
                 {
-                    AssetDatabase.MoveAsset(serializationConfigPath, "Assets/" + SirenixAssetPaths.OdinEditorConfigsPath + fileName);
+                    AssetDatabase.MoveAsset(serializationConfigPath, SirenixAssetPaths.OdinEditorConfigsPath + fileName);
                 }
-                AssetDatabase.Refresh();
+                //AssetDatabase.Refresh();
             }
 
-            // Rename Vector2IntFormatter.cs to .txt
+            // Move script files to Editor folder.
             {
-                var folder = "Assets/" + SirenixAssetPaths.OdinPath + "Scripts/";
-                var from = folder + "VectorIntFormatters.cs";
-                var to = folder + "Editor/VectorIntFormatters.cs";
-                if (File.Exists(from))
+                var sourceFolder = SirenixAssetPaths.OdinPath + "Scripts/";
+                var targetFolder = sourceFolder + "Editor/";
+
+                foreach (var f in SerializerScriptFiles)
                 {
-                    AssetDatabase.MoveAsset(from, to);
+                    var from = sourceFolder + f;
+                    var to = targetFolder + f;
+                    if (File.Exists(from))
+                    {
+                        File.Move(from, to);
+                        File.Delete(from + ".meta");
+                    }
                 }
             }
 
@@ -488,7 +510,7 @@ namespace Sirenix.OdinInspector.Editor
 
         private bool HasDemos()
         {
-            var dir = new DirectoryInfo("Assets/" + SirenixAssetPaths.SirenixPluginPath + "Demos");
+            var dir = new DirectoryInfo(SirenixAssetPaths.SirenixPluginPath + "Demos");
             if (!dir.Exists)
             {
                 return false;
@@ -509,9 +531,9 @@ namespace Sirenix.OdinInspector.Editor
         {
             var directoriesToDelete = new List<string>();
 
-            if (Directory.Exists("Assets/" + SirenixAssetPaths.SirenixPluginPath + "Demos"))
+            if (Directory.Exists(SirenixAssetPaths.SirenixPluginPath + "Demos"))
             {
-                directoriesToDelete.AddRange(new DirectoryInfo("Assets/" + SirenixAssetPaths.SirenixPluginPath + "Demos").GetDirectories().Select(x => x.FullName));
+                directoriesToDelete.AddRange(new DirectoryInfo(SirenixAssetPaths.SirenixPluginPath + "Demos").GetDirectories().Select(x => x.FullName));
             }
 
             DeleteDirsAndFiles(directoriesToDelete);
@@ -521,11 +543,11 @@ namespace Sirenix.OdinInspector.Editor
         {
             if (this.HasDemos())
             {
-                return "Delete all imported demos located in \"Assets/" + SirenixAssetPaths.SirenixPluginPath + "Demos/\"";
+                return "Delete all imported demos located in \"" + SirenixAssetPaths.SirenixPluginPath + "Demos/\"";
             }
             else
             {
-                return "No imported demos was found in \"Assets/" + SirenixAssetPaths.SirenixPluginPath + "Demos/\"";
+                return "No imported demos was found in \"" + SirenixAssetPaths.SirenixPluginPath + "Demos/\"";
             }
         }
 

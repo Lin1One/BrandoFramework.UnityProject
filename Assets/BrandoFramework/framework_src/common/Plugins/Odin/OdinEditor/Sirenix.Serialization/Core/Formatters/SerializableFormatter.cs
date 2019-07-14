@@ -74,7 +74,7 @@ namespace Sirenix.Serialization
                     {
                         value = SerializableFormatter<T>.ISerializableConstructor(info, reader.Context.StreamingContext);
 
-                        this.InvokeOnDeserializingCallbacks(value, reader.Context);
+                        this.InvokeOnDeserializingCallbacks(ref value, reader.Context);
 
                         if (IsValueType == false)
                         {
@@ -93,7 +93,7 @@ namespace Sirenix.Serialization
             {
                 value = ReflectionFormatter.Deserialize(reader);
 
-                this.InvokeOnDeserializingCallbacks(value, reader.Context);
+                this.InvokeOnDeserializingCallbacks(ref value, reader.Context);
 
                 if (IsValueType == false)
                 {
@@ -168,7 +168,7 @@ namespace Sirenix.Serialization
                         {
                             string typeName;
                             reader.ReadString(out typeName);
-                            type = reader.Binder.BindToType(typeName, reader.Context.Config.DebugContext);
+                            type = reader.Context.Binder.BindToType(typeName, reader.Context.Config.DebugContext);
                         }
 
                         if (type == null)
@@ -210,7 +210,7 @@ namespace Sirenix.Serialization
                 {
                     try
                     {
-                        writer.WriteString("type", writer.Binder.BindToName(entry.ObjectType, writer.Context.Config.DebugContext));
+                        writer.WriteString("type", writer.Context.Binder.BindToName(entry.ObjectType, writer.Context.Config.DebugContext));
                         var readerWriter = Serializer.Get(entry.ObjectType);
                         readerWriter.WriteValueWeak(entry.Name, entry.Value, writer);
                     }

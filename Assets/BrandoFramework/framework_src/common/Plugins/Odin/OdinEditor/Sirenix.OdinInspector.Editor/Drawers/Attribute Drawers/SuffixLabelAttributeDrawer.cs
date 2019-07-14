@@ -24,25 +24,34 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     [DrawerPriority(DrawerPriorityLevel.WrapperPriority)]
     public sealed class SuffixLabelAttributeDrawer : OdinAttributeDrawer<SuffixLabelAttribute>
     {
+        private StringMemberHelper labelHelper;
+
+        protected override void Initialize()
+        {
+            this.labelHelper = new StringMemberHelper(this.Property.FindParent(p => p.Info.HasSingleBackingMember, true), this.Attribute.Label);
+        }
+
         /// <summary>
         /// Draws the property.
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var property = this.Property;
-            var attribute = this.Attribute;
+            //PropertyContext<StringMemberHelper> context;
+            //if (this.Property.Context.Get(this, "SuffixContext", out context))
+            //{
+            //    context.Value = new StringMemberHelper(this.Property.FindParent(p => p.Info.HasSingleBackingMember, true), this.Attribute.Label);
+            //}
 
-            PropertyContext<StringMemberHelper> context;
-            if (property.Context.Get(this, "SuffixContext", out context))
+            if (this.labelHelper.ErrorMessage != null)
             {
-                context.Value = new StringMemberHelper(property.FindParent(p => p.Info.HasSingleBackingMember, true).ParentType, attribute.Label);
+                SirenixEditorGUI.ErrorMessageBox(this.labelHelper.ErrorMessage);
             }
 
-            if (attribute.Overlay)
+            if (this.Attribute.Overlay)
             {
                 this.CallNextDrawer(label);
                 GUIHelper.PushGUIEnabled(true);
-                GUI.Label(GUILayoutUtility.GetLastRect().HorizontalPadding(0, 8), context.Value.GetString(property), SirenixGUIStyles.RightAlignedGreyMiniLabel);
+                GUI.Label(GUILayoutUtility.GetLastRect().HorizontalPadding(0, 8), this.labelHelper.GetString(this.Property), SirenixGUIStyles.RightAlignedGreyMiniLabel);
                 GUIHelper.PopGUIEnabled();
             }
             else
@@ -52,7 +61,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 this.CallNextDrawer(label);
                 GUILayout.EndVertical();
                 GUIHelper.PushGUIEnabled(true);
-                GUILayout.Label(context.Value.GetString(property), SirenixGUIStyles.RightAlignedGreyMiniLabel, GUILayoutOptions.ExpandWidth(false));
+                GUILayout.Label(this.labelHelper.GetString(this.Property), SirenixGUIStyles.RightAlignedGreyMiniLabel, GUILayoutOptions.ExpandWidth(false));
                 GUIHelper.PopGUIEnabled();
                 GUILayout.EndHorizontal();
             }

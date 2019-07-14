@@ -9,7 +9,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using System;
 
     [AttributeExample(typeof(TableListAttribute))]
-    public class TableListExamples
+    internal class TableListExamples
     {
         [TableList(ShowIndexLabels = true)]
         public List<SomeCustomClass> TableListWithIndexLabels = new List<SomeCustomClass>();

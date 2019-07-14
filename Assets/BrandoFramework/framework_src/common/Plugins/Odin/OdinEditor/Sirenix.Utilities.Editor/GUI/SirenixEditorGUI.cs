@@ -458,7 +458,7 @@ namespace Sirenix.Utilities.Editor
                     DragAndDrop.visualMode = DragAndDropVisualMode.Copy;
                     Event.current.Use();
 
-                    if (eventType == EventType.DragPerform)
+                    if (eventType == EventType.dragPerform)
                     {
                         DragAndDrop.AcceptDrag();
                         GUI.changed = true;
@@ -3035,8 +3035,8 @@ namespace Sirenix.Utilities.Editor
                 // Update T
                 if (Event.current.type == EventType.MouseDrag)
                 {
-                    GUI.changed = true;
                     Event.current.Use();
+                    GUI.changed = true;
                     return Event.current.delta;
                 }
 

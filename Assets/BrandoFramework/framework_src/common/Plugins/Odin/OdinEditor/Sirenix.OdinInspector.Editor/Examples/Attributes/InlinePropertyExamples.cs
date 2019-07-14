@@ -7,7 +7,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(InlinePropertyAttribute))]
-    public class InlinePropertyExamples
+    internal class InlinePropertyExamples
     {
         public Vector3 Vector3;
 

@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(HideInPlayModeAttribute))]
-    public class HideInPlayModeExamples
+    internal class HideInPlayModeExamples
     {
         [Title("Hidden in play mode")]
         [HideInPlayMode]

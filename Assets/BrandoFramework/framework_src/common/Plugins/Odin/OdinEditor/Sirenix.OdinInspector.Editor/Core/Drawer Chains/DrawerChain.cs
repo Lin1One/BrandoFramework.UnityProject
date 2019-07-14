@@ -8,15 +8,9 @@
 
 namespace Sirenix.OdinInspector.Editor
 {
-    using Sirenix.Utilities;
-    using Sirenix.Utilities.Editor;
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using UnityEditor;
-    using UnityEngine;
 
     public abstract class DrawerChain : IEnumerator<OdinDrawer>, IEnumerable<OdinDrawer>
     {

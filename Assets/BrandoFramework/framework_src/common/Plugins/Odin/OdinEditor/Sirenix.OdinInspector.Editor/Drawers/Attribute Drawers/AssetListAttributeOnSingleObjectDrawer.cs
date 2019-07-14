@@ -61,6 +61,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     this.AvailableAsset.Clear();
 
                     IEnumerable<AssetUtilities.AssetSearchResult> allAssets;
+#pragma warning disable CS0618 // Type or member is obsolete
                     if (this.PrettyPath == null)
                     {
                         allAssets = AssetUtilities.GetAllAssetsOfTypeWithProgress(this.Property.ValueEntry.BaseValueType, null);
@@ -69,6 +70,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                     {
                         allAssets = AssetUtilities.GetAllAssetsOfTypeWithProgress(this.Property.ValueEntry.BaseValueType, "Assets/" + this.PrettyPath.TrimStart('/'));
                     }
+#pragma warning restore CS0618 // Type or member is obsolete
 
                     System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
                     sw.Start();

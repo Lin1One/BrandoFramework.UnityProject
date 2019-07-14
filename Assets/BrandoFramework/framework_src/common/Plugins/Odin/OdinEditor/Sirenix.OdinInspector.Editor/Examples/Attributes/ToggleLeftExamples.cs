@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(ToggleLeftAttribute))]
-    public class ToggleLeftExamples
+    internal class ToggleLeftExamples
     {
         [InfoBox("Draws the toggle button before the label for a bool property.")]
         [ToggleLeft]

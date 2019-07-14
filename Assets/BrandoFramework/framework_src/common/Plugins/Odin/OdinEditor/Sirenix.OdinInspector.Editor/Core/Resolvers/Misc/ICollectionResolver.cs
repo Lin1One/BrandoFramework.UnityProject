@@ -20,7 +20,11 @@ namespace Sirenix.OdinInspector.Editor
 
         void QueueRemove(object[] values);
 
+        void QueueRemove(object value, int selectionIndex);
+
         void QueueAdd(object[] values);
+
+        void QueueAdd(object value, int selectionIndex);
 
         void QueueClear();
 

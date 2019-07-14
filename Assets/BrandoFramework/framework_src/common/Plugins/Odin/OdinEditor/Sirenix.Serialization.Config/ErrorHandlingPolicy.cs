@@ -1,4 +1,10 @@
 //-----------------------------------------------------------------------// <copyright file="ErrorHandlingPolicy.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------
+// <copyright file="ErrorHandlingPolicy.cs" company="Sirenix IVS">
+// Copyright (c) Sirenix IVS. All rights reserved.
+// </copyright>
+//-----------------------------------------------------------------------
+
 namespace Sirenix.Serialization
 {
     /// <summary>

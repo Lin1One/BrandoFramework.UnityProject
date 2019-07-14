@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(ButtonGroupAttribute))]
-    public class ButtonGroupExamples
+    internal class ButtonGroupExamples
     {
         [ButtonGroup]
         private void A()

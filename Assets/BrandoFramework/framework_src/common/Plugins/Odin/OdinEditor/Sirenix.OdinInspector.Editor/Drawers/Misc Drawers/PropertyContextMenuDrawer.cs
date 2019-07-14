@@ -105,11 +105,13 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
                 bool active = prefabProperty != null;
 
-                if (entry.ValueChangedFromPrefab)
+                int moddedChildren = property.Children.Recurse().Count(c => c.ValueEntry != null && c.ValueEntry.ValueChangedFromPrefab);
+
+                if (entry.ValueChangedFromPrefab || moddedChildren > 0)
                 {
                     if (active)
                     {
-                        genericMenu.AddItem(new GUIContent("Revert to prefab value"), false, () =>
+                        genericMenu.AddItem(new GUIContent("Revert to prefab value" + (moddedChildren > 0 ? " (" + moddedChildren + " child modifications to revert)" : "")), false, () =>
                         {
                             for (int i = 0; i < entry.ValueCount; i++)
                             {

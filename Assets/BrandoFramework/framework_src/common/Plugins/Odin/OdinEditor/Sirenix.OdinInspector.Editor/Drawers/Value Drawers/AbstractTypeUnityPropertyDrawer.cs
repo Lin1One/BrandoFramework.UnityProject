@@ -69,15 +69,8 @@ namespace Sirenix.OdinInspector.Editor
 
             if (unityProperty == null)
             {
-                if (UnityVersion.IsVersionOrGreater(2017, 1))
-                {
-                    this.CallNextDrawer(label);
-                }
-                else
-                {
-                    SirenixEditorGUI.ErrorMessageBox("Could not get a Unity SerializedProperty for the property '" + entry.Property.NiceName + "' of type '" + entry.TypeOfValue.GetNiceName() + "' at path '" + entry.Property.Path + "'.");
-                }
-
+                SirenixEditorGUI.ErrorMessageBox("Could not get a Unity SerializedProperty for the property '" + entry.Property.NiceName + "' of type '" + entry.TypeOfValue.GetNiceName() + "' at path '" + entry.Property.Path + "'. Legacy Unity drawing compatibility is broken for this property; falling back to normal Odin drawing. Please report an issue on Odin's issue tracker with details.");
+                this.CallNextDrawer(label);
                 return;
             }
 

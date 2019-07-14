@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using System;
 
     [AttributeExample(typeof(TabGroupAttribute))]
-    public class TabGroupExamples
+    internal class TabGroupExamples
     {
         [TabGroup("Tab A")]
         public int One;

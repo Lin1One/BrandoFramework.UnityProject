@@ -76,6 +76,11 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             this.paging.CurrentPage = this.currPage.Value;
             this.Property.ValueEntry.OnChildValueChanged += OnChildValueChanged;
 
+            if (this.Attribute.AlwaysExpanded)
+            {
+                this.isVisible.Value = true;
+            }
+
             var p = this.Attribute.CellPadding;
             if (p > 0)
             {

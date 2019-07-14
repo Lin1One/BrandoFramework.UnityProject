@@ -8,7 +8,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEditor;
 
     [AttributeExample(typeof(CustomValueDrawerAttribute))]
-    public class CustomValueDrawerExamples
+    internal class CustomValueDrawerExamples
     {
         public float From = 2, To = 7;
 

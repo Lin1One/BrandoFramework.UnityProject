@@ -5,6 +5,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
     using System.IO;
@@ -35,7 +36,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 #pragma warning restore CS0618 // Type or member is obsolete
 
             this.parentProperty = this.Property.FindParent(p => p.Info.HasSingleBackingMember, true);
-            this.parentPath = new StringMemberHelper(this.parentProperty.ParentType, this.Attribute.ParentFolder);
+            this.parentPath = new StringMemberHelper(this.parentProperty, this.Attribute.ParentFolder);
             this.exists = this.PathExists(this.ValueEntry.SmartValue, this.parentPath.GetString(this.Property));
         }
 
@@ -138,7 +139,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             // Find first existing path to open.
             while (showInExplorerPath.IsNullOrWhitespace() == false && Directory.Exists(showInExplorerPath) == false)
             {
-                showInExplorerPath = Path.GetDirectoryName(createDirectoryPath);
+                showInExplorerPath = Path.GetDirectoryName(showInExplorerPath);
             }
 
             // Show in explorer

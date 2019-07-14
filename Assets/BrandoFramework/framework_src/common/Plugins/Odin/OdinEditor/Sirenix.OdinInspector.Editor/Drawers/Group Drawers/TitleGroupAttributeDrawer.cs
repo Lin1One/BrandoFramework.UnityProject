@@ -38,8 +38,8 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             {
                 context.Value = new TitleContext()
                 {
-                    TitleHelper = new StringMemberHelper(property.ParentType, attribute.GroupName),
-                    SubtitleHelper = new StringMemberHelper(property.ParentType, attribute.Subtitle),
+                    TitleHelper = new StringMemberHelper(property, attribute.GroupName),
+                    SubtitleHelper = new StringMemberHelper(property, attribute.Subtitle),
                 };
             }
 

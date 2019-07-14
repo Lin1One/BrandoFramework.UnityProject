@@ -31,7 +31,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 var context = property.Context.Get<StringMemberHelper>(this, "StringContext", (StringMemberHelper)null);
                 if (context.Value == null)
                 {
-                    context.Value = new StringMemberHelper(property.ParentType, attribute.tooltip);
+                    context.Value = new StringMemberHelper(property, attribute.tooltip);
                 }
 
                 if (context.Value.ErrorMessage != null)
@@ -67,7 +67,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 var context = property.Context.Get<StringMemberHelper>(this, "Tooltip", (StringMemberHelper)null);
                 if (context.Value == null)
                 {
-                    context.Value = new StringMemberHelper(property.ParentType, attribute.Tooltip);
+                    context.Value = new StringMemberHelper(property, attribute.Tooltip);
                 }
 
                 if (context.Value.ErrorMessage != null)

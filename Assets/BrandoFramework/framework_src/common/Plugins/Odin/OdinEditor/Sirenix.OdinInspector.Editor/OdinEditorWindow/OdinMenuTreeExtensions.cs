@@ -333,7 +333,7 @@ namespace Sirenix.OdinInspector.Editor
                 assetPath = "Assets/" + assetPath;
             }
 
-            UnityEngine.Object obj = AssetDatabase.LoadAssetAtPath(assetPath, type);
+            var obj = AssetDatabase.LoadAssetAtPath(assetPath, type);
 
             string name;
             SplitMenuPath(menuItemPath, out menuItemPath, out name);

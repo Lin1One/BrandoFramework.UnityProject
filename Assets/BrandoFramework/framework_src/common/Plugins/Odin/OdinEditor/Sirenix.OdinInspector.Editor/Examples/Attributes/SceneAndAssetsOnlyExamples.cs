@@ -8,7 +8,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
 
     [AttributeExample(typeof(AssetsOnlyAttribute))]
     [AttributeExample(typeof(SceneObjectsOnlyAttribute))]
-    public class SceneAndAssetsOnlyExamples
+    internal class SceneAndAssetsOnlyExamples
     {
         [Title("Assets only")]
         [AssetsOnly]

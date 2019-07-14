@@ -81,6 +81,7 @@ namespace Sirenix.Utilities.Editor
 
                     temp = ScriptableObject.CreateInstance(scriptType);
 
+                    // We can use 'Assets/' here as it's a temporary file that will be deleted later.
                     string tempName = Guid.NewGuid().ToString() + ".asset";
                     string tempAssetPath = "Assets/" + tempName;
                     string tempFullPath = Application.dataPath + "/" + tempName;

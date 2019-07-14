@@ -16,7 +16,7 @@ namespace Sirenix.Serialization
 
         private int count;
         private T[] array;
-        private bool isFree;
+        private volatile bool isFree;
 
         private Buffer(int count)
         {
@@ -147,6 +147,7 @@ namespace Sirenix.Serialization
                             {
                                 Buffer<T>.FreeBuffers[i] = buffer;
                                 added = true;
+                                break;
                             }
                         }
 

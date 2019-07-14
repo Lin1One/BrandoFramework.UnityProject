@@ -4,7 +4,7 @@
 namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(ButtonAttribute))]
-    public class ButtonExamples
+    internal class ButtonExamples
     {
         public string ButtonName = "Dynamic button name";
 

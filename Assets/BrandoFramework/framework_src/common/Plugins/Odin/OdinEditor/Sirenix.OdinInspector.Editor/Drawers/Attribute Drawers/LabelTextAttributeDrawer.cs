@@ -26,36 +26,40 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     [DrawerPriority(DrawerPriorityLevel.SuperPriority)]
     public sealed class LabelTextAttributeDrawer : OdinAttributeDrawer<LabelTextAttribute>
     {
+        private GUIContent overrideLabel;
+        private StringMemberHelper stringHelper;
+
+        protected override void Initialize()
+        {
+            this.stringHelper = new StringMemberHelper(this.Property, this.Attribute.Text);
+        }
+
         /// <summary>
         /// Draws the attribute.
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var property = this.Property;
-            var attribute = this.Attribute;
-
-            var context = property.Context.Get<StringMemberHelper>(this, "StringContext", (StringMemberHelper)null);
-            if (context.Value == null)
+            if (this.stringHelper.ErrorMessage != null)
             {
-                context.Value = new StringMemberHelper(property.ParentType, attribute.Text);
+                SirenixEditorGUI.ErrorMessageBox(this.stringHelper.ErrorMessage);
             }
+            
+            GUIContent useLabel;
+            
+            var str = this.stringHelper.GetString(this.Property);
 
-            if (context.Value.ErrorMessage != null)
+            if (str == null)
             {
-                SirenixEditorGUI.ErrorMessageBox(context.Value.ErrorMessage);
-            }
-
-            if (label == null)
-            {
-                property.Label = null;
+                useLabel = null;
             }
             else
             {
-                property.Label = label;
-                property.Label.text = context.Value.GetString(property);
+                if (overrideLabel == null) overrideLabel = new GUIContent();
+                overrideLabel.text = str;
+                useLabel = overrideLabel;
             }
-
-            this.CallNextDrawer(property.Label);
+            
+            this.CallNextDrawer(useLabel);
         }
     }
 }

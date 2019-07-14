@@ -5,7 +5,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
 {
     [AttributeExample(typeof(PropertyTooltipAttribute),
         "PropertyTooltip is used to add tooltips to properties in the inspector.\nPropertyTooltip can also be applied to properties and methods, unlike Unity's Tooltip attribute.")]
-    public class PropertyTooltipExamples
+    internal class PropertyTooltipExamples
     {
         [PropertyTooltip("This is tooltip on an int property.")]
         public int MyInt;

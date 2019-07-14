@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="Vector4"/> type.
     /// </summary>
-    /// <seealso cref="Vector4" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Vector4}" />
     public class Vector4Formatter : MinimalBaseFormatter<Vector4>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();

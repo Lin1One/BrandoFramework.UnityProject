@@ -5,6 +5,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
     using UnityEditor;
@@ -17,32 +18,23 @@ namespace Sirenix.OdinInspector.Editor.Drawers
     /// <seealso cref="RequiredAttribute"/>
     /// <seealso cref="InfoBoxAttribute"/>
     /// <seealso cref="ValidateInputAttribute"/>
-
     [DrawerPriority(DrawerPriorityLevel.WrapperPriority)]
-    public sealed class RequiredAttributeDrawer : OdinAttributeDrawer<RequiredAttribute>
+    public sealed class RequiredAttributeDrawer<T> : OdinAttributeDrawer<RequiredAttribute, T> where T: class
     {
         /// <summary>
         /// Draws the property.
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var property = this.Property;
-            var attribute = this.Attribute;
-
-            if (property.ValueEntry.BaseValueType.IsValueType)
-            {
-                //SirenixEditorGUI.ErrorMessageBox("Value types cannot be null, and thus cannot be marked as required.");
-                return;
-            }
-
             // Message context.
             PropertyContext<StringMemberHelper> context = null;
-            if (attribute.ErrorMessage != null)
+            if (this.Attribute.ErrorMessage != null)
             {
-                context = property.Context.Get<StringMemberHelper>(this, "ErrorMessage", (StringMemberHelper)null);
+                context = this.Property.Context.Get<StringMemberHelper>(this, "ErrorMessage", (StringMemberHelper)null);
                 if (context.Value == null)
                 {
-                    context.Value = new StringMemberHelper(property.ParentType, attribute.ErrorMessage);
+                    //context.Value = new StringMemberHelper(property.ParentType, attribute.ErrorMessage);
+                    context.Value = new StringMemberHelper(this.Property, this.Attribute.ErrorMessage);
                 }
 
                 if (context.Value.ErrorMessage != null)
@@ -51,31 +43,31 @@ namespace Sirenix.OdinInspector.Editor.Drawers
                 }
             }
 
-            var isMissing = CheckIsMissing(property);
+            var isMissing = CheckIsMissing(this.Property);
 
             if (isMissing)
             {
-                string msg = attribute.ErrorMessage != null ? context.Value.GetString(property) : (property.NiceName + " is required.");
-                if (attribute.MessageType == InfoMessageType.Warning)
+                string msg = this.Attribute.ErrorMessage != null ? context.Value.GetString(this.Property) : (this.Property.NiceName + " is required.");
+                if (this.Attribute.MessageType == InfoMessageType.Warning)
                 {
                     SirenixEditorGUI.WarningMessageBox(msg);
                 }
-                else if (attribute.MessageType == InfoMessageType.Error)
+                else if (this.Attribute.MessageType == InfoMessageType.Error)
                 {
                     SirenixEditorGUI.ErrorMessageBox(msg);
                 }
                 else
                 {
-                    EditorGUILayout.HelpBox(msg, (MessageType)attribute.MessageType);
+                    EditorGUILayout.HelpBox(msg, (MessageType)this.Attribute.MessageType);
                 }
             }
 
-            var key = UniqueDrawerKey.Create(property, this);
+            var key = UniqueDrawerKey.Create(this.Property, this);
             SirenixEditorGUI.BeginShakeableGroup(key);
             this.CallNextDrawer(label);
             SirenixEditorGUI.EndShakeableGroup(key);
 
-            if (!isMissing && CheckIsMissing(property))
+            if (!isMissing && CheckIsMissing(this.Property))
             {
                 SirenixEditorGUI.StartShakingGroup(key);
             }

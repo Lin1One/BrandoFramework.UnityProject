@@ -252,7 +252,7 @@ namespace Sirenix.OdinInspector.Editor
             infos.Add(InspectorPropertyInfo.CreateForMember(member, allowEditable, backend, list));
         }
 
-        internal static Type ProcessingOwnerType;
+        public static Type ProcessingOwnerType { get; set; }
 
         public static void AddMember(this IList<InspectorPropertyInfo> infos, string name)
         {

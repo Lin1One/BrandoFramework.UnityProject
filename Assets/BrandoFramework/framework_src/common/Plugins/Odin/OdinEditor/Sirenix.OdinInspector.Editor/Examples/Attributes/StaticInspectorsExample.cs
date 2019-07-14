@@ -8,7 +8,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using System;
 
     [AttributeExample(typeof(ShowInInspectorAttribute), "You can use the ShowInInspector attribute on static members to make them appear in the inspector as well.")]
-    public class StaticInspectorsExample
+    internal class StaticInspectorsExample
     {
         [ShowInInspector]
         public static List<MySomeStruct> SomeStaticField = new List<MySomeStruct>();

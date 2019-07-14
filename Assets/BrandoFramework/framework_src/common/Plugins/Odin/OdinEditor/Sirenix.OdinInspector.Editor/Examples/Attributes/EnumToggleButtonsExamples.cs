@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using Sirenix.OdinInspector;
 
     [AttributeExample(typeof(EnumToggleButtonsAttribute))]
-    public class EnumToggleButtonsExamples
+    internal class EnumToggleButtonsExamples
     {
         [Title("Default")]
         public SomeBitmaskEnum DefaultEnumBitmask;

@@ -136,7 +136,19 @@ namespace Sirenix.OdinInspector.Editor.Drawers
 
                     var prev = EditorGUI.showMixedValue;
                     EditorGUI.showMixedValue = false;
+                    EditorGUI.BeginChangeCheck();
                     this.DoTheDrawing();
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        var e = this.Property.BaseValueEntry as PropertyValueEntry;
+                        if (e != null)
+                        {
+                            for (int i = 0; i < e.ValueCount; i++)
+                            {
+                                e.TriggerOnChildValueChanged(i);
+                            }
+                        }
+                    }
                     EditorGUI.showMixedValue = prev;
                     if (this.Attribute.MaxHeight != 0)
                     {

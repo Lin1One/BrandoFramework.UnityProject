@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using UnityEngine;
 
     [AttributeExample(typeof(CustomContextMenuAttribute))]
-    public class CustomContextMenuExamples
+    internal class CustomContextMenuExamples
     {
         [InfoBox("A custom context menu is added on this property. Right click the property to view the custom context menu.")]
         [CustomContextMenu("Say Hello/Twice", "SayHello")]

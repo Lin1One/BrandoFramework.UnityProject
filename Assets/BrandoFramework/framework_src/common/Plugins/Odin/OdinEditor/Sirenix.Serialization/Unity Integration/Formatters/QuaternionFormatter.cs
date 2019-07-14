@@ -10,7 +10,7 @@ namespace Sirenix.Serialization
     /// <summary>
     /// Custom formatter for the <see cref="Quaternion"/> type.
     /// </summary>
-    /// <seealso cref="Quaternion" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Quaternion}" />
     public class QuaternionFormatter : MinimalBaseFormatter<Quaternion>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();

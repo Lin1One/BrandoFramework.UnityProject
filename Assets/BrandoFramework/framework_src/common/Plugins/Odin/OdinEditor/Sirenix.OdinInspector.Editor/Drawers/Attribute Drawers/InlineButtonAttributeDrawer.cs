@@ -47,7 +47,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
             if (context.Value == null)
             {
                 context.Value = new ButtonContext();
-                context.Value.LabelHelper = new StringMemberHelper(entry.ParentType, attribute.Label ?? attribute.MemberMethod.SplitPascalCase(), ref context.Value.ErrorMessage);
+                context.Value.LabelHelper = new StringMemberHelper(this.Property, attribute.Label ?? attribute.MemberMethod.SplitPascalCase(), ref context.Value.ErrorMessage);
 
                 if (context.Value.ErrorMessage == null)
                 {

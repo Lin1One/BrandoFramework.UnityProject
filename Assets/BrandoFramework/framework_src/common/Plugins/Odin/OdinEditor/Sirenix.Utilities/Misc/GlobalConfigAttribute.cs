@@ -1,4 +1,5 @@
 //-----------------------------------------------------------------------// <copyright file="GlobalConfigAttribute.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
+//-----------------------------------------------------------------------// <copyright file="GlobalConfigAttribute.cs" company="Sirenix IVS"> // Copyright (c) Sirenix IVS. All rights reserved.// </copyright>//-----------------------------------------------------------------------
 //-----------------------------------------------------------------------
 // <copyright file="GlobalConfigAttribute.cs" company="Sirenix IVS">
 // Copyright (c) Sirenix IVS. All rights reserved.
@@ -7,7 +8,6 @@
 
 namespace Sirenix.Utilities
 {
-    using Sirenix.Utilities;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -27,6 +27,7 @@ namespace Sirenix.Utilities
         /// <summary>
         /// Gets the full asset path including Application.dataPath. Only relevant if IsInResourcesFolder is false.
         /// </summary>
+        [Obsolete("It's a bit more complicated than that as it's not always possible to know the full path, so try and make due without it if you can, only using the AssetDatabase.")]
         public string FullPath
         {
             get { return Application.dataPath + "/" + this.AssetPath; }
@@ -49,6 +50,33 @@ namespace Sirenix.Utilities
             }
         }
 
+        internal string AssetPathWithAssetsPrefix
+        {
+            get
+            {
+                var p = this.AssetPath;
+                if (p.StartsWith("Assets/"))
+                {
+                    return p;
+                }
+
+                return "Assets/" + p;
+            }
+        }
+
+        internal string AssetPathWithoutAssetsPrefix
+        {
+            get
+            {
+                var p = this.AssetPath;
+                if (p.StartsWith("Assets/"))
+                {
+                    return p.Substring("Assets/".Length);
+                }
+                return p;
+            }
+        }
+
         /// <summary>
         /// Gets the resources path. Only relevant if IsInResourcesFolder is true.
         /// </summary>
@@ -56,26 +84,17 @@ namespace Sirenix.Utilities
         {
             get
             {
-                string resourcesPath = "";
                 if (this.IsInResourcesFolder)
                 {
-                    Stack<string> folders = new Stack<string>();
-
-                    // Find nearest resource folder.
-                    var currDir = new DirectoryInfo(this.FullPath);
-                    while (currDir.Name.Equals("resources", StringComparison.OrdinalIgnoreCase) == false)
+                    var resourcesPath = this.AssetPath;
+                    var i = resourcesPath.LastIndexOf("/resources/", StringComparison.InvariantCultureIgnoreCase);
+                    if (i >= 0)
                     {
-                        folders.Push(currDir.Name);
-                        currDir = currDir.Parent;
-                    }
-
-                    while (folders.Any())
-                    {
-                        resourcesPath += folders.Pop() + "/";
+                        return resourcesPath.Substring(i + "/resources/".Length);
                     }
                 }
 
-                return resourcesPath;
+                return "";
             }
         }
 

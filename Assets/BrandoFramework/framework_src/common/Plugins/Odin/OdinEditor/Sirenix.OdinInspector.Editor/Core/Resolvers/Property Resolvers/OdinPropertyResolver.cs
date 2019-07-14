@@ -16,6 +16,9 @@ namespace Sirenix.OdinInspector.Editor
         private int lastUpdatedTreeID = -1;
         private int childCount;
 
+        public bool HasChildCountConflict { get; protected set; }
+        public int MaxChildCountSeen { get; protected set; }
+
         public static OdinPropertyResolver Create(Type resolverType, InspectorProperty property)
         {
             if (resolverType == null)
@@ -99,9 +102,6 @@ namespace Sirenix.OdinInspector.Editor
 
     public abstract class OdinPropertyResolver<TValue> : OdinPropertyResolver
     {
-        protected bool HasChildCountConflict { get; private set; }
-        protected int MaxChildCountSeen { get; private set; }
-
         public sealed override Type ResolverForType { get { return typeof(TValue); } }
 
         public IPropertyValueEntry<TValue> ValueEntry { get { return (IPropertyValueEntry<TValue>)this.Property.ValueEntry; } }

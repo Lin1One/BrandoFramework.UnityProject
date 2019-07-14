@@ -6,7 +6,7 @@ namespace Sirenix.OdinInspector.Editor.Examples
     using System;
 
     [AttributeExample(typeof(BoxGroupAttribute))]
-    public class BoxGroupExamples
+    internal class BoxGroupExamples
     {
         // Box with a title.
         [BoxGroup("Some Title")]

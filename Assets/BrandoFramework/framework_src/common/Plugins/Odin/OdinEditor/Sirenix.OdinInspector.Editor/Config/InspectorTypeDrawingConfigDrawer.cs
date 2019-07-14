@@ -6,6 +6,7 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor
 {
     using System;
@@ -17,8 +18,8 @@ namespace Sirenix.OdinInspector.Editor
     using Utilities.Editor.CodeGeneration;
     using UnityEditor;
     using UnityEngine;
-    using UnityEngine.Networking;
     using System.Reflection;
+    using Sirenix.OdinInspector.Internal;
 
     /// <summary>
     /// <para>Draws an <see cref="InspectorTypeDrawingConfig"/> instance, and contains methods getting all types that should be drawn by Odin.</para>
@@ -376,16 +377,16 @@ namespace Sirenix.OdinInspector.Editor
                 if (gUIText != null) NeverDrawTypes.Add(gUIText);
             }
 
-            var unityObjectTypes = AssemblyUtilities.GetTypes(AssemblyTypeFlags.All)
-                                                    .Where(type =>
-                                                        !type.Assembly.IsDynamic() &&
-                                                        typeof(UnityEngine.Object).IsAssignableFrom(type) &&
-                                                        //TypeExtensions.IsValidIdentifier(type.FullName) &&
-                                                        !type.IsDefined<CompilerGeneratedAttribute>() &&
-                                                        !type.IsDefined<ObsoleteAttribute>() &&
-                                                        !typeof(Joint).IsAssignableFrom(type) &&
-                                                        !NeverDrawTypes.Contains(type))
-                                                    .ToArray();
+            var unityObjectTypes = AssemblyUtilities.GetTypes(AssemblyTypeFlags.All) // @Tor: Consider switching to AssemblyTypeFlags.CustomTypes?
+                .Where(type =>
+                    !type.Assembly.IsDynamic() &&
+                    typeof(UnityEngine.Object).IsAssignableFrom(type) &&
+                    //TypeExtensions.IsValidIdentifier(type.FullName) &&
+                    !type.IsDefined<CompilerGeneratedAttribute>() &&
+                    !type.IsDefined<ObsoleteAttribute>() &&
+                    !typeof(Joint).IsAssignableFrom(type) &&
+                    !NeverDrawTypes.Contains(type))
+                .ToArray();
 
             Dictionary<Type, Type> haveDrawersAlready = new Dictionary<Type, Type>();
             Dictionary<Type, Type> derivedClassDrawnTypes = new Dictionary<Type, Type>();
@@ -436,8 +437,14 @@ namespace Sirenix.OdinInspector.Editor
                 typeof(UnityEngine.Object),
                 typeof(ScriptableObject),
                 typeof(StateMachineBehaviour),
-                typeof(NetworkBehaviour)
+                //typeof(Networking.NetworkBehaviour)
             };
+
+            if (UnityNetworkingUtility.NetworkBehaviourType != null)
+            {
+                // UnityEngine.Networking has been removed in Unity 2019+. 
+                stopBaseTypeLookUpTypes.Add(UnityNetworkingUtility.NetworkBehaviourType);
+            }
 
             //Debug.Log("Searching the following " + unityObjectTypes.Length + " types for Odin-drawable types:\n\n" + string.Join("\n", unityObjectTypes.Select(n => n.GetNiceFullName()).ToArray()));
 

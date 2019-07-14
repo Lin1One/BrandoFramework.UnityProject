@@ -5,10 +5,10 @@
 // Copyright (c) Sirenix IVS. All rights reserved.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace Sirenix.OdinInspector.Editor.Drawers
 {
     using Sirenix.Utilities.Editor;
-    using UnityEditor;
     using UnityEngine;
 
     /// <summary>
@@ -21,8 +21,7 @@ namespace Sirenix.OdinInspector.Editor.Drawers
         /// </summary>
         protected override void DrawPropertyLayout(GUIContent label)
         {
-            var entry = this.ValueEntry;
-            entry.SmartValue = SirenixEditorFields.IntField(label, entry.SmartValue);
+            this.ValueEntry.SmartValue = SirenixEditorFields.IntField(label, this.ValueEntry.SmartValue);
         }
     }
 }

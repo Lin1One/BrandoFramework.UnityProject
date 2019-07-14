@@ -20,7 +20,7 @@ namespace Sirenix.OdinInspector.Editor
             }
             else
             {
-                EditorApplication.delayCall += () => InspectorConfig.Instance.UpdateOdinEditors();
+                UnityEditorEventUtility.DelayAction(() => InspectorConfig.Instance.UpdateOdinEditors());
             }
         }
     }
