@@ -226,7 +226,7 @@ namespace Client.LegoUI
 
         private string compositionString
         {
-            get { return input != null ? input.compositionString : Input.compositionString; }
+            get { return input != null ? input.compositionString : UnityEngine.Input.compositionString; }
         }
 
         // Doesn't include dot and @ on purpose! See usage for details.

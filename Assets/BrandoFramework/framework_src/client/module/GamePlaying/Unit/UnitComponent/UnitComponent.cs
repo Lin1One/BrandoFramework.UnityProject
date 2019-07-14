@@ -20,19 +20,19 @@ namespace Client.GamePlaying.Unit
     /// <summary>
     /// 游戏个体组件基类
     /// </summary>
-    public abstract class UnitComponent : IUnitComponent
+    public abstract class UnitComponentBase : IUnitComponent
     {
         #region 静态池功能
-        private static readonly Dictionary<Type, Stack<UnitComponent>> s_pool 
-            = new Dictionary<Type, Stack<UnitComponent>>();
+        private static readonly Dictionary<Type, Stack<UnitComponentBase>> s_pool 
+            = new Dictionary<Type, Stack<UnitComponentBase>>();
 
         //从池中获取一个指定类型的对象
-        internal static T GetComponent<T>(UnitEntityBase role) where T : UnitComponent, new()
+        internal static T GetComponent<T>(UnitEntityBase role) where T : UnitComponentBase, new()
         {
             Type type = typeof(T);
             if(!s_pool.ContainsKey(type))
             {
-                s_pool.Add(type, new Stack<UnitComponent>());
+                s_pool.Add(type, new Stack<UnitComponentBase>());
             }
             T com;
             if (s_pool[type].Count >0)
@@ -50,7 +50,7 @@ namespace Client.GamePlaying.Unit
         }
 
         //回收一个对象到池中
-        internal static void RecoverComponent(UnitComponent com)
+        internal static void RecoverComponent(UnitComponentBase com)
         {
             if (com.m_isRecover)
             {

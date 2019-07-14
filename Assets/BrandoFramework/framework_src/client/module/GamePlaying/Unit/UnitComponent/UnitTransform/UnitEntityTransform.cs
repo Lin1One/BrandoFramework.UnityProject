@@ -24,7 +24,7 @@ namespace Client.GamePlaying.Unit
     /// <summary>
     /// 角色的U3D数据类
     /// </summary>
-    public class XTwoU3DData : UnitComponent , IUnitEntityTransform
+    public class XTwoU3DData : UnitComponentBase , IUnitEntityTransform
     {
         private bool m_isActive;
 

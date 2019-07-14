@@ -1,0 +1,494 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f428099a0891794eb75ffb505d31157, type: 3}
+  m_Name: TileSet Black
+  m_EditorClassIdentifier: 
+  baseSprite: {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  subTiles:
+  - {fileID: 114459699550610324}
+  - {fileID: 114186556827543592}
+  - {fileID: 114459675194320302}
+  - {fileID: 114636985506532764}
+  - {fileID: 114212680286354352}
+  - {fileID: 114108243161510102}
+  - {fileID: 114030005795701746}
+  - {fileID: 114472219566231394}
+  - {fileID: 114083411101666004}
+  iLastIndex: 0
+--- !u!114 &114030005795701746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_Ex_2_Diagonal_Apart_H'
+  m_EditorClassIdentifier: 
+  tileSetType: 6
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: ddb792e6a4d0d694a9d71720d8844b7e, type: 3}
+  - {fileID: 21300000, guid: 14acf331e52dd8a4a9ec19c554a5dd0c, type: 3}
+  - {fileID: 21300000, guid: 0da0acff8bdaa4b4d9a6326ce3385e03, type: 3}
+  - {fileID: 21300000, guid: 3ecec5504e566344f83657ed89f2b422, type: 3}
+  - {fileID: 21300000, guid: 2388af1396722e44bb07c6c17b0fc58c, type: 3}
+  - {fileID: 21300000, guid: f968e04ddb2530844a3436eff285406a, type: 3}
+  - {fileID: 21300000, guid: 66625b29fc8b02d47a0a2a61d6eb0451, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 34.800022, y: -46.19998}
+  bSimpleView: 1
+  bFlodOut: 1
+  bakedTileSetImg: {fileID: 0}
+--- !u!114 &114083411101666004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_Ex_1_Diagonal'
+  m_EditorClassIdentifier: 
+  tileSetType: 8
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 11fb1ddda29983441937a7a97bf77d34, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: fa094beceb141e541870b37b6bc59abd, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 751835603375b1c4387fe26c0cfce695, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 8091170f0f560b24bbaa109730a722bb, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  - {fileID: 11400000}
+  - {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 37.20005, y: -44.399902}
+  bSimpleView: 0
+  bFlodOut: 0
+  bakedTileSetImg: {fileID: 0}
+--- !u!114 &114108243161510102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_Ex_2_Diagonal_Together'
+  m_EditorClassIdentifier: 
+  tileSetType: 5
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 7574f9cbaee33e54b85ea6f9dede64fc, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: f1340de99054abb408cf92e0b66ffd78, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 3b1a52b10177c3a40b53520da9295ebd, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: e745c4d764f043a4098d5c058cc51f8a, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 35.999996, y: -46.199966}
+  bSimpleView: 0
+  bFlodOut: 0
+  bakedTileSetImg: {fileID: 0}
+--- !u!114 &114186556827543592
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_OneWay'
+  m_EditorClassIdentifier: 
+  tileSetType: 1
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: 3852ab4b03b143048a17c6e9f51d5927, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 89452cdc27c248745a5940bd036f9d44, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: c6f3c7fc522399248a1635657de5a3ea, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 195ed8fa751d71c44bdad1221b1bad39, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: ab585433703a3934fa3068718b6a7d66, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 39.599995, y: -47.999992}
+  bSimpleView: 0
+  bFlodOut: 0
+  bakedTileSetImg: {fileID: 0}
+--- !u!114 &114212680286354352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_Ex_3_Diagonal'
+  m_EditorClassIdentifier: 
+  tileSetType: 4
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 7b8458a8d4e77af4bb04fd58acfe02a7, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: c3c6f8e340161944d94ef649c17da15a, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 880e5205eff589d44883ac8021fa3f99, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: b5e26494afe8c2d49932c06d190bb9e8, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 39.000057, y: -37.800026}
+  bSimpleView: 1
+  bFlodOut: 0
+  bakedTileSetImg: {fileID: 0}
+--- !u!114 &114459675194320302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_TwoWay'
+  m_EditorClassIdentifier: 
+  tileSetType: 2
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 34393966ea2f6454e84f588f7e3bbf59, type: 3}
+  - {fileID: 21300000, guid: d28bf68709608304ca8c0cfeac7cc3d4, type: 3}
+  - {fileID: 21300000, guid: 14acf331e52dd8a4a9ec19c554a5dd0c, type: 3}
+  - {fileID: 21300000, guid: 9f54df0ce8301c544833e296a9bf4008, type: 3}
+  - {fileID: 21300000, guid: 280873ea3caaa3343bac70a2256b7d73, type: 3}
+  - {fileID: 21300000, guid: d28bf68709608304ca8c0cfeac7cc3d4, type: 3}
+  - {fileID: 21300000, guid: f968e04ddb2530844a3436eff285406a, type: 3}
+  - {fileID: 21300000, guid: 9f54df0ce8301c544833e296a9bf4008, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 31.20001, y: -44.4}
+  bSimpleView: 0
+  bFlodOut: 1
+  bakedTileSetImg: {fileID: 0}
+--- !u!114 &114459699550610324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_Normal'
+  m_EditorClassIdentifier: 
+  tileSetType: 0
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 2a4bc55ce78d2d54298a625d3d7cae20, type: 3}
+  - {fileID: 21300000, guid: 2d19a0a7d79222045a0112cbc15e5c02, type: 3}
+  - {fileID: 21300000, guid: a43c8e5e9c87e7c4a992c98f0298b347, type: 3}
+  - {fileID: 21300000, guid: e70651f18e47dc8459a2d2eae199a0b2, type: 3}
+  - {fileID: 21300000, guid: 009818c0ebe998640b053634878d558e, type: 3}
+  - {fileID: 21300000, guid: fc8e0b4f341507045a9e7b5795b8770e, type: 3}
+  - {fileID: 21300000, guid: c1863cccb522af74387cb246301bde7d, type: 3}
+  - {fileID: 21300000, guid: a61565f647d582449a1870779bac2ff7, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 40.20002, y: -45.600002}
+  bSimpleView: 0
+  bFlodOut: 0
+  bakedTileSetImg: {fileID: 0}
+--- !u!114 &114472219566231394
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_Ex_2_Diagonal_Apart_V'
+  m_EditorClassIdentifier: 
+  tileSetType: 7
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 34393966ea2f6454e84f588f7e3bbf59, type: 3}
+  - {fileID: 21300000, guid: 8058380f8a7e7a1438e4d71307f81119, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: fbd1a5af844696f4f92e7229f88cdd30, type: 3}
+  - {fileID: 21300000, guid: 280873ea3caaa3343bac70a2256b7d73, type: 3}
+  - {fileID: 21300000, guid: 8cbf0b0e5cc5d234f9aa4c5207b27fc7, type: 3}
+  - {fileID: 21300000, guid: b8fc4ade7cdc3b24db8aca01a2db684a, type: 3}
+  - {fileID: 21300000, guid: db2f951148223de44bc6911c9be6cb57, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 28.800013, y: -46.200016}
+  bSimpleView: 1
+  bFlodOut: 1
+  bakedTileSetImg: {fileID: 0}
+--- !u!114 &114636985506532764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68eef596edbf4054192497ed21c3426d, type: 3}
+  m_Name: '[Sub]_TileSet White_ThreeWay'
+  m_EditorClassIdentifier: 
+  tileSetType: 3
+  outField: {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  FieldTypes: 000000000000000000000000000000000000000000000000000000000000000000000000
+  DirectionalSprites:
+  - {fileID: 21300000, guid: ba632fb81f29dd647ac39e4c78a611fc, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 90e0ff3f199874242a078377a01e95db, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 179eff4c1082b23459029f9c378ab6c1, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 769a9b4f0ccad234b830d4f9411253f0, type: 3}
+  - {fileID: 21300000, guid: d42f368b20e86f04fa89146c246f8ff2, type: 3}
+  - {fileID: 21300000, guid: 2911f5840cb05a147a1628a4056321b6, type: 3}
+  DirectionalTiles:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  CustomOutField:
+  - {fileID: 0}
+  - {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  - {fileID: 11400000}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 11400000}
+  - {fileID: 11400000, guid: 0ec2ba2f761103240958f3ba951303c0, type: 2}
+  - {fileID: 11400000}
+  parent: {fileID: 11400000}
+  iPriority: 0
+  bAllowNullOutField: 1
+  vIsometricAngle: {x: 34.20016, y: -50.40002}
+  bSimpleView: 1
+  bFlodOut: 1
+  bakedTileSetImg: {fileID: 0}

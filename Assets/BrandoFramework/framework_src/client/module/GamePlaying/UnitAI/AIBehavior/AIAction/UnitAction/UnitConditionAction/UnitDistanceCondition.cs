@@ -40,7 +40,7 @@ namespace Client.GamePlaying.AI
 
         protected override AIBehaviorState OnUpdate()
         {
-            var position2d = new Vector2(unitEntity.U3DData.Trans.position.x, unitEntity.U3DData.Trans.position.z);
+            var position2d = new Vector2(unitEntity.UnitTrans.Trans.position.x, unitEntity.UnitTrans.Trans.position.z);
             var distance = Vector2.Distance(position2d, targetPosition2D);
             AIBehaviorState state;
             if (distance < 5)

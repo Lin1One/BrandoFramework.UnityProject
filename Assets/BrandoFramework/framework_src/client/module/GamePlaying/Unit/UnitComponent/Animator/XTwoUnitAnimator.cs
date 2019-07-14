@@ -22,7 +22,7 @@ namespace Client.GamePlaying.Unit
     /// <summary>
     /// 动画控制类，除了作为角色的组件，也可以通用管理动画
     /// </summary>
-    public class XTwoUnitAnimator : UnitComponent, IYuUnitAnimator
+    public class XTwoUnitAnimator : UnitComponentBase, IYuUnitAnimator
     {
         private Animator m_animator;
         RuntimeAnimatorController m_controlAssetRef;       //管理动画控制器资源
@@ -56,7 +56,7 @@ namespace Client.GamePlaying.Unit
 
         protected override void OnInit()
         {
-            m_animator = Role.U3DData.Trans?.GetComponent<Animator>();
+            m_animator = Role.UnitTrans.Trans?.GetComponent<Animator>();
 
             if (m_animator == null)
             {
@@ -87,7 +87,7 @@ namespace Client.GamePlaying.Unit
 
         public void InitAnimator()
         {
-            m_animator = Role.U3DData.Trans?.GetComponent<Animator>();
+            m_animator = Role.UnitTrans.Trans?.GetComponent<Animator>();
 
             if (m_animator == null)
             {
@@ -371,8 +371,8 @@ namespace Client.GamePlaying.Unit
         {
             if (anima == null)
             {
-                anima = Role.U3DData.Trans != null ?
-                    Role.U3DData.Trans.GetComponent<Animator>() : null;
+                anima = Role.UnitTrans.Trans != null ?
+                    Role.UnitTrans.Trans.GetComponent<Animator>() : null;
 
                 if (anima == null)
                 {

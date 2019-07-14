@@ -22,7 +22,7 @@ namespace Client.GamePlaying.Unit
     /// <summary>
     /// 行为状态机
     /// </summary>
-    public class XTwoActStateMachine : UnitComponent , IYuActStateMachine
+    public class XTwoActStateMachine : UnitComponentBase , IYuActStateMachine
     {
         private IUnitActState m_curState;     //当前状态
         //private IYuTimerModule m_timerModule;     //计时器模块（记录持续状态时间）

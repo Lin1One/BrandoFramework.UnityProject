@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1316831233524218}
+  m_IsPrefabParent: 1
+--- !u!1 &1316831233524218
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4725354321360248}
+  - component: {fileID: 114355924275546482}
+  - component: {fileID: 114080869328083372}
+  m_Layer: 0
+  m_Name: Iso_Map
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &4725354321360248
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1316831233524218}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114080869328083372
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1316831233524218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9a998913839d164999b7db5b0c68274, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fResolutionOfIsometric: {x: 100, y: 100, z: 100}
+  bUseIsometricSorting: 0
+  ReferencePPU: 128
+  _grid: {fileID: 114355924275546482}
+  TileAngle: {x: 30, y: -45}
+  GameCamera: {fileID: 0}
+  bCustomResolution: 0
+  vCustomResolution: {x: 100, y: 100, z: 100}
+  BulkPrefab: {fileID: 1546251774040964, guid: 6833410dfe591f249a090fab82882005, type: 2}
+  TilePrefab: {fileID: 1046543167763804, guid: 9a3da0318e7dfbf42b6fd7d4f5931e99, type: 2}
+  OverlayPrefab: {fileID: 1592815093577602, guid: 4faa7a78282025f4983711e4f230d0dc,
+    type: 2}
+  TriggerPlanePrefab: {fileID: 1146297822137414, guid: eb036e55468ee0a47a04e6e4f4d18551,
+    type: 2}
+  TriggerCubePrefab: {fileID: 1811613497238622, guid: 2e5f534a50f59254fa55f5a491483f11,
+    type: 2}
+  ObstaclePrefab: {fileID: 1811613497238622, guid: 06c188f61480fb54f99f4f00757815ab,
+    type: 2}
+  Side_Union_Prefab: {fileID: 1580747263118890, guid: f750d7e4fbec74148822ef16dbca6411,
+    type: 2}
+  Side_X_Prefab: {fileID: 1294401461980918, guid: 3ba32460195143548b6c03015afcaf5c,
+    type: 2}
+  Side_Y_Prefab: {fileID: 1520765385588328, guid: 7d618fae3f9726149832044c1da94738,
+    type: 2}
+  Side_Z_Prefab: {fileID: 1871864581218188, guid: ae5ea28f6a4b63d4f8959cc9a0d65d28,
+    type: 2}
+  Collider_X_Prefab: {fileID: 1980660792570282, guid: e2ffb73f22df4314ba09605b4465240f,
+    type: 2}
+  Collider_Y_Prefab: {fileID: 1634582935028770, guid: d4119e3cf64037041858a6c6f8697c62,
+    type: 2}
+  Collider_Z_Prefab: {fileID: 1775253258512372, guid: 92ebe7c243440b2489975933f1b0ab35,
+    type: 2}
+  Collider_Cube_Prefab: {fileID: 1398195258802098, guid: 17472a47dc167694fa2962c311396526,
+    type: 2}
+  TchPrefab: {fileID: 1449530117493326, guid: a1d4e1414e19a7148aa70e104368567f, type: 2}
+  IsoTile_Union_OutlineImage: {fileID: 21300000, guid: 2650d6c1087ca1648877ede9ee22efeb,
+    type: 3}
+  IsoTile_Side_OutlineImage: {fileID: 21300000, guid: 5a826b4b0cf0a3c4eada4882faa516e1,
+    type: 3}
+  RefTileSprite: {fileID: 21300000, guid: 11f26cf8ed715744ca762764c4c433b9, type: 3}
+--- !u!114 &114355924275546482
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1316831233524218}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 679569b6ee24e0b40b5d66ec49928ad0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bUseLocalGrid: 1
+  _TileSize: {x: 1, y: 1, z: 1}
+  _GridInterval: {x: 1, y: 0.33333334, z: 1}
+  bChildUpdatedFlagForEditor: 1

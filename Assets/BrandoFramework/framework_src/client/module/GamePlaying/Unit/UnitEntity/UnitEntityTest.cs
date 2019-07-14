@@ -30,7 +30,7 @@ namespace Client.GamePlaying.Unit
         public override void InitComponent()
         {
             //初始化UnityObject数据
-            m_u3dData = AddComponent<XTwoU3DData>();
+            unitTrans = AddComponent<XTwoU3DData>();
 
             InitAddtionalComponent();
         }
@@ -67,7 +67,7 @@ namespace Client.GamePlaying.Unit
             //{
             //    onCreated += (obj) => { m_u3dData.RefreshTrans(); };
             //}
-            m_u3dData.LoadAsset(assetId, isSync, onCreated);
+            unitTrans.LoadAsset(assetId, isSync, onCreated);
             //InitAddtionalComponent();
         }
     }

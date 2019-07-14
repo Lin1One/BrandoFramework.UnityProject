@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00aea00fb7f544341ad806da09061e8e, type: 3}
+  m_Name: Tags
+  m_EditorClassIdentifier: 
+  desc: 2
+  tags:
+  - {fileID: 11400000, guid: a75502f51740fc8489c361c397101f58, type: 2}
+  - {fileID: 114846518196859702}
+  - {fileID: 114577926498080118}
+  - {fileID: 0}
+--- !u!114 &114577926498080118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28ac50fb2700c08489d8d854ef1a91b4, type: 3}
+  m_Name: T[wsafdasd]
+  m_EditorClassIdentifier: 
+  _tag: wsafdasd
+--- !u!114 &114846518196859702
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28ac50fb2700c08489d8d854ef1a91b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tag: PPo

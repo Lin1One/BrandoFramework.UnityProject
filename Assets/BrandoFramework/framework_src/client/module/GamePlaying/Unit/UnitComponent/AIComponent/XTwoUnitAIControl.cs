@@ -21,7 +21,7 @@ namespace Client.GamePlaying.Unit
     /// <summary>
     /// AI控制器
     /// </summary>
-    public class XTwoUnitAIControl : UnitComponent, IYuUnitAIControl
+    public class XTwoUnitAIControl : UnitComponentBase, IYuUnitAIControl
     {
         private YuAIBehaviorTree m_behaviorTree;    //行为树
 

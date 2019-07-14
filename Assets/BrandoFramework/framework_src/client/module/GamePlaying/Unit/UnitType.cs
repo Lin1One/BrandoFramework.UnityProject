@@ -9,7 +9,7 @@ namespace Client.GamePlaying.Unit
 {
     public enum UnitType : byte
     {
-        LeadPlayer, //主角
+        MainUnit, //主角
         FriendlyPlayer,     //其他玩家
         HostilePlayer, //敌对玩家
         Monster,    //怪物

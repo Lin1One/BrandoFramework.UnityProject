@@ -1,0 +1,291 @@
+﻿[Anonym Isometric Builder]
+    Editor Extensions/2D & Sprite Management
+    This extension requires one license per seat
+    (Changed) Requires Unity 5.6 or higher
+	Requires Unity A version or higher version since the 1.2.5 update.
+
+    Email me if you have any bugs or comments
+    by Anonym(hg.studio.one@gmail.com)
+
+	Web Site
+	https://hgstudioone.wixsite.com/isometricbuilder
+
+	Unity Forum
+	https://forum.unity.com/threads/released-isometric-builder-powerful-isometric-map-editor-for-3d-world.512111/
+
+	Asset Store
+	https://www.assetstore.unity3d.com/en/#!/content/98848
+
+[Tutorials]
+    1.  Youtube Tutorials
+        https://www.youtube.com/playlist?list=PLFBcmjDxL7ATka0irlRs64M6YBmOYeJVC
+    
+    2. How to Start
+		https://1drv.ms/p/s!Av4r1XquEJjij4MeZddaplhE0puFSA 
+	
+	3. Components Guide Sway
+        https://sway.com/DrytvEKsYMk90IQD?ref=Link
+
+
+[Version History]
+	2.2.1
+		[Improved]
+		Now TileWand and OnGroundOffset work better.
+		Improved Attachment options for Magic Wand Palette.
+
+		[Bug Fix]
+		OnGround Toggle error in Startup Page.
+
+	2.2.0
+		[New]
+		Startup Page
+
+		[Improved]
+		GameObjectSelector is supported with Sphere Collider.
+		IsoLight, you can specify a target tile with the GameObjectSelector.
+
+	2.1.2
+		[New]
+		Above of Tile option added to TileWand Master Window.
+
+	2.1.1
+		[New]
+		Trick Camera for 3D MeshRenderer
+
+		[Improved]
+		TileSet will changed collectly when tile deleted by keyboard.
+
+	2.1.0
+		[New]
+		TileSet : A convenient feature to change the shape automatically by the relation with surrounding tiles has been added.
+		With new Freezing of IsoTileBulk also makes the Editor environment super lighter.
+
+		[Improved]
+		Editor mode speed up a lot.
+		Fixed an issue where tiles overlap when using Tile Wand.
+		More Save options for Tile Wand.
+
+	2.0.6
+		[New]
+		Lock Bulk Target was added to MagicWandPalette.
+
+		[Bug Fix]
+		All Tile Control Wand disappeared when specific condition.
+		GUI scroll error occurred when there were many Tile Wands.
+		A error occurred when use Create TileWand Btn.
+		And minor bugs...
+
+		[Improved]
+		Improved Iso Bakery to prevent dummy game objects from being created when creating meshes for Navmesh.
+		No more lightmap applied to the mesh renderer.
+		Changed the name of the mesh renderer game object to the name of the tile that the collider was in
+		Saveable after IsoMap.Delete Backups
+		Improved GameObject Filter of ScreenShot tool
+
+	2.0.5
+		[Bug Fix]
+		Magic Wand do not pointing correctly when IsoBulk is not positioned at 0(0, 0, 0).
+		Error occured when compressed Tile Wand's Icon is drawn.
+		IsoTransform and Iso2DBase do not work properly.
+		Some errors of TCH.
+
+	2.0.4
+		[Bug Fix]
+		A problem that was not saved on exit after creating Tile Wand.
+		Wand using Packed Texture is not drawn correctly.
+
+	2.0.3
+		[Bug Fix]
+		Scale of Iso2DObject's Inspector is not applied immediately.
+		Tile Wand could not be created with Prefab's child tiles.
+		Gizmo Icon was copied meaningless in UNITY_2018_3_OR_NEWER
+
+	2.0.2
+		[New]
+		Tile Auto Creation (Tile Wand)
+
+		[Bug Fix]
+		Iso2D Scale Bug
+		Sorting Order Bug when Tile CopyCat
+
+	2.0.0
+		[New]
+		MagicPaletteWindow
+		Support 2018.3 new Prefab Workflow
+
+	1.3.7
+		[New]
+		Tile Drag Methods in RunTime
+
+	1.3.6.4
+		[New]
+		IsoTile Selection Assistant
+		https://hgstudioone.wixsite.com/isometricbuilder/etc-tools
+
+		[Bug Fix]
+		Fixed a problem where the DepthFudge value of the IsoTile Attachment was initialized to 0 when changing the Global OnGroundObject setting.
+
+		[Improved]
+		ISOBasis Gizmo, which displays the height above the floor, is displayed even if it is not in AutoISO mode.
+
+	1.3.6.3
+		[Bug Fix]
+		Now, ISOBasis and OnGroundObject option working collectly
+
+	1.3.5.2
+		[Bug Fix]
+		Fixed an issue where AutoISO's SO value was always 0 under certain conditions.
+
+	1.3.5
+		[Improved]
+			Auto ISO
+			OnSceneGUI for multiple controls
+			Now we can instantiate the IsoBulk on runtime of AutoISO Mode.
+
+		[New]
+			IsoBasis for the alignment of ground objects.
+			WebGL Demo
+
+		[BugFix]
+			CharacterController: Break while RevertPosition
+
+	1.2.5.2.1
+		[Bug Fix]
+			Regular Collider SO, calculated improperly.
+	1.2.5.2
+		[New] 
+			Auto ISO Mode!
+			TallCharacterHelper
+
+		[Improved: Character Controller]
+			IsometricSortingOrder
+			ParticleSortingTrick
+			Isotile Attachment Editor
+
+		[Bug Fix]
+			Fixed missing prefab bug in pre-v.2018.2
+
+	1.2.4
+		[New]
+			IsoHierarchyWindow
+			SSHelper
+
+		[Improved]
+			Character Controller
+			8-Directional Movement
+			Continuous Movement
+			Sample Animator for 8-Dir Sprite animation
+
+	1.2.3
+		[New]
+			IsometricNavMeshAgent
+			It uses NavMeshAgent and helps to navigate Isometric space.
+			This allows pathfinding and jumping on NavMesh.
+
+		[Improved]		
+			The Now Height (Y) value no longer affects the Scale_Y value of the RegularCollider.
+			Now, when you drag the local grid, the value of the global grid is intuitively applied.
+
+	1.2.2
+		[New]
+			Atlas Helper(#if UNITY_2017_1_OR_NEWER)
+		[Improved]
+			Isometric Bakery - MeshForNavMesh component
+
+	1.2.1
+		[Bug Fixed]
+			IsoLight - Improved color calculation
+			IsoLight - Remove reference when IsoLighterReciver.OnDestroy.
+
+	1.2.0
+		[New]
+			IsoLight
+			Isometric Bakery			
+
+		[Improved]
+			Isometric Character Controller(with Key Input Assist)
+
+	1.1.2
+		[Bug Fixed]
+		Extrude Handle dose not work under certain conditions
+		Scale.z issue for using with other shader
+		UI Color for profesional skin users
+	
+	1.1.1
+        [New]
+        Resource: White Style Tile
+        Scene: Particle & Physics Sample Scene
+
+        [Bug Fixed]
+        Now...
+        Bulk.Coordinates can find the Bulk's Grid.
+        If there was a problem bulk in project, move the bulk once to the child of another object and it will work normally.
+
+        Grid component update all affected bulk / tiles when LocalGrid is activated / deactivated.
+
+        Overlay and Obstacle of IsoTile are created with modified size according to the size of tile.
+
+        Particle System's trsform is applied to Particle Trick normally.
+        When using gradient colors, colors are applied normally.
+
+        Nothing happens in Self CopyCat of IsoTile.
+
+        Displayed by applying the SpriteRenderer's color to the Union Tile inspector.
+
+	1.1.0
+        [New features]
+        1. Particle sort trick
+            check the 3D position of each particles to enhance the visibility check and collision check
+
+        2. Depth adjustment of tile decoration (overlay & obstacle)
+            Now you can easily adjust the depth of all the decorations in the tile's Inspector.
+
+        [Deactivate function]
+        The related functionality has been improved and now bsoIsometricSorting of IsoMap is no longer necessary.
+        (It is no longer visible when Off in the Inspector)
+
+        and Minor bug fixes
+
+    
+    1.0.2 
+        [Guide for users who were using previous versions]
+        There are file creation/deletion issues in the process of grouping some classes into Util folders. 
+        Please check the following steps and proceed.
+        (If you had individual work in the Anonym folder, back up and update the work.)
+            1. Create a new scene
+            2. Delete the Assets / Anonym folder
+            3. Update to the latest version
+
+        [Fixed Bug]
+        Missing Sprite Link
+        Building Error
+
+    1.0.1 BugFix
+        Invalid instance generation bug
+        Coordinates Bug of bulk
+
+    1.0 Initial Version	    
+
+[Graphic Resource (CC0, CC-BY)]
+    1.	Kenney’s Asset
+        A.	Isometric Dungeon Tiles
+            http://www.kenney.nl/assets/isometric-dungeon-tiles
+        B.	Isometric City
+            http://www.kenney.nl/assets/isometric-city
+        C.	Isometric Blocks
+            http://www.kenney.nl/assets/isometric-blocks
+            
+    2.	Medieval Building Tileset
+        https://opengameart.org/content/isometric-64x64-medieval-building-tileset
+
+    3.  laetissima
+        https://opengameart.org/users/laetissima
+
+	4. Erikari
+		https://erikari.itch.io/elements-supremacy-assets
+        
+[On Developing]
+    Selection Tool
+    Pixel Perfect Tool
+    Style Sheets
+    3D Support
