@@ -13,6 +13,11 @@ namespace Client.GamePlaying.Unit
         /// </summary>
         private Dictionary<UnitType, List<UnitEntityBase>> activeUnits;
 
+        private void AddUnitToActiveUnitDic(UnitEntityBase a)
+        {
+
+        }
+
         public void RegistUintType<T>() where T : UnitEntityBase, new()
         {
             var type = typeof(T);
@@ -67,7 +72,7 @@ namespace Client.GamePlaying.Unit
             bool isSync = false)
             where T : UnitEntityBase, new()
         {
-            UnitEntityBase unit = null;
+            UnitEntityBase unit;
 
             if (TryGetUnitByGuid(id, type, out unit))
             {

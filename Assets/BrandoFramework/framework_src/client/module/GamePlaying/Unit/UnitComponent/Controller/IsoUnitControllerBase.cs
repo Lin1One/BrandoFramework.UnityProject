@@ -11,10 +11,15 @@ namespace Client.GamePlaying.Unit
     {
         private UnitEntityBase unitEntity;
 
-        const string Name_X_Axis_Param = "X-Dir";
-        const string Name_Z_Axis_Param = "Z-Dir";
-        const string Name_Moving_Param = "OnMoving";
+        protected InGameDirection _currentInGameDirection;
 
+        public InGameDirection currentInGameDirection
+        {
+            get { return _currentInGameDirection; }
+        }
+
+        [SerializeField]
+        Queue<InGameDirection> DirQ = new Queue<InGameDirection>();
 
         #region 组件生命周期
 
@@ -52,16 +57,6 @@ namespace Client.GamePlaying.Unit
         }
 
         #endregion
-
-        protected InGameDirection _currentInGameDirection;
-
-        public InGameDirection currentInGameDirection
-        {
-            get { return _currentInGameDirection; }
-        }
-
-        [SerializeField]
-        Queue<InGameDirection> DirQ = new Queue<InGameDirection>();
 
         #region Layer
 
@@ -209,7 +204,7 @@ namespace Client.GamePlaying.Unit
 
         #endregion Jump
 
-        #region Character
+        #region 控制对象 Character
 
         //朝向
         protected bool bRotateToDirection = false;
@@ -259,13 +254,16 @@ namespace Client.GamePlaying.Unit
         }
         #endregion
 
-        #region 动画 Animator
+        #region 动画机 Animator
 
+        //Animator 参数
+        const string Name_X_Axis_Param = "X-Dir";
+        const string Name_Z_Axis_Param = "Z-Dir";
+        const string Name_Moving_Param = "OnMoving";
         /// <summary>
         /// 动画机
         /// </summary>
         protected Animator animator;
-
 
         private void GetUnitAnimator()
         {
@@ -318,7 +316,6 @@ namespace Client.GamePlaying.Unit
 
         //目标点
         protected GameObject destination;
-
 
 
         protected bool bOnMoving = false;
