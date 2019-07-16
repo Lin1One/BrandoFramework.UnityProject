@@ -1,30 +1,34 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class TwoSum_Solution
+
+namespace Study.LeetCode
 {
-    public int[] TwoSum(int[] nums, int target)
+    public partial class Solution
     {
-        int[] result = new int[2];
-        Dictionary<int, int> symbol = new Dictionary<int, int>();
-        for (int i = 0; i < nums.Length; i++)
+        public int[] TwoSum(int[] nums, int target)
         {
-            int t = target - nums[i];
-            if (!symbol.ContainsKey(t))
+            int[] result = new int[2];
+            Dictionary<int, int> symbol = new Dictionary<int, int>();
+            for (int i = 0; i < nums.Length; i++)
             {
-                symbol.Add(t, i);
+                int t = target - nums[i];
+                if (!symbol.ContainsKey(t))
+                {
+                    symbol.Add(t, i);
+                }
             }
-        }
-        for (int j = 0; j < nums.Length; j++)
-        {
-            if (symbol.ContainsKey(nums[j]) && symbol[nums[j]] != j)
+            for (int j = 0; j < nums.Length; j++)
             {
-                result[0] = j;
-                result[1] = symbol[nums[j]];
-                break;
+                if (symbol.ContainsKey(nums[j]) && symbol[nums[j]] != j)
+                {
+                    result[0] = j;
+                    result[1] = symbol[nums[j]];
+                    break;
+                }
             }
+            return result;
         }
-        return result;
     }
 }
 
