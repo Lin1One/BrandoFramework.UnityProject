@@ -30,8 +30,8 @@ namespace Study.LeetCode
 
 
         //记忆化递归
-        //时间复杂度：O(n)O(n)，树形递归的大小可以达到 n。
-        //空间复杂度：O(n)O(n)，递归树的深度可以达到 n。
+        //时间复杂度：O(n)，树形递归的大小可以达到 n。
+        //空间复杂度：O(n)，递归树的深度可以达到 n。
         public int climbStairs(int n)
         {
             int[] memo = new int[n + 1];
