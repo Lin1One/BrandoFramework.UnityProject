@@ -25,16 +25,6 @@ namespace Study.LeetCode
         //    \   \
         //    3    3
 
-        public class TreeNode 
-        {
-            public int val;
-            public TreeNode left;
-            public TreeNode right;
-            public TreeNode(int x) { val = x; }
-        }
-
-
-    
         //1.时间复杂度：O(n)，因为我们遍历整个输入树一次，
         //所以总的运行时间为 O(n)，其中 n 是树中结点的总数。
         //2.空间复杂度：递归调用的次数受树的高度限制。

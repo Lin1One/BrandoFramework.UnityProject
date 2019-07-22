@@ -127,7 +127,7 @@ namespace Study.LeetCode
 
         public int majorityElement(int[] nums) 
         {
-            return majorityElemeec(nums, 0, nums.length-1);
+            return majorityElemeec(nums, 0, nums.Length-1);
         }
 
     }
