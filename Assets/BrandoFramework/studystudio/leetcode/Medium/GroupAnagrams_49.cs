@@ -40,35 +40,35 @@ namespace Study.LeetCode
             return new List<IList<string>>(ans.Values);
         }
 
-        public IList<IList<string>> GroupAnagrams2(string[] strs) 
-        {
-            if (strs.Length == 0) return null;
-            Dictionary<string, IList<string>> ans = 
-                new Dictionary<string, IList<string>>();
-            int[] count = new int[26];
-            foreach (string s in strs) 
-            {
-                for(int i = 0; i < count.Length;i++)
-                {
-                    count[i] = 0;
-                }
-                foreach (char c in s.ToCharArray())
-                {
-                    count[c - 'a']++;
-                }
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < 26; i++)
-                {
-                    sb.Append('#');
-                    sb.Append(count[i]);
-                }
-                string key = sb.ToString();
-                if (!ans.ContainsKey(key)) 
-                    ans.Add(key, new ArrayList());
-                ans[key].Add(s);
-            }
-            return new List<IList<string>>(ans.Values);
-        }
+        // public IList<IList<string>> GroupAnagrams2(string[] strs) 
+        // {
+        //     if (strs.Length == 0) return null;
+        //     Dictionary<string, IList<string>> ans = 
+        //         new Dictionary<string, IList<string>>();
+        //     int[] count = new int[26];
+        //     foreach (string s in strs) 
+        //     {
+        //         for(int i = 0; i < count.Length;i++)
+        //         {
+        //             count[i] = 0;
+        //         }
+        //         foreach (char c in s.ToCharArray())
+        //         {
+        //             count[c - 'a']++;
+        //         }
+        //         StringBuilder sb = new StringBuilder();
+        //         for (int i = 0; i < 26; i++)
+        //         {
+        //             sb.Append('#');
+        //             sb.Append(count[i]);
+        //         }
+        //         string key = sb.ToString();
+        //         if (!ans.ContainsKey(key)) 
+        //             ans.Add(key, new ArrayList());
+        //         ans[key].Add(s);
+        //     }
+        //     return new List<IList<string>>(ans.Values);
+        // }
     }
 }
 

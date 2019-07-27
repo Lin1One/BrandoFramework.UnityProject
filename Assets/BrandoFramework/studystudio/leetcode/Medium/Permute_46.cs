@@ -70,7 +70,7 @@ namespace Study.LeetCode
                 var oneList2 = new List<int>(){nums[1],nums[0]};
                 ans.Add(oneList1);
                 ans.Add(oneList2);
-                return one;
+                return ans;
             }
             for(var i = 0;i< length;i++)
             {
