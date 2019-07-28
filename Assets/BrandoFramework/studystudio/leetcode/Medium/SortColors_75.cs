@@ -7,6 +7,43 @@ namespace Study.LeetCode
 {
     public partial class Solution
     {
+
+        // 输入:
+        // [2,0,1]
+        // 输出
+        // [1,0,2]
+        // 预期结果
+        // [0,1,2]
+        public void SortColors_Test(int[] nums) 
+        {
+            int redWhiteBorder = 0;
+            int whiteBludBorde = nums.Length - 1 ;
+            int currentIndex = 0;
+            int temp = 0;
+            while(currentIndex <= whiteBludBorde)
+            {
+                if(nums[currentIndex] == 0)
+                {
+                    temp = nums[currentIndex];
+                    nums[currentIndex] = nums[redWhiteBorder];
+                    nums[redWhiteBorder] = temp;
+                    redWhiteBorder++;
+                    currentIndex++;
+                }
+                else if(nums[currentIndex] == 2)
+                {
+                    temp = nums[currentIndex];
+                    nums[currentIndex] = nums[whiteBludBorde];
+                    nums[whiteBludBorde] = temp;
+                    whiteBludBorde--;
+                }
+                else
+                {
+                    currentIndex++;
+                }
+            }
+        }
+
         // 给定一个包含红色、白色和蓝色，一共 n 个元素的数组，
         // 原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
         // 此题中，我们使用整数 0、 1 和 2 分别表示红色、白色和蓝色。
@@ -19,30 +56,6 @@ namespace Study.LeetCode
         // 输出: [0,0,1,1,2,2]
         // 进阶：
 
-        
-        public void SortColors(int[] nums) 
-        {
-            int redWhiteBorder = -1;
-            int whiteBludBorde = -1;
-            for(var i = 0;i < nums.Length;i++)
-            {
-                if(nums[i] == 2)
-                {
-                    continue;
-                }
-                else if(nums[i] == 1)
-                {
-                    int temp = nums[whiteBludBorde + 1];
-                    //nums[whiteBludBorde + 1] 
-                    nums[i]  = temp;
-                }
-                else
-                {
-                    int temp = nums[whiteBludBorde + 1];
-                }
-            }
-
-        }
         
         public void sortColors(int[] nums) 
         {
