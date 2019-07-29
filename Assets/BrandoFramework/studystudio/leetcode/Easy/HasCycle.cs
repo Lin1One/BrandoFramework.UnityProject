@@ -96,6 +96,30 @@ namespace Study.LeetCode
             }
             return true;
         }
+
+        public bool HasCycle3(ListNode head)
+        {
+            if (head == null || head.next == null)
+            {
+                return false;
+            }
+            var one = head.next;
+            var two = head.next.next;
+            while (one != null && two != null)
+            {
+                if (one == two)
+                {
+                    return true;
+                }
+                if (two.next == null)
+                {
+                    return false;
+                }
+                one = one.next;
+                two = two.next.next;
+            }
+            return false;
+    }
     }
 }
 
