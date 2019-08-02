@@ -6,6 +6,7 @@ namespace Study.LeetCode
 {
     public partial class Solution
     {
+        //206. 反转链表
         // 反转一个单链表。
 
         // 示例:
@@ -23,6 +24,24 @@ namespace Study.LeetCode
         *     public ListNode(int x) { val = x; }
         * }
         */
+        public ListNode ReverseList_Test(ListNode head)
+        {
+            if(head == null)
+            {
+                return null;
+            }
+            var newHead = head;
+            while(head.next != null)
+            {
+                var next = head.next;
+                head.next = head.next.next;
+                next.next = newHead;
+                newHead = next;
+            }
+            return newHead;
+        }
+
+
 
         //递归
         public ListNode ReverseList1(ListNode head) 
@@ -63,10 +82,6 @@ namespace Study.LeetCode
                 head.next = oriNext.next;
                 oriNext.next = newHead;
                 newHead = oriNext;
-
-                //newHead.next = head.next;
-                //head.next = newHead;
-                //newHead.next = head;
             }
             return newHead;
         }
