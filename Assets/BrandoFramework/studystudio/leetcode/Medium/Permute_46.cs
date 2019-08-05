@@ -23,20 +23,20 @@ namespace Study.LeetCode
 
 
 
-        private List<IList<int>> ans = new List<IList<int>>();
+        private List<IList<int>> ans2 = new List<IList<int>>();
         public IList<IList<int>> Permute(int[] nums)
         {
             int length = nums.Length;
             var permuteList = new List<int>();
             addPermute(nums,permuteList);
-            return ans;
+            return ans2;
         }
 
         private void addPermute(int[] nums,List<int> permuteList)
         {
             if(permuteList.Count == nums.Length)
             {
-                ans.Add(permuteList);
+                ans2.Add(permuteList);
                 return;
             }
             for(var i = 0;i < nums.Length;i++)
@@ -54,23 +54,23 @@ namespace Study.LeetCode
         //迭代实现（未实现）
         public IList<IList<int>> Permute3(int[] nums)
         {
-            List<IList<int>> ans = new List<IList<int>>();
+            List<IList<int>> ans2 = new List<IList<int>>();
             int length = nums.Length;
             if(length == 1)
             {
                 var oneList = new List<int>();
                 oneList.Add(nums[0]);
-                ans.Add(oneList);
-                return ans;
+                ans2.Add(oneList);
+                return ans2;
             }
 
             if(length == 2)
             {
                 var oneList1 = new List<int>(){nums[0],nums[1]};
                 var oneList2 = new List<int>(){nums[1],nums[0]};
-                ans.Add(oneList1);
-                ans.Add(oneList2);
-                return ans;
+                ans2.Add(oneList1);
+                ans2.Add(oneList2);
+                return ans2;
             }
             for(var i = 0;i< length;i++)
             {
@@ -96,8 +96,8 @@ namespace Study.LeetCode
                         rangeStart2 = (--rangeStart2 + length) % length;
                         rangeStart1 = ++rangeStart1 % length;
                     }
-                    ans.Add(listItem1);
-                    ans.Add(listItem2);
+                    ans2.Add(listItem1);
+                    ans2.Add(listItem2);
                     if(length == 3)
                     {
                         j++;
@@ -106,7 +106,7 @@ namespace Study.LeetCode
                     //}
                 }
             }
-            return ans;
+            return ans2;
         }
 
 

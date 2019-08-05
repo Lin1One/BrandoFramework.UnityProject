@@ -2,6 +2,7 @@
 using UnityEngine;
 using System;
 using System.Text;
+using System.Linq;
 
 namespace Study.LeetCode
 {

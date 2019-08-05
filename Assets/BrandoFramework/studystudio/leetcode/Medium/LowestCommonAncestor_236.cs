@@ -112,7 +112,7 @@ namespace Study.LeetCode
 
         public TreeNode LowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) 
         {
-            
+            return null;
         }
 
         // 方法二：使用父指针迭代
