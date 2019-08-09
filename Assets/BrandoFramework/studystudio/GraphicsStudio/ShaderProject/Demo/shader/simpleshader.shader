@@ -5,6 +5,7 @@ Shader "Demo/simpleshader"
 {
     Properties
     {
+        _color("Color Tint", Color) = (1.0,1.0,1.0,1.0)
     }
     SubShader
     {
@@ -15,7 +16,8 @@ Shader "Demo/simpleshader"
             #pragma vertex vert
             //片元着色器函数名称
             #pragma fragment frag
-
+            // 在Cg代码中，我们需要定义一个与属性名称和类型都匹配的变量            
+            fixed4 _color;
             //application To vertexshader
             struct a2v 
             {
@@ -44,7 +46,10 @@ Shader "Demo/simpleshader"
             // SV_Target： 限定输出
             float4 frag(v2f i) : SV_Target
             {
-                return fixed4(i.color,1.0);
+                fixed3 c = i.color;
+
+                c *= _color.rgb;
+                return fixed4(c,1.0);
             }
             ENDCG
         }
