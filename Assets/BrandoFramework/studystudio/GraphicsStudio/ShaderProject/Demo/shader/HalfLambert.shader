@@ -1,4 +1,4 @@
-﻿Shader "Demo/DiffusePixelLevel"
+﻿Shader "Demo/HalfLambert"
 {
 Properties
     {
@@ -45,15 +45,17 @@ Properties
 
             fixed4 frag (v2f i) : SV_Target
             {
+                
                 // 通过Unity的内置变量UNITY_LIGHTMODEL_AMBIENT得到了环境光部分
                 fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;   
 
                 fixed3 worldNormal = normalize(i.worldNormal);
                 fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
-
+                fixed halfLambert = dot(worldNormal,worldLightDir) * 0.5 + 0.1;
                 fixed3 diffuse = _LightColor0.rgb * 
                     _Diffuse.rgb * 
-                    saturate(dot(worldNormal, worldLightDir));    
+                    halfLambert;
+
                 // 对环境光和漫反射光部分相加，得到最终的光照结果
                 fixed3 color = diffuse + ambient;  
                 return fixed4(color, 1.0);

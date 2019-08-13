@@ -1,7 +1,7 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
 //shader 名称
-Shader "Demo/simpleshader"
+Shader "Demo/SimpleShader"
 {
     Properties
     {
