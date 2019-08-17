@@ -25,7 +25,7 @@ namespace Study.LeetCode
 
         public int Search(int[] nums, int target) 
         {
-            
+            return 0;
         }
 
         private int FindRotateIndex(int[] nums,int left,int right)
@@ -48,6 +48,7 @@ namespace Study.LeetCode
                     left = mid + 1;
                 }
             }
+            return -1;
         }
 
 
@@ -97,7 +98,7 @@ namespace Study.LeetCode
 
         private int [] nums;
         private int target;
-        public int Search(int[] nums, int target) 
+        public int Search1(int[] nums, int target) 
         {
             this.nums = nums;
             this.target = target;

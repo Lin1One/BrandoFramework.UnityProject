@@ -59,7 +59,7 @@ namespace Study.LeetCode
         //二分查找模板
         public int searchInsertTemplate2(int[] nums, int target) 
         {
-            int left = 0, right = nums.length; // 注意
+            int left = 0, right = nums.Length; // 注意
             while(left < right) 
             { // 注意
                 int mid = (left + right) / 2; // 注意
@@ -81,7 +81,7 @@ namespace Study.LeetCode
         }
         public int searchInsertTemplate1(int[] nums, int target)
         {
-            int left = 0, right = nums.length - 1; // 注意
+            int left = 0, right = nums.Length - 1; // 注意
             while(left <= right) 
             { // 注意
                 int mid = (left + right) / 2; // 注意
