@@ -5,6 +5,9 @@
 
 #endregion
 
+using System.Collections.Generic;
+using System;
+
 namespace Study.LeetCode
 {
     public partial class Solution
