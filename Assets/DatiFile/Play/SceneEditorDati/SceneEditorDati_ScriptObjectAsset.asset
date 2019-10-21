@@ -1,0 +1,409 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae6e2f3ddcbf8aa4095ef2592be04501, type: 3}
+  m_Name: SceneEditorDati_ScriptObjectAsset
+  m_EditorClassIdentifier: 
+  actualSerializableObject:
+    SceneRoot: {fileID: 0}
+    CurrentSceneInfo:
+      mapId: 1
+      mapName: TestScene
+      xCellCount: 2
+      zCellCount: 2
+      xCellSize: 22.608875
+      zCellSize: 22.56304
+      originPos: {x: -23.80343, y: -23.05722}
+      cells:
+      - cellId: 0
+        itemsNum: 0200000003000000050000000600000008000000
+      - cellId: 1
+        itemsNum: 000000000200000006000000
+      - cellId: 2
+        itemsNum: 0100000006000000
+      - cellId: 3
+        itemsNum: 040000000600000007000000
+      layers:
+      - layerName: TestScene#2#2#1
+        pos:
+          x: 0
+          y: 0
+          z: 0
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 1
+          z: 1
+        parentLayer: 0
+      - layerName: Building
+        pos:
+          x: 0
+          y: 0
+          z: 0
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 1
+          z: 1
+        parentLayer: 1
+      - layerName: Terrain
+        pos:
+          x: 0
+          y: 0
+          z: 0
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 1
+          z: 1
+        parentLayer: 1
+      - layerName: HeightMap
+        pos:
+          x: 0
+          y: 0
+          z: 0
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 1
+          z: 1
+        parentLayer: 1
+      - layerName: BoxCollider
+        pos:
+          x: 0
+          y: -3
+          z: 0.9
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 3
+          z: 1
+        parentLayer: 0
+      - layerName: BoxCollider (1)
+        pos:
+          x: 0
+          y: -3
+          z: 0.9
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 3
+          z: 1
+        parentLayer: 0
+      items:
+      - objNum: 0
+        objName: Other_ZhangPeng_05
+        prefabName: Other_ZhangPeng_05
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/originAsset/prefab/Other_ZhangPeng_05.prefab
+        pos:
+          x: 10.04
+          y: 0
+          z: -16.7
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 1
+          z: 1
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      - objNum: 1
+        objName: ChangBanPoZhiZhan_ShaoTa_01
+        prefabName: ChangBanPoZhiZhan_ShaoTa_01
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/originAsset/prefab/ChangBanPoZhiZhan_ShaoTa_01.prefab
+        pos:
+          x: -6.54
+          y: 0
+          z: 3.78
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 1
+          z: 1
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      - objNum: 2
+        objName: cliff
+        prefabName: cliff
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/cliff.prefab
+        pos:
+          x: -0.26
+          y: -0.55404377
+          z: -10.99
+        rot:
+          x: -0
+          y: 110.84229
+          z: -0
+        scal:
+          x: 1.5000013
+          y: 1.5
+          z: 1.5000013
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      - objNum: 3
+        objName: rock2
+        prefabName: rock2
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/rock2.prefab
+        pos:
+          x: -13.086359
+          y: 1.4187956
+          z: -2.427
+        rot:
+          x: 0.000036655423
+          y: -0
+          z: -0
+        scal:
+          x: 1.5
+          y: 1.5
+          z: 1.5
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      - objNum: 4
+        objName: rock4
+        prefabName: rock4
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/rock4.prefab
+        pos:
+          x: 14.231682
+          y: 4.8453674
+          z: 10.924786
+        rot:
+          x: 354.05893
+          y: 327.28952
+          z: 85.30242
+        scal:
+          x: 1.5000017
+          y: 1.5000013
+          z: 1.5000015
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      - objNum: 5
+        objName: rock1
+        prefabName: rock1
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/rock1.prefab
+        pos:
+          x: -5.1903505
+          y: 2.84
+          z: -2.56
+        rot:
+          x: 359.3263
+          y: 180
+          z: 180
+        scal:
+          x: 1.5
+          y: 1.5
+          z: 1.5
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      - objNum: 6
+        objName: ground
+        prefabName: ground
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/ground.prefab
+        pos:
+          x: -1.1663983
+          y: -0.829201
+          z: -0.47300208
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1.5
+          y: 1.5
+          z: 1.5
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      - objNum: 7
+        objName: TestSceneCombineObject
+        prefabName: TestSceneCombineObject
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/TestSceneCombineAsset/TestSceneCombineObject.prefab
+        pos:
+          x: 15.666893
+          y: -14.496103
+          z: 21.238045
+        rot:
+          x: -0
+          y: 0
+          z: 0
+        scal:
+          x: 1
+          y: 1
+          z: 1
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      - objNum: 8
+        objName: rock2 (1)
+        prefabName: rock2
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/rock2.prefab
+        pos:
+          x: -16.33
+          y: 1.4187956
+          z: -2.427
+        rot:
+          x: 0.000036655423
+          y: -0
+          z: -0
+        scal:
+          x: 1.5
+          y: 1.5
+          z: 1.5
+        parentLayer: 3
+        lightmapIndexes: ffffffff
+        lightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+        realtimeLightmapIndexes: ffffffff
+        realtimeLightmapScaleOffsets:
+        - x: 1
+          y: 1
+          z: 0
+          w: 0
+      lightmapInfo:
+        lightmapMode: 0
+        dataIndexes: 
+        types: 
+        lightmapTexNames: []
+        lightmapTexPath: []
+      navMeshData:
+        i: 0
+      ConsiderHeightMap: 1
+      heightMapOriX: -25
+      heightMapOriZ: -24.1
+      heightMapSizeX: 50
+      heightMapSizeZ: 50
+      heightMapMinY: -13.5
+      heightMapSizeY: 21
+      heightMap: {fileID: 0}
+      hasLight: 0
+      lightPos: {x: 0, y: 0, z: 0}
+      lightDir: {x: 0, y: 0, z: 0}
+      lightColor: {r: 0, g: 0, b: 0, a: 0}
+      lightIntensity: 0
+      hasFog: 0
+      fogColor: {r: 1, g: 1, b: 1, a: 1}
+      fogMode: 1
+      fogStart: 0
+      fogEnd: 20
+      fogDensity: 0
+      skyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+    SceneInfoStorePath: 

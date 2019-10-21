@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 751adfaa6feee0143bd585717894b361, type: 3}
+  m_Name: MaterialCombine_Building
+  m_EditorClassIdentifier: 
+  materialsAndUVRects:
+  - material: {fileID: 2100000, guid: 84b39146cd1119c1a000ee884ada8c59, type: 2}
+    atlasRect:
+      serializedVersion: 2
+      x: 0.5359001
+      y: 0.0012953368
+      width: 0.4630593
+      height: 0.5764249
+    srcObjName: bigBridge
+    allPropsUseSameTiling: 1
+    allPropsUseSameTiling_sourceMaterialTiling:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    allPropsUseSameTiling_samplingEncapsulatinRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    propsUseDifferntTiling_srcUVsamplingRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    tilingTreatment: 0
+  - material: {fileID: 2100000, guid: 7add3c6dcd117aa1a00026ba4ada8c59, type: 2}
+    atlasRect:
+      serializedVersion: 2
+      x: 0.5359001
+      y: 0.5803109
+      width: 0.2663892
+      height: 0.3316062
+    srcObjName: floatingPlatform
+    allPropsUseSameTiling: 1
+    allPropsUseSameTiling_sourceMaterialTiling:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    allPropsUseSameTiling_samplingEncapsulatinRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    propsUseDifferntTiling_srcUVsamplingRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    tilingTreatment: 0
+  - material: {fileID: 2100000, guid: fc0aa96dcd117aa1a00026ba4ada8c59, type: 2}
+    atlasRect:
+      serializedVersion: 2
+      x: 0.0010405828
+      y: 0.0012953368
+      width: 0.5327784
+      height: 0.6632124
+    srcObjName: mediumPlatform
+    allPropsUseSameTiling: 1
+    allPropsUseSameTiling_sourceMaterialTiling:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    allPropsUseSameTiling_samplingEncapsulatinRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    propsUseDifferntTiling_srcUVsamplingRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    tilingTreatment: 0
+  - material: {fileID: 2100000, guid: 0c57597dcd117aa1a00026ba4ada8c59, type: 2}
+    atlasRect:
+      serializedVersion: 2
+      x: 0.0010405828
+      y: 0.66709846
+      width: 0.2663892
+      height: 0.3316062
+    srcObjName: lightPost
+    allPropsUseSameTiling: 1
+    allPropsUseSameTiling_sourceMaterialTiling:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    allPropsUseSameTiling_samplingEncapsulatinRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 1
+      height: 1
+    propsUseDifferntTiling_srcUVsamplingRect:
+      serializedVersion: 2
+      x: 0
+      y: 0
+      width: 0
+      height: 0
+    tilingTreatment: 0
+  resultMaterials:
+  - combinedMaterial: {fileID: 2100000, guid: b8095302be5c4ec45af417aeaf4bd201, type: 2}
+    considerMeshUVs: 0
+    sourceMaterials:
+    - {fileID: 2100000, guid: 84b39146cd1119c1a000ee884ada8c59, type: 2}
+    - {fileID: 2100000, guid: 7add3c6dcd117aa1a00026ba4ada8c59, type: 2}
+    - {fileID: 2100000, guid: fc0aa96dcd117aa1a00026ba4ada8c59, type: 2}
+    - {fileID: 2100000, guid: 0c57597dcd117aa1a00026ba4ada8c59, type: 2}
+  doMultiMaterial: 0

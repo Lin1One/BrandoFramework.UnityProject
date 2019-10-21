@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: ProjectInfoDati_ScriptObjectAsset
   m_EditorClassIdentifier: Framework.Common:Common.Config:ProjectInfoDati
   actualSerializableObject:
-    CurrentDevelopProjectName: 
+    DevelopProjectName: 
     ProjectRootDir: 
     CurrentProjectAssetDatabaseDirPath: 
+    AssetBundleBuildDir: 
     ProjectRuntimeScriptDefines: 
     ProjectEditorScriptingDefines: 
     ProjectScriptingDefines: 

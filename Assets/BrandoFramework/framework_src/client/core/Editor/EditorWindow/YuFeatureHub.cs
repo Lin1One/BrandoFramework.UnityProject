@@ -1,6 +1,7 @@
 using Client.Assets.Editor;
 using Client.DataTable.Editor;
 using Client.GamePlaying.AI;
+using Client.Scene.Editor;
 using Common.Config;
 using Common.DataStruct;
 using Common.EditorWindow;
@@ -26,6 +27,7 @@ namespace Client.Core.Editor
             tree.Add("脚本创建器", ScriptCreaterDati.GetSingleDati(),EditorIcons.Info);
             tree.Add("数据表", DataTableEditorDati.GetSingleDati(),EditorIcons.Table);
             tree.Add("AssetBundle", AssetBundleEditorDati.GetSingleDati(), EditorIcons.File);
+            tree.Add("场景编辑", SceneEditorDati.GetSingleDati(), EditorIcons.LightBulb);
             tree.Add("测试面板", new MethedInvokeBorad(),EditorIcons.SingleUser);
             tree.Add("行为树", BehaviorTreeVisualization.Instance,EditorIcons.Tree);
             //tree.Add("核心配置", YuU3dCoreSettingDati.GetSingleDati(),

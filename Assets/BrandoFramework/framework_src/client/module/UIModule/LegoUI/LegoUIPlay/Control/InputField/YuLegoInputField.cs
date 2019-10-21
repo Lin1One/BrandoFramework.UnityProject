@@ -835,11 +835,11 @@ namespace Client.LegoUI
             UpdateLabel();
         }
 
-        static string clipboard
-        {
-            get { return GUIUtility.systemCopyBuffer; }
-            set { GUIUtility.systemCopyBuffer = value; }
-        }
+        static string clipboard;
+        //{
+        //    get { return GUIUtility.systemCopyBuffer; }
+        //    set { GUIUtility.systemCopyBuffer = value; }
+        //}
 
         private bool InPlaceEditing()
         {
