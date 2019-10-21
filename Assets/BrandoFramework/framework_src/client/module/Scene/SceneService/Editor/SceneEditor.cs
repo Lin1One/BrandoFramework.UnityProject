@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using System.Linq;
 
 namespace Client.Scene.Editor
 {
@@ -224,11 +225,11 @@ namespace Client.Scene.Editor
         {
             //初始化节点、预制物容器
             List<SceneLayerInfo> layerList = new List<SceneLayerInfo>();
-            List<SceneItemInfo> prefabList = new List<SceneItemInfo>();
-            SceneCellInfo[] cellsInfo = new SceneCellInfo[CurrentSceneInfo.xCellCount * CurrentSceneInfo.zCellCount];
+            List<SceneItemInfoInEditor> prefabList = new List<SceneItemInfoInEditor>();
+            SceneCellInfoInEditor[] cellsInfo = new SceneCellInfoInEditor[CurrentSceneInfo.xCellCount * CurrentSceneInfo.zCellCount];
             for (int i = 0; i < cellsInfo.Length; i++)
             {
-                cellsInfo[i] = new SceneCellInfo();
+                cellsInfo[i] = new SceneCellInfoInEditor();
                 cellsInfo[i].cellId = i;
                 cellsInfo[i].itemsNum = new List<int>();
             }
@@ -265,7 +266,7 @@ namespace Client.Scene.Editor
                         //Todo 可能需要添加获取资源其他信息
                         //prefabPath = CopyFileToResources(prefabPath);
 
-                        SceneItemInfo itemInfo = new SceneItemInfo();
+                        SceneItemInfoInEditor itemInfo = new SceneItemInfoInEditor();
                         itemInfo.parentLayer = MyMapTool.GetELaterByName(trans.parent.name, sceneRoot.name);
 
                         List<int> numList;
@@ -285,11 +286,13 @@ namespace Client.Scene.Editor
 
                         if (numList != null && numList.Count > 0 && itemInfo.parentLayer != EMapLayer.None)
                         {
+
                             //初始化物体info
                             prefabList.Add(itemInfo);
-                            itemInfo.pos = new MyVector3(trans.position);
-                            itemInfo.scal = new MyVector3(trans.lossyScale);
-                            itemInfo.rot = new MyVector3(trans.eulerAngles);
+                            itemInfo.obj = trans.gameObject;
+                            itemInfo.pos = trans.position;
+                            itemInfo.scale = trans.lossyScale;
+                            itemInfo.rot = trans.eulerAngles;
                             itemInfo.objNum = itemNum;
                             itemInfo.objName = trans.name;
                             itemInfo.prefabName = objPrefab.name;
@@ -860,6 +863,42 @@ namespace Client.Scene.Editor
             //}
 
             //EditorUtility.ClearProgressBar();
+        }
+
+        public void SetSceneGameObjectInCell(int cellID)
+        {
+            SceneCellInfoInEditor cellInfo = new SceneCellInfoInEditor();
+
+            foreach(var cell in CurrentSceneInfo.cells)
+            {
+                if (cell.cellId == cellID)
+                {
+                    cellInfo = cell;
+                }
+            }
+            if(cellInfo == null)
+            {
+                return;
+            }
+
+            var itemIds = cellInfo.itemsNum;
+            var allItemIds = CurrentSceneInfo.items;
+            List<GameObject> gameObjectIncell = new List<GameObject>();
+            foreach(var targetItemId in itemIds)
+            {
+                foreach(var item in allItemIds)
+                {
+                    if(targetItemId == item.objNum && !gameObjectIncell.Contains(item.obj))
+                    {
+                        gameObjectIncell.Add(item.obj);
+                    }
+                }
+            }
+            if(gameObjectIncell.Count > 0)
+            {
+                Selection.objects = gameObjectIncell.ToArray();
+                EditorGUIUtility.PingObject(gameObjectIncell[0]);
+            }
         }
 
         #endregion

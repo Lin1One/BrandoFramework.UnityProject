@@ -1,10 +1,7 @@
-﻿using Common.Utility;
-using GameWorld;
+﻿using GameWorld;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using UnityEditor;
 using UnityEngine;
 
 namespace Client.Scene.Editor
@@ -43,13 +40,13 @@ namespace Client.Scene.Editor
         public Vector2 originPos;   //原点，（xz坐标最小点）
 
         [LabelText("场景格信息")]
-        public SceneCellInfo[] cells;
+        public SceneCellInfoInEditor[] cells;
 
         [LabelText("场景分层节点信息")]
         public SceneLayerInfo[] layers;
 
         [LabelText("场景物体信息")]
-        public SceneItemInfo[] items;
+        public SceneItemInfoInEditor[] items;
 
         [BoxGroup("光照贴图", false)]
         [LabelText("光照贴图数据")]
@@ -179,6 +176,75 @@ namespace Client.Scene.Editor
         public float zLenth
         {
             get { return zCellCount * zCellSize; }
+        }
+    }
+
+    //物体info
+    [Serializable]
+    public class SceneItemInfoInEditor
+    {
+        [LabelText("物体Id")]
+        [LabelWidth(70)]
+        public int objNum;
+
+        [LabelWidth(70)]
+        public GameObject obj;
+
+        [LabelText("物体名称")]
+        [LabelWidth(70)]
+        public string objName;
+
+        [LabelText("预制体名称")]
+        [LabelWidth(70)]
+        public string prefabName;
+
+        [LabelText("资源路径")]
+        [LabelWidth(70)]
+        public string prefabAssetPath;
+
+        [NonSerialized]
+        public int useCount = 0;
+        [LabelWidth(70)]
+        public Vector3 pos = new Vector3();
+
+        [LabelWidth(70)]
+        public Vector3 rot = new Vector3();
+
+        [LabelWidth(70)]
+        public Vector3 scale = new Vector3();
+
+        [LabelText("物体场景类型")]
+        [LabelWidth(70)]
+        public EMapLayer parentLayer;
+
+        [LabelText("光照贴图ID")]
+        public int[] lightmapIndexes;
+
+        [LabelText("光照贴图偏移")]
+        public MyVector4[] lightmapScaleOffsets;
+
+        [LabelText("实时光照贴图ID")]
+        public int[] realtimeLightmapIndexes;
+
+        [LabelText("实时光照贴图偏移")]
+        public MyVector4[] realtimeLightmapScaleOffsets;
+    }
+
+    //格子info
+    [Serializable]
+    public class SceneCellInfoInEditor
+    {
+        [LabelText("场景格ID")]
+        [LabelWidth(70)]
+        [InlineButton("SetCellItemsInScene","选择该格游戏物体")]
+        public int cellId;
+
+        [LabelText("场景物体ID列表")]
+        public List<int> itemsNum;
+
+        private void SetCellItemsInScene()
+        {
+            SceneEditorDati.GetActualInstance().SetSceneGameObjectInCell(cellId);
         }
     }
 
