@@ -1,7 +1,7 @@
 {
     "name": "UGUI.Editor",
     "references": [
-        "GUID:0a6bad87ebf293045b19795d5c48a678"
+        "UGUI"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
@@ -10,6 +10,5 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": []
+    "defineConstraints": []
 }

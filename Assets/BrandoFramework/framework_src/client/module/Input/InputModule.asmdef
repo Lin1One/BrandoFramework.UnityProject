@@ -1,10 +1,9 @@
 {
     "name": "Client.Input",
     "references": [
-        "GUID:97928e559fe6a9f4d9785783dbbc6734",
-        "GUID:e57b4f91e09341346bcb1283971e8329",
-        "GUID:3a56d6bdc449dc84a957341339d9c550",
-        "GUID:e8e84a12a41701e46a450d97be444168"
+        "Client.Module",
+        "Client.Core.Play",
+        "Framework.Common"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
@@ -13,6 +12,5 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": []
+    "defineConstraints": []
 }

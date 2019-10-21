@@ -5,8 +5,7 @@
         "OdinPlay",
         "Framework.Common",
         "framework_module_serializer",
-        "Client.Core.Play",
-        "IsoPlugin"
+        "Client.Core.Play"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
@@ -15,6 +14,5 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": []
+    "defineConstraints": []
 }
