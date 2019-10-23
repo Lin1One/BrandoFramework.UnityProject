@@ -46,7 +46,11 @@ namespace Client.Scene.Editor
         [Button("合并材质")]
         public void CombineMaterial()
         {
-
+            var combiner = new TextureCombiner();
+            TextureCombiner.CreateCombinedMaterialInfoAsset(combineAssetFolder);
+            //创建 TextureCombineResult
+            //Texuture
+            //Material
         }
 
         [HorizontalGroup("合并操作")]
