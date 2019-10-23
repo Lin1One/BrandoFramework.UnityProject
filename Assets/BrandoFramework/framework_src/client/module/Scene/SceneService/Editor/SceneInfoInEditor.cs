@@ -236,13 +236,16 @@ namespace Client.Scene.Editor
     {
         [LabelText("场景格ID")]
         [LabelWidth(70)]
-        [InlineButton("SetCellItemsInScene","选择该格游戏物体")]
+        [InlineButton("SelectCellItemsInScene", "选择该格游戏物体")]
         public int cellId;
 
         [LabelText("场景物体ID列表")]
         public List<int> itemsNum;
 
-        private void SetCellItemsInScene()
+        [LabelText("仅位于该格物体ID列表")]
+        public List<int> OnlyInThisCellItemIds;
+
+        private void SelectCellItemsInScene()
         {
             SceneEditorDati.GetActualInstance().SetSceneGameObjectInCell(cellId);
         }

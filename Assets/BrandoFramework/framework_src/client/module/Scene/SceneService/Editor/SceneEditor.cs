@@ -4,9 +4,9 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using System.Linq;
 
 namespace Client.Scene.Editor
 {
@@ -22,9 +22,11 @@ namespace Client.Scene.Editor
         [InlineButton("AnalyzeCurrentScene", "解析当前场景")]
         public GameObject SceneRoot;
 
+        [TabGroup("场景解析")]
         [HideLabel]
         public SceneInfoInEditor CurrentSceneInfo;
 
+        [TabGroup("场景解析")]
         [Space(10)]
         [LabelText("场景数据保存路径")]
         [InlineButton("SaveSceneAnalysisInfo", "保存")]
@@ -33,6 +35,9 @@ namespace Client.Scene.Editor
         public string SceneInfoStorePath;
         // = Application.dataPath + "/GameWorld/TestScene/MapData/"
 
+        [TabGroup("场景格")]
+        [HideLabel]
+        public SceneCellEditor CellEditor;
         #endregion
 
         #region 解析场景信息
@@ -81,6 +86,8 @@ namespace Client.Scene.Editor
             ////创建navMesh数据
             //NavMeshTriangulation navMeshTri = NavMesh.CalculateTriangulation();
             //info.navMeshData = YuNavMeshDataCreate.CreateNavMeshData(navMeshTri);
+
+            SetCellEditorTab();
         }
 
         private Vector4 GetRect(Transform root)
@@ -232,6 +239,7 @@ namespace Client.Scene.Editor
                 cellsInfo[i] = new SceneCellInfoInEditor();
                 cellsInfo[i].cellId = i;
                 cellsInfo[i].itemsNum = new List<int>();
+                cellsInfo[i].OnlyInThisCellItemIds = new List<int>();
             }
 
             //prefab总数
@@ -316,14 +324,21 @@ namespace Client.Scene.Editor
 
                             }
 
-                            foreach (int num in numList)     //遍历对应编号的格子info，存入物体info
+                            if(numList.Count == 1)
                             {
-                                if (num >= 0 && num < cellsInfo.Length)
+                                cellsInfo[numList[0]].OnlyInThisCellItemIds.Add(itemInfo.objNum);
+                                cellsInfo[numList[0]].itemsNum.Add(itemInfo.objNum);
+                            }
+                            else
+                            {
+                                foreach (int num in numList)     //遍历对应编号的格子info，存入物体info
                                 {
-                                    cellsInfo[num].itemsNum.Add(itemInfo.objNum);
+                                    if (num >= 0 && num < cellsInfo.Length)
+                                    {
+                                        cellsInfo[num].itemsNum.Add(itemInfo.objNum);
+                                    }
                                 }
                             }
-
                             itemNum++;
                         }
                         return true;
@@ -841,28 +856,6 @@ namespace Client.Scene.Editor
 
                 }
             }
-            //mapInfo.heightMap = heightMap;
-            //byte[] bytes = heightMap.EncodeToPNG();
-            //string fullPath = Application.dataPath;
-            //fullPath = fullPath.Remove(fullPath.IndexOf("Assets"));
-            //fullPath = fullPath + fullPathName;
-            //File.WriteAllBytes(fullPathName, bytes);
-
-            //AssetDatabase.Refresh();
-
-            //TextureImporter texImporter = TextureImporter.GetAtPath(fullPathName) as TextureImporter;
-            //if (texImporter != null)
-            //{
-            //    TextureImporterPlatformSettings setting = new TextureImporterPlatformSettings();
-            //    setting.format = TextureImporterFormat.RG16;
-
-            //    texImporter.SetPlatformTextureSettings(setting);
-            //    texImporter.isReadable = true;
-            //    texImporter.SaveAndReimport();
-            //    AssetDatabase.ImportAsset(fullPathName);
-            //}
-
-            //EditorUtility.ClearProgressBar();
         }
 
         public void SetSceneGameObjectInCell(int cellID)
@@ -1158,6 +1151,15 @@ namespace Client.Scene.Editor
             }
 
             EditorUtility.ClearProgressBar();
+        }
+
+        #endregion
+
+        #region 场景格信息
+
+        public void SetCellEditorTab()
+        {
+            CellEditor.cellInfos = CurrentSceneInfo.cells.ToList();
         }
 
         #endregion

@@ -25,12 +25,16 @@ MonoBehaviour:
       cells:
       - cellId: 0
         itemsNum: 0200000003000000050000000600000008000000
+        OnlyInThisCellItemIds: 030000000500000008000000
       - cellId: 1
         itemsNum: 000000000200000006000000
+        OnlyInThisCellItemIds: 00000000
       - cellId: 2
         itemsNum: 0100000006000000
+        OnlyInThisCellItemIds: 01000000
       - cellId: 3
         itemsNum: 040000000600000007000000
+        OnlyInThisCellItemIds: 0400000007000000
       layers:
       - layerName: TestScene#2#2#1
         pos:
@@ -91,7 +95,7 @@ MonoBehaviour:
       - layerName: BoxCollider
         pos:
           x: 0
-          y: -3
+          y: 4.1
           z: 0.9
         rot:
           x: -0
@@ -105,7 +109,7 @@ MonoBehaviour:
       - layerName: BoxCollider (1)
         pos:
           x: 0
-          y: -3
+          y: 1.8
           z: 0.9
         rot:
           x: -0
@@ -116,15 +120,11 @@ MonoBehaviour:
           y: 3
           z: 1
         parentLayer: 0
-      items:
-      - objNum: 0
-        objName: Other_ZhangPeng_05
-        prefabName: Other_ZhangPeng_05
-        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/originAsset/prefab/Other_ZhangPeng_05.prefab
+      - layerName: Cube
         pos:
-          x: 10.04
+          x: 0
           y: 0
-          z: -16.7
+          z: 0
         rot:
           x: -0
           y: 0
@@ -133,6 +133,16 @@ MonoBehaviour:
           x: 1
           y: 1
           z: 1
+        parentLayer: 0
+      items:
+      - objNum: 0
+        obj: {fileID: 0}
+        objName: Other_ZhangPeng_05
+        prefabName: Other_ZhangPeng_05
+        prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/originAsset/prefab/Other_ZhangPeng_05.prefab
+        pos: {x: 10.04, y: 0, z: -16.7}
+        rot: {x: -0, y: 0, z: 0}
+        scale: {x: 1, y: 1, z: 1}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -147,21 +157,13 @@ MonoBehaviour:
           z: 0
           w: 0
       - objNum: 1
+        obj: {fileID: 0}
         objName: ChangBanPoZhiZhan_ShaoTa_01
         prefabName: ChangBanPoZhiZhan_ShaoTa_01
         prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/originAsset/prefab/ChangBanPoZhiZhan_ShaoTa_01.prefab
-        pos:
-          x: -6.54
-          y: 0
-          z: 3.78
-        rot:
-          x: -0
-          y: 0
-          z: 0
-        scal:
-          x: 1
-          y: 1
-          z: 1
+        pos: {x: -6.54, y: 0, z: 3.78}
+        rot: {x: -0, y: 0, z: 0}
+        scale: {x: 1, y: 1, z: 1}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -176,21 +178,13 @@ MonoBehaviour:
           z: 0
           w: 0
       - objNum: 2
+        obj: {fileID: 0}
         objName: cliff
         prefabName: cliff
         prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/cliff.prefab
-        pos:
-          x: -0.26
-          y: -0.55404377
-          z: -10.99
-        rot:
-          x: -0
-          y: 110.84229
-          z: -0
-        scal:
-          x: 1.5000013
-          y: 1.5
-          z: 1.5000013
+        pos: {x: -0.26, y: -0.55404377, z: -10.99}
+        rot: {x: -0, y: 110.84229, z: -0}
+        scale: {x: 1.5000013, y: 1.5, z: 1.5000013}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -205,21 +199,13 @@ MonoBehaviour:
           z: 0
           w: 0
       - objNum: 3
+        obj: {fileID: 0}
         objName: rock2
         prefabName: rock2
         prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/rock2.prefab
-        pos:
-          x: -13.086359
-          y: 1.4187956
-          z: -2.427
-        rot:
-          x: 0.000036655423
-          y: -0
-          z: -0
-        scal:
-          x: 1.5
-          y: 1.5
-          z: 1.5
+        pos: {x: -13.086359, y: 1.4187956, z: -2.427}
+        rot: {x: 0.000036655423, y: -0, z: -0}
+        scale: {x: 1.5, y: 1.5, z: 1.5}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -234,21 +220,13 @@ MonoBehaviour:
           z: 0
           w: 0
       - objNum: 4
+        obj: {fileID: 0}
         objName: rock4
         prefabName: rock4
         prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/rock4.prefab
-        pos:
-          x: 14.231682
-          y: 4.8453674
-          z: 10.924786
-        rot:
-          x: 354.05893
-          y: 327.28952
-          z: 85.30242
-        scal:
-          x: 1.5000017
-          y: 1.5000013
-          z: 1.5000015
+        pos: {x: 14.231682, y: 4.8453674, z: 10.924786}
+        rot: {x: 354.05893, y: 327.28952, z: 85.30242}
+        scale: {x: 1.5000017, y: 1.5000013, z: 1.5000015}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -263,21 +241,13 @@ MonoBehaviour:
           z: 0
           w: 0
       - objNum: 5
+        obj: {fileID: 0}
         objName: rock1
         prefabName: rock1
         prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/rock1.prefab
-        pos:
-          x: -5.1903505
-          y: 2.84
-          z: -2.56
-        rot:
-          x: 359.3263
-          y: 180
-          z: 180
-        scal:
-          x: 1.5
-          y: 1.5
-          z: 1.5
+        pos: {x: -5.1903505, y: 2.84, z: -2.56}
+        rot: {x: 359.3263, y: 180, z: 180}
+        scale: {x: 1.5, y: 1.5, z: 1.5}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -292,21 +262,13 @@ MonoBehaviour:
           z: 0
           w: 0
       - objNum: 6
+        obj: {fileID: 0}
         objName: ground
         prefabName: ground
         prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/ground.prefab
-        pos:
-          x: -1.1663983
-          y: -0.829201
-          z: -0.47300208
-        rot:
-          x: -0
-          y: 0
-          z: 0
-        scal:
-          x: 1.5
-          y: 1.5
-          z: 1.5
+        pos: {x: -1.1663983, y: -0.829201, z: -0.47300208}
+        rot: {x: -0, y: 0, z: 0}
+        scale: {x: 1.5, y: 1.5, z: 1.5}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -321,21 +283,13 @@ MonoBehaviour:
           z: 0
           w: 0
       - objNum: 7
+        obj: {fileID: 0}
         objName: TestSceneCombineObject
         prefabName: TestSceneCombineObject
         prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/TestSceneCombineAsset/TestSceneCombineObject.prefab
-        pos:
-          x: 15.666893
-          y: -14.496103
-          z: 21.238045
-        rot:
-          x: -0
-          y: 0
-          z: 0
-        scal:
-          x: 1
-          y: 1
-          z: 1
+        pos: {x: 15.666893, y: -14.496103, z: 21.238045}
+        rot: {x: -0, y: 0, z: 0}
+        scale: {x: 1, y: 1, z: 1}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -350,21 +304,13 @@ MonoBehaviour:
           z: 0
           w: 0
       - objNum: 8
+        obj: {fileID: 0}
         objName: rock2 (1)
         prefabName: rock2
         prefabAssetPath: Assets/BrandoFramework/framework_src/client/module/Scene/TestScene/Free_Rocks/_prefabs/rock2.prefab
-        pos:
-          x: -16.33
-          y: 1.4187956
-          z: -2.427
-        rot:
-          x: 0.000036655423
-          y: -0
-          z: -0
-        scal:
-          x: 1.5
-          y: 1.5
-          z: 1.5
+        pos: {x: -16.33, y: 1.4187956, z: -2.427}
+        rot: {x: 0.000036655423, y: -0, z: -0}
+        scale: {x: 1.5, y: 1.5, z: 1.5}
         parentLayer: 3
         lightmapIndexes: ffffffff
         lightmapScaleOffsets:
@@ -391,9 +337,8 @@ MonoBehaviour:
       heightMapOriZ: -24.1
       heightMapSizeX: 50
       heightMapSizeZ: 50
-      heightMapMinY: -13.5
+      heightMapMinY: -8.7
       heightMapSizeY: 21
-      heightMap: {fileID: 0}
       hasLight: 0
       lightPos: {x: 0, y: 0, z: 0}
       lightDir: {x: 0, y: 0, z: 0}
@@ -407,3 +352,20 @@ MonoBehaviour:
       fogDensity: 0
       skyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
     SceneInfoStorePath: 
+    CellEditor:
+      cellInfos:
+      - cellId: 0
+        itemsNum: 0200000003000000050000000600000008000000
+        OnlyInThisCellItemIds: 030000000500000008000000
+      - cellId: 1
+        itemsNum: 000000000200000006000000
+        OnlyInThisCellItemIds: 00000000
+      - cellId: 2
+        itemsNum: 0100000006000000
+        OnlyInThisCellItemIds: 01000000
+      - cellId: 3
+        itemsNum: 040000000600000007000000
+        OnlyInThisCellItemIds: 0400000007000000
+      CurrentCellID: 0
+      currentCellItems: []
+      CellGameObjectRendererInfo: 

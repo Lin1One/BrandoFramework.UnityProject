@@ -51,6 +51,17 @@ namespace Common.DataStruct
             }
         }
 
+
+        public static List<V> ToValuesList<T, V>(this Dictionary<T, V> dictionary)
+        {
+            var resultList = new List<V>();
+            foreach (var v in dictionary.Values)
+            {
+                resultList.Add(v);
+            }
+            return resultList;
+        }
+
         #endregion
 
         #region 列表
