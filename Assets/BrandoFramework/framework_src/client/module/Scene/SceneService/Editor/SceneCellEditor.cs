@@ -38,19 +38,34 @@ namespace Client.Scene.Editor
         public string combineAssetFolder;
 
         [BoxGroup("场景合并")]
+        [LabelText("通用合并设置")]
+        public GameObjectCombineSetting combineSetting;
+
+        [BoxGroup("场景合并")]
         [LabelText("当前场景格物体合并分组")]
-        public List<SceneCellItemCombineGroup> cellItemGroup;
+        public List<SceneCellItemCombineGroup> cellItemGroups;
 
 
         [HorizontalGroup("合并操作")]
         [Button("合并材质")]
         public void CombineMaterial()
         {
-            var combiner = new TextureCombiner();
-            TextureCombiner.CreateCombinedMaterialInfoAsset(combineAssetFolder);
-            //创建 TextureCombineResult
-            //Texuture
-            //Material
+            for(var i = 0;i<cellItemGroups.Count;i++)
+            {
+                var interalCombineSetting = cellItemGroups[i].groupCombineSetting;
+                var combineSetting = interalCombineSetting.maxAtlasWidth != 0 ? interalCombineSetting : this.combineSetting;
+
+                var combineData = new TextureCombinePipelineData();
+                combineData.CombinedMaterialInfoPath = combineAssetFolder + "/Cell" + CurrentCellID + "_Group" + i + ".asset";
+                combineData.DoMultiMaterial = combineSetting.DoMultiMaterial;
+
+                TextureCombiner.CombineMaterial(cellItemGroups[i].groupGameObjects, combineSetting, combineData);
+
+                //创建 TextureCombineResult
+                //Texuture
+                //Material
+            }
+
         }
 
         [HorizontalGroup("合并操作")]
@@ -93,7 +108,7 @@ namespace Client.Scene.Editor
 
         private void GroupingGameObjects()
         {
-            cellItemGroup = SceneCellItemCombineGroup.Grouping(CombineInGroupBy, CurrentCellItems);
+            cellItemGroups = SceneCellItemCombineGroup.Grouping(CombineInGroupBy, CurrentCellItems);
         }
 
         private void ResetCurrentCellInfo()
@@ -108,6 +123,7 @@ namespace Client.Scene.Editor
     {
         public string groupInfo;
         public UnityEngine.Object groupByObj;
+        public GameObjectCombineSetting groupCombineSetting;
         public List<GameObject> groupGameObjects = new List<GameObject>();
 
         public static List<SceneCellItemCombineGroup> Grouping(CombineGroupType groupBy,List<GameObject> gameObjects)
