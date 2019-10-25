@@ -3,7 +3,7 @@ using Client.DataTable.Editor;
 using Client.GamePlaying.AI;
 using Client.Scene.Editor;
 using Common.Config;
-using Common.DataStruct;
+using Common;
 using Common.EditorWindow;
 using Common.ScriptCreate;
 using DraftBorad;
@@ -41,7 +41,7 @@ namespace Client.Core.Editor
 
         public static void OpenItem(string builderId)
         {
-            var itemIndex = Instance.Builders.FindIndex(b => b.TypeId() == builderId);
+            var itemIndex = Instance.Builders.FindIndex(b => b.TypeName() == builderId);
             OpenItem(2 + itemIndex);
         }
 

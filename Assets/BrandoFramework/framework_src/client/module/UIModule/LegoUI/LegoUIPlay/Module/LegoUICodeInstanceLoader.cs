@@ -7,7 +7,7 @@
 #endregion
 
 using UnityEngine;
-using YuCommon;
+
 using YuU3dPlay;
 
 namespace Client.LegoUI

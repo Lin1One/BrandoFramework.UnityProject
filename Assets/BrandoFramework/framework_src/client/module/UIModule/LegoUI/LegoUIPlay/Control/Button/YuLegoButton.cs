@@ -13,9 +13,9 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using YuCommon;
+
 using Client.LegoUI;
-using Common.DataStruct;
+using Common;
 
 namespace Client.LegoUI
 {

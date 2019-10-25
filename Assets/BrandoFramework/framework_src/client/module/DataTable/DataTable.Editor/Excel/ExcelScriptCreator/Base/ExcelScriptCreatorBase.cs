@@ -8,7 +8,7 @@
 
 using Common;
 using Common.Config;
-using Common.DataStruct;
+using Common;
 using Common.ScriptCreate;
 using Common.Utility;
 using NPOI.XSSF.UserModel;

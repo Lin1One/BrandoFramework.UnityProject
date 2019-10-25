@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.DataStruct;
+using Common;
 using Common.PrefsData;
 using System;
 using System.Linq;

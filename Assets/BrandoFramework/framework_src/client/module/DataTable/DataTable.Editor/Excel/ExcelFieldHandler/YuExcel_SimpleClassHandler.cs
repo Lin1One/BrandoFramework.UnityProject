@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.DataStruct;
+using Common;
 using Common.ScriptCreate;
 using Common.Utility;
 using System;

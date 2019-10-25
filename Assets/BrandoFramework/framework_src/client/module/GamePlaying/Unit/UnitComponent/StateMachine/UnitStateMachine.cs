@@ -13,7 +13,7 @@
 #endregion
 
 using Common;
-using client_module_event;
+using Client.Core;
 using System;
 using System.Collections.Generic;
 
@@ -99,7 +99,7 @@ namespace Client.GamePlaying.Unit
 
         protected override void OnRelease()
         {
-            Injector.Instance.Get<IU3DEventModule>().RemoveUnityEvent(YuUnityEventType.FixedUpdate, OnFixedUpdate);
+            Injector.Instance.Get<IU3DEventModule>().RemoveUnityEvent(UnityEventType.FixedUpdate, OnFixedUpdate);
             //if (m_messageEventID != -1)
             //{
             //    //YuU3dAppUtility.Injector.Get<IYuU3DEventModule>().RemoveSpecifiedHandler()

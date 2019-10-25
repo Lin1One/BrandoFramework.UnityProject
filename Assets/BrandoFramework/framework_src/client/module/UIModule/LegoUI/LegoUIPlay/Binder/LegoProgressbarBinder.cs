@@ -7,7 +7,7 @@
 #endregion
 
 
-using Common.DataStruct;
+using Common;
 
 namespace Client.LegoUI
 {

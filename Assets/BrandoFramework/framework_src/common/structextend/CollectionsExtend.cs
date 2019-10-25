@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Common.DataStruct
+namespace Common
 {
     /// <summary>
     /// 常用扩展功能函数集合类。

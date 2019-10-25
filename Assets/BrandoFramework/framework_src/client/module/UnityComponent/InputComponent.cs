@@ -1,7 +1,6 @@
 ﻿
-using client_module_event;
+using Client.Core.UnityComponent;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Client.Module.UnityComponent

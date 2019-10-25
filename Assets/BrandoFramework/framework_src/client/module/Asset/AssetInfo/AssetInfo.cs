@@ -1,9 +1,8 @@
 
 
-using Common.DataStruct;
+using Common;
 using System;
 using System.Text;
-using YuCommon;
 
 
 #region Head

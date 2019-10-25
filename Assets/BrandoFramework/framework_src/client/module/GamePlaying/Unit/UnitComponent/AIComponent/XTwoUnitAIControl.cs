@@ -14,7 +14,7 @@
 
 using Client.GamePlaying.AI;
 using Common;
-using client_module_event;
+using Client.Core;
 
 namespace Client.GamePlaying.Unit
 {
@@ -57,7 +57,7 @@ namespace Client.GamePlaying.Unit
 
         protected override void OnInit()
         {
-            EvnetModule.WatchUnityEvent(YuUnityEventType.Update, OnFixedUpdate);
+            EvnetModule.WatchUnityEvent(UnityEventType.Update, OnFixedUpdate);
         }
 
         protected override void OnRelease()
@@ -70,7 +70,7 @@ namespace Client.GamePlaying.Unit
             }
 
             EvnetModule.RemoveUnityEvent(
-                YuUnityEventType.Update, OnFixedUpdate);
+                UnityEventType.Update, OnFixedUpdate);
         }
 
         private void OnFixedUpdate()

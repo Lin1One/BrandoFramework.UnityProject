@@ -12,12 +12,12 @@
 
 #endregion
 
-using Common.DataStruct;
+using Common;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using YuCommon;
+
 
 namespace Client.LegoUI
 {

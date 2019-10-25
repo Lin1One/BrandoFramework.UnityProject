@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using YuCommon;
+
 using YuU3dPlay;
 
 namespace Client.LegoUI

@@ -1,10 +1,10 @@
-﻿using client_module_event;
+﻿using Client.Core;
 using Common;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using YuCommon;
+
 using YuU3dPlay;
 
 namespace Client.LegoUI
@@ -80,9 +80,9 @@ namespace Client.LegoUI
             base.OnDrag(eventData);
 
             // 抛出摇杆被拖动事件
-            EventModule.TriggerEvent(YuUnityEventCode.Input_DragRocker);
+            EventModule.TriggerEvent(ProjectCoreEventCode.Input_DragRocker);
             var contentPostion = content.anchoredPosition;
-            EventModule.TriggerEvent(YuUnityEventCode.Input_RockerMove, null, contentPostion);
+            EventModule.TriggerEvent(ProjectCoreEventCode.Input_RockerMove, null, contentPostion);
 
             if (contentPostion.magnitude > radius)
             {
@@ -96,7 +96,7 @@ namespace Client.LegoUI
             base.OnEndDrag(eventData);
 
             // 抛出摇杆停止拖拽事件
-            EventModule.TriggerEvent(YuUnityEventCode.Input_EndDragRocker);
+            EventModule.TriggerEvent(ProjectCoreEventCode.Input_EndDragRocker);
         }
 
         #endregion

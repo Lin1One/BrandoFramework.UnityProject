@@ -12,6 +12,7 @@
 
 #endregion
 
+using Common;
 using Common.DataStruct;
 using System;
 using System.Collections.Generic;

@@ -16,7 +16,7 @@ using Client.Assets;
 using Common;
 using UnityEngine;
 using UnityEngine.UI;
-using YuCommon;
+
 using YuU3dPlay;
 
 namespace Client.LegoUI

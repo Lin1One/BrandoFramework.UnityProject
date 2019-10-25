@@ -1,5 +1,5 @@
-﻿using Common.DataStruct;
-using YuCommon;
+﻿using Common;
+
 
 namespace Client.LegoUI
 {

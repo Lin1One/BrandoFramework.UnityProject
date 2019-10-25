@@ -7,7 +7,7 @@
 #endregion
 
 using Common.Config;
-using Common.DataStruct;
+using Common;
 using Common.Editor;
 using Common.PrefsData;
 using Common.Utility;

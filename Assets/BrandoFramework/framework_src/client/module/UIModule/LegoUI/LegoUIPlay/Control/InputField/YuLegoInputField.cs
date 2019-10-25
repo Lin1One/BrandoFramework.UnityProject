@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.DataStruct;
+using Common;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -14,7 +14,7 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using YuCommon;
+
 
 namespace Client.LegoUI
 {

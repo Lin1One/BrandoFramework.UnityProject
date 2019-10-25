@@ -17,7 +17,7 @@ using Common.Utility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using YuCommon;
+
 using YuU3dPlay;
 
 #pragma warning disable 649

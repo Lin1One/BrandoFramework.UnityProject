@@ -1,4 +1,4 @@
-using Common.DataStruct;
+using Common;
 using Common.Utility;
 using Sirenix.OdinInspector.Editor;
 using System;
@@ -150,7 +150,7 @@ namespace Common.EditorWindow
             foreach (var builder in Builders)
             {
                 var isLoadInWindow = Convert.ToBoolean(
-                        PlayerPrefs.GetString(builder.TypeId() + "IsLoadIn" + GetType(), "true"));
+                        PlayerPrefs.GetString(builder.TypeName() + "IsLoadIn" + GetType(), "true"));
                 if (isLoadInWindow)
                 {
                     builder.BuildMenuItem(menuTree);

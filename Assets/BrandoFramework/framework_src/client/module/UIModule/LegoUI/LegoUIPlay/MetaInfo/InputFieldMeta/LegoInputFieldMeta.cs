@@ -7,7 +7,7 @@
 #endregion
 
 using Client.Extend;
-using Common.DataStruct;
+using Common;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

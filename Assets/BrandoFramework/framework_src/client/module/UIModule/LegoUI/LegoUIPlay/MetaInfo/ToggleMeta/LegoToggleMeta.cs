@@ -7,7 +7,7 @@
 #endregion
 
 using Client.Extend;
-using Common.DataStruct;
+using Common;
 using UnityEngine.Serialization;
 
 namespace Client.LegoUI

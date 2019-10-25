@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.DataStruct;
+using Common;
 using Common.Utility;
 using Sirenix.OdinInspector;
 using System;
@@ -32,7 +32,7 @@ namespace Common.PrefsData
         [VerticalGroup("资料文件详细说明")]
         public string DetailHelp;
 
-        private string TypeId => GetType().TypeId();
+        private string TypeId => GetType().TypeName();
 
         private bool IsShowDetailHelp()
         {

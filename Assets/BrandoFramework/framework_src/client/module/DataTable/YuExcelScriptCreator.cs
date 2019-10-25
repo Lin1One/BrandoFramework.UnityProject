@@ -6,12 +6,11 @@
 
 #endregion
 
+using Common;
 using NPOI.XSSF.UserModel;
 using System;
 using System.IO;
 using UnityEditor;
-using Common.ScriptCreate;
-using Common.DataStruct;
 
 namespace Client.DataTable.Editor
 {

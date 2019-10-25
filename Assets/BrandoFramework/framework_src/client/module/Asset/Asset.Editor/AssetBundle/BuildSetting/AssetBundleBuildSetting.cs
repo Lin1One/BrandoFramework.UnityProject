@@ -7,7 +7,7 @@
 
 #endregion
 
-using Common.DataStruct;
+using Common;
 using Common.Editor;
 using Common.Utility;
 using Sirenix.OdinInspector;

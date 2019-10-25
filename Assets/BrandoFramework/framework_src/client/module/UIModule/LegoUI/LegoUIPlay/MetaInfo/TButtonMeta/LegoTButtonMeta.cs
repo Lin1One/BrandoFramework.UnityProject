@@ -9,7 +9,7 @@
 using System;
 using Sirenix.OdinInspector;
 using Client.LegoUI;
-using Common.DataStruct;
+using Common;
 
 namespace Client.LegoUI
 {

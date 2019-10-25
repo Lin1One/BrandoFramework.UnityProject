@@ -6,12 +6,12 @@
 
 #endregion
 
-using Common.DataStruct;
+using Common;
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using YuCommon;
+
 
 namespace Client.LegoUI
 {

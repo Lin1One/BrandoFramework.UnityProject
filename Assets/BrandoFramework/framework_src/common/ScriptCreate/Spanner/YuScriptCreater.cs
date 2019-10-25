@@ -12,7 +12,7 @@
 
 #endregion
 
-using Common.DataStruct;
+using Common;
 using Common.Utility;
 using Sirenix.OdinInspector;
 using System;

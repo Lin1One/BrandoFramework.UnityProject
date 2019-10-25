@@ -8,7 +8,7 @@
 
 
 using Client.Extend;
-using Common.DataStruct;
+using Common;
 
 namespace Client.LegoUI
 {

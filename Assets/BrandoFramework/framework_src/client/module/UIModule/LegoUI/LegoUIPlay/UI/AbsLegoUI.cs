@@ -7,7 +7,7 @@
 #endregion
 
 using Common;
-using Common.DataStruct;
+using Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

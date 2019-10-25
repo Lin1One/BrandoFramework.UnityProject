@@ -9,7 +9,7 @@
 #endregion
 
 using Common;
-using client_module_event;
+using Client.Core;
 using System.Collections.Generic;
 
 namespace Client.Assets
@@ -35,7 +35,7 @@ namespace Client.Assets
 
         public AbsLoader()
         {
-            EventModule.WatchUnityEvent(YuUnityEventType.FixedUpdate, LoadUpdate);
+            EventModule.WatchUnityEvent(UnityEventType.FixedUpdate, LoadUpdate);
         }
 
         #endregion

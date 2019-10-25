@@ -13,7 +13,7 @@
 #endregion
 
 using Client.GamePlaying.AI;
-using Common.DataStruct;
+using Common;
 using System;
 using UnityEngine;
 

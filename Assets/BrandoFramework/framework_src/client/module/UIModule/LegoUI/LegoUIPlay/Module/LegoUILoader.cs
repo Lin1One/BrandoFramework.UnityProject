@@ -12,13 +12,13 @@
 
 #endregion
 
-using client_module_event;
+using Client.Core;
 using Common;
-using Common.DataStruct;
+using Common;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using YuCommon;
+
 using YuU3dPlay;
 
 #pragma warning disable 649
@@ -242,7 +242,7 @@ namespace Client.LegoUI
             buildTask.UiBuildCallback?.Invoke(view);
 
             //触发界面创建完成事件
-            U3DEventModule.TriggerEvent(YuUnityEventCode.View_Created, null, view);
+            U3DEventModule.TriggerEvent(ProjectCoreEventCode.View_Created, null, view);
             view.ShowDefault();
         }
 

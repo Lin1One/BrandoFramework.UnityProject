@@ -1,4 +1,4 @@
-using Common.DataStruct;
+using Common;
 using Common.Setting;
 using Common.Utility;
 using Sirenix.OdinInspector.Editor;

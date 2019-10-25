@@ -13,7 +13,7 @@
 #endregion
 
 using Common;
-using Common.DataStruct;
+using Common;
 using System;
 
 namespace client_module_network
