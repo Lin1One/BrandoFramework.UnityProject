@@ -21,7 +21,7 @@ namespace Client.Scene
         internal bool resizePowerOfTwoTextures = false;    //POT texture 重新设置尺寸（算上 padding）
         internal bool fixOutOfBoundsUVs = false;
         internal int maxTilingBakeSize = 1024;
-        internal bool saveAtlasesAsAssets = false;
+        internal bool saveAtlasesAsAssets = false;          //是否保存合并资源
         internal PackingAlgorithmEnum packingAlgorithm = PackingAlgorithmEnum.UnitysPackTextures;
         internal bool meshBakerTexturePackerForcePowerOfTwo = true;              //贴图 Atlas 为 POT
         internal bool normalizeTexelDensity = false;
@@ -36,8 +36,10 @@ namespace Client.Scene
 
         public bool DoMultiMaterial{ get;set; }
 
+        /// <summary>
+        /// 材质合并的图集及Rect映射结果数组,每项对应一个 shader 的材质
+        /// </summary>
         public AtlasesAndRects[] ResultAtlasesAndRects { get; set; }
-
 
         internal TextureCombinerNonTextureProperties nonTexturePropertyBlender;
         internal List<MaterialPropTexturesSet> distinctMaterialTextures;            //合并材质各属性所要合并的 Texture 集合
@@ -45,7 +47,7 @@ namespace Client.Scene
         internal List<Material> allowedMaterialsFilter;
         internal List<ShaderTextureProperty> texPropertyNames;
         internal List<ShaderTextureProperty> customShaderPropNames = new List<ShaderTextureProperty>();
-        internal TextureCombinerPipeline.CreateAtlasForProperty[] allTexturesAreNullAndSameColor;
+        internal TextureCombinePipeline.CreateAtlasForProperty[] allTexturesAreNullAndSameColor;
 
         internal int numAtlases
         {
