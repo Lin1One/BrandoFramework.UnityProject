@@ -3,15 +3,11 @@ using System.Collections.Generic;
 
 namespace Common
 {
-    public interface IReset
-    {
-        void Reset();
-    }
 
     /// <summary>
     /// 基础泛型对象池。
     /// </summary>
-    public class ObjectPool<T> : IObjectPool<T> where T : class
+    public class GenericObjectPool<T> : IGenericObjectPool<T> where T : class
     {
         /// <summary>
         /// 当前还未使用处于空闲状态的实例列表。
@@ -34,16 +30,16 @@ namespace Common
         /// </summary>
         /// <param name="createFunc">用于创建实例的委托。</param>
         /// <param name="initCount">初始化的实例数量。</param>
-        /// <param name="poolKey">对象的友好命名。</param>
+        /// <param name="poolKey">对象池的命名。</param>
         /// <param name="onCreated">实例创建完毕的委托。</param>
-        /// <param name="destroy">清理实例时的委托。</param>
-        public ObjectPool
+        /// <param name="destroyFunc">清理实例时的委托。</param>
+        public GenericObjectPool
         (
             Func<T> createFunc,
             int initCount,
             string poolKey = null,
             Action<T> onCreated = null,
-            Action<T> destroy = null
+            Action<T> destroyFunc = null
         )
         {
             AvaliableObjects = new List<T>(initCount);
@@ -51,7 +47,7 @@ namespace Common
             this.initCount = initCount;
             this.createFunc = createFunc;
             this.onCreated = onCreated;
-            this.destroy = destroy;
+            this.destroy = destroyFunc;
             key = poolKey;
 
             for (var i = 0; i < initCount; i++)

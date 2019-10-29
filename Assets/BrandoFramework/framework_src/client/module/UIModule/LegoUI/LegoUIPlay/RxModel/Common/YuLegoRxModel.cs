@@ -25,9 +25,9 @@ namespace Client.LegoUI
     {
         #region 自身类型实例对象池
 
-        private static IObjectPool<YuLegoRxModel> rxModelPool;
+        private static IGenericObjectPool<YuLegoRxModel> rxModelPool;
 
-        private static IObjectPool<YuLegoRxModel> RxModelPool
+        private static IGenericObjectPool<YuLegoRxModel> RxModelPool
         {
             get
             {
@@ -36,7 +36,7 @@ namespace Client.LegoUI
                     return rxModelPool;
                 }
 
-                rxModelPool = new ObjectPool<YuLegoRxModel>(
+                rxModelPool = new GenericObjectPool<YuLegoRxModel>(
                     () => new YuLegoRxModel(), 10
                 );
 

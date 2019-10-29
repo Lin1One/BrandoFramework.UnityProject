@@ -27,9 +27,9 @@ namespace Client.LegoUI
 
         #region 自身对象池
 
-        private static IObjectPool<LegoControlStorage> storagePool;
+        private static IGenericObjectPool<LegoControlStorage> storagePool;
 
-        public static IObjectPool<LegoControlStorage> StoragePool
+        public static IGenericObjectPool<LegoControlStorage> StoragePool
         {
             get
             {
@@ -38,7 +38,7 @@ namespace Client.LegoUI
                     return storagePool;
                 }
 
-                storagePool = new ObjectPool<LegoControlStorage>(
+                storagePool = new GenericObjectPool<LegoControlStorage>(
                     () => new LegoControlStorage(), 10);
                 return storagePool;
             }

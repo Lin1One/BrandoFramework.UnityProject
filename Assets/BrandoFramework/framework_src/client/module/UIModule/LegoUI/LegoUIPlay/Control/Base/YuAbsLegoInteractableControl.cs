@@ -29,9 +29,9 @@ namespace Client.LegoUI
     {
         #region 交互处理器对象池
 
-        private static IObjectPool<HandleDict> handleDictPool;
+        private static IGenericObjectPool<HandleDict> handleDictPool;
 
-        private static IObjectPool<HandleDict> HandleDictPool
+        private static IGenericObjectPool<HandleDict> HandleDictPool
         {
             get
             {
@@ -40,7 +40,7 @@ namespace Client.LegoUI
                     return handleDictPool;
                 }
 
-                handleDictPool = new ObjectPool<HandleDict>(
+                handleDictPool = new GenericObjectPool<HandleDict>(
                     () => new HandleDict(), 100);
                 return handleDictPool;
             }

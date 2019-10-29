@@ -16,9 +16,9 @@ namespace Client.LegoUI
     [Singleton]
     public class LegoBuildTaskPool
     {
-        private IObjectPool<LegoBuildTask> taskPool;
+        private IGenericObjectPool<LegoBuildTask> taskPool;
 
-        private IObjectPool<LegoBuildTask> TaskPool
+        private IGenericObjectPool<LegoBuildTask> TaskPool
         {
             get
             {
@@ -27,7 +27,7 @@ namespace Client.LegoUI
                     return taskPool;
                 }
 
-                taskPool = new ObjectPool<LegoBuildTask>(
+                taskPool = new GenericObjectPool<LegoBuildTask>(
                     () => new LegoBuildTask(), 30);
                 return taskPool;
             }

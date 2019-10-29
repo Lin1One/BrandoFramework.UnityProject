@@ -1,12 +1,16 @@
-﻿
-
-namespace Common
+﻿namespace Common
 {
+
+    public interface IReset
+    {
+        void Reset();
+    }
+
     /// <summary>
     /// 泛型对象池接口。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IObjectPool<T> where T : class
+    public interface IGenericObjectPool<T> where T : class
     {
         /// <summary>
         /// 获取一个对象实例。

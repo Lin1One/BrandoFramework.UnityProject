@@ -21,9 +21,9 @@ namespace Client.LegoUI
     {
         #region 延迟构建的基础响应数据对象池
 
-        private static IObjectPool<ILegoRxStruct<byte>> bytePool;
+        private static IGenericObjectPool<ILegoRxStruct<byte>> bytePool;
 
-        private static IObjectPool<ILegoRxStruct<byte>> BytePool
+        private static IGenericObjectPool<ILegoRxStruct<byte>> BytePool
         {
             get
             {
@@ -32,7 +32,7 @@ namespace Client.LegoUI
                     return bytePool;
                 }
 
-                bytePool = new ObjectPool<ILegoRxStruct<byte>>(
+                bytePool = new GenericObjectPool<ILegoRxStruct<byte>>(
                     () => new YuLegoRxByte(), 10
                 );
 
@@ -40,9 +40,9 @@ namespace Client.LegoUI
             }
         }
 
-        private static IObjectPool<ILegoRxStruct<short>> shortPool;
+        private static IGenericObjectPool<ILegoRxStruct<short>> shortPool;
 
-        private static IObjectPool<ILegoRxStruct<short>> ShortPool
+        private static IGenericObjectPool<ILegoRxStruct<short>> ShortPool
         {
             get
             {
@@ -51,7 +51,7 @@ namespace Client.LegoUI
                     return shortPool;
                 }
 
-                shortPool = new ObjectPool<ILegoRxStruct<short>>(
+                shortPool = new GenericObjectPool<ILegoRxStruct<short>>(
                     () => new YuLegoRxShort(), 10
                 );
 
@@ -59,9 +59,9 @@ namespace Client.LegoUI
             }
         }
 
-        private static IObjectPool<ILegoRxStruct<int>> intPool;
+        private static IGenericObjectPool<ILegoRxStruct<int>> intPool;
 
-        private static IObjectPool<ILegoRxStruct<int>> IntPool
+        private static IGenericObjectPool<ILegoRxStruct<int>> IntPool
         {
             get
             {
@@ -70,7 +70,7 @@ namespace Client.LegoUI
                     return intPool;
                 }
 
-                intPool = new ObjectPool<ILegoRxStruct<int>>(
+                intPool = new GenericObjectPool<ILegoRxStruct<int>>(
                     () => new YuLegoRxInt(), 100
                 );
 
@@ -78,9 +78,9 @@ namespace Client.LegoUI
             }
         }
 
-        private static IObjectPool<ILegoRxStruct<long>> longPool;
+        private static IGenericObjectPool<ILegoRxStruct<long>> longPool;
 
-        private static IObjectPool<ILegoRxStruct<long>> LongPool
+        private static IGenericObjectPool<ILegoRxStruct<long>> LongPool
         {
             get
             {
@@ -89,7 +89,7 @@ namespace Client.LegoUI
                     return longPool;
                 }
 
-                longPool = new ObjectPool<ILegoRxStruct<long>>(
+                longPool = new GenericObjectPool<ILegoRxStruct<long>>(
                     () => new YuLegoRxLong(), 10
                 );
 
@@ -97,9 +97,9 @@ namespace Client.LegoUI
             }
         }
 
-        private static IObjectPool<ILegoRxStruct<string>> strPool;
+        private static IGenericObjectPool<ILegoRxStruct<string>> strPool;
 
-        private static IObjectPool<ILegoRxStruct<string>> StrPool
+        private static IGenericObjectPool<ILegoRxStruct<string>> StrPool
         {
             get
             {
@@ -108,7 +108,7 @@ namespace Client.LegoUI
                     return strPool;
                 }
 
-                strPool = new ObjectPool<ILegoRxStruct<string>>(
+                strPool = new GenericObjectPool<ILegoRxStruct<string>>(
                     () => new YuLegoRxString(), 100
                 );
 
@@ -116,9 +116,9 @@ namespace Client.LegoUI
             }
         }
 
-        private static IObjectPool<ILegoRxStruct<float>> floatPool;
+        private static IGenericObjectPool<ILegoRxStruct<float>> floatPool;
 
-        private static IObjectPool<ILegoRxStruct<float>> FloatPool
+        private static IGenericObjectPool<ILegoRxStruct<float>> FloatPool
         {
             get
             {
@@ -127,7 +127,7 @@ namespace Client.LegoUI
                     return floatPool;
                 }
 
-                floatPool = new ObjectPool<ILegoRxStruct<float>>(
+                floatPool = new GenericObjectPool<ILegoRxStruct<float>>(
                     () => new YuLegoRxFloat(), 100
                 );
 
@@ -135,9 +135,9 @@ namespace Client.LegoUI
             }
         }
 
-        private static IObjectPool<ILegoRxStruct<double>> doublePool;
+        private static IGenericObjectPool<ILegoRxStruct<double>> doublePool;
 
-        private static IObjectPool<ILegoRxStruct<double>> DoublePool
+        private static IGenericObjectPool<ILegoRxStruct<double>> DoublePool
         {
             get
             {
@@ -146,7 +146,7 @@ namespace Client.LegoUI
                     return doublePool;
                 }
 
-                doublePool = new ObjectPool<ILegoRxStruct<double>>(
+                doublePool = new GenericObjectPool<ILegoRxStruct<double>>(
                     () => new YuLegoRxDouble(), 10
                 );
 
@@ -154,9 +154,9 @@ namespace Client.LegoUI
             }
         }
 
-        private static IObjectPool<ILegoRxStruct<bool>> boolPool;
+        private static IGenericObjectPool<ILegoRxStruct<bool>> boolPool;
 
-        private static IObjectPool<ILegoRxStruct<bool>> BoolPool
+        private static IGenericObjectPool<ILegoRxStruct<bool>> BoolPool
         {
             get
             {
@@ -165,7 +165,7 @@ namespace Client.LegoUI
                     return boolPool;
                 }
 
-                boolPool = new ObjectPool<ILegoRxStruct<bool>>(
+                boolPool = new GenericObjectPool<ILegoRxStruct<bool>>(
                     () => new YuLegoRxBool(), 20
                 );
 

@@ -25,9 +25,9 @@ namespace Client.LegoUI
     [Singleton]
     public class YuLegoUnloadTaskPool
     {
-        private IObjectPool<YuLegoUnloadTask> taskPool;
+        private IGenericObjectPool<YuLegoUnloadTask> taskPool;
 
-        private IObjectPool<YuLegoUnloadTask> TaskPool
+        private IGenericObjectPool<YuLegoUnloadTask> TaskPool
         {
             get
             {
@@ -36,7 +36,7 @@ namespace Client.LegoUI
                     return taskPool;
                 }
 
-                taskPool = new ObjectPool<YuLegoUnloadTask>(
+                taskPool = new GenericObjectPool<YuLegoUnloadTask>(
                     () => new YuLegoUnloadTask(), 30);
                 return taskPool;
             }

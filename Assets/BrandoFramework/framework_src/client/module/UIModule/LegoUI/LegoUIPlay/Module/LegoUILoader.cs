@@ -554,9 +554,9 @@ namespace Client.LegoUI
 
         #region UI业务处理上下文对象池
 
-        private IObjectPool<IYuLegoLogicContext> contextPool;
+        private IGenericObjectPool<IYuLegoLogicContext> contextPool;
 
-        private IObjectPool<IYuLegoLogicContext> ContextPool
+        private IGenericObjectPool<IYuLegoLogicContext> ContextPool
         {
             get
             {
@@ -565,7 +565,7 @@ namespace Client.LegoUI
                     return contextPool;
                 }
 
-                contextPool = new ObjectPool<IYuLegoLogicContext>(
+                contextPool = new GenericObjectPool<IYuLegoLogicContext>(
                     () => new YuLegoLogicContext(), 10);
                 return contextPool;
             }

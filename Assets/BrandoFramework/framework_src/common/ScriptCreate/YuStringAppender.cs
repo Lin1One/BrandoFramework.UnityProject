@@ -93,14 +93,14 @@ namespace Common
 
         public YuStringAppender()
         {
-            m_Builder = YuCommonFactory.StringBuilderPool.Take();
+            m_Builder = CommonPool.StringBuilderPool.Take();
             m_Builder.Clear();
         }
 
         public void Dispose()
         {
             m_Builder.Clear();
-            YuCommonFactory.StringBuilderPool.Restore(m_Builder);
+            CommonPool.StringBuilderPool.Restore(m_Builder);
         }
 
         public override string ToString()

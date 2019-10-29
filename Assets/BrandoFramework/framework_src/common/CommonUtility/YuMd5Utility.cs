@@ -73,7 +73,7 @@ namespace Common.Utility
                 return null;
             }
 
-            var sb = YuCommonFactory.StringBuilderPool.Take();
+            var sb = CommonPool.StringBuilderPool.Take();
             sb.Clear();
 
             try
@@ -98,7 +98,7 @@ namespace Common.Utility
             }
             finally
             {
-                YuCommonFactory.StringBuilderPool.Restore(sb);
+                CommonPool.StringBuilderPool.Restore(sb);
             }
         }
     }

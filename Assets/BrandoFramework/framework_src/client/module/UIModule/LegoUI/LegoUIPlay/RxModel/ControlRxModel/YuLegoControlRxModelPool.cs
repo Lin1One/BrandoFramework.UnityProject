@@ -11,9 +11,9 @@ namespace Client.LegoUI
     {
         #region Text
 
-        private static IObjectPool<YuLegoTextRxModel> textModelPool;
+        private static IGenericObjectPool<YuLegoTextRxModel> textModelPool;
 
-        private static IObjectPool<YuLegoTextRxModel> TextModelPool
+        private static IGenericObjectPool<YuLegoTextRxModel> TextModelPool
         {
             get
             {
@@ -22,7 +22,7 @@ namespace Client.LegoUI
                     return textModelPool;
                 }
 
-                textModelPool = new ObjectPool<YuLegoTextRxModel>(
+                textModelPool = new GenericObjectPool<YuLegoTextRxModel>(
                     () => new YuLegoTextRxModel(),
                     100
                 );
@@ -39,9 +39,9 @@ namespace Client.LegoUI
 
         #region Button
 
-        private static IObjectPool<YuLegoButtonRxModel> buttonModelPool;
+        private static IGenericObjectPool<YuLegoButtonRxModel> buttonModelPool;
 
-        private static IObjectPool<YuLegoButtonRxModel> ButtonModelPool
+        private static IGenericObjectPool<YuLegoButtonRxModel> ButtonModelPool
         {
             get
             {
@@ -50,7 +50,7 @@ namespace Client.LegoUI
                     return buttonModelPool;
                 }
 
-                buttonModelPool = new ObjectPool<YuLegoButtonRxModel>(
+                buttonModelPool = new GenericObjectPool<YuLegoButtonRxModel>(
                     () => new YuLegoButtonRxModel(),
                     100
                 );
@@ -66,9 +66,9 @@ namespace Client.LegoUI
 
         #region TButton
 
-        private static IObjectPool<YuLegoTButtonRxModel> tbuttonModelPool;
+        private static IGenericObjectPool<YuLegoTButtonRxModel> tbuttonModelPool;
 
-        private static IObjectPool<YuLegoTButtonRxModel> TbuttonModelPool
+        private static IGenericObjectPool<YuLegoTButtonRxModel> TbuttonModelPool
         {
             get
             {
@@ -77,7 +77,7 @@ namespace Client.LegoUI
                     return tbuttonModelPool;
                 }
 
-                tbuttonModelPool = new ObjectPool<YuLegoTButtonRxModel>(
+                tbuttonModelPool = new GenericObjectPool<YuLegoTButtonRxModel>(
                     () => new YuLegoTButtonRxModel(),
                     100
                 );
@@ -93,9 +93,9 @@ namespace Client.LegoUI
 
         #region Image
 
-        private static IObjectPool<YuLegoImageRxModel> imageModelPool;
+        private static IGenericObjectPool<YuLegoImageRxModel> imageModelPool;
 
-        private static IObjectPool<YuLegoImageRxModel> ImageModelPool
+        private static IGenericObjectPool<YuLegoImageRxModel> ImageModelPool
         {
             get
             {
@@ -104,7 +104,7 @@ namespace Client.LegoUI
                     return imageModelPool;
                 }
 
-                imageModelPool = new ObjectPool<YuLegoImageRxModel>(
+                imageModelPool = new GenericObjectPool<YuLegoImageRxModel>(
                     () => new YuLegoImageRxModel(),
                     100
                 );
@@ -121,9 +121,9 @@ namespace Client.LegoUI
 
         #region RawImage
 
-        private static IObjectPool<YuLegoRawImageRxModel> rawImageModelPool;
+        private static IGenericObjectPool<YuLegoRawImageRxModel> rawImageModelPool;
 
-        private static IObjectPool<YuLegoRawImageRxModel> RawImageModelPool
+        private static IGenericObjectPool<YuLegoRawImageRxModel> RawImageModelPool
         {
             get
             {
@@ -132,7 +132,7 @@ namespace Client.LegoUI
                     return rawImageModelPool;
                 }
 
-                rawImageModelPool = new ObjectPool<YuLegoRawImageRxModel>(
+                rawImageModelPool = new GenericObjectPool<YuLegoRawImageRxModel>(
                     () => new YuLegoRawImageRxModel(),
                     100
                 );
@@ -148,9 +148,9 @@ namespace Client.LegoUI
 
         #region Toggle
 
-        private static IObjectPool<YuLegoToggleRxModel> toggleModelPool;
+        private static IGenericObjectPool<YuLegoToggleRxModel> toggleModelPool;
 
-        private static IObjectPool<YuLegoToggleRxModel> ToggleModelPool
+        private static IGenericObjectPool<YuLegoToggleRxModel> ToggleModelPool
         {
             get
             {
@@ -159,7 +159,7 @@ namespace Client.LegoUI
                     return toggleModelPool;
                 }
 
-                toggleModelPool = new ObjectPool<YuLegoToggleRxModel>(
+                toggleModelPool = new GenericObjectPool<YuLegoToggleRxModel>(
                     () => new YuLegoToggleRxModel(),
                     100
                 );
@@ -176,9 +176,9 @@ namespace Client.LegoUI
         #region PlaneToggle
 
 
-        private static IObjectPool<YuLegoPlaneToggleRxModel> planeToggleModelPool;
+        private static IGenericObjectPool<YuLegoPlaneToggleRxModel> planeToggleModelPool;
 
-        private static IObjectPool<YuLegoPlaneToggleRxModel> PlaneToggleModelPool
+        private static IGenericObjectPool<YuLegoPlaneToggleRxModel> PlaneToggleModelPool
         {
             get
             {
@@ -187,7 +187,7 @@ namespace Client.LegoUI
                     return planeToggleModelPool;
                 }
 
-                planeToggleModelPool = new ObjectPool<YuLegoPlaneToggleRxModel>(
+                planeToggleModelPool = new GenericObjectPool<YuLegoPlaneToggleRxModel>(
                     () => new YuLegoPlaneToggleRxModel(),
                     100
                 );
@@ -203,9 +203,9 @@ namespace Client.LegoUI
 
         #region Slider
 
-        private static IObjectPool<YuLegoSliderRxModel> sliderModelPool;
+        private static IGenericObjectPool<YuLegoSliderRxModel> sliderModelPool;
 
-        private static IObjectPool<YuLegoSliderRxModel> SliderModelPool
+        private static IGenericObjectPool<YuLegoSliderRxModel> SliderModelPool
         {
             get
             {
@@ -214,7 +214,7 @@ namespace Client.LegoUI
                     return sliderModelPool;
                 }
 
-                sliderModelPool = new ObjectPool<YuLegoSliderRxModel>(
+                sliderModelPool = new GenericObjectPool<YuLegoSliderRxModel>(
                     () => new YuLegoSliderRxModel(),
                     100
                 );
@@ -230,9 +230,9 @@ namespace Client.LegoUI
 
         #region InputField
 
-        private static IObjectPool<YuLegoInputFieldRxModel> inputFieldModelPool;
+        private static IGenericObjectPool<YuLegoInputFieldRxModel> inputFieldModelPool;
 
-        private static IObjectPool<YuLegoInputFieldRxModel> InputFieldModelPool
+        private static IGenericObjectPool<YuLegoInputFieldRxModel> InputFieldModelPool
         {
             get
             {
@@ -241,7 +241,7 @@ namespace Client.LegoUI
                     return inputFieldModelPool;
                 }
 
-                inputFieldModelPool = new ObjectPool<YuLegoInputFieldRxModel>(
+                inputFieldModelPool = new GenericObjectPool<YuLegoInputFieldRxModel>(
                     () => new YuLegoInputFieldRxModel(),
                     100
                 );
@@ -257,9 +257,9 @@ namespace Client.LegoUI
 
         #region Progressbar
 
-        private static IObjectPool<YuLegoProgressbarRxModel> progressbarModelPool;
+        private static IGenericObjectPool<YuLegoProgressbarRxModel> progressbarModelPool;
 
-        private static IObjectPool<YuLegoProgressbarRxModel> ProgressbarModelPool
+        private static IGenericObjectPool<YuLegoProgressbarRxModel> ProgressbarModelPool
         {
             get
             {
@@ -268,7 +268,7 @@ namespace Client.LegoUI
                     return progressbarModelPool;
                 }
 
-                progressbarModelPool = new ObjectPool<YuLegoProgressbarRxModel>(
+                progressbarModelPool = new GenericObjectPool<YuLegoProgressbarRxModel>(
                     () => new YuLegoProgressbarRxModel(),
                     100
                 );
@@ -284,9 +284,9 @@ namespace Client.LegoUI
 
         #region Progressbar
 
-        private static IObjectPool<YuLegoRockerRxModel> rockerModelPool;
+        private static IGenericObjectPool<YuLegoRockerRxModel> rockerModelPool;
 
-        private static IObjectPool<YuLegoRockerRxModel> RockerModelPool
+        private static IGenericObjectPool<YuLegoRockerRxModel> RockerModelPool
         {
             get
             {
@@ -295,7 +295,7 @@ namespace Client.LegoUI
                     return rockerModelPool;
                 }
 
-                rockerModelPool = new ObjectPool<YuLegoRockerRxModel>(
+                rockerModelPool = new GenericObjectPool<YuLegoRockerRxModel>(
                     () => new YuLegoRockerRxModel(),
                     100
                 );

@@ -68,9 +68,9 @@ namespace Client.LegoUI
 
         #region 对象池
 
-        private static IObjectPool<ILegoAtlas> atlasPool;
+        private static IGenericObjectPool<ILegoAtlas> atlasPool;
 
-        private static IObjectPool<ILegoAtlas> AtlasPool
+        private static IGenericObjectPool<ILegoAtlas> AtlasPool
         {
             get
             {
@@ -79,7 +79,7 @@ namespace Client.LegoUI
                     return atlasPool;
                 }
 
-                atlasPool = new ObjectPool<ILegoAtlas>(
+                atlasPool = new GenericObjectPool<ILegoAtlas>(
                     () => new LegoAtlas(), 20);
                 return atlasPool;
             }

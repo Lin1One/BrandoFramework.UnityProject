@@ -26,7 +26,7 @@ namespace Common
         {
             if (!BytesPoolDict.ContainsKey(length))
             {
-                BytesPoolDict.Add(length, new ObjectPool<byte[]>(
+                BytesPoolDict.Add(length, new GenericObjectPool<byte[]>(
                     () => new byte[length], 1));
             }
 
@@ -41,9 +41,9 @@ namespace Common
             targetPool.Restore(bytes);
         }
 
-        private static Dictionary<int, IObjectPool<byte[]>> bytesDictPool;
+        private static Dictionary<int, IGenericObjectPool<byte[]>> bytesDictPool;
 
-        private static Dictionary<int, IObjectPool<byte[]>> BytesPoolDict
+        private static Dictionary<int, IGenericObjectPool<byte[]>> BytesPoolDict
         {
             get
             {
@@ -52,7 +52,7 @@ namespace Common
                     return bytesDictPool;
                 }
 
-                bytesDictPool = new Dictionary<int, IObjectPool<byte[]>>();
+                bytesDictPool = new Dictionary<int, IGenericObjectPool<byte[]>>();
                 return bytesDictPool;
             }
         }

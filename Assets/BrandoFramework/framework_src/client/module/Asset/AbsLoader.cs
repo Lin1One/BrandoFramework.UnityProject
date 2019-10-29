@@ -68,9 +68,9 @@ namespace Client.Assets
 
         #region 任务对象池
 
-        private IObjectPool<TTask> _taskPol;
+        private IGenericObjectPool<TTask> _taskPol;
 
-        private IObjectPool<TTask> TaskPool
+        private IGenericObjectPool<TTask> TaskPool
         {
             get
             {
@@ -79,7 +79,7 @@ namespace Client.Assets
                     return _taskPol;
                 }
 
-                _taskPol = new ObjectPool<TTask>(CreateTask, 100);
+                _taskPol = new GenericObjectPool<TTask>(CreateTask, 100);
                 return _taskPol;
             }
         }

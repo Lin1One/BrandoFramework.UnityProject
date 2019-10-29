@@ -45,8 +45,8 @@ namespace Client.Core
         /// <summary>
         /// 事件任务对象池。
         /// </summary>
-        public static readonly IObjectPool<EventTask> EventTaskPool
-        = new ObjectPool<EventTask>(() => new EventTask(), 10);
+        public static readonly IGenericObjectPool<EventTask> EventTaskPool
+        = new GenericObjectPool<EventTask>(() => new EventTask(), 10);
 
 
 

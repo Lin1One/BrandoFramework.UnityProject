@@ -12,9 +12,9 @@ namespace YuU3dPlay
     {
         #region 延迟构建的基础响应数据对象池
 
-        private static IObjectPool<IRxStruct<byte>> bytePool;
+        private static IGenericObjectPool<IRxStruct<byte>> bytePool;
 
-        private static IObjectPool<IRxStruct<byte>> BytePool
+        private static IGenericObjectPool<IRxStruct<byte>> BytePool
         {
             get
             {
@@ -23,7 +23,7 @@ namespace YuU3dPlay
                     return bytePool;
                 }
 
-                bytePool = new ObjectPool<IRxStruct<byte>>(
+                bytePool = new GenericObjectPool<IRxStruct<byte>>(
                     () => new RxByte(), 10
                 );
 
@@ -31,9 +31,9 @@ namespace YuU3dPlay
             }
         }
 
-        private static IObjectPool<IRxStruct<short>> shortPool;
+        private static IGenericObjectPool<IRxStruct<short>> shortPool;
 
-        private static IObjectPool<IRxStruct<short>> ShortPool
+        private static IGenericObjectPool<IRxStruct<short>> ShortPool
         {
             get
             {
@@ -42,7 +42,7 @@ namespace YuU3dPlay
                     return shortPool;
                 }
 
-                shortPool = new ObjectPool<IRxStruct<short>>(
+                shortPool = new GenericObjectPool<IRxStruct<short>>(
                     () => new YuRxShort(), 10
                 );
 
@@ -50,9 +50,9 @@ namespace YuU3dPlay
             }
         }
 
-        private static IObjectPool<IRxStruct<int>> intPool;
+        private static IGenericObjectPool<IRxStruct<int>> intPool;
 
-        private static IObjectPool<IRxStruct<int>> IntPool
+        private static IGenericObjectPool<IRxStruct<int>> IntPool
         {
             get
             {
@@ -61,7 +61,7 @@ namespace YuU3dPlay
                     return intPool;
                 }
 
-                intPool = new ObjectPool<IRxStruct<int>>(
+                intPool = new GenericObjectPool<IRxStruct<int>>(
                     () => new YuRxInt(), 100
                 );
 
@@ -69,9 +69,9 @@ namespace YuU3dPlay
             }
         }
 
-        private static IObjectPool<IRxStruct<long>> longPool;
+        private static IGenericObjectPool<IRxStruct<long>> longPool;
 
-        private static IObjectPool<IRxStruct<long>> LongPool
+        private static IGenericObjectPool<IRxStruct<long>> LongPool
         {
             get
             {
@@ -80,7 +80,7 @@ namespace YuU3dPlay
                     return longPool;
                 }
 
-                longPool = new ObjectPool<IRxStruct<long>>(
+                longPool = new GenericObjectPool<IRxStruct<long>>(
                     () => new YuRxLong(), 10
                 );
 
@@ -88,9 +88,9 @@ namespace YuU3dPlay
             }
         }
 
-        private static IObjectPool<IRxStruct<string>> strPool;
+        private static IGenericObjectPool<IRxStruct<string>> strPool;
 
-        private static IObjectPool<IRxStruct<string>> StrPool
+        private static IGenericObjectPool<IRxStruct<string>> StrPool
         {
             get
             {
@@ -99,7 +99,7 @@ namespace YuU3dPlay
                     return strPool;
                 }
 
-                strPool = new ObjectPool<IRxStruct<string>>(
+                strPool = new GenericObjectPool<IRxStruct<string>>(
                     () => new YuRxString(), 100
                 );
 
@@ -107,9 +107,9 @@ namespace YuU3dPlay
             }
         }
 
-        private static IObjectPool<IRxStruct<float>> floatPool;
+        private static IGenericObjectPool<IRxStruct<float>> floatPool;
 
-        private static IObjectPool<IRxStruct<float>> FloatPool
+        private static IGenericObjectPool<IRxStruct<float>> FloatPool
         {
             get
             {
@@ -118,7 +118,7 @@ namespace YuU3dPlay
                     return floatPool;
                 }
 
-                floatPool = new ObjectPool<IRxStruct<float>>(
+                floatPool = new GenericObjectPool<IRxStruct<float>>(
                     () => new YuRxFloat(), 100
                 );
 
@@ -126,9 +126,9 @@ namespace YuU3dPlay
             }
         }
 
-        private static IObjectPool<IRxStruct<double>> doublePool;
+        private static IGenericObjectPool<IRxStruct<double>> doublePool;
 
-        private static IObjectPool<IRxStruct<double>> DoublePool
+        private static IGenericObjectPool<IRxStruct<double>> DoublePool
         {
             get
             {
@@ -137,7 +137,7 @@ namespace YuU3dPlay
                     return doublePool;
                 }
 
-                doublePool = new ObjectPool<IRxStruct<double>>(
+                doublePool = new GenericObjectPool<IRxStruct<double>>(
                     () => new YuRxDouble(), 10
                 );
 
@@ -145,9 +145,9 @@ namespace YuU3dPlay
             }
         }
 
-        private static IObjectPool<IRxStruct<bool>> boolPool;
+        private static IGenericObjectPool<IRxStruct<bool>> boolPool;
 
-        private static IObjectPool<IRxStruct<bool>> BoolPool
+        private static IGenericObjectPool<IRxStruct<bool>> BoolPool
         {
             get
             {
@@ -156,7 +156,7 @@ namespace YuU3dPlay
                     return boolPool;
                 }
 
-                boolPool = new ObjectPool<IRxStruct<bool>>(
+                boolPool = new GenericObjectPool<IRxStruct<bool>>(
                     () => new RxBool(), 20
                 );
 

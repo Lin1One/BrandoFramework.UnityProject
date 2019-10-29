@@ -6,20 +6,20 @@ namespace Common
     /// 静态通用工厂。
     /// 1. 持有各种常用的对象池。
     /// </summary>
-    public static class YuCommonFactory
+    public static class CommonPool
     {
-        private static ObjectPool<StringBuilder> _StringBuilderPool;
+        private static GenericObjectPool<StringBuilder> _StringBuilderPool;
 
         /// <summary>
         /// 字符串构造器对象池，默认容量为50。
         /// </summary>
-        public static ObjectPool<StringBuilder> StringBuilderPool
+        public static GenericObjectPool<StringBuilder> StringBuilderPool
         {
             get
             {
                 if (_StringBuilderPool != null) return _StringBuilderPool;
 
-                _StringBuilderPool = new ObjectPool<StringBuilder>(() => new StringBuilder(), 10);
+                _StringBuilderPool = new GenericObjectPool<StringBuilder>(() => new StringBuilder(), 10);
                 return _StringBuilderPool;
             }
         }
