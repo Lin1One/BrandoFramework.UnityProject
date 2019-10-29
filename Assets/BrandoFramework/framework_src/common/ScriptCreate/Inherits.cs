@@ -16,14 +16,4 @@ namespace Common.ScriptCreate
 
         Interface,
     }
-
-    [Serializable]
-    public enum ScriptType : byte
-    {
-        Csharp,
-        
-        TypeScript,
-        
-        Lua
-    }
 }

@@ -1,14 +1,11 @@
 {
-    "name": "Client.Core.Editor",
+    "name": "Client.DataTable.Editor",
     "references": [
-        "OdinEditor",
+        "Client.Core.Play",
         "OdinPlay",
         "Framework.Common",
-        "TestBorad",
-        "Client.Module",
-        "Common.Editor",
-        "Asset.Editor",
-        "Client.DataTable.Editor"
+        "framework_module_serializer",
+        "OdinEditor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

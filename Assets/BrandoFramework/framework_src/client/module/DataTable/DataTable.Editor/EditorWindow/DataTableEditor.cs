@@ -11,7 +11,7 @@ using Common.ScriptCreate;
 using Common.Utility;
 using Sirenix.OdinInspector;
 using System;
-using System.Collections.Generic;
+using UnityEngine;
 
 namespace Client.DataTable.Editor
 {
@@ -66,9 +66,9 @@ namespace Client.DataTable.Editor
         [Button("导出Excel脚本")]
         private void ExportScript()
         {
-            Injector.Instance.Get<ExcelCSharpEntityScriptCreator>().
-                CreateScript(TaregetExcel,this);
             Injector.Instance.Get<YuU3dExcelCsharpInterfaceScriptCreator>().
+                CreateScript(TaregetExcel, this);
+            Injector.Instance.Get<ExcelCSharpEntityScriptCreator>().
                 CreateScript(TaregetExcel,this);
             AssetDatabaseUtility.Refresh();
         }
