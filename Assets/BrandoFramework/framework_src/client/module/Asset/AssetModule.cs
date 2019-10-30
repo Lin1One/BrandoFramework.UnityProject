@@ -1,5 +1,5 @@
+using Client.Core;
 using Common;
-using Common.Config;
 using Common.Utility;
 using System;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ namespace Client.Assets
         private string GetAssetPath(string assetId)
         {
             var assetInfo = AssetInfoHelper.GetAssetInfo(assetId);
-            var path = assetInfo.GetEditorPath($"Assets/GameProjects/{ProjectInfoDati.GetActualInstance().DevelopProjectName}/AssetDatabase/");
+            var path = assetInfo.GetEditorPath($"Assets/GameProjects/{ProjectInfoDati.GetActualInstance().DevelopProjectName}/AssetDatabase");
             return path;
         }
 
@@ -318,12 +318,12 @@ namespace Client.Assets
 
         public void ReleaseTarget(string assetId)
         {
-            Buffer.TryRemove(assetId);
+            //Buffer.TryRemove(assetId);
 
-            if (_isLoadBundle)
-            {
-               // _bundleLoader.ReleaseTarget(assetId);
-            }
+            //if (_isLoadBundle)
+            //{
+            //   // _bundleLoader.ReleaseTarget(assetId);
+            //}
         }
 
         #endregion

@@ -6,12 +6,14 @@
 
 #endregion
 
+using Client.Core;
 using Common;
 using Common.ScriptCreate;
 using Common.Utility;
 using Sirenix.OdinInspector;
 using System;
-using UnityEngine;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace Client.DataTable.Editor
 {
@@ -31,6 +33,8 @@ namespace Client.DataTable.Editor
         [TabGroup("Excel")]
         [HideLabel]
         public YuU3dExcelDataExportSetting DataExportSetting;
+
+        //public TableDataBoard<TestProject_ExcelEntity_Test> 
     }
 
 
@@ -67,9 +71,13 @@ namespace Client.DataTable.Editor
         private void ExportScript()
         {
             Injector.Instance.Get<YuU3dExcelCsharpInterfaceScriptCreator>().
-                CreateScript(TaregetExcel, this);
-            Injector.Instance.Get<ExcelCSharpEntityScriptCreator>().
-                CreateScript(TaregetExcel,this);
+                CreateScript(this);
+            var scriptFileName = Injector.Instance.Get<ExcelCSharpEntityScriptCreator>().
+                CreateScript(this);
+            GlobalExcelPathMap.Instance.AddAppPathMap(ProjectInfoDati.GetActualInstance(),
+                scriptFileName,
+                TaregetExcel);
+            GlobalExcelPathMap.Instance.Save();
             AssetDatabaseUtility.Refresh();
         }
     }
@@ -80,16 +88,80 @@ namespace Client.DataTable.Editor
     [Serializable]
     public class YuU3dExcelDataExportSetting
     {
-        [BoxGroup("Excel数据导出")]
-        [HideLabel]
-        public YuU3dExcelDataExport DataExport;
+        private const string DataFileExtention = ".bytes";
 
-        //[BoxGroup("应用内Excel数据导出")] [HideLabel] public YuU3dExcelAppDataExportSetting AppDataExportSetting;
+        [BoxGroup("Excel数据导出")]
+        [LabelText("导出目录")]
+        [FolderPath]
+        public string ExportDir;
+
+        [BoxGroup("Excel数据导出")]
+        [LabelText("Excel脚本名称")]
+        [InlineButton("ExportExcelData","导出数据")]
+        public string excelDataClass;
+
+        public void ExportExcelData()
+        {
+            var projectInfo = ProjectInfoDati.GetActualInstance();
+            var fullClassName = projectInfo.ProjectRuntimeScriptDefines + "." + excelDataClass;
+            var assemblyPath = projectInfo.ProjectRuntimeAssemblyPath;
+            var targetAssembly = Assembly.LoadFile(assemblyPath);
+            var excelDataClassType = targetAssembly.GetType(fullClassName);
+            var excelFileToExport = GlobalExcelPathMap.GetFilename(excelDataClass, projectInfo.DevelopProjectName);
+            ExportExcelDatas(excelDataClassType, excelFileToExport);
+        }
+
+        [BoxGroup("Excel数据导出")]
+        [Button("导出所有Excel数据")]
+        public void ExportAllExcelData()
+        {
+            var projectInfo = ProjectInfoDati.GetActualInstance();
+
+            var assemblyPath = projectInfo.ProjectRuntimeAssemblyPath;
+            Assembly targetAssembly = Assembly.LoadFile(assemblyPath);
+            var excelDataClassType = targetAssembly.GetTypes();
+            var types = targetAssembly.GetTypes();
+            foreach (var type in types)
+            {
+                if((typeof(IExcelEntity).IsAssignableFrom(type)))
+                {
+                    var excelFileToExport = GlobalExcelPathMap.GetFilename(type.Name, projectInfo.DevelopProjectName);
+                    ExportExcelDatas(type, excelFileToExport);
+                }
+            }
+        }
+
+        private void ExportExcelDatas(Type excelEntityType, string excelFilePath)
+        {
+            var dataRowStrs = ExcelUtility.GetSheetStrs(excelFilePath);
+
+            var initEntitysMethod = excelEntityType.GetMethod("InitEntitys");
+            var instance = Activator.CreateInstance(excelEntityType);
+            object[] param = new object[] { dataRowStrs };
+            var result = initEntitysMethod?.Invoke(instance, param);
+            var dataList = result.As<List<IExcelEntity>>();
+
+            var DataBytes = Injector.Instance.Get<ProtobufSerializer>().Serialize(dataList);
+            var exportFilePath = ExportDir + "/" + excelEntityType.Name + DataFileExtention;
+            IOUtility.WriteAllBytes(exportFilePath, DataBytes, true);
+        }
+
+        private void ExportExcelDatas(IExcelEntity entity, string excelFilePath)
+        {
+            var dataRowStrs = ExcelUtility.GetSheetStrs(excelFilePath);
+            var dataList = entity.InitEntitys(dataRowStrs);
+            var DataBytes = Injector.Instance.Get<ISerializer>().Serialize(dataList);
+            var exportFilePath = ExportDir + "/" + entity.TypeName() + DataFileExtention;
+            IOUtility.WriteAllBytes(exportFilePath, DataBytes, true);
+        }
     }
 
     [Serializable]
-    public class YuU3dExcelDataExport
+    public class TableDataBoard<T> where T : class, IExcelEntity<T>
     {
+        public List<T> tableDatas;
     }
+
+
 
 }

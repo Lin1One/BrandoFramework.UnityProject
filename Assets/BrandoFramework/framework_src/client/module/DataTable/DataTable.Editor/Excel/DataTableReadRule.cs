@@ -25,5 +25,8 @@ namespace Client.DataTable.Editor
 
         [LabelText("数据结构定义行索引默认为3")]
         public int StrcutDefineIndex = 3;
+
+        [LabelText("表格数据起始行数")]
+        public int DataBeginRowIndex = 4;
     }
 }

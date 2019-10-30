@@ -15,7 +15,7 @@ namespace Client.DataTable.Editor
     {
         ScriptType ScriptType { get; }
 
-        void CreateScript(string excelPath, ExcelScriptExportSetting exportSetting);
+        string CreateScript(ExcelScriptExportSetting exportSetting);
 
         ////void CreateScript(string excelPath, YuU3dAppSetting appSetting = null);
     }

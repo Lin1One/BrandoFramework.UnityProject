@@ -113,11 +113,11 @@ namespace Common.PrefsData
                 var dateAttr = typeof(T).GetAttribute<YuSaveAbleAtDate>();
                 if (dateAttr == null)
                 {
-                    path = Application.dataPath + "/_Yu/EditorSetting/" + typeof(T).Name + ".txt";
+                    path = Application.dataPath + "/BrandoFramework/EditorSetting/" + typeof(T).Name + ".txt";
                 }
                 else
                 {
-                    path = Application.dataPath + $"/_Yu/EditorSetting/{typeof(T).Name}/"
+                    path = Application.dataPath + $"/BrandoFramework/EditorSetting/{typeof(T).Name}/"
                                                 + $"{DateTime.Now.ToLongDateString()}.txt";
                 }
 
@@ -133,11 +133,11 @@ namespace Common.PrefsData
                 var dateAttr = typeof(T).GetAttribute<YuSaveAbleAtDate>();
                 if (dateAttr == null)
                 {
-                    path = Application.dataPath + "/_Yu/Resources/Setting/" + typeof(T).Name + ".txt";
+                    path = Application.dataPath + "/BrandoFramework/Resources/Setting/" + typeof(T).Name + ".txt";
                 }
                 else
                 {
-                    path = Application.dataPath + $"/_Yu/Resources/Setting/{typeof(T).Name}/"
+                    path = Application.dataPath + $"/BrandoFramework/Resources/Setting/{typeof(T).Name}/"
                                                 + $"{DateTime.Now.ToLongDateString()}.txt";
                 }
 
@@ -178,8 +178,8 @@ namespace Common.PrefsData
             }
             else
             {
-                //var formatedContent = YuEditorAPIInvoker.PrettifyJsonString(jsContent);
-                //YuIOUtility.WriteAllText(writePath, formatedContent);
+                //var formatedContent = EditorAPIInvoker.PrettifyJsonString(jsContent);
+                IOUtility.WriteAllText(writePath, jsContent);
             }
 
             TryShowDialog(showDialog);

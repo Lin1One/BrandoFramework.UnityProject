@@ -2,7 +2,6 @@ using Client.Assets.Editor;
 using Client.DataTable.Editor;
 using Client.GamePlaying.AI;
 using Client.Scene.Editor;
-using Common.Config;
 using Common;
 using Common.EditorWindow;
 using Common.ScriptCreate;

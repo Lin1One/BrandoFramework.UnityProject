@@ -4,6 +4,7 @@
         "OdinEditor",
         "OdinPlay",
         "Framework.Common",
+        "Client.Core.Play",
         "Common.Editor"
     ],
     "optionalUnityReferences": [],

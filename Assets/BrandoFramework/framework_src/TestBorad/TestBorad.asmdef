@@ -3,7 +3,10 @@
     "references": [
         "OdinPlay",
         "OdinEditor",
-        "ProgramingStudio"
+        "ProgramingStudio",
+        "Client.DataTable.Editor",
+        "TestProject.Play",
+        "Client.Core.Play"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

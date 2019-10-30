@@ -7,8 +7,8 @@
 #endregion
 
 using Client.Assets;
+using Client.Core;
 using Common;
-using Common.Config;
 using Common.Utility;
 using System.Collections.Generic;
 using System.IO;

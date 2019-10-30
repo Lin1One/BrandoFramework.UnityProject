@@ -9,6 +9,7 @@
 using Common;
 using Common.ScriptCreate;
 using Common.Utility;
+using UnityEngine;
 
 namespace Client.DataTable.Editor
 {
@@ -53,7 +54,8 @@ namespace Client.DataTable.Editor
                 "System.Linq",
                 typeof(SerializeUtility).Namespace,
                 "Sirenix.OdinInspector",
-                "UnityEngine"
+                "UnityEngine",
+                typeof(IExcelEntity).Namespace
             );
         }
 
@@ -69,6 +71,12 @@ namespace Client.DataTable.Editor
 
         private void AppendCsClassHead()
         {
+            var classNameSpace = projectInfo.ProjectRuntimeScriptDefines;
+            if (string.IsNullOrEmpty(classNameSpace))
+            {
+                Debug.LogError("项目脚本命名空间为空");
+                return;
+            }
             Appender.AppendLine($"namespace {projectInfo.ProjectRuntimeScriptDefines}");
             Appender.AppendLeftBracketsAndToRight();
             Appender.AppendCsComment("Excel数据表_" + SheetInfo.ChineseId);
@@ -85,7 +93,7 @@ namespace Client.DataTable.Editor
             }
             Appender.AppendLine($"public class {ScriptName}");
             var interfaceName = ExcelUtility.EntityInterfaceName(projectInfo,SheetInfo);
-            Appender.AppendLine($"    : {interfaceName}, IYuExcelEntity<{ScriptName}>");
+            Appender.AppendLine($"    : {interfaceName}, IExcelEntity<{ScriptName}>");
             Appender.AppendLeftBracketsAndToRight();
         }
 
@@ -158,10 +166,10 @@ namespace Client.DataTable.Editor
         private void AppendCsInitEntitys()
         {
             Appender.AppendCsComment("将excel的txt数据源转换为数据列表。");
-            Appender.AppendLine($"public List<{ScriptName}> InitEntitys(List<string> rows)");
+            Appender.AppendLine($"public List<{"IExcelEntity"}> InitEntitys(List<string> rows)");
             Appender.AppendLine("{");
             Appender.ToRight();
-            Appender.AppendLine($"var entitys = new List<{ScriptName}>();");
+            Appender.AppendLine($"var entitys = new List<{"IExcelEntity"}>();");
             Appender.AppendLine(" int i = 0;");
             Appender.AppendLine("try");
             Appender.AppendLine("{");

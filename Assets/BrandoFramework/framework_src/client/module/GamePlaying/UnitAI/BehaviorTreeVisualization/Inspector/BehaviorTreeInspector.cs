@@ -12,12 +12,11 @@
 
 #endregion
 
-using Common;
-using Common.Config;
+
+using Client.Core;
 using Common.Utility;
 using Sirenix.OdinInspector;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Client.GamePlaying.AI

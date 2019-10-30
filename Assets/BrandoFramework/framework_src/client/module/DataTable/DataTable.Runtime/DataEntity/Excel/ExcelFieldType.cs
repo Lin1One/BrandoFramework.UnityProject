@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace Client.DataTable.Editor
+namespace Client.DataTable
 {
     /// <summary>
     /// Excel配置表字段类型。

@@ -6,8 +6,8 @@
 
 #endregion
 
+using Client.Core;
 using Common;
-using Common.Config;
 using System.Collections.Generic;
 using UnityEngine;
 

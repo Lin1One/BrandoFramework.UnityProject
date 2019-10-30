@@ -10,7 +10,7 @@ using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 
-namespace Common.Config
+namespace Client.Core
 {
     [Serializable]
     public class ProjectInfoDati : GenericSingleDati<ProjectInfo, ProjectInfoDati>
@@ -43,7 +43,12 @@ namespace Common.Config
         [FolderPath]
         [LabelText("AssetBundle输出目录")]
         public string AssetBundleBuildDir;
-        
+
+        [BoxGroup("Script")]
+        [LabelWidth(130)]
+        [LabelText("项目运行时程序集路径")]
+        [FilePath]
+        public string ProjectRuntimeAssemblyPath;
 
         [BoxGroup("Script")]
         [LabelWidth(130)]

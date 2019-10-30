@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.Config;
+using Client.Core;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
@@ -165,14 +165,12 @@ namespace Client.DataTable.Editor
                             // 如果目标单元格为空则填入默认的“0”字符串。
                             if (row.GetCell(colIndex) == null || row.GetCell(colIndex).ToString() == "")
                             {
-                                ////sb.Append("0" + YuExcelConstant.SeparatorStr);
-                                sb.Append("0"  /*YuExcelConstant.SeparatorStr*/);
+                                sb.Append("0" + ExcelDataConstant.SeparatorStr);
                             }
                             else
                             {
                                 var cellStr = row.GetCell(colIndex).ToString();
-                                ////sb.Append(cellStr + YuExcelConstant.SeparatorStr);
-                                sb.Append(cellStr /*+ YuExcelConstant.SeparatorStr*/);
+                                sb.Append(cellStr + ExcelDataConstant.SeparatorStr);
                             }
                         }
                         catch (Exception ex)
@@ -185,7 +183,7 @@ namespace Client.DataTable.Editor
                     // 移除最后添加的分割字符串，默认为[__]。
                     var lineStr = sb.ToString();
                     var cutedLineStr = lineStr.Substring(0,
-                        lineStr.Length/* - YuExcelConstant.SeparatorStr.Length*/);
+                        lineStr.Length - ExcelDataConstant.SeparatorStr.Length);
                     strList.Add(cutedLineStr);
                 }
 

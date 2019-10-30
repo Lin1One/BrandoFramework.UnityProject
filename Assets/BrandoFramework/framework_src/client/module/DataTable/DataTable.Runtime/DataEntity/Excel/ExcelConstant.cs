@@ -6,7 +6,7 @@
 
 #endregion
 
-namespace Client.DataTable.Editor
+namespace Client.DataTable
 {
     /// <summary>
     /// excel相关工作流常量。

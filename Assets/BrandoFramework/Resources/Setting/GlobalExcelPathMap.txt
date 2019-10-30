@@ -1,0 +1,1 @@
+{"AppExcelSourcePathMaps":[{"ProjectId":"TestProject","ClassIds":["TestProject_IExcelEntity_Test","TestProject_ExcelEntity_Test"],"ExcelFileIds":["Assets/GameProjects/TestProject/OriginAssets/DataTable/Excel/TestExcel.xlsx","Assets/GameProjects/TestProject/OriginAssets/DataTable/Excel/TestExcel.xlsx"]}]}

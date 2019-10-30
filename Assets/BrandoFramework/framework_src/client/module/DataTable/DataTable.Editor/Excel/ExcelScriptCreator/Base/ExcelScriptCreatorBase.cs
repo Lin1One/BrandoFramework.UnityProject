@@ -6,8 +6,8 @@
 
 #endregion
 
+using Client.Core;
 using Common;
-using Common.Config;
 using Common.ScriptCreate;
 using Common.Utility;
 using NPOI.XSSF.UserModel;
@@ -18,23 +18,23 @@ namespace Client.DataTable.Editor
 {
     public abstract class ExcelScriptCreatorBase : IExcelScriptCreator, IDisposable
     {
-        public abstract ScriptType ScriptType { get; }
-        protected ExcelSheetInfo SheetInfo { get; private set; }
-        protected ProjectInfo projectInfo => ProjectInfoDati.GetActualInstance();
-
-        protected ExcelScriptExportSetting exportSetting;
-        public abstract string ScriptName { get; }
-        protected YuStringAppender Appender { get; } = new YuStringAppender();
-
         private const string IGNORE_STR = "Ignore";
         private const string CLASS_PARAMS_PROPERTYOBJ = "Class=ParamsPropertyObj";
         private const string CLASS_SIMPLEOBJ = "Class=SimpleObj";
         private const string ARRAY_STR = "Array";
 
-        public void CreateScript(string excelPath, ExcelScriptExportSetting exportSetting)
+        protected ProjectInfo projectInfo => ProjectInfoDati.GetActualInstance();
+
+        protected ExcelScriptExportSetting exportSetting;
+        protected ExcelSheetInfo SheetInfo { get; private set; }
+        public abstract ScriptType ScriptType { get; }
+        public abstract string ScriptName { get; }
+        protected YuStringAppender Appender { get; } = new YuStringAppender();
+
+        public string CreateScript(ExcelScriptExportSetting exportSetting)
         {
             this.exportSetting = exportSetting;
-            GetSheetInfo(excelPath);
+            InitSheetInfo(exportSetting);
 
             if (projectInfo != null && !string.IsNullOrEmpty(projectInfo.ProjectScriptingDefines))
             {
@@ -51,14 +51,16 @@ namespace Client.DataTable.Editor
             var content = Appender.ToString();
             IOUtility.WriteAllText($"{exportSetting.ExportDir}/{ScriptName}.cs", content);
             Dispose();
+            return ScriptName;
         }
 
         /// <summary>
         /// 获取工作簿，读取表头信息，
         /// </summary>
         /// <param name="Excel文件路径"></param>
-        private void GetSheetInfo(string excelFilePath)
+        private void InitSheetInfo(ExcelScriptExportSetting exportSetting)
         {
+            string excelFilePath = exportSetting.TaregetExcel;
             var readRule = exportSetting.readRule;
 
             using (var fs = new FileStream(excelFilePath, FileMode.Open, FileAccess.ReadWrite))
@@ -87,18 +89,14 @@ namespace Client.DataTable.Editor
                         //分隔符
                         var arraySplit = TryGetArraySplit(fieldDefineStr);
 
-                        var fieldInfo = new ExcelFieldInfo
-                            (
+                        var fieldInfo = new ExcelFieldInfo(
                                 englishComment,
                                 chineseComment,
                                 fieldType,
+                                arraySplit,
                                 index,
-                                //CurrentAppSetting,
                                 SheetInfo.EnglishId,
-                                fieldClassDesc
-                            )
-                        { ArraySplit = arraySplit };
-
+                                fieldClassDesc);
                         SheetInfo.AddFieldInfo(fieldInfo);
                     }
                     catch (Exception e)
@@ -147,7 +145,7 @@ namespace Client.DataTable.Editor
         }
 
         /// <summary>
-        /// 字段类型
+        /// 获取字段类型
         /// </summary>
         private ExcelFieldType GetFieldDefine(string fieldDefineStr)
         {
@@ -177,7 +175,7 @@ namespace Client.DataTable.Editor
         }
 
         /// <summary>
-        /// 编写脚本
+        /// 编写具体脚本内容
         /// </summary>
         protected abstract void AppendScript();
 

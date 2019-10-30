@@ -8,6 +8,7 @@
 
 #endregion
 
+using Client.Core;
 using Client.Extend;
 using Common;
 using System;

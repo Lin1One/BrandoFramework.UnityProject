@@ -1,12 +1,10 @@
 ﻿using Client.Assets;
-using Common;
-using Common.Config;
+using Client.Core;
 using Common;
 using Common.Utility;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Common.DataStruct;
 
 namespace Client.LegoUI
 {

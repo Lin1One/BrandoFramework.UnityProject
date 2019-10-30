@@ -11,12 +11,13 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
   m_Name: ProjectInfoDati_ScriptObjectAsset
-  m_EditorClassIdentifier: Framework.Common:Common.Config:ProjectInfoDati
+  m_EditorClassIdentifier: Client.Core.Play:Client.Core:ProjectInfoDati
   actualSerializableObject:
-    DevelopProjectName: 
-    ProjectRootDir: 
-    CurrentProjectAssetDatabaseDirPath: 
+    DevelopProjectName: TestProject
+    ProjectRootDir: Assets/GameProjects/TestProject
+    CurrentProjectAssetDatabaseDirPath: Assets/GameProjects/TestProject/AssetDatabase
     AssetBundleBuildDir: 
-    ProjectRuntimeScriptDefines: 
+    ProjectRuntimeAssemblyPath: 
+    ProjectRuntimeScriptDefines: TestProject
     ProjectEditorScriptingDefines: 
     ProjectScriptingDefines: 

@@ -5,16 +5,19 @@
 
 #endregion
 
+using Client;
 using Client.Assets;
+using Client.Core;
+using Client.DataTable;
 using Client.GamePlaying.Unit;
-using client_module_event;
 using Common;
 using UnityEngine;
 
-namespace Client
+namespace TestProject
 {
     public class TestProjectBootstrap : GameBootstrap
     {
+        //public TableDataBoard<TestProject_ExcelEntity_Test> 
         /// <summary>
         /// 基础映射。
         /// </summary>
@@ -25,6 +28,8 @@ namespace Client
             injector.Mapping<IAssetModule, AssetModule>();
             injector.Mapping<IAssetInfoHelper, AssetInfoHelper>();
             injector.Mapping<IUnitModule, UnitModuleBase>();
+            injector.Mapping<IDataTableModule, DataTableModule>();
+            injector.Mapping<ISerializer, ProtobufSerializer>();
         }
 
         /// <summary>
@@ -42,9 +47,12 @@ namespace Client
         protected override void StartGame()
         {
             var unitModule = Injector.Instance.Get<IUnitModule>();
-            unitModule.RegistUintType<UnitEntityTest>();
+            //unitModule.RegistUintType<UnitEntityTest>();
+            Injector.Instance.Get<IDataTableModule>().AsyncLoadEntitys<TestProject_ExcelEntity_Test>(list => Debug.Log(list.Count));
+            //unitModule.CreateUnit<UnitEntityTest>(10000, UnitType.MainUnit, "abao_model", (a) => Debug.Log("创建完成"), null, true);
+            var excelDataList  = Injector.Instance.Get<IDataTableModule>().GetRecords<TestProject_ExcelEntity_Test>();
+            Debug.Log(excelDataList.Count  + "!!!");
 
-            unitModule.CreateUnit<UnitEntityTest>(10000, UnitType.MainUnit, "abao_model", (a) => Debug.Log("创建完成"), null, true);
         }
         
     }

@@ -6,16 +6,8 @@
 
 #endregion
 
-using Client.Assets.Editor;
+using Client.Core;
 using Common;
-using Common.Config;
-using Common.Utility;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using UnityEditor;
-using UnityEngine;
 
 namespace Client.Assets
 {

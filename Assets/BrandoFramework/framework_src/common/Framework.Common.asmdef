@@ -2,8 +2,7 @@
     "name": "Framework.Common",
     "references": [
         "OdinEditor",
-        "OdinPlay",
-        "TestBorad"
+        "OdinPlay"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

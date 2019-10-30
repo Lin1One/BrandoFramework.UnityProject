@@ -12,7 +12,7 @@
 
 #endregion
 
-using Common.Config;
+using Client.Core;
 using System.Collections.Generic;
 using UnityEngine;
 

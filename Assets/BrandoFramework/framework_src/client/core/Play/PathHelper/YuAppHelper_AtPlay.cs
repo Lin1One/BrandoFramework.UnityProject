@@ -1,9 +1,7 @@
-﻿using Common.Config;
-using Common.Utility;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 
-namespace Client
+namespace Client.Core
 {
     public partial class YuAppHelper
     {

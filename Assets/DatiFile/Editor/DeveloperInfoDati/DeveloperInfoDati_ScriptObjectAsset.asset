@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 0}
   m_Name: DeveloperInfoDati_ScriptObjectAsset
-  m_EditorClassIdentifier: Framework.Common:Common.Config:DeveloperInfoDati
+  m_EditorClassIdentifier: Client.Core.Play:Client.Core:DeveloperInfoDati
   actualSerializableObject:
     DeveloperName: 
     DeveloperEmail: 

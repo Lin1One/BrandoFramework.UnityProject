@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.Config;
+using Client.Core;
 using Common.Utility;
 using Sirenix.OdinInspector;
 using System.Collections.Generic;

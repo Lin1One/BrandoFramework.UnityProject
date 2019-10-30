@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.Config;
+using Client.Core;
 using Common.Editor;
 using Common.Utility;
 using System;

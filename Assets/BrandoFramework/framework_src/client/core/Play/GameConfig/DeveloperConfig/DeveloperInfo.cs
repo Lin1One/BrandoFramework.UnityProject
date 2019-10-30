@@ -8,16 +8,16 @@
 using Common.PrefsData;
 using Sirenix.OdinInspector;
 using System;
-using UnityEngine;
 
-namespace Common.Config
+namespace Client.Core
 {
     [YuDatiDetailHelpDesc("开发者信息")]
     [DatiInEditor]
-
     public class DeveloperInfoDati: GenericSingleDati<DeveloperInfo, DeveloperInfoDati>
     {
+
     }
+
     [Serializable]
     public class DeveloperInfo
     {

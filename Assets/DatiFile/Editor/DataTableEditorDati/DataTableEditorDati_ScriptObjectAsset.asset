@@ -18,8 +18,11 @@ MonoBehaviour:
         ChineseCommentIndex: 0
         EnglishCommentIndex: 2
         StrcutDefineIndex: 3
+        DataBeginRowIndex: 4
       scriptType: 0
       serializationType: 0
       TaregetExcel: Assets/GameProjects/TestProject/OriginAssets/DataTable/Excel/TestExcel.xlsx
       ExportDir: Assets/GameProjects/TestProject/Src/Play/DataTable
-    DataExportSetting: {}
+    DataExportSetting:
+      ExportDir: Assets/GameProjects/TestProject/AssetDatabase/Package_00/DataTable
+      excelDataClass: TestProject_ExcelEntity_Test

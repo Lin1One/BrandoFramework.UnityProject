@@ -13,8 +13,6 @@ namespace Client.DataTable.Editor
     /// </summary>
     public class ExcelFieldInfo
     {
-        //private static YuU3dAppSetting CurrentU3DApp => YuU3dAppSettingDati.CurrentActual;
-
         /// <summary>
         /// 字段英文名。
         /// </summary>
@@ -50,15 +48,14 @@ namespace Client.DataTable.Editor
         /// </summary>
         public string SheetClassId { get; }
 
-        //private readonly YuU3dAppSetting u3DAppSetting;
 
         public ExcelFieldInfo
         (
             string englishName,
             string chineseName,
             ExcelFieldType fieldType,
+            char arraySplit,
             int index,
-            //YuU3dAppSetting u3DAppSetting,
             string sheetClassId,
             string classDesc = null
         )
@@ -66,8 +63,8 @@ namespace Client.DataTable.Editor
             EnglishName = englishName;
             ChineseName = chineseName;
             FieldType = fieldType;
+            ArraySplit = arraySplit;
             Index = index;
-            ////this.u3DAppSetting = u3DAppSetting;
             SheetClassId = sheetClassId;
             FieldClassDesc = classDesc;
         }

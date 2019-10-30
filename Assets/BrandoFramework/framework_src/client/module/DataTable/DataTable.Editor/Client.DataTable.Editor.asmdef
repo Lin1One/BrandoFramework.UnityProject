@@ -5,7 +5,8 @@
         "OdinPlay",
         "Framework.Common",
         "framework_module_serializer",
-        "OdinEditor"
+        "OdinEditor",
+        "Client.Module"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
