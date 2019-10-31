@@ -6,7 +6,7 @@
 
 #endregion
 
-using Client.Assets;
+using Client.Core;
 using Common;
 using Common.Utility;
 using System;

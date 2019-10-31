@@ -102,7 +102,7 @@ namespace Client.LegoUI
                     var text = textAsset.text;
                     meta = JsonUtility.FromJson<LegoUIMeta>(text);
                     uiMetaDict.Add(uiId, meta);
-                    AssetModule.ReleaseTarget(uiId);
+                    AssetModule.ReleaseAsset(uiId);
                 }
                 catch (System.Exception e)
                 {

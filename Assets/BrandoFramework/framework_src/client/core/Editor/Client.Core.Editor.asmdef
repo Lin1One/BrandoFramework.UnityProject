@@ -7,7 +7,6 @@
         "TestBorad",
         "Client.Module",
         "Common.Editor",
-        "Asset.Editor",
         "Client.DataTable.Editor",
         "Client.Core.Play"
     ],

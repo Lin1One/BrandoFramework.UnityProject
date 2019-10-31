@@ -12,12 +12,10 @@
 
 #endregion
 
-using Client.Assets;
+using Client.Core;
 using Common;
 using UnityEngine;
 using UnityEngine.UI;
-
-using YuU3dPlay;
 
 namespace Client.LegoUI
 {

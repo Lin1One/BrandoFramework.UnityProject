@@ -95,7 +95,7 @@ namespace Client.DataTable
                     var bytes = textAsset.bytes;
                     //Serializer.DeSerialize<List<T>>(bytes);
                     ExcelDataWrapper<T>.Entitys = Serializer.DeSerialize<List<T>>(bytes);
-                    assetModule.ReleaseTarget(assetId);
+                    assetModule.ReleaseAsset(assetId);
                     gotData = true;
                 }
                 catch (Exception e)
@@ -143,7 +143,7 @@ namespace Client.DataTable
                 Injector.Instance.Get<IU3DEventModule>().RemoveUnityEvent(
                     UnityEventType.Update, CheckLoadEnd<T>);
                 var assetId = typeof(T).Name.ToLower();
-                Injector.Instance.Get<IAssetModule>().ReleaseTarget(assetId);
+                Injector.Instance.Get<IAssetModule>().ReleaseAsset(assetId);
                 ExcelDataWrapper<T>.onLoaded?.Invoke(ExcelDataWrapper<T>.Entitys);
             }
         }
