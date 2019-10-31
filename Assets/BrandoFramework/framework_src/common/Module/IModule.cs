@@ -5,11 +5,7 @@
 
 #endregion
 
-
-using System;
-using UnityEngine;
-
-namespace Client
+namespace Common
 {
     public interface IModule
     {

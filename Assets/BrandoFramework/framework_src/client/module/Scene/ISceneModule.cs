@@ -5,6 +5,7 @@
 
 #endregion
 
+using Common;
 using UnityEngine;
 
 namespace Client.Scene

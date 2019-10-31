@@ -5,6 +5,8 @@
 
 #endregion
 
+using Common;
+
 namespace Client.InputModule
 {
     public interface IInputModule : IModule
