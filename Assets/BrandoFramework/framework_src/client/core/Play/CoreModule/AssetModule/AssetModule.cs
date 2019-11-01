@@ -1,4 +1,3 @@
-using Client.Core;
 using Common;
 using Common.Utility;
 using System;
@@ -16,26 +15,50 @@ using Object = UnityEngine.Object;
 #endregion
 
 
-namespace Client.Assets
+namespace Client.Core
 {
     [Singleton]
-    //[DefaultInjecType(typeof(IAssetModule))]
-    public class AssetModule : AbsLoader<string, IAssetLoadTask, UnityEngine.Object>, IAssetModule
+    [DefaultInjecType(typeof(IAssetModule))]
+    public class AssetModule : LoaderBase<string, IAssetLoadTask, UnityEngine.Object>, IAssetModule
     {
         #region 构造
+        //private readonly ProjectInfo _appEntity;
+        private readonly ProjectInfo projectInfo;
 
-        //private readonly IYuU3dAppEntity _appEntity;
+        [Inject]
+        protected IAssetInfoHelper assetInfoHelper;
+        protected IAssetInfoHelper AssetInfoHelper
+        {
+            get
+            {
+                if (assetInfoHelper == null)
+                {
+                    assetInfoHelper = Injector.Instance.Get<IAssetInfoHelper>();
+                }
+                return assetInfoHelper;
+            }
+        }
 
         public AssetModule()
         {
+            LoadMax = 3;
+            projectInfo = ProjectInfoDati.GetActualInstance();
             //_appEntity = U3dGlobal.Get<IYuU3dAppEntity>();
-            //_isLoadBundle = _appEntity.RunSetting.IsLoadFromAssetBundle;
+            _isLoadBundle = false;//_appEntity.RunSetting.IsLoadFromAssetBundle;
             InitLoadActions();
         }
 
         #endregion
 
-        //[YuInject] private readonly IBundleLoader _bundleLoader;
+        public void Init()
+        {
+        }
+
+        #region 注入字段
+
+        [Inject] private readonly IBundleLoader _bundleLoader;
+
+        #endregion
 
 
 
@@ -46,7 +69,7 @@ namespace Client.Assets
         private string GetAssetPath(string assetId)
         {
             var assetInfo = AssetInfoHelper.GetAssetInfo(assetId);
-            var path = assetInfo.GetEditorPath($"Assets/GameProjects/{ProjectInfoDati.GetActualInstance().DevelopProjectName}/AssetDatabase");
+            var path = assetInfo?.GetEditorPath(projectInfo.CurrentProjectAssetDatabaseDirPath);
             return path;
         }
 
@@ -62,56 +85,23 @@ namespace Client.Assets
         {
             if (_isLoadBundle)
             {
-                var loadState = GetLoadState(assetId);
-
-                switch (loadState)
+                if(Buffer.HasValue(assetId))
                 {
-                    case LoadState.NotLoad:
-                        OnNotLoad();
-                        break;
-                    case LoadState.Loaded:
-                        OnLoaded();
-                        break;
-                    case LoadState.Loading:
-                        OnLoading();
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    callback(Buffer.GetValue(assetId) as TAsset);
+                    return;
                 }
+
+                var task = TakeTask();
+                task.AssetId = assetId;
+                task.AssetType = typeof(TAsset);
+                task.Callback = (asset) => { callback?.Invoke(asset as TAsset); };
+                WaitTasks.Enqueue(task);
             }
             else
             {
                 string path = GetAssetPath(assetId);
                 var asset = AssetDatabaseUtility.LoadAssetAtPath<TAsset>(path);
                 callback(asset);
-            }
-
-            void ConvertAction(UnityEngine.Object tCallback)
-            {
-                Buffer.TryCache(assetId, tCallback);
-                //LoadingIds.TryRemove(assetId);
-                var finalAsset = tCallback as TAsset;
-                callback?.Invoke(finalAsset);
-            }
-
-            void OnNotLoad()
-            {
-                Callbcker.AddCallback(assetId, ConvertAction);
-                var task = TakeTask();
-                task.AssetId = assetId;
-                task.AssetType = typeof(TAsset);
-                WaitTasks.Enqueue(task);
-            }
-
-            void OnLoaded()
-            {
-                var asset = Buffer.GetValue(assetId) as TAsset;
-                callback(asset);
-            }
-
-            void OnLoading()
-            {
-                Callbcker.AddCallback(assetId, ConvertAction);
             }
         }
 
@@ -120,14 +110,56 @@ namespace Client.Assets
         protected override void StartOneLoadAsync(IAssetLoadTask task)
         {
             var assetId = task.AssetId;
+            var loadState = GetLoadState(assetId);
+            var callback = task.Callback;
+
+            switch (loadState)
+            {
+                case LoadState.NotLoad:
+                    OnNotLoad();
+                    break;
+                case LoadState.Loaded:
+                    OnLoaded();
+                    break;
+                case LoadState.Loading:
+                    OnLoading();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
 
             if (LoadingIds.Contains(assetId))
             {
                 return;
             }
 
-            LoadingIds.Add(assetId);
-            StartLoadBundle(task);
+            void OnNotLoad()
+            {
+                Callbcker.AddCallback(assetId, ConvertAction);
+                SetLoadState(assetId, LoadState.Loading);
+
+                LoadingIds.Add(assetId);
+                StartLoadBundle(task);
+            }
+
+            void OnLoaded()
+            {
+                var asset = Buffer.GetValue(assetId);
+                callback(asset);
+            }
+
+            void OnLoading()
+            {
+                Callbcker.AddCallback(assetId, ConvertAction);
+            }
+
+
+            void ConvertAction(UnityEngine.Object tCallback)
+            {
+                LoadingIds.Remove(assetId);
+                var finalAsset = tCallback;
+                callback?.Invoke(finalAsset);
+            }
         }
 
         private void StartLoadBundle(IAssetLoadTask task)
@@ -161,45 +193,53 @@ namespace Client.Assets
         private void LoadTexture2dAsync(IAssetLoadTask task) => LoadAssetAsyncAtType<Texture2D>(task);
         private void LoadFontAsync(IAssetLoadTask task) => LoadAssetAsyncAtType<Font>(task);
         private void LoadMaterialAsync(IAssetLoadTask task) => LoadAssetAsyncAtType<Material>(task);
-
-        private void LoadAnimaControlAsync(IAssetLoadTask task) =>
-            LoadAssetAsyncAtType<RuntimeAnimatorController>(task);
+        private void LoadAnimaControlAsync(IAssetLoadTask task) => LoadAssetAsyncAtType<RuntimeAnimatorController>(task);
 
         private void LoadAssetAsyncAtType<TAsset2>(IAssetLoadTask task) where TAsset2 : UnityEngine.Object
         {
             var id = task.AssetId;
-            //_bundleLoader.LoadAsync(id, bf => bf.LoadAsync<TAsset2>(id, OnAssetLoaded));
+            _bundleLoader.LoadAsync(id, bf =>
+            {
+                if(Buffer.HasValue(task.AssetId))
+                {
+                    var asset = Buffer.GetValue(task.AssetId) as TAsset2;
+                    Callbcker.Callback(task.AssetId, asset);
+                    RestoreTask(task);
+                }
+                else
+                {
+                    if (bf != null)
+                    {
+                        bf.LoadAsync<TAsset2>(id, OnAssetLoaded);
+                    }
+                    else
+                    {
+                        OnAssetLoaded(null);
+                    }
+                }
+            }
+            );
 
             void OnAssetLoaded(TAsset2 asset2)
             {
+                //_bundleLoader.ReleaseTarget(task.AssetId);
 #if UNITY_EDITOR
-                if (asset2 != null && asset2 is GameObject)
+                if (asset2 != null)
                 {
-                    var prefab = asset2 as GameObject;
-                    foreach (var render in prefab.GetComponentsInChildren<Renderer>())
-                    {
-                        foreach (var mat in render.sharedMaterials)
-                        {
-                            if (mat != null)
-                            {
-                                var shaderName = mat.shader.name;
-                                var shader = Shader.Find(shaderName);
-                                if (shader != null)
-                                {
-                                    mat.shader = shader;
-                                }
-                            }
-                        }
-                    }
+                    RefrashShader(asset2);
                 }
-
-                if (asset2 == null)
+                else
                 {
                     Debug.LogError("加载ab资源失败：" + id);
                 }
 #endif
-
-                Callbcker.Callback(id, asset2);
+                if (asset2 != null)
+                {
+                    //HideLostRes(asset2);
+                    Buffer.TryCache(task.AssetId, asset2);
+                    SetLoadState(task.AssetId, LoadState.Loaded);
+                }
+                Callbcker.Callback(task.AssetId, asset2);
                 RestoreTask(task);
             }
         }
@@ -210,12 +250,12 @@ namespace Client.Assets
 
         public void LoadAllAsync<TAsset>(string bundleId, Action<List<TAsset>> callback) where TAsset : Object
         {
-            //if (_isLoadBundle)
-            //{
-            //    var bundleRef = _bundleLoader.Load(bundleId);
-            //    bundleRef.LoadAllAsync(callback);
-            //    return;
-            //}
+            if (_isLoadBundle)
+            {
+                var bundleRef = _bundleLoader.Load(bundleId);
+                bundleRef.LoadAllAsync(callback);
+                return;
+            }
 
             var assets = AssetDatabaseUtility.LoadAllAssetsAtPath<TAsset>(GetAssetPath(bundleId));
             callback(assets);
@@ -225,116 +265,173 @@ namespace Client.Assets
 
         #region 同步加载
 
+        #endregion
+
+        #endregion
+
         public TAsset Load<TAsset>(string assetId) where TAsset : Object
         {
-            //if (Buffer.HasValue(assetId))
-            //{
-            //    //if(_isLoadBundle)
-            //    //{
-            //    //    _bundleLoader.Use(assetId.ToLower());
-            //    //}
-            //    return Buffer.GetValue(assetId) as TAsset;
-            //}
+            if (Buffer.HasValue(assetId))
+            {
+                if(_isLoadBundle)
+                {
+                    _bundleLoader.Use(assetId.ToLower());
+                }
+                return Buffer.GetValue(assetId) as TAsset;
+            }
 
             TAsset asset;
 
-            //            if (_isLoadBundle)
-            //            {
-            ////                var bundleRef = _bundleLoader.Load(assetId);
-            ////                asset = bundleRef?.Load<TAsset>(assetId);
+            if (_isLoadBundle)
+            {
+                var bundleRef = _bundleLoader.Load(assetId);
+                asset = bundleRef?.Load<TAsset>(assetId);
 
-            ////#if UNITY_EDITOR
-            ////                if (asset != null && asset is GameObject)
-            ////                {
-            ////                    var prefab = asset as GameObject;
-            ////                    foreach (var render in prefab.GetComponentsInChildren<Renderer>())
-            ////                    {
-            ////                        foreach (var mat in render.sharedMaterials)
-            ////                        {
-            ////                            if (mat != null)
-            ////                            {
-            ////                                var shaderName = mat.shader.name;
-            ////                                var shader = Shader.Find(shaderName);
-            ////                                if (shader != null)
-            ////                                {
-            ////                                    mat.shader = shader;
-            ////                                }
-            ////                            }
-            ////                        }
-            ////                    }
-            ////                }
-            ////                if (asset == null)
-            ////                {
-            ////                    Debug.LogError("加载ab资源失败：" + assetId);
-            ////                    return null;
-            ////                }
-            ////#endif
-            //            }
-            //            else
-            //            {
+                if (asset == null)
+                {
+#if DEBUG
+                    Debug.LogError("加载ab资源失败：" + assetId);
+#endif
+                    return null;
+                }
+#if UNITY_EDITOR
+                else
+                {
+                    RefrashShader(asset);
+                }
+#endif
+                //HideLostRes(asset);
+            }
+            else
+            {
+                asset = AssetDatabaseUtility.LoadAssetAtPath<TAsset>(GetAssetPath(assetId));
+            }
 
-            //            }
-            asset = AssetDatabaseUtility.LoadAssetAtPath<TAsset>(GetAssetPath(assetId));
-
-            //Buffer.TryCache(assetId, asset);
+            Buffer.TryCache(assetId, asset);
             return asset;
         }
+
+        //private void HideLostRes(Object asset)
+        //{
+        //    if (asset is GameObject)
+        //    {
+        //         var prefab = asset as GameObject;
+        //        foreach (var render in prefab.GetComponentsInChildren<Renderer>())
+        //        {
+        //            foreach (var mat in render.sharedMaterials)
+        //            {
+        //                if (mat == null || mat.shader == null)
+        //                {
+        //                    render.enabled = false;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    else if (asset is Material)
+        //    {
+        //        var mat = asset as Material;
+        //        if(mat.shader == null)
+        //        {
+        //            mat.shader = Shader.Find("");
+        //        }
+        //    }
+        //}
+
+
+#if UNITY_EDITOR
+
+        private void RefrashShader(Object asset)
+        {
+            if (asset is GameObject)
+            {
+                var prefab = asset as GameObject;
+                foreach (var render in prefab.GetComponentsInChildren<Renderer>())
+                {
+                    foreach (var mat in render.sharedMaterials)
+                    {
+                        if (mat != null)
+                        {
+                            var shaderName = mat.shader.name;
+                            var shader = Shader.Find(shaderName);
+                            if (shader != null)
+                            {
+                                mat.shader = shader;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (asset is Material)
+            {
+                var mat = asset as Material;
+                var shaderName = mat.shader.name;
+                var shader = Shader.Find(shaderName);
+                if (shader != null)
+                {
+                    mat.shader = shader;
+                }
+            }
+        }
+
+
+#endif
 
         public List<TAsset> LoadAll<TAsset>(string bundleId) where TAsset : Object
         {
             List<TAsset> assets;
 
-            //if (_isLoadBundle)
-            //{
-            //    //var bundleRef = _bundleLoader.Load(bundleId);
-            //    //assets = bundleRef.LoadAll<TAsset>();
-            //}
-            //else
-            //{
-            assets = AssetDatabaseUtility.LoadAllAssetsAtPath<TAsset>(GetAssetPath(bundleId));
-            //}
+            if (_isLoadBundle)
+            {
+                var bundleRef = _bundleLoader.Load(bundleId);
+                assets = bundleRef.LoadAll<TAsset>();
+            }
+            else
+            {
+                assets = AssetDatabaseUtility.LoadAllAssetsAtPath<TAsset>(GetAssetPath(bundleId));
+            }
 
             return assets;
         }
 
-        #endregion
-
-        #endregion
-
-        #region 卸载
+#region 卸载
 
         public void ReleaseAsset(List<string> assetIds)
         {
             foreach (var assetId in assetIds)
             {
+                var asset = Buffer.GetValue(assetId);
+                if (asset != null)
+                {
+                    Resources.UnloadAsset(asset);
+                }
                 Buffer.TryRemove(assetId);
             }
 
             if (_isLoadBundle)
             {
-                //_bundleLoader.ReleaseAsset(assetIds);
+                _bundleLoader.ReleaseAsset(assetIds);
             }
         }
 
         public void ReleaseAsset(string assetId)
         {
-            //Buffer.TryRemove(assetId);
+            var asset = Buffer.GetValue(assetId);
+            if(asset != null)
+            {
+                Resources.UnloadAsset(asset);
+            }
+            Buffer.TryRemove(assetId);
 
-            //if (_isLoadBundle)
-            //{
-            //   // _bundleLoader.ReleaseTarget(assetId);
-            //}
+            if (_isLoadBundle)
+            {
+                _bundleLoader.ReleaseTarget(assetId);
+            }
         }
 
-        #endregion
+#endregion
 
         public void Dispose()
         {
-        }
-
-        public void Init()
-        {
-            throw new NotImplementedException();
         }
 
         public bool IsReady { get; }

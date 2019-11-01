@@ -12,7 +12,7 @@ using Common;
 namespace Client.Core
 {
     [Singleton]
-    //[DefaultInjecType(typeof(ILoadCallbcker<string, IBundleRef>))]
+    [DefaultInjecType(typeof(ILoadCallbcker<string, IBundleRef>))]
     public class BundleLoadCallbacker : AbsLoadCallbacker<string, IBundleRef>, IBundleLoadCallbacker
     {
     }

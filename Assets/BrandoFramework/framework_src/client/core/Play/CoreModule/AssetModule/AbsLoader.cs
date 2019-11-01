@@ -12,12 +12,10 @@ using System.Collections.Generic;
 
 namespace Client.Core
 {
-    public abstract class AbsLoader<TKey, TTask, TCallbackValue> : IAssetLoader<TKey, TTask, TCallbackValue>
+    public abstract class LoaderBase<TKey, TTask, TCallbackValue> : IAssetLoader<TKey, TTask, TCallbackValue>
          where TTask : class
          where TCallbackValue : class
     {
-        #region 构造
-
         private IU3DEventModule eventModule;
         private IU3DEventModule EventModule
         {
@@ -31,36 +29,18 @@ namespace Client.Core
             }
         }
 
-        public AbsLoader()
+        public LoaderBase()
         {
             EventModule.WatchUnityEvent(UnityEventType.FixedUpdate, LoadUpdate);
         }
 
-        #endregion
 
         #region 注入属性
 
-        //[Inject]
+        [Inject]
         protected readonly IBuffer<TKey, TCallbackValue> Buffer;
-        //[Inject]
+        [Inject]
         protected readonly ILoadCallbcker<TKey, TCallbackValue> Callbcker;
-        //[Inject]
-        protected readonly IBundlePathHelper BundlePathHelper;
-        //[Inject]
-        protected readonly IBundleDependInfoHelper DependInfoHelper;
-        //[Inject]
-        protected  IAssetInfoHelper assetInfoHelper;
-        protected IAssetInfoHelper AssetInfoHelper
-        {
-            get
-            {
-                if (assetInfoHelper == null)
-                {
-                    assetInfoHelper = Injector.Instance.Get<IAssetInfoHelper>();
-                }
-                return assetInfoHelper;
-            }
-        }
 
         #endregion
 
@@ -93,7 +73,7 @@ namespace Client.Core
 
         protected Queue<TTask> WaitTasks { get; } = new Queue<TTask>();
         protected HashSet<TKey> LoadingIds { get; } = new HashSet<TKey>();
-        //protected int WaitingCount => WaitTasks.Count;
+        protected int WaitingCount => WaitTasks.Count;
         protected int LoadingCount => LoadingIds.Count;
         protected int LoadMax { get; set; } = 3;
 

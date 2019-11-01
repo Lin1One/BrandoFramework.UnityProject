@@ -6,11 +6,13 @@
 
 #endregion
 
+using Common;
 using System;
 using System.Collections.Generic;
 
 namespace Client.Core
 {
+    [DefaultInjecType(typeof(BundleLoader))]
     public interface IBundleLoader : IAssetLoader<string, IBundleLoadTask, IBundleRef>
     {
         void LoadAsync(string assetId, Action<IBundleRef> callback);

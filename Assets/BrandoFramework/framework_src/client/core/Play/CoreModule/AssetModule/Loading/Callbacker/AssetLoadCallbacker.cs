@@ -12,7 +12,7 @@ using Common;
 namespace Client.Core
 {
     [Singleton]
-    ////[DefaultInjecType(typeof(ILoadCallbcker<string, UnityEngine.Object>))]
+    [DefaultInjecType(typeof(ILoadCallbcker<string, UnityEngine.Object>))]
     public class AssetLoadCallbacker : AbsLoadCallbacker<string, UnityEngine.Object>, IAssetLoadCallbacker
     {
     }

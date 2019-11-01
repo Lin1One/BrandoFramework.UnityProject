@@ -21,40 +21,96 @@ namespace Common
                 return instance;
             }
         }
-
+        protected Injector(){}
         private Dictionary<Type, Type> typeMaps;
-        private Dictionary<Type, Type> TypeMappings => typeMaps ?? (typeMaps = new Dictionary<Type, Type>());
+        private Dictionary<Type, Type> TypeMaps => typeMaps ?? (typeMaps = new Dictionary<Type, Type>());
 
+        private Dictionary<Type, object> singles;
+        protected Dictionary<Type, object> Singles => singles ?? (singles = new Dictionary<Type, object>());
+
+        private Dictionary<Type, Func<object>> singleFuncs;
+        private Dictionary<Type, Func<object>> SingleFuncs => singleFuncs ?? (singleFuncs = new Dictionary<Type, Func<object>>());
+
+        private Dictionary<Type, Func<object>> multiFuncs;
+        private Dictionary<Type, Func<object>> MultiFuncs => multiFuncs ?? (multiFuncs = new Dictionary<Type, Func<object>>());
+
+        private Dictionary<Type, FieldInfo[]> cachedFieldInfos;
+        private Dictionary<Type, FieldInfo[]> CachedFieldInfos => cachedFieldInfos ?? (cachedFieldInfos = new Dictionary<Type, FieldInfo[]>());
+
+        private List<FieldInfo> tempFieldInfos;
+        private List<FieldInfo> TempFieldInfos => tempFieldInfos ?? (tempFieldInfos = new List<FieldInfo>());
+
+        private Dictionary<Type, PropertyInfo[]> cachedPropertyInfos;
+        private Dictionary<Type, PropertyInfo[]> CachedPropertyInfos => cachedPropertyInfos ?? (cachedPropertyInfos = new Dictionary<Type, PropertyInfo[]>());
+
+        private List<PropertyInfo> tempPropertyInfos;
+        private List<PropertyInfo> TempPropertyInfos => tempPropertyInfos ?? (tempPropertyInfos = new List<PropertyInfo>());
+
+
+        private const BindingFlags BINGDING_FLAGS = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance |
+               BindingFlags.Static;
 
         #region 映射关系
 
         /// <summary>
         /// 添加类型映射
         /// </summary>
-        /// <param name="absT">抽象类型。</param>
+        /// <param name="absT">抽象类型或接口。</param>
         /// <param name="implT">具体实现类型。</param>
         /// <exception cref="Exception"></exception>
-        private void Mapping(Type absT, Type implT)
+        private void Map(Type absT, Type implT)
         {
-            if (TypeMappings.ContainsKey(absT))
+            if (TypeMaps.ContainsKey(absT))
             {
-                if (TypeMappings[absT] != implT)
+                if (TypeMaps[absT] != implT)
                 {
                     Debug.LogError($"源类型{absT.Name}当前映射到目标类型{implT.Name}");
                 }
                 return;
             }
-            TypeMappings.Add(absT, implT);
+            TypeMaps.Add(absT, implT);
         }
 
-        public void Mapping<TAbs, TImpl>() where TImpl : TAbs
+        public void Map<TAbs, TImpl>() where TImpl : TAbs
         {
-            Mapping(typeof(TAbs), typeof(TImpl));
+            Map(typeof(TAbs), typeof(TImpl));
         }
 
-        public bool HasMapping<TAbs>() => TypeMappings.ContainsKey(typeof(TAbs));
+        public bool HasMapped<TAbs>() => TypeMaps.ContainsKey(typeof(TAbs));
 
         private bool IsAbsType(Type t) => t.IsInterface || t.IsAbstract;
+
+        public void MapWithSingletonCreateFunc<TAbs, TImpl>(Func<object> func) where TImpl : TAbs
+        {
+            var absType = typeof(TAbs);
+
+            if (SingleFuncs.ContainsKey(absType))
+            {
+                throw new Exception($"单例源类型{absType.Name}的构建委托已存在，" +
+                                    $"当前的构建委托为{SingleFuncs[absType]}," +
+                                    $"新的构建委托为{func}！");
+            }
+
+            Map<TAbs, TImpl>();
+            var implType = GetImplType(absType);
+            SingleFuncs.Add(implType, func);
+        }
+
+        public void MapWithMultiCreateFunc<TAbs, TImpl>(Func<object> func) where TImpl : TAbs
+        {
+            var absType = typeof(TAbs);
+
+            if (MultiFuncs.ContainsKey(absType))
+            {
+                throw new Exception($"多实例源类型{absType.Name}的构建委托已存在，" +
+                                    $"当前的构建委托为{SingleFuncs[absType]}," +
+                                    $"新的构建委托为{func}！");
+            }
+
+            Map<TAbs, TImpl>();
+            var implType = GetImplType(absType);
+            MultiFuncs.Add(implType, func);
+        }
 
         #endregion
 
@@ -85,37 +141,47 @@ namespace Common
         {
             Type implType;
 
-            if (!TypeMappings.ContainsKey(absType))
+            if (!TypeMaps.ContainsKey(absType))
             {
-                if (IsAbsType(absType))
+                var defaultType = absType.GetAbsTypeDefaultMapImplType();
+                if (defaultType != null)
                 {
-                    throw new Exception($"接口或者抽象类{absType}无法创建实例！");
+                    implType = defaultType;
                 }
-                implType = absType;
+                else if (IsAbsType(absType))
+                {
+                    throw new Exception($"接口或者抽象类{absType},未映射实现类型，无法创建实例！");
+                }
+                else
+                {
+                    implType = absType;
+                }
             }
             else
             {
-                implType = TypeMappings[absType];
+                implType = TypeMaps[absType];
             }
             return implType;
         }
 
         protected object Reslove(Type implType)
         {
+            //已创建单例获取
             var instance = TryGetFromSingles(implType);
             if (instance != null)
             {
                 return instance;
             }
 
-            instance = TryGetFromFunc(implType);
+            //通过类型传入的创建方法创建
+            instance = TryGetFromTypeCreateFunc(implType);
             if (instance != null)
             {
                 return instance;
             }
 
-            var fieldInfos = GetFieldInfos(implType);
-            var propertyInfos = GetPropertyInfos(implType);
+            var fieldInfos = GetInjectFieldInfos(implType);
+            var propertyInfos = GetInjectPropertyInfos(implType);
             var obj = Activator.CreateInstance(implType);
 
             if (implType.IsSingle())
@@ -126,12 +192,8 @@ namespace Common
             InjectFields(obj, fieldInfos);
             InjectPropertys(obj, propertyInfos);
             InvokeInitByReflection(obj);
-
             return obj;
         }
-
-        private Dictionary<Type, object> singles;
-        protected Dictionary<Type, object> Singles => singles ?? (singles = new Dictionary<Type, object>());
 
         /// <summary>
         /// 获取单例类型
@@ -148,21 +210,13 @@ namespace Common
             return existSingle;
         }
 
-        private Dictionary<Type, Func<object>> singleFuncs;
 
-        private Dictionary<Type, Func<object>> SingleFuncs => 
-            singleFuncs ?? (singleFuncs = new Dictionary<Type, Func<object>>());
-
-        private Dictionary<Type, Func<object>> multiFuncs;
-
-        private Dictionary<Type, Func<object>> MultiFuncs =>
-            multiFuncs ?? (multiFuncs = new Dictionary<Type, Func<object>>());
         /// <summary>
         /// 通过类型映射的创建方法获取实例
         /// </summary>
         /// <param name="targetType"></param>
         /// <returns></returns>
-        private object TryGetFromFunc(Type targetType)
+        private object TryGetFromTypeCreateFunc(Type targetType)
         {
             if (SingleFuncs.ContainsKey(targetType))
             {
@@ -172,37 +226,22 @@ namespace Common
                 return singleInstance;
             }
 
-            if (!MultiFuncs.ContainsKey(targetType))
+            if (MultiFuncs.ContainsKey(targetType))
             {
-                return null;
-            }
+                var multiFunc = MultiFuncs[targetType];
+                var multiInstance = multiFunc();
+                return multiInstance;
 
-            var multiFunc = MultiFuncs[targetType];
-            var multiInstance = multiFunc();
-            return multiInstance;
+            }
+            return null;
         }
 
-        private Dictionary<Type, FieldInfo[]> cachedFieldInfos;
-        private Dictionary<Type, FieldInfo[]> CachedFieldInfos =>
-            cachedFieldInfos ?? (cachedFieldInfos = new Dictionary<Type, FieldInfo[]>());
-
-        private List<FieldInfo> tempFieldInfos;
-        private List<FieldInfo> TempFieldInfos => 
-            tempFieldInfos ?? (tempFieldInfos = new List<FieldInfo>());
-
-        private const BindingFlags BINGDING_FLAGS = 
-            BindingFlags.Public |
-            BindingFlags.NonPublic |
-            BindingFlags.Instance |
-            BindingFlags.Static;
-
-
         /// <summary>
-        /// 获取依赖类型的实例
+        /// 获取依赖类型的字段
         /// </summary>
         /// <param name="targetType"></param>
         /// <returns></returns>
-        protected FieldInfo[] GetFieldInfos(Type targetType)
+        protected FieldInfo[] GetInjectFieldInfos(Type targetType)
         {
             if (CachedFieldInfos.ContainsKey(targetType))
             {
@@ -224,17 +263,7 @@ namespace Common
             return fieldInfoArray;
         }
 
-        private Dictionary<Type, PropertyInfo[]> cachedPropertyInfos;
-
-        private Dictionary<Type, PropertyInfo[]> CachedPropertyInfos =>
-            cachedPropertyInfos ?? (cachedPropertyInfos = new Dictionary<Type, PropertyInfo[]>());
-
-        private List<PropertyInfo> tempPropertyInfos;
-
-        private List<PropertyInfo> TempPropertyInfos =>
-            tempPropertyInfos ?? (tempPropertyInfos = new List<PropertyInfo>());
-
-        protected PropertyInfo[] GetPropertyInfos(Type targetType)
+        protected PropertyInfo[] GetInjectPropertyInfos(Type targetType)
         {
             if (CachedPropertyInfos.ContainsKey(targetType))
             {
@@ -260,7 +289,7 @@ namespace Common
         {
             foreach (var fieldInfo in fieldInfos)
             {
-                var fieldType = GetFieldOrPropertyType(fieldInfo.FieldType);
+                var fieldType = GetImplType(fieldInfo.FieldType);
                 var field = Reslove(fieldType);
                 fieldInfo.SetValue(instance, field);
             }
@@ -270,7 +299,7 @@ namespace Common
         {
             foreach (var propertyInfo in propertyInfos)
             {
-                var propertyType = GetFieldOrPropertyType(propertyInfo.PropertyType);
+                var propertyType = GetImplType(propertyInfo.PropertyType);
                 var property = Reslove(propertyType);
                 propertyInfo.SetValue(instance, property);
             }
@@ -278,15 +307,14 @@ namespace Common
 
         protected Type GetFieldOrPropertyType(Type sourceType)
         {
-            return TypeMappings.ContainsKey(sourceType) ? TypeMappings[sourceType] : sourceType;
+            return TypeMaps.ContainsKey(sourceType) ? TypeMaps[sourceType] : sourceType;
         }
 
         private const string AUTO_INJECT = "AutoInject";
 
         void InvokeInitByReflection(object instance)
         {
-            var autoInject = instance.GetType().GetMethods(
-                    BindingFlags.NonPublic | BindingFlags.Instance)
+            var autoInject = instance.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                 .ToList().Find(m => m.Name == AUTO_INJECT);
             autoInject?.Invoke(instance, null);
         }
@@ -301,8 +329,7 @@ namespace Common
 
             void InvokeInitAtReflectionEnable()
             {
-                var autoInject = instance.GetType().GetMethods(
-                        BindingFlags.NonPublic | BindingFlags.Instance)
+                var autoInject = instance.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance)
                     .ToList().Find(m => m.Name == AUTO_INJECT);
                 autoInject?.Invoke(instance, null);
             }
@@ -316,14 +343,13 @@ namespace Common
 //#endif
         }
 
-
         #endregion
 
         #region 清理
 
         public void CleanAllMap()
         {
-            TypeMappings.Clear();
+            TypeMaps.Clear();
             Singles.Clear();
             MultiFuncs.Clear();
             CachedFieldInfos.Clear();
@@ -335,55 +361,10 @@ namespace Common
         #endregion 
     }
 
-    #region 注入器扩展类
-
-    public static class InjectExtension
-    {
-        public static bool HasInjectAttribute(this MemberInfo member)
-        {
-            return member.GetCustomAttributes(typeof(InjectAttribute), true).Any();
-        }
-
-        public static bool IsSingle(this Type type)
-        {
-            return type.GetCustomAttributes(typeof(SingletonAttribute), true).Any();
-        }
-    }
-
-    #endregion
-
     #region 待整理代码
-    //public void RegisterSingleBuildFunc<TAbs, TImpl>(Func<object> func) where TImpl : TAbs
-    //{
-    //    var absType = typeof(TAbs);
 
-    //    if (SingleFuncs.ContainsKey(absType))
-    //    {
-    //        throw new Exception($"单例源类型{absType.Name}的构建委托已存在，" +
-    //                            $"当前的构建委托为{SingleFuncs[absType]}," +
-    //                            $"新的构建委托为{func}！");
-    //    }
 
-    //    Mapping<TAbs, TImpl>();
-    //    var implType = GetImplType(absType);
-    //    SingleFuncs.Add(implType, func);
-    //}
 
-    //public void RegisterMultiBuildFunc<TAbs, TImpl>(Func<object> func) where TImpl : TAbs
-    //{
-    //    var absType = typeof(TAbs);
-
-    //    if (MultiFuncs.ContainsKey(absType))
-    //    {
-    //        throw new Exception($"多实例源类型{absType.Name}的构建委托已存在，" +
-    //                            $"当前的构建委托为{SingleFuncs[absType]}," +
-    //                            $"新的构建委托为{func}！");
-    //    }
-
-    //    Mapping<TAbs, TImpl>();
-    //    var implType = GetImplType(absType);
-    //    MultiFuncs.Add(implType, func);
-    //}
 
     //public void ReMapping<TAbs, TImpl>() where TImpl : TAbs
     //{

@@ -12,7 +12,7 @@ using Common;
 namespace Client.Core
 {
     [Singleton]
-    //[DefaultInjecType(typeof(IBuffer<string, UnityEngine.Object>))]
+    [DefaultInjecType(typeof(IBuffer<string, UnityEngine.Object>))]
     public class AssetBuffer : AbsBuffer<string, UnityEngine.Object>, IAssetBuffer
     {
     }

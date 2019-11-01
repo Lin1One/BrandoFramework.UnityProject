@@ -73,7 +73,7 @@ namespace Common.Utility
 
             var args = new object[] {path, typeof(T)};
             var asset = (T) LoadAssetAtPathMethod.Invoke(null, args);
-            var asset2 = AssetDatabase.LoadAssetAtPath<T>(path);
+            //var asset2 = AssetDatabase.LoadAssetAtPath<T>(path);
              //asset = AssetDatabase.LoadAssetAtPath<T>(path);
             return asset;
         }

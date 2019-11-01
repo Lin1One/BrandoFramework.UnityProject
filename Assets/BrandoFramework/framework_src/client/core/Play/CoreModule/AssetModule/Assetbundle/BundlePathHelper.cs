@@ -14,7 +14,7 @@ using UnityEngine;
 namespace Client.Core
 {
     [Singleton]
-    //[DefaultInjecType(typeof(IBundlePathHelper))]
+    [DefaultInjecType(typeof(IBundlePathHelper))]
     public class BundlePathHelper : IBundlePathHelper
     {
         //private readonly YuU3dAppSetting _appSetting = U3dGlobal.CurrentApp;

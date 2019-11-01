@@ -13,7 +13,8 @@ using System.Collections.Generic;
 
 namespace Client.Core
 {
-    public interface IAssetModule : IAssetLoader<string, IAssetLoadTask, UnityEngine.Object>, IModule
+    [DefaultInjecType(typeof(AssetModule))]
+    public interface IAssetModule : IModule
     {
         void LoadAsync<TAsset>(string assetId, Action<TAsset> callback) where TAsset : UnityEngine.Object;
 

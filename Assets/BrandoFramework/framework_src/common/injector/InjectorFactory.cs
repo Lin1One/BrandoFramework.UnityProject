@@ -23,6 +23,6 @@ namespace Common
             isBinding = true;
         }
 
-        public static IInjector GetInjector() => injectorImpl ?? (injectorImpl = new Injector());
+        public static IInjector GetInjector() => injectorImpl ?? (injectorImpl = Injector.Instance);
     }
 }

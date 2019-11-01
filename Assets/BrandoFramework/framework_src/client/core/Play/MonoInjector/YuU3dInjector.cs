@@ -145,8 +145,8 @@ namespace Common
                 CacheToPathMapObjs(path, targetMono);
             }
 
-            var fieldInfos = GetFieldInfos(implType);
-            var propertyInfos = GetPropertyInfos(implType);
+            var fieldInfos = GetInjectFieldInfos(implType);
+            var propertyInfos = GetInjectPropertyInfos(implType);
             InjectMonoFields(targetMono, fieldInfos);
             InjectMonoPropertys(targetMono, propertyInfos);
             InvokeInit(targetMono);

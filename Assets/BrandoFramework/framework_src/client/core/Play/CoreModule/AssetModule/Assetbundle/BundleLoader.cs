@@ -19,7 +19,7 @@ namespace Client.Core
 {
     [Singleton]
     //[DefaultInjecType(typeof(IBundleLoader))]
-    public class BundleLoader : AbsLoader<string, IBundleLoadTask, IBundleRef>, IBundleLoader
+    public class BundleLoader : LoaderBase<string, IBundleLoadTask, IBundleRef>, IBundleLoader
     {
 
         public BundleLoader()
@@ -50,6 +50,10 @@ namespace Client.Core
         protected override IBundleLoadTask CreateTask() => new BundleLoadTask();
         [Inject]
         protected readonly IBundlePathInfoHelepr BundlePathInfoHelepr;
+        [Inject]
+        protected readonly IBundlePathHelper BundlePathHelper;
+        [Inject]
+        protected readonly IBundleDependInfoHelper DependInfoHelper;
 
         #region 异步加载
 
@@ -128,7 +132,6 @@ namespace Client.Core
 #if DEBUG
         private int m_countChian; //链式加载堆栈计数，以免死循环
 #endif
-
 
         public void LoadAsync(string assetId, Action<IBundleRef> callback)
         {
@@ -285,252 +288,252 @@ namespace Client.Core
 #endif
         }
 
-#endregion
+        #endregion
 
-#region BundleRef对象获取及回收
+        #region BundleRef对象获取及回收
 
-        ////private readonly IGenericObjectPool<IBundleRef> _bundleRefPool
-        ////    = new GenericObjectPool<IBundleRef>(AssetFactory.CreateBundleRef, 100);
+        private readonly IGenericObjectPool<IBundleRef> _bundleRefPool
+            = new GenericObjectPool<IBundleRef>(AssetFactory.CreateBundleRef, 100);
 
-        //        private IBundleRef TakeRef() => _bundleRefPool.Take();
-        //        private void RestoreRef(IBundleRef bundleRef) => _bundleRefPool.Restore(bundleRef);
+        private IBundleRef TakeRef() => _bundleRefPool.Take();
+        private void RestoreRef(IBundleRef bundleRef) => _bundleRefPool.Restore(bundleRef);
 
-#endregion
+        #endregion
 
-#region 同步加载
+        #region 同步加载
 
         public IBundleRef Load(string assetId)
-        {
-            var assetLowerId = assetId.ToLower();
-            var bundleId = BundlePathInfoHelepr.GetBundleId(assetLowerId);
-            var loadState = GetLoadState(bundleId);
-
-            switch (loadState)
-            {
-                case LoadState.NotLoad:
-                    return OnNotLoad();
-                case LoadState.Loaded:
-                    return OnLoaded();
-                case LoadState.Loading:
-                    //Todo 待完成
-                    //Debug.LogError("错误，在异步加载中，调用了词资源的同步加载");
-                    return OnNotLoad();
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            IBundleRef OnNotLoad()
-            {
-                var dependInfo = DependInfoHelper.GetDependInfo(bundleId);
-                if(dependInfo == null)
                 {
-                    dependInfo = new BundleDependInfo(bundleId, new string[0]);
-                }
-#if DEBUG
-                m_countChian = 0;
-#endif
+                    var assetLowerId = assetId.ToLower();
+                    var bundleId = BundlePathInfoHelepr.GetBundleId(assetLowerId);
+                    var loadState = GetLoadState(bundleId);
 
-                return LoadBundleChian(bundleId, dependInfo);
-            }
-
-            IBundleRef OnLoaded()
-            {
-                var bundleRef = Buffer.GetValue(bundleId);
-                return bundleRef;
-            }
-
-            IBundleRef LoadBundleChian(string initiatedBundleId, BundleDependInfo dependInfo)
-            {
-#if DEBUG
-                m_countChian++;
-                if (m_countChian > 100)
-                {
-                    Debug.LogError("严重错误：同步加载堆栈超过100，请检查加载逻辑或资源依赖关系：" + initiatedBundleId);
-                    return null;
-                }
-#endif
-
-                var dependIds = dependInfo.DirectDepends;
-                var dependCount = dependIds.Count;
-
-                var loadState2 = GetLoadState(dependInfo.BundleId);
-                IBundleRef bundleRef2;
-                if (loadState2 == LoadState.Loaded)
-                {
-                    bundleRef2 = Buffer.GetValue(dependInfo.BundleId);
-                    bundleRef2.Use();
-                    return bundleRef2;
-                }
-                else if (loadState2 == LoadState.AddTask)
-                {
-                    return null;
-                }
-                SetLoadState(dependInfo.BundleId, LoadState.AddTask);
-
-                for (int index = 0; index < dependCount; index++)
-                {
-                    var sonId = dependIds[index];
-
-                    var sonDepndInfo = DependInfoHelper.GetDependInfo(sonId);
-                    if (sonDepndInfo.DirectDepends.Count > 0)
+                    switch (loadState)
                     {
-                        LoadBundleChian(initiatedBundleId, sonDepndInfo);
+                        case LoadState.NotLoad:
+                            return OnNotLoad();
+                        case LoadState.Loaded:
+                            return OnLoaded();
+                        case LoadState.Loading:
+                            //Todo 待完成
+                            //Debug.LogError("错误，在异步加载中，调用了词资源的同步加载");
+                            return OnNotLoad();
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
-                    else
+
+                    IBundleRef OnNotLoad()
                     {
-                        loadState2 = GetLoadState(sonId);
-                        IBundleRef bundleRef;
-                        if (loadState2 != LoadState.NotLoad)
+                        var dependInfo = DependInfoHelper.GetDependInfo(bundleId);
+                        if(dependInfo == null)
                         {
-                            if (loadState2 == LoadState.Loaded)
+                            dependInfo = new BundleDependInfo(bundleId, new string[0]);
+                        }
+        #if DEBUG
+                        m_countChian = 0;
+        #endif
+
+                        return LoadBundleChian(bundleId, dependInfo);
+                    }
+
+                    IBundleRef OnLoaded()
+                    {
+                        var bundleRef = Buffer.GetValue(bundleId);
+                        return bundleRef;
+                    }
+
+                    IBundleRef LoadBundleChian(string initiatedBundleId, BundleDependInfo dependInfo)
+                    {
+        #if DEBUG
+                        m_countChian++;
+                        if (m_countChian > 100)
+                        {
+                            Debug.LogError("严重错误：同步加载堆栈超过100，请检查加载逻辑或资源依赖关系：" + initiatedBundleId);
+                            return null;
+                        }
+        #endif
+
+                        var dependIds = dependInfo.DirectDepends;
+                        var dependCount = dependIds.Count;
+
+                        var loadState2 = GetLoadState(dependInfo.BundleId);
+                        IBundleRef bundleRef2;
+                        if (loadState2 == LoadState.Loaded)
+                        {
+                            bundleRef2 = Buffer.GetValue(dependInfo.BundleId);
+                            bundleRef2.Use();
+                            return bundleRef2;
+                        }
+                        else if (loadState2 == LoadState.AddTask)
+                        {
+                            return null;
+                        }
+                        SetLoadState(dependInfo.BundleId, LoadState.AddTask);
+
+                        for (int index = 0; index < dependCount; index++)
+                        {
+                            var sonId = dependIds[index];
+
+                            var sonDepndInfo = DependInfoHelper.GetDependInfo(sonId);
+                            if (sonDepndInfo.DirectDepends.Count > 0)
                             {
-                                bundleRef = Buffer.GetValue(sonId);
-                                bundleRef.Use();
-                                continue;
+                                LoadBundleChian(initiatedBundleId, sonDepndInfo);
                             }
-                            else if (loadState2 == LoadState.AddTask)
+                            else
                             {
-                                continue;
+                                loadState2 = GetLoadState(sonId);
+                                IBundleRef bundleRef;
+                                if (loadState2 != LoadState.NotLoad)
+                                {
+                                    if (loadState2 == LoadState.Loaded)
+                                    {
+                                        bundleRef = Buffer.GetValue(sonId);
+                                        bundleRef.Use();
+                                        continue;
+                                    }
+                                    else if (loadState2 == LoadState.AddTask)
+                                    {
+                                        continue;
+                                    }
+                                }
+
+                                var bundlePath = BundlePathInfoHelepr.GetBundlePath(sonId);
+
+        #if UNITY_EDITOR
+                                ////AnalyzeProfiler.SaveStartLoad(sonId);
+        #endif
+
+                                var assetBundle = AssetBundle.LoadFromFile(bundlePath);
+                                bundleRef = new BundleRef();
+                                if (assetBundle != null)
+                                {
+                                    bundleRef.Update(assetBundle, OnBundleRelease);
+                                    bundleRef.Use();
+                                    Buffer.TryCache(sonId, bundleRef);
+                                    SetLoadState(sonId, LoadState.Loaded);
+                                }
+                                else
+                                {
+                                    SetLoadState(sonId, LoadState.NotLoad);
+                                }
+
+        #if UNITY_EDITOR
+                                ////AnalyzeProfiler.AddBundleToBundleRef(sonId, dependInfo.BundleId);
+        #endif
                             }
+
                         }
 
-                        var bundlePath = BundlePathInfoHelepr.GetBundlePath(sonId);
-
-#if UNITY_EDITOR
-                        ////AnalyzeProfiler.SaveStartLoad(sonId);
-#endif
-
-                        var assetBundle = AssetBundle.LoadFromFile(bundlePath);
-                        bundleRef = new BundleRef();
-                        if (assetBundle != null)
+                        loadState2 = GetLoadState(dependInfo.BundleId);
+                        if (loadState2 == LoadState.Loaded)  //Todo 如果在异步加载中应该怎么设计？
                         {
-                            bundleRef.Update(assetBundle, OnBundleRelease);
-                            bundleRef.Use();
-                            Buffer.TryCache(sonId, bundleRef);
-                            SetLoadState(sonId, LoadState.Loaded);
+                            bundleRef2 = Buffer.GetValue(dependInfo.BundleId);
+                            bundleRef2.Use();
+                            return bundleRef2;
+                        }
+                        var bundlePath2 = BundlePathInfoHelepr.GetBundlePath(dependInfo.BundleId);
+        #if UNITY_EDITOR
+                        ////AnalyzeProfiler.SaveStartLoad(dependInfo.BundleId);
+        #endif
+                        var assetBundle2 = AssetBundle.LoadFromFile(bundlePath2);
+                        bundleRef2 = new BundleRef();
+                        if (assetBundle2 != null)
+                        {
+                            bundleRef2.Update(assetBundle2, OnBundleRelease);
+                            bundleRef2.Use();
+                            Buffer.TryCache(dependInfo.BundleId, bundleRef2);
+                            SetLoadState(dependInfo.BundleId, LoadState.Loaded);
                         }
                         else
                         {
-                            SetLoadState(sonId, LoadState.NotLoad);
+                            SetLoadState(dependInfo.BundleId, LoadState.NotLoad);
+                            return null;
                         }
 
-#if UNITY_EDITOR
-                        ////AnalyzeProfiler.AddBundleToBundleRef(sonId, dependInfo.BundleId);
-#endif
+        #if UNITY_EDITOR
+                        ////AnalyzeProfiler.AddBundleToBundleRef(initiatedBundleId, dependInfo.BundleId);
+        #endif
+                        return bundleRef2;
                     }
-
                 }
-
-                loadState2 = GetLoadState(dependInfo.BundleId);
-                if (loadState2 == LoadState.Loaded)  //Todo 如果在异步加载中应该怎么设计？
-                {
-                    bundleRef2 = Buffer.GetValue(dependInfo.BundleId);
-                    bundleRef2.Use();
-                    return bundleRef2;
-                }
-                var bundlePath2 = BundlePathInfoHelepr.GetBundlePath(dependInfo.BundleId);
-#if UNITY_EDITOR
-                ////AnalyzeProfiler.SaveStartLoad(dependInfo.BundleId);
-#endif
-                var assetBundle2 = AssetBundle.LoadFromFile(bundlePath2);
-                bundleRef2 = new BundleRef();
-                if (assetBundle2 != null)
-                {
-                    bundleRef2.Update(assetBundle2, OnBundleRelease);
-                    bundleRef2.Use();
-                    Buffer.TryCache(dependInfo.BundleId, bundleRef2);
-                    SetLoadState(dependInfo.BundleId, LoadState.Loaded);
-                }
-                else
-                {
-                    SetLoadState(dependInfo.BundleId, LoadState.NotLoad);
-                    return null;
-                }
-
-#if UNITY_EDITOR
-                ////AnalyzeProfiler.AddBundleToBundleRef(initiatedBundleId, dependInfo.BundleId);
-#endif
-                return bundleRef2;
-            }
-        }
-
-#endregion
-
-#region 引用+1
-
-        public void Use(string assetId)
-        {
-            var bundleId = BundlePathInfoHelepr.GetBundleId(assetId);
-            var bundleRef = Buffer.GetValue(bundleId);
-            bundleRef.Use();
-        }
-
-#endregion
-
-#region 卸载
-
-        public void ReleaseAsset(List<string> assetIds)
-        {
-            foreach (var assetId in assetIds)
-            {
-                var bundleId = BundlePathInfoHelepr.GetBundleId(assetId);
-                Buffer.GetValue(bundleId).Unuse();
-
-#if UNITY_EDITOR
-                ////AnalyzeProfiler.RemoveAssetToBundleRef(bundleId, assetId);
-#endif
-            }
-        }
-
-        public void ReleaseTarget(string assetId)
-        {
-            var bundleId = BundlePathInfoHelepr.GetBundleId(assetId);
-            var bundleRef = Buffer.GetValue(bundleId);
-            bundleRef.Unuse();
-            SetLoadState(bundleId, LoadState.NotLoad);
-            //            TryRestoreBundleRef(bundleRef);
-
-#if UNITY_EDITOR
-            ////AnalyzeProfiler.RemoveAssetToBundleRef(bundleId, assetId);
-#endif
-        }
-
-        public void SetCurrentAppAssetBundleInfo(byte[] bytes)
-        {
-            //IYuU3dAppEntity appEntity = YuU3dAppUtility.Injector.Get<IYuU3dAppEntity>();
-            //var locApp = appEntity.CurrentRuningU3DApp;
-            //currentAppAssetBundleInfo = YuSerializeUtility.DeSerialize<YuAppAssetBundleInfo>(bytes);
-        }
-
-        //        private void TryRestoreBundleRef(IBundleRef bundleRef)
-        //        {
-        //            if (bundleRef.RefCount > 0)
-        //            {
-        //                return;
-        //            }
-        //
-        //            RestoreRef(bundleRef);
-        //        }
-
-        private void OnBundleRelease(string bundleId)
-        {
-            SetLoadState(bundleId, LoadState.NotLoad);
-            Buffer.TryRemove(bundleId);
-            // todo 从Buff中移除bundleref
-
-            var dependInfo = DependInfoHelper.GetDependInfo(bundleId);
-            foreach (var directDepend in dependInfo.DirectDepends)
-            {
-                var bundleRef = Buffer.GetValue(directDepend);
-                bundleRef.Unuse();
-
-#if UNITY_EDITOR
-                ////AnalyzeProfiler.RemoveBundleToBundleRef(directDepend, bundleId);
-#endif
-            }
-        }
 
         #endregion
+
+        #region 引用+1
+
+                public void Use(string assetId)
+                {
+                    var bundleId = BundlePathInfoHelepr.GetBundleId(assetId);
+                    var bundleRef = Buffer.GetValue(bundleId);
+                    bundleRef.Use();
+                }
+
+        #endregion
+
+        #region 卸载
+
+                public void ReleaseAsset(List<string> assetIds)
+                {
+                    foreach (var assetId in assetIds)
+                    {
+                        var bundleId = BundlePathInfoHelepr.GetBundleId(assetId);
+                        Buffer.GetValue(bundleId).Unuse();
+
+        #if UNITY_EDITOR
+                        ////AnalyzeProfiler.RemoveAssetToBundleRef(bundleId, assetId);
+        #endif
+                    }
+                }
+
+                public void ReleaseTarget(string assetId)
+                {
+                    var bundleId = BundlePathInfoHelepr.GetBundleId(assetId);
+                    var bundleRef = Buffer.GetValue(bundleId);
+                    bundleRef.Unuse();
+                    SetLoadState(bundleId, LoadState.NotLoad);
+                    //            TryRestoreBundleRef(bundleRef);
+
+        #if UNITY_EDITOR
+                    ////AnalyzeProfiler.RemoveAssetToBundleRef(bundleId, assetId);
+        #endif
+                }
+
+                public void SetCurrentAppAssetBundleInfo(byte[] bytes)
+                {
+                    //IYuU3dAppEntity appEntity = YuU3dAppUtility.Injector.Get<IYuU3dAppEntity>();
+                    //var locApp = appEntity.CurrentRuningU3DApp;
+                    //currentAppAssetBundleInfo = YuSerializeUtility.DeSerialize<YuAppAssetBundleInfo>(bytes);
+                }
+
+                //        private void TryRestoreBundleRef(IBundleRef bundleRef)
+                //        {
+                //            if (bundleRef.RefCount > 0)
+                //            {
+                //                return;
+                //            }
+                //
+                //            RestoreRef(bundleRef);
+                //        }
+
+                private void OnBundleRelease(string bundleId)
+                {
+                    SetLoadState(bundleId, LoadState.NotLoad);
+                    Buffer.TryRemove(bundleId);
+                    // todo 从Buff中移除bundleref
+
+                    var dependInfo = DependInfoHelper.GetDependInfo(bundleId);
+                    foreach (var directDepend in dependInfo.DirectDepends)
+                    {
+                        var bundleRef = Buffer.GetValue(directDepend);
+                        bundleRef.Unuse();
+
+        #if UNITY_EDITOR
+                        ////AnalyzeProfiler.RemoveBundleToBundleRef(directDepend, bundleId);
+        #endif
+                    }
+                }
+
+                #endregion
 
         #region  异步加载任务
         //异步加载任务
