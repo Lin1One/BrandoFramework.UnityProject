@@ -51,8 +51,7 @@ Properties
                 fixed3 worldNormal = normalize(i.worldNormal);
                 fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);
 
-                fixed3 diffuse = _LightColor0.rgb * 
-                    _Diffuse.rgb * 
+                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * 
                     saturate(dot(worldNormal, worldLightDir));    
                 // 对环境光和漫反射光部分相加，得到最终的光照结果
                 fixed3 color = diffuse + ambient;  

@@ -44,12 +44,9 @@ Shader "Demo/SpecularVertexLevel"
                 v2f o;
                 o.pos = UnityObjectToClipPos(v.vertex);    
                 fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;    
-                fixed3 worldNormal = normalize(mul(v.normal, 
-                    (float3x3)unity_WorldToObject));    
+                fixed3 worldNormal = normalize(mul(v.normal, (float3x3)unity_WorldToObject));    
                 fixed3 worldLightDir = normalize(_WorldSpaceLightPos0.xyz);    
-                fixed3 diffuse = _LightColor0.rgb * 
-                    _Diffuse.rgb * 
-                    saturate(dot(worldNormal, worldLightDir));
+                fixed3 diffuse = _LightColor0.rgb * _Diffuse.rgb * saturate(dot(worldNormal, worldLightDir));
 
                 //高光部分
                 // 由于Cg的reflect函数的入射方向要求是由光源指向交点处的，

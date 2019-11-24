@@ -54,5 +54,5 @@ Shader "Demo/SimpleShader"
             ENDCG
         }
     }
-    FallBack "Diffuse"
+    //FallBack "Diffuse"
 }
