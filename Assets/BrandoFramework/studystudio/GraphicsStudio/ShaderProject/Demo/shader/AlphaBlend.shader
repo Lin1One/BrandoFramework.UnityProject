@@ -50,9 +50,10 @@
             struct v2f 
             {    
                 float4 pos : SV_POSITION;
-                float3 worldNormal : TEXCOORD0;
-                float3 worldPos : TEXCOORD1;
-                float2 uv : TEXCOORD2;
+                float2 uv : TEXCOORD0;
+                float3 worldNormal : TEXCOORD1;
+                float3 worldPos : TEXCOORD2;
+                
             };
 
             v2f vert(a2v v) 
