@@ -39,9 +39,9 @@ Shader "ShaderStudio/Dissolve"
 			fixed _LineWidth;
 			sampler2D _MainTex;
 			sampler2D _BumpMap;
+			sampler2D _BurnMap;
 			fixed4 _BurnFirstColor;
 			fixed4 _BurnSecondColor;
-			sampler2D _BurnMap;
 			
 			float4 _MainTex_ST;
 			float4 _BumpMap_ST;
@@ -68,16 +68,15 @@ Shader "ShaderStudio/Dissolve"
 			{
 				v2f o;
 				o.pos = UnityObjectToClipPos(v.vertex);
+				o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 				o.uvMainTex = TRANSFORM_TEX(v.texcoord, _MainTex);
 				o.uvBumpMap = TRANSFORM_TEX(v.texcoord, _BumpMap);
 				o.uvBurnMap = TRANSFORM_TEX(v.texcoord, _BurnMap);
 				
+				//切线空间下的光照方向
 				TANGENT_SPACE_ROTATION;
   				o.lightDir = mul(rotation, ObjSpaceLightDir(v.vertex)).xyz;
-
-  				o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
   				TRANSFER_SHADOW(o);
-				
 				return o;
 			}
 			
@@ -85,12 +84,12 @@ Shader "ShaderStudio/Dissolve"
 			{
 				fixed3 burn = tex2D(_BurnMap, i.uvBurnMap).rgb;		
 				clip(burn.r - _BurnAmount);
+	
+				fixed3 albedo = tex2D(_MainTex, i.uvMainTex).rgb;
+				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
 
 				float3 tangentLightDir = normalize(i.lightDir);
 				fixed3 tangentNormal = UnpackNormal(tex2D(_BumpMap, i.uvBumpMap));
-				
-				fixed3 albedo = tex2D(_MainTex, i.uvMainTex).rgb;
-				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
 				fixed3 diffuse = _LightColor0.rgb * albedo * max(0, dot(tangentNormal, tangentLightDir));
 				UNITY_LIGHT_ATTENUATION(atten, i, i.worldPos);
 
@@ -128,21 +127,19 @@ Shader "ShaderStudio/Dissolve"
 				float2 uvBurnMap : TEXCOORD1;
 			};
 			
-			v2f vert(appdata_base v) {
+			v2f vert(appdata_base v) 
+			{
 				v2f o;
-				
 				TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-				
 				o.uvBurnMap = TRANSFORM_TEX(v.texcoord, _BurnMap);
 				
 				return o;
 			}
 			
-			fixed4 frag(v2f i) : SV_Target {
+			fixed4 frag(v2f i) : SV_Target 
+			{
 				fixed3 burn = tex2D(_BurnMap, i.uvBurnMap).rgb;
-				
 				clip(burn.r - _BurnAmount);
-				
 				SHADOW_CASTER_FRAGMENT(i)
 			}
 			ENDCG

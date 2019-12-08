@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: DissolveMat
-  m_Shader: {fileID: 4800000, guid: d075ba8c0125ec74b9df715af03ab67e, type: 3}
+  m_Shader: {fileID: 4800000, guid: 7d3b43634626f294288723947fe01a93, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -20,11 +20,11 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 7e67f0d9d68098042b8287d36994e7cd, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BurnMap:
-        m_Texture: {fileID: 2800000, guid: 0bb52c2649f065d49bf740d783fc63fe, type: 3}
+        m_Texture: {fileID: 2800000, guid: e870c0f66bbaff840828cd06557ddd17, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
