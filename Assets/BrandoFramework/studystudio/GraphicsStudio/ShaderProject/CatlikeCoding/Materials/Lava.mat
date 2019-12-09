@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Lava
   m_Shader: {fileID: 4800000, guid: 507e5419769c64e00932f47c2307f9fa, type: 3}
-  m_ShaderKeywords: _EMISSION_MAP _SMOOTHNESS_ALBEDO
+  m_ShaderKeywords: _EMISSION_MAP _NORMAL_MAP _SMOOTHNESS_ALBEDO
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
