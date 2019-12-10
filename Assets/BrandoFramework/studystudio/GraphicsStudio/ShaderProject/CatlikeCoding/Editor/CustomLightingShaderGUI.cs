@@ -80,7 +80,8 @@ public class CustomLightingShaderGUI : ShaderGUI
         if (!semitransparentShadows)
         {
             shouldShowAlphaCutoff = true;
-        }
+        }
+
     }
 
     void DoMain()
@@ -334,7 +335,9 @@ public class CustomLightingShaderGUI : ShaderGUI
                 srcBlend = BlendMode.One,
                 dstBlend = BlendMode.OneMinusSrcAlpha,
                 zWrite = false
-            }        };
+            }
+
+        };
     }
 
 }
