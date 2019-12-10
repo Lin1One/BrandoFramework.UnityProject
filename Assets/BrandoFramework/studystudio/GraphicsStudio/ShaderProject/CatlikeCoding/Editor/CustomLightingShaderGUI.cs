@@ -22,34 +22,6 @@ public class CustomLightingShaderGUI : ShaderGUI
         DoSecondary();
     }
 
-    void DoMain()
-    {
-        GUILayout.Label("Main Maps", EditorStyles.boldLabel);
-        MaterialProperty mainTex = FindProperty("_MainTex");
-        MaterialProperty tint = FindProperty("_Tint");
-        GUIContent albedoLabel = MakeLabel(mainTex, "Albedo (RGB)");
-        editor.TexturePropertySingleLine(albedoLabel, mainTex, tint);
-        if (shouldShowAlphaCutoff)
-        {
-            DoAlphaCutoff();
-        }
-        DoMetallic();
-        DoSmoothness();
-        DoNormals();
-        DoOcclusion();
-        DoEmission();
-        DoDetailMask();
-        editor.TextureScaleOffsetProperty(mainTex);
-    }
-
-    void DoAlphaCutoff()
-    {
-        MaterialProperty slider = FindProperty("_AlphaCutoff");
-        EditorGUI.indentLevel += 2;
-        editor.ShaderProperty(slider, MakeLabel(slider));
-        EditorGUI.indentLevel -= 2;
-    }
-
     void DoRenderingMode()
     {
         RenderingMode mode = RenderingMode.Opaque;
@@ -88,7 +60,58 @@ public class CustomLightingShaderGUI : ShaderGUI
                 m.SetInt("_ZWrite", settings.zWrite ? 1 : 0);
             }
         }
+        if (mode == RenderingMode.Fade || mode == RenderingMode.Transparent)
+        {
+            DoSemitransparentShadows();
+
+        }
     }
+
+    void DoSemitransparentShadows()
+    {
+        EditorGUI.BeginChangeCheck();
+        bool semitransparentShadows =
+            EditorGUILayout.Toggle(MakeLabel("Semitransp. Shadows", "Semitransparent Shadows"),
+                IsKeywordEnabled("_SEMITRANSPARENT_SHADOWS"));
+        if (EditorGUI.EndChangeCheck())
+        {
+            SetKeyword("_SEMITRANSPARENT_SHADOWS", semitransparentShadows);
+        }
+        if (!semitransparentShadows)
+        {
+            shouldShowAlphaCutoff = true;
+        }
+    }
+
+    void DoMain()
+    {
+        GUILayout.Label("Main Maps", EditorStyles.boldLabel);
+        MaterialProperty mainTex = FindProperty("_MainTex");
+        MaterialProperty tint = FindProperty("_Tint");
+        GUIContent albedoLabel = MakeLabel(mainTex, "Albedo (RGB)");
+        editor.TexturePropertySingleLine(albedoLabel, mainTex, tint);
+        if (shouldShowAlphaCutoff)
+        {
+            DoAlphaCutoff();
+        }
+        DoMetallic();
+        DoSmoothness();
+        DoNormals();
+        DoOcclusion();
+        DoEmission();
+        DoDetailMask();
+        editor.TextureScaleOffsetProperty(mainTex);
+    }
+
+    void DoAlphaCutoff()
+    {
+        MaterialProperty slider = FindProperty("_AlphaCutoff");
+        EditorGUI.indentLevel += 2;
+        editor.ShaderProperty(slider, MakeLabel(slider));
+        EditorGUI.indentLevel -= 2;
+    }
+
+
 
     void DoMetallic()
     {
@@ -304,7 +327,14 @@ public class CustomLightingShaderGUI : ShaderGUI
                 srcBlend = BlendMode.SrcAlpha,
                 dstBlend = BlendMode.OneMinusSrcAlpha,
                 zWrite = false
-            }        };
+            },
+            new RenderingSettings() {
+                queue = RenderQueue.Transparent,
+                renderType = "Transparent",
+                srcBlend = BlendMode.One,
+                dstBlend = BlendMode.OneMinusSrcAlpha,
+                zWrite = false
+            }        };
     }
 
 }
