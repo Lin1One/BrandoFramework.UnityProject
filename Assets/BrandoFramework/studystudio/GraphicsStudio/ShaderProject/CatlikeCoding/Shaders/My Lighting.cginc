@@ -6,6 +6,13 @@
 #include "UnityPBSLighting.cginc"
 #include "AutoLight.cginc"
 
+#if defined(FOG_LINEAR) || defined(FOG_EXP) || defined(FOG_EXP2)
+	#if !defined(FOG_DISTANCE)
+		#define FOG_DEPTH 1
+	#endif
+	#define FOG_ON 1
+#endif
+
 float4 _Tint;
 float _AlphaCutoff;
 sampler2D _MainTex, _DetailTex, _DetailMask;
@@ -43,7 +50,11 @@ struct Interpolators {
 		float3 binormal : TEXCOORD3;
 	#endif
 
-	float3 worldPos : TEXCOORD4;
+	#if FOG_DEPTH
+		float4 worldPos : TEXCOORD4;
+	#else
+		float3 worldPos : TEXCOORD4;
+	#endif
 
 	SHADOW_COORDS(5)
 
@@ -142,27 +153,6 @@ float3 CreateBinormal (float3 normal, float3 tangent, float binormalSign) {
 		(binormalSign * unity_WorldTransformParams.w);
 }
 
-Interpolators MyVertexProgram (VertexData v) {
-	Interpolators i;
-	i.pos = UnityObjectToClipPos(v.vertex);
-	i.worldPos = mul(unity_ObjectToWorld, v.vertex);
-	i.normal = UnityObjectToWorldNormal(v.normal);
-
-	#if defined(BINORMAL_PER_FRAGMENT)
-		i.tangent = float4(UnityObjectToWorldDir(v.tangent.xyz), v.tangent.w);
-	#else
-		i.tangent = UnityObjectToWorldDir(v.tangent.xyz);
-		i.binormal = CreateBinormal(i.normal, i.tangent, v.tangent.w);
-	#endif
-
-	i.uv.xy = TRANSFORM_TEX(v.uv, _MainTex);
-	i.uv.zw = TRANSFORM_TEX(v.uv, _DetailTex);
-
-	TRANSFER_SHADOW(i);
-
-	ComputeVertexLightColor(i);
-	return i;
-}
 
 UnityLight CreateLight (Interpolators i) {
 	UnityLight light;
@@ -246,11 +236,14 @@ UnityIndirect CreateIndirectLight (Interpolators i, float3 viewDir) {
 			float occlusion = GetOcclusion(i);
 		indirectLight.diffuse *= occlusion;
 		indirectLight.specular *= occlusion;
+		#if defined(DEFERRED_PASS) && UNITY_ENABLE_REFLECTION_BUFFERS
+			indirectLight.specular = 0;
+		#endif
+
 	#endif
 
 	return indirectLight;
 }
-
 
 float3 GetTangentSpaceNormal (Interpolators i) {
 	float3 normal = float3(0, 0, 1);
@@ -280,6 +273,49 @@ void InitializeFragmentNormal(inout Interpolators i) {
 		tangentSpaceNormal.y * binormal +
 		tangentSpaceNormal.z * i.normal
 	);
+}
+
+//应用雾效
+float4 ApplyFog (float4 color, Interpolators i) {
+#if FOG_ON
+	float viewDistance = length(_WorldSpaceCameraPos - i.worldPos);
+
+	#if FOG_DEPTH
+		viewDistance = UNITY_Z_0_FAR_FROM_CLIPSPACE(i.worldPos.w);
+	#endif
+
+	UNITY_CALC_FOG_FACTOR_RAW(viewDistance);
+	float3 fogColor = 0;
+#if defined(FORWARD_BASE_PASS)
+	fogColor = unity_FogColor.rgb;
+#endif
+	color.rgb = lerp(fogColor, color.rgb, saturate(unityFogFactor));
+#endif
+	return color;
+}
+
+
+
+Interpolators MyVertexProgram (VertexData v) {
+	Interpolators i;
+	i.pos = UnityObjectToClipPos(v.vertex);
+	i.worldPos = mul(unity_ObjectToWorld, v.vertex);
+	i.normal = UnityObjectToWorldNormal(v.normal);
+
+	#if defined(BINORMAL_PER_FRAGMENT)
+		i.tangent = float4(UnityObjectToWorldDir(v.tangent.xyz), v.tangent.w);
+	#else
+		i.tangent = UnityObjectToWorldDir(v.tangent.xyz);
+		i.binormal = CreateBinormal(i.normal, i.tangent, v.tangent.w);
+	#endif
+
+	i.uv.xy = TRANSFORM_TEX(v.uv, _MainTex);
+	i.uv.zw = TRANSFORM_TEX(v.uv, _DetailTex);
+
+	TRANSFER_SHADOW(i);
+
+	ComputeVertexLightColor(i);
+	return i;
 }
 
 FragmentOutput MyFragmentProgram (Interpolators i) : SV_TARGET {
@@ -326,7 +362,8 @@ FragmentOutput MyFragmentProgram (Interpolators i) : SV_TARGET {
 		output.gBuffer2 = float4(i.normal * 0.5 + 0.5, 1);
 		output.gBuffer3 = color;
 	#else
-		output.color = color;
+		output.color = ApplyFog(color, i);
+;
 	#endif
 	return output;
 }
