@@ -7,11 +7,16 @@
 			Cull Off
 			ZTest Always
 			ZWrite Off
-			Blend One One
+			Blend [_SrcBlend] [_DstBlend]
+			//Blend DstColor Zero
+			//Blend One One
 			CGPROGRAM
 
 			#include "UnityCG.cginc"
 			#include "MyDeferredShading.cginc"
+
+			#pragma multi_compile _ SHADOWS_SCREEN
+			#pragma multi_compile _ UNITY_HDR_ON
 
 			#pragma target 3.0
 
@@ -27,7 +32,7 @@
 			Cull Off
 			ZTest Always
 			ZWrite Off
-			
+			//Blend DstColor Zero
 			Stencil {
 				Ref [_StencilNonBackground]
 				ReadMask [_StencilNonBackground]
@@ -37,6 +42,8 @@
 
 			CGPROGRAM
 			#pragma target 3.0
+			//#pragma multi_compile _ SHADOWS_SCREEN
+
 			#pragma vertex VertexProgram
 			#pragma fragment FragmentProgram
 			#pragma exclude_renderers nomrt

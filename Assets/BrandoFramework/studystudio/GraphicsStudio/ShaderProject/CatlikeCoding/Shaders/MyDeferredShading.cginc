@@ -1,12 +1,22 @@
 ﻿#if !defined(MY_DEFERRED_SHADING)
 #define MY_DEFERRED_SHADING
 
-#include "UnityCG.cginc"
-
+//#include "UnityCG.cginc"
+#include "UnityPBSLighting.cginc"
 
 sampler2D _CameraGBufferTexture0;
 sampler2D _CameraGBufferTexture1;
 sampler2D _CameraGBufferTexture2;
+
+#if defined (SHADOWS_SCREEN)
+	sampler2D _ShadowMapTexture;
+#endif
+
+sampler2D _LightTexture0;
+float4x4 unity_WorldToLight;
+
+float4 _LightColor;
+float4 _LightDir;
 
 struct VertexData {
 	float4 vertex : POSITION;
@@ -21,6 +31,29 @@ struct Interpolators {
 };
 
 UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
+
+UnityLight CreateLight (float2 uv, float3 worldPos, float viewZ) {
+	UnityLight light;
+	light.dir = -_LightDir;
+	float attenuation = 1;
+
+	#if defined(DIRECTIONAL_COOKIE)
+		float2 uvCookie = mul(unity_WorldToLight, float4(worldPos, 1)).xy;
+		//attenuation *= tex2D(_LightTexture0, uvCookie).w;
+		attenuation *= tex2Dbias(_LightTexture0, float4(uvCookie, 0, -8)).w;
+	#endif
+
+	float shadowAttenuation = 1;
+	#if defined(SHADOWS_SCREEN)
+		shadowAttenuation = tex2D(_ShadowMapTexture, uv).r;
+		float shadowFadeDistance = UnityComputeShadowFadeDistance(worldPos, viewZ);
+		float shadowFade = UnityComputeShadowFade(shadowFadeDistance);
+		shadowAttenuation = saturate(shadowAttenuation + shadowFade);
+	#endif
+	light.color = _LightColor.rgb * (attenuation * shadowAttenuation);
+	return light;
+}
+
 
 Interpolators VertexProgram (VertexData v) {
 	Interpolators i;
@@ -37,12 +70,28 @@ float4 FragmentProgram (Interpolators i) : SV_Target {
 	float3 rayToFarPlane = i.ray * _ProjectionParams.z / i.ray.z;
 	float3 viewPos = rayToFarPlane * depth;
 	float3 worldPos = mul(unity_CameraToWorld, float4(viewPos, 1)).xyz;
+	float3 viewDir = normalize(_WorldSpaceCameraPos - worldPos);
 	float3 albedo = tex2D(_CameraGBufferTexture0, uv).rgb;
 	float3 specularTint = tex2D(_CameraGBufferTexture1, uv).rgb;
 	float3 smoothness = tex2D(_CameraGBufferTexture1, uv).a;
 	float3 normal = tex2D(_CameraGBufferTexture2, uv).rgb * 2 - 1;
+	float oneMinusReflectivity = 1 - SpecularStrength(specularTint);
 
-	return 0;
+	UnityLight light = CreateLight(uv,worldPos,viewDir.z);
+
+	UnityIndirect indirectLight;
+	indirectLight.diffuse = 0;
+	indirectLight.specular = 0;
+
+	float4 color = UNITY_BRDF_PBS(
+    	albedo, specularTint, oneMinusReflectivity, smoothness,
+    	normal, viewDir, light, indirectLight
+    );
+
+	#if !defined(UNITY_HDR_ON)
+		color = exp2(-color);
+	#endif
+	return color;
 
 }
 #endif
