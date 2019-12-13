@@ -2,28 +2,29 @@
 	
 	Properties {
 	}
+
 	SubShader {
+
 		Pass {
+			Blend [_SrcBlend] [_DstBlend]
 			Cull Off
 			ZTest Always
 			ZWrite Off
-			Blend [_SrcBlend] [_DstBlend]
-			//Blend DstColor Zero
-			//Blend One One
+
 			CGPROGRAM
 
-			#include "UnityCG.cginc"
-			#include "MyDeferredShading.cginc"
-
-			#pragma multi_compile _ SHADOWS_SCREEN
-			#pragma multi_compile _ UNITY_HDR_ON
-
 			#pragma target 3.0
-
 			#pragma vertex VertexProgram
 			#pragma fragment FragmentProgram
 
 			#pragma exclude_renderers nomrt
+
+			#pragma multi_compile_lightpass
+			#pragma multi_compile _ UNITY_HDR_ON
+			#pragma multi_compile _ DIRECTIONAL_COOKIE
+			#pragma multi_compile _ SHADOWS_SCREEN
+
+			#include "MyDeferredShading.cginc"
 
 			ENDCG
 		}
@@ -32,7 +33,7 @@
 			Cull Off
 			ZTest Always
 			ZWrite Off
-			//Blend DstColor Zero
+
 			Stencil {
 				Ref [_StencilNonBackground]
 				ReadMask [_StencilNonBackground]
@@ -41,20 +42,21 @@
 			}
 
 			CGPROGRAM
-			#pragma target 3.0
-			//#pragma multi_compile _ SHADOWS_SCREEN
 
+			#pragma target 3.0
 			#pragma vertex VertexProgram
 			#pragma fragment FragmentProgram
+
 			#pragma exclude_renderers nomrt
+
 			#include "UnityCG.cginc"
-			
+
 			sampler2D _LightBuffer;
 
 			struct VertexData {
 				float4 vertex : POSITION;
 				float2 uv : TEXCOORD0;
-				};
+			};
 
 			struct Interpolators {
 				float4 pos : SV_POSITION;
@@ -68,11 +70,10 @@
 				return i;
 			}
 
-
 			float4 FragmentProgram (Interpolators i) : SV_Target {
-				float4 color = tex2D(_LightBuffer, i.uv);
-				return -log2(color);
+				return -log2(tex2D(_LightBuffer, i.uv));
 			}
+
 			ENDCG
 		}
 	}

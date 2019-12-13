@@ -18,6 +18,7 @@ float4x4 unity_WorldToLight;
 float4 _LightColor;
 float4 _LightDir;
 
+
 struct VertexData {
 	float4 vertex : POSITION;
 	float3 normal : NORMAL;
@@ -34,23 +35,29 @@ UNITY_DECLARE_DEPTH_TEXTURE(_CameraDepthTexture);
 
 UnityLight CreateLight (float2 uv, float3 worldPos, float viewZ) {
 	UnityLight light;
-	light.dir = -_LightDir;
+	//light.dir = -_LightDir;
 	float attenuation = 1;
-
+	float shadowAttenuation = 1;
+	bool shadowed;
+#if defined(DIRECTIONAL) || defined(DIRECTIONAL_COOKIE)
+		light.dir = -_LightDir;
 	#if defined(DIRECTIONAL_COOKIE)
 		float2 uvCookie = mul(unity_WorldToLight, float4(worldPos, 1)).xy;
-		//attenuation *= tex2D(_LightTexture0, uvCookie).w;
 		attenuation *= tex2Dbias(_LightTexture0, float4(uvCookie, 0, -8)).w;
 	#endif
-
-	float shadowAttenuation = 1;
 	#if defined(SHADOWS_SCREEN)
+		shadowed = true;
 		shadowAttenuation = tex2D(_ShadowMapTexture, uv).r;
 		float shadowFadeDistance = UnityComputeShadowFadeDistance(worldPos, viewZ);
 		float shadowFade = UnityComputeShadowFade(shadowFadeDistance);
 		shadowAttenuation = saturate(shadowAttenuation + shadowFade);
-	#endif
+	#endif	
+#else
+	light.dir = 1;
+#endif
+
 	light.color = _LightColor.rgb * (attenuation * shadowAttenuation);
+	//light.color = _LightColor.rgb;
 	return light;
 }
 

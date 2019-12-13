@@ -13,8 +13,8 @@
 	#define FOG_ON 1
 #endif
 
-float4 _Tint;
-float _AlphaCutoff;
+float4 _Color;
+float _Cutoff;
 sampler2D _MainTex, _DetailTex, _DetailMask;
 float4 _MainTex_ST, _DetailTex_ST;
 
@@ -36,6 +36,7 @@ struct VertexData {
 	float3 normal : NORMAL;
 	float4 tangent : TANGENT;
 	float2 uv : TEXCOORD0;
+	float2 uv1 : TEXCOORD1;
 };
 
 struct Interpolators {
@@ -61,7 +62,11 @@ struct Interpolators {
 	#if defined(VERTEXLIGHT_ON)
 		float3 vertexLightColor : TEXCOORD6;
 	#endif
+	#if defined(LIGHTMAP_ON)
+		float2 lightmapUV : TEXCOORD6;
+	#endif
 };
+
 
 struct FragmentOutput {
 	#if defined(DEFERRED_PASS)
@@ -75,7 +80,7 @@ struct FragmentOutput {
 };
 
 float3 GetAlbedo (Interpolators i) {
-	float3 albedo = tex2D(_MainTex, i.uv.xy).rgb * _Tint.rgb;
+	float3 albedo = tex2D(_MainTex, i.uv.xy).rgb * _Color.rgb;
 	#if defined (_DETAIL_ALBEDO_MAP)
 		float3 details = tex2D(_DetailTex, i.uv.zw) * unity_ColorSpaceDouble;
 		albedo = lerp(albedo, albedo * details, GetDetailMask(i));
@@ -84,7 +89,7 @@ float3 GetAlbedo (Interpolators i) {
 }
 
 float GetAlpha (Interpolators i) {
-	float alpha = _Tint.a;
+	float alpha = _Color.a;
 	#if !defined(_SMOOTHNESS_ALBEDO)
 		alpha *= tex2D(_MainTex, i.uv.xy).a;
 	#endif
@@ -195,12 +200,19 @@ UnityIndirect CreateIndirectLight (Interpolators i, float3 viewDir) {
 	indirectLight.diffuse = 0;
 	indirectLight.specular = 0;
 
+	//顶点光照
 	#if defined(VERTEXLIGHT_ON)
 		indirectLight.diffuse = i.vertexLightColor;
 	#endif
 
 	#if defined(FORWARD_BASE_PASS) || defined(DEFERRED_PASS)
-		indirectLight.diffuse += max(0, ShadeSH9(float4(i.normal, 1)));
+		#if defined(LIGHTMAP_ON)
+			//indirectLight.diffuse = UNITY_SAMPLE_TEX2D(unity_Lightmap, i.lightmapUV);
+			indirectLight.diffuse = DecodeLightmap(
+				UNITY_SAMPLE_TEX2D(unity_Lightmap, i.lightmapUV));
+		#else
+			indirectLight.diffuse += max(0, ShadeSH9(float4(i.normal, 1)));
+		#endif
 		float3 reflectionDir = reflect(-viewDir, i.normal);
 		Unity_GlossyEnvironmentData envData;
 		envData.roughness = 1 - GetSmoothness(i);
@@ -312,6 +324,11 @@ Interpolators MyVertexProgram (VertexData v) {
 	i.uv.xy = TRANSFORM_TEX(v.uv, _MainTex);
 	i.uv.zw = TRANSFORM_TEX(v.uv, _DetailTex);
 
+	#if defined(LIGHTMAP_ON)
+		//i.lightmapUV = TRANSFORM_TEX(v.uv1, unity_Lightmap);
+		i.lightmapUV = v.uv1 * unity_LightmapST.xy + unity_LightmapST.zw;
+	#endif
+
 	TRANSFER_SHADOW(i);
 
 	ComputeVertexLightColor(i);
@@ -320,7 +337,7 @@ Interpolators MyVertexProgram (VertexData v) {
 
 FragmentOutput MyFragmentProgram (Interpolators i) : SV_TARGET {
 	float alpha = GetAlpha(i);
-	clip(alpha - _AlphaCutoff);
+	clip(alpha - _Cutoff);
 	InitializeFragmentNormal(i);
 
 	float3 viewDir = normalize(_WorldSpaceCameraPos - i.worldPos);

@@ -1,9 +1,9 @@
 ﻿Shader "Custom/My First Lighting Shader" {
 
 	Properties {
-		_Tint ("Tint", Color) = (1, 1, 1, 1)
+		_Color ("_Color", Color) = (1, 1, 1, 1)
 		_MainTex ("Albedo", 2D) = "white" {}
-		_AlphaCutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
+		_Cutoff ("Alpha Cutoff", Range(0, 1)) = 0.5
 
 		[NoScaleOffset] _NormalMap ("Normals", 2D) = "bump" {}
 		_BumpScale ("Bump Scale", Float) = 1
@@ -49,7 +49,7 @@
 
 			#pragma multi_compile_fog
 			#pragma multi_compile _ SHADOWS_SCREEN
-			#pragma multi_compile _ VERTEXLIGHT_ON
+			#pragma multi_compile _ LIGHTMAP_ON VERTEXLIGHT_ON
 			#pragma shader_feature _DETAIL_MASK
 			#pragma shader_feature _METALLIC_MAP
 			#pragma shader_feature _ _SMOOTHNESS_ALBEDO _SMOOTHNESS_METALLIC
