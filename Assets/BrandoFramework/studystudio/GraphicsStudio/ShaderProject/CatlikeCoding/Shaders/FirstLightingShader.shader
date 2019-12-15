@@ -1,4 +1,4 @@
-﻿Shader "Custom/My First Lighting Shader" {
+﻿Shader "GraphicsStudio/FirstLightingShader" {
 
 	Properties {
 		_Color ("_Color", Color) = (1, 1, 1, 1)
@@ -66,7 +66,7 @@
 
 			#define FORWARD_BASE_PASS
 
-			#include "My Lighting.cginc"
+			#include "LightingCgInc.cginc"
 
 			ENDCG
 		}
@@ -97,7 +97,7 @@
 			#pragma vertex MyVertexProgram
 			#pragma fragment MyFragmentProgram
 
-			#include "My Lighting.cginc"
+			#include "LightingCgInc.cginc"
 
 			ENDCG
 		}
@@ -127,7 +127,7 @@
 
 			#define DEFERRED_PASS
 
-			#include "My Lighting.cginc"
+			#include "LightingCgInc.cginc"
 
 			ENDCG
 		}
