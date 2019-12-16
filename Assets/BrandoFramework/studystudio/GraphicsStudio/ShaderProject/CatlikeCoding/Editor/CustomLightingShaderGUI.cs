@@ -106,7 +106,7 @@ public class CustomLightingShaderGUI : ShaderGUI
 
     void DoAlphaCutoff()
     {
-        MaterialProperty slider = FindProperty("Cutoff");
+        MaterialProperty slider = FindProperty("_Cutoff");
         EditorGUI.indentLevel += 2;
         editor.ShaderProperty(slider, MakeLabel(slider));
         EditorGUI.indentLevel -= 2;
@@ -193,7 +193,16 @@ public class CustomLightingShaderGUI : ShaderGUI
             MakeLabel(map, "Emission (RGB)"), map, FindProperty("_Emission"), emissionConfig, false);
         if (EditorGUI.EndChangeCheck())
         {
-            SetKeyword("_EMISSION_MAP", map.textureValue);
+            //if (tex != map.textureValue)
+            //{
+                SetKeyword("_EMISSION_MAP", map.textureValue);
+            //}
+
+            foreach (Material m in editor.targets)
+            {
+                m.globalIlluminationFlags =
+                    MaterialGlobalIlluminationFlags.BakedEmissive;
+            }
         }
     }
 
