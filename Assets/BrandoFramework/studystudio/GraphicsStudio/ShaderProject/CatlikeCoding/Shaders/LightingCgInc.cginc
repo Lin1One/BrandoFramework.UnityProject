@@ -31,6 +31,7 @@ float3 _Emission;
 float _Cutoff;
 
 struct VertexData {
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 	float4 vertex : POSITION;
 	float3 normal : NORMAL;
 	float4 tangent : TANGENT;
@@ -56,7 +57,7 @@ struct Interpolators {
 		float3 worldPos : TEXCOORD4;
 	#endif
 
-	SHADOW_COORDS(5)
+	UNITY_SHADOW_COORDS(5)
 
 	#if defined(VERTEXLIGHT_ON)
 		float3 vertexLightColor : TEXCOORD6;
@@ -163,6 +164,8 @@ float3 CreateBinormal (float3 normal, float3 tangent, float binormalSign) {
 
 Interpolators MyVertexProgram (VertexData v) {
 	Interpolators i;
+	UNITY_INITIALIZE_OUTPUT(Interpolators, i);
+	UNITY_SETUP_INSTANCE_ID(v);
 	i.pos = UnityObjectToClipPos(v.vertex);
 	i.worldPos.xyz = mul(unity_ObjectToWorld, v.vertex);
 	#if FOG_DEPTH
@@ -184,11 +187,24 @@ Interpolators MyVertexProgram (VertexData v) {
 		i.lightmapUV = v.uv1 * unity_LightmapST.xy + unity_LightmapST.zw;
 	#endif
 
-	TRANSFER_SHADOW(i);
+	UNITY_TRANSFER_SHADOW(i,v.uv1);
 
 	ComputeVertexLightColor(i);
 	return i;
 }
+
+float FadeShadows (Interpolators i, float attenuation) {
+	#if HANDLE_SHADOWS_BLENDING_IN_GI
+		//视图向量和视图矩阵
+		float viewZ = dot(_WorldSpaceCameraPos - i.worldPos, UNITY_MATRIX_V[2].xyz);
+		float shadowFadeDistance = UnityComputeShadowFadeDistance(i.worldPos, viewZ);
+		float shadowFade = UnityComputeShadowFade(shadowFadeDistance);
+		float bakedAttenuation = UnitySampleBakedOcclusion(i.lightmapUV, i.worldPos);
+		attenuation = UnityMixRealtimeAndBakedShadows(attenuation, bakedAttenuation, shadowFade);
+	#endif
+	return attenuation;
+}
+
 
 UnityLight CreateLight (Interpolators i) {
 	UnityLight light;
@@ -204,6 +220,7 @@ UnityLight CreateLight (Interpolators i) {
 		#endif
 
 		UNITY_LIGHT_ATTENUATION(attenuation, i, i.worldPos.xyz);
+		attenuation = FadeShadows(i, attenuation);
 		
 		light.color = _LightColor0.rgb * attenuation;
 	#endif

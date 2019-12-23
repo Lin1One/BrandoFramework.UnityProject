@@ -21,6 +21,7 @@ struct VertexData {
 	float4 vertex : POSITION;
 	float2 uv : TEXCOORD0;
 	float2 uv1 : TEXCOORD1;
+	float2 uv2 : TEXCOORD2;
 };
 
 struct Interpolators {
@@ -75,10 +76,12 @@ float3 GetEmission (Interpolators i) {
 
 Interpolators MyLightmappingVertexProgram (VertexData v) {
 	Interpolators i;
-	v.vertex.xy = v.uv1 * unity_LightmapST.xy + unity_LightmapST.zw;
-	v.vertex.z = v.vertex.z > 0 ? 0.0001 : 0;
+	// v.vertex.xy = v.uv1 * unity_LightmapST.xy + unity_LightmapST.zw;
+	// v.vertex.z = v.vertex.z > 0 ? 0.0001 : 0;
 	
-	i.pos = UnityObjectToClipPos(v.vertex);
+	// i.pos = UnityObjectToClipPos(v.vertex);
+	i.pos = UnityMetaVertexPosition(
+		v.vertex, v.uv1, v.uv2, unity_LightmapST, unity_DynamicLightmapST);
 	i.uv.xy = TRANSFORM_TEX(v.uv, _MainTex);
 	i.uv.zw = TRANSFORM_TEX(v.uv, _DetailTex);
 	return i;

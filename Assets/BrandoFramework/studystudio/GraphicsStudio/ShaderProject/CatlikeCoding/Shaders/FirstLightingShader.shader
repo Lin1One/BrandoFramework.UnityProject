@@ -50,6 +50,7 @@
 			#pragma multi_compile_fog
 			#pragma multi_compile _ SHADOWS_SCREEN
 			#pragma multi_compile _ LIGHTMAP_ON VERTEXLIGHT_ON
+			#pragma multi_compile_instancing
 			#pragma shader_feature _DETAIL_MASK
 			#pragma shader_feature _METALLIC_MAP
 			#pragma shader_feature _ _SMOOTHNESS_ALBEDO _SMOOTHNESS_METALLIC
@@ -145,6 +146,7 @@
 			#pragma shader_feature _DETAIL_ALBEDO_MAP
 			#pragma shader_feature _DETAIL_NORMAL_MAP
 			#pragma multi_compile _ UNITY_HDR_ON
+			#pragma multi_compile_instancing
 
 			#pragma vertex MyVertexProgram
 			#pragma fragment MyFragmentProgram
@@ -170,6 +172,8 @@
 			#pragma shader_feature _SEMITRANSPARENT_SHADOWS
 
 			#pragma multi_compile_shadowcaster
+			#pragma multi_compile_instancing
+
 			#pragma vertex MyShadowVertexProgram
 			#pragma fragment MyShadowFragmentProgram
 

@@ -20,6 +20,7 @@ public class CustomLightingShaderGUI : ShaderGUI
         DoRenderingMode();
         DoMain();
         DoSecondary();
+        DoAdvanced();
     }
 
     void DoRenderingMode()
@@ -245,6 +246,13 @@ public class CustomLightingShaderGUI : ShaderGUI
         {
             SetKeyword("_DETAIL_MASK", mask.textureValue);
         }
+    }
+
+    void DoAdvanced()
+    {
+        GUILayout.Label("Advanced Options", EditorStyles.boldLabel);
+
+        editor.EnableInstancingField();
     }
 
 
