@@ -9,12 +9,10 @@
 #include "UnityCG.cginc"
 #include "Lighting.cginc"
 #include "AutoLight.cginc"
-//uniform float4 _ShadowColor;
-uniform half4 _ShadowColor;
+#include "LightMapCginc.cginc"
+
 uniform sampler2D _ShadowMaskMap;
 uniform sampler2D _LightColorMap;
-//uniform float4 _LightMapWeight;
-uniform half4 _LightMapWeight;
 //uniform float4 _GlobalLightColor;
 uniform half4 _GlobalLightColor;
 uniform float4 _GlobalLightDir;
@@ -76,69 +74,11 @@ shadowV2f shadowVert(shadowAppdata v)
 	return o;
 }
 
-inline half3 GetLightMapDiffuse(half2 uv, out half shadowMask)
-{
-	shadowMask = DecodeLightmap(UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, uv)).r;
-	half3 lightMapColor = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, uv));
-	return lightMapColor * _LightMapWeight.y + _ShadowColor.rgb * (1.0 - shadowMask);
-}
 
-inline half3 CalcLightDiffuse(half3 lightDiffuse, half shadowMask, half3 lightMapDiffuse)
-{
-	return mul(lightDiffuse, shadowMask) * _LightMapWeight.x + lightMapDiffuse;
-}
-
-inline half3 CalcLightDiffuseByUV(half2 uv, half3 lightDiffuse)
-{
-	half shadowMask;
-	half3 lightMapDiffuse = GetLightMapDiffuse(uv, shadowMask);
-	return CalcLightDiffuse(lightDiffuse, shadowMask, lightMapDiffuse);
-}
-
-inline half3 CalcLightDiffuseMultiDiffuseColor(half3 lightDiffuse, half3 diffuseColor)
-{
-	return lightDiffuse * diffuseColor;
-}
-
-inline half3 CalcLightMapLow(half2 uv, half3 lightDiffuse, half3 diffuseColor)
-{
-	lightDiffuse = CalcLightDiffuseByUV(uv, lightDiffuse);
-	return CalcLightDiffuseMultiDiffuseColor(lightDiffuse, diffuseColor);
-}
-
-//inline half3 CalcLightMapLow(half2 uv, half3 lightDiffuse, half3 diffuseColor)
-//{
-//	half shadowMask = DecodeLightmap(UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, uv)).r;
-//	half3 lightMapColor = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, uv));
-//	lightDiffuse = mul(lightDiffuse, shadowMask) * _LightMapWeight.x + lightMapColor * _LightMapWeight.y + _ShadowColor.rgb * (1.0 - shadowMask);
-//	return lightDiffuse * diffuseColor;
-//}
-
-//inline half3 CalcLightMapHigh(half2 uv, half3 lightDiffuse, half3 lightSpecular, half3 diffuseColor)
-//{
-//	half shadowMask = DecodeLightmap(UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, uv)).r;
-//	half3 lightMapColor = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, uv));
-//	lightDiffuse = mul(lightDiffuse, shadowMask) * _LightMapWeight.x + lightMapColor * _LightMapWeight.y + _ShadowColor.rgb * (1.0 - shadowMask);
-//	//lightSpecular = mul(lightSpecular, max(shadowMask, 1)) * _LightMapWeight.x;
-//	lightSpecular = lightSpecular * _LightMapWeight.x * shadowMask;
-//
-//	return lightDiffuse * diffuseColor + lightSpecular;
-//}
-inline half3 CalcLightMapHigh(half2 uv, half3 lightDiffuse, half3 lightSpecular, half3 diffuseColor)
-{
-	half shadowMask;
-	half3 lightMapDiffuse = GetLightMapDiffuse(uv, shadowMask);
-	lightDiffuse = CalcLightDiffuse(lightDiffuse, shadowMask, lightMapDiffuse);
-	//lightSpecular = mul(lightSpecular, max(shadowMask, 1)) * _LightMapWeight.x;
-	lightSpecular = lightSpecular * _LightMapWeight.x * shadowMask;
-
-	return lightDiffuse * diffuseColor + lightSpecular;
-}
-
-//Roughness£º´Ö³¬¶È
-//NoV:·¨ÏßÓëÊÓÏßµÄ¼Ð½Ç
-//´Ö³¬¶ÈÔ½Ð¡ ·µ»ØµÄÑÕÉ«Ô½½Ó½üSpecularColor£¬Ô½´ó£¬ÑÕÉ«Ô½°µ
-//Nov Ô½´ó·µ»ØµÄÑÕÉ«Ô½½Ó½üSpecularColor£¬Ô½Ð¡£¬Ô½½Ó½ü°×É«
+//Roughnessï¿½ï¿½ï¿½Ö³ï¿½ï¿½ï¿½
+//NoV:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ßµÄ¼Ð½ï¿½
+//ï¿½Ö³ï¿½ï¿½ï¿½Ô½Ð¡ ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½É«Ô½ï¿½Ó½ï¿½SpecularColorï¿½ï¿½Ô½ï¿½ï¿½ï¿½ï¿½É«Ô½ï¿½ï¿½
+//Nov Ô½ï¿½ó·µ»Øµï¿½ï¿½ï¿½É«Ô½ï¿½Ó½ï¿½SpecularColorï¿½ï¿½Ô½Ð¡ï¿½ï¿½Ô½ï¿½Ó½ï¿½ï¿½ï¿½É«
 inline half3 EnvBRDFApprox(half3 SpecularColor, half Roughness, half NoV)
 {
 	// [ Lazarov 2013, "Getting More Physical in Call of Duty: Black Ops II" ]
@@ -152,9 +92,9 @@ inline half3 EnvBRDFApprox(half3 SpecularColor, half Roughness, half NoV)
 	return SpecularColor * AB.x + AB.y;
 }
 
-//Roughness:´Ö²Ú¶È
-//RoL£ºÊÓ½Ç
-//Roughness Ô½´ó£¬·µ»ØÖµËæ×ÅROL±ä»¯Ô½²»Ã÷ÏÔ
+//Roughness:ï¿½Ö²Ú¶ï¿½
+//RoLï¿½ï¿½ï¿½Ó½ï¿½
+//Roughness Ô½ï¿½ó£¬·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ROLï¿½ä»¯Ô½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 inline half PhongApprox(half Roughness, half RoL)
 {
 	//half a = Roughness * Roughness;			// 1 mul
