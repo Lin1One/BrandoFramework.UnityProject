@@ -3,7 +3,6 @@
 
 #include "UnityStandardCore.cginc"
 #include "RealTimeLightBase.cginc"
-#include "XGame2.cginc" 
 
 uniform sampler2D _Diffuse; 
 uniform float4 _Diffuse_ST;
@@ -126,6 +125,49 @@ FragmentCommonData FragmentDataSetup(float4 albedo, vertexOutput i)
 	return o;
 }
 
+//----------------- ShadowCaster ------------------ //
+
+struct vertexShadowCasterOutput
+{
+	V2F_SHADOW_CASTER_NOPOS
+	float2 uv : TEXCOORD1;
+	float4 pos : SV_POSITION;
+	half alpha : TEXCOORD2;
+};
+
+
+vertexShadowCasterOutput vertShawdowCasterCore(appdata_full v)
+{
+	vertexShadowCasterOutput o;
+	TRANSFER_SHADOW_CASTER_NOPOS(o,o.pos)
+	o.uv = TRANSFORM_TEX(v.texcoord, _Diffuse);
+
+	float4 posWorld;
+	#ifdef _WAVE_ON
+		posWorld = Wave(v);
+	#else
+		posWorld = mul(unity_ObjectToWorld, v.vertex);
+	#endif
+
+	float distance = length(posWorld.xyz - _WorldSpaceCameraPos.xyz);
+	half alpha = 1.0 - saturate(distance - _WavesControl.w / _ProjectionParams.z - _WavesControl.w);
+	v.vertex = mul(unity_WorldToObject, posWorld);
+	o.pos = UnityObjectToClipPos(v.vertex);
+	o.alpha = alpha;
+	return o;
+}
+
+vertexShadowCasterOutput waveVertShawdowCaster(appdata_full v)
+{
+	return vertShawdowCasterCore(v);
+}
+
+float4 fragShadowCaster(vertexShadowCasterOutput i) : SV_TARGET
+{
+	float4 diffuseColor = tex2D(_Diffuse, i.uv);
+	clip(diffuseColor.a * i.alpha - _CutOff);
+	SHADOW_CASTER_FRAGMENT(i)
+}
 
 // struct BaseVertexOutput 
 // {
@@ -140,13 +182,7 @@ FragmentCommonData FragmentDataSetup(float4 albedo, vertexOutput i)
 // 	float3 normalWorld : NORMAL;
 // };
 
-// struct vertexShadowCasterOutput
-// {
-// 	V2F_SHADOW_CASTER_NOPOS
-// 	float2 uv : TEXCOORD1;
-// 	float4 pos : SV_POSITION;
-// 	half alpha : TEXCOORD2;
-// };
+
 
 
 // FragmentCommonData FragmentDataSetup(half4 albedo, BaseVertexOutput i)
@@ -215,45 +251,45 @@ FragmentCommonData FragmentDataSetup(float4 albedo, vertexOutput i)
 // 	return vertCore(v, false);
 // }
 
-vertexShadowCasterOutput vertShawdowCasterCore(appdata_full v, bool bWave)
-{
-	vertexShadowCasterOutput o;
-	TRANSFER_SHADOW_CASTER_NOPOS(o,o.pos)
-	o.uv = TRANSFORM_TEX(v.texcoord, _Diffuse);
-	float4 posWorld;
-	if (bWave)
-	{
-		posWorld = Wave(v);
-	}
-	else
-	{
-		posWorld = mul(unity_ObjectToWorld, v.vertex);
-	}
+// vertexShadowCasterOutput vertShawdowCasterCore(appdata_full v, bool bWave)
+// {
+// 	vertexShadowCasterOutput o;
+// 	TRANSFER_SHADOW_CASTER_NOPOS(o,o.pos)
+// 	o.uv = TRANSFORM_TEX(v.texcoord, _Diffuse);
+// 	float4 posWorld;
+// 	if (bWave)
+// 	{
+// 		posWorld = Wave(v);
+// 	}
+// 	else
+// 	{
+// 		posWorld = mul(unity_ObjectToWorld, v.vertex);
+// 	}
 
-	float distance = length(posWorld.xyz - _WorldSpaceCameraPos.xyz);
-	half alpha = 1.0 - saturate(distance - _WavesControl.w / _ProjectionParams.z - _WavesControl.w);
-	v.vertex = mul(unity_WorldToObject, posWorld);
-	o.pos = UnityObjectToClipPos(v.vertex);
-	o.alpha = alpha;
-	return o;
-}
+// 	float distance = length(posWorld.xyz - _WorldSpaceCameraPos.xyz);
+// 	half alpha = 1.0 - saturate(distance - _WavesControl.w / _ProjectionParams.z - _WavesControl.w);
+// 	v.vertex = mul(unity_WorldToObject, posWorld);
+// 	o.pos = UnityObjectToClipPos(v.vertex);
+// 	o.alpha = alpha;
+// 	return o;
+// }
 
-vertexShadowCasterOutput waveVertShawdowCaster(appdata_full v)
-{
-	return vertShawdowCasterCore(v, true);
-}
+// vertexShadowCasterOutput waveVertShawdowCaster(appdata_full v)
+// {
+// 	return vertShawdowCasterCore(v, true);
+// }
 
-vertexShadowCasterOutput vertShawdowCaster(appdata_full v)
-{
-	return vertShawdowCasterCore(v, false);
-}
+// vertexShadowCasterOutput vertShawdowCaster(appdata_full v)
+// {
+// 	return vertShawdowCasterCore(v, false);
+// }
 
-half4 fragShadowCaster(vertexShadowCasterOutput i) : SV_TARGET
-{
-	half4 diffuseColor = tex2D(_Diffuse, i.uv);
+// half4 fragShadowCaster(vertexShadowCasterOutput i) : SV_TARGET
+// {
+// 	half4 diffuseColor = tex2D(_Diffuse, i.uv);
 	
-	clip(diffuseColor.a * i.alpha - _CutOff);
-	SHADOW_CASTER_FRAGMENT(i)
-}
+// 	clip(diffuseColor.a * i.alpha - _CutOff);
+// 	SHADOW_CASTER_FRAGMENT(i)
+// }
 
 #endif

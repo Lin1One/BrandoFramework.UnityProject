@@ -10,6 +10,7 @@ uniform sampler2D _NormMap;
 
 struct vertexOutput
 {
+	UNITY_VERTEX_INPUT_INSTANCE_ID
 	float4 pos : SV_POSITION;
 	float4 uv : TEXCOORD0;
 	float4 tSpace0 : TEXCOORD1;
@@ -20,10 +21,10 @@ struct vertexOutput
 	UNITY_FOG_COORDS(4)
 	
 #if SHADOWS_SCREEN
-		SHADOW_COORDS(5)
+	SHADOW_COORDS(5)
 #endif
 
-#if _USEHEIGHT_ON
+#if _HEIGHTMAP_ON
 	half3 heightuv : TEXCOORD8;
 #endif
 
@@ -32,12 +33,12 @@ struct vertexOutput
 #if _VERTALPHA_ON
 	fixed4 color : COLOR;
 #endif
-
-	UNITY_VERTEX_INPUT_INSTANCE_ID 
 };
 
 inline vertexOutput vert(appdata_full v)
 {
+	vertexOutput o;
+
 	UNITY_SETUP_INSTANCE_ID(v);
 #if _ENABLEBONEBAKE_ON
 	float4 normal = float4(v.normal, 0);
@@ -52,7 +53,6 @@ inline vertexOutput vert(appdata_full v)
 	v.tangent = float4(tangent.xyz, v.tangent.w);
 #endif
 
-	vertexOutput o;
 	UNITY_TRANSFER_INSTANCE_ID(v, o);
 	o.pos = UnityObjectToClipPos(v.vertex);
 
@@ -76,6 +76,7 @@ inline vertexOutput vert(appdata_full v)
 #endif
 
 	o.lightDir = _WorldSpaceLightPos0.xyz - worldPos * _WorldSpaceLightPos0.w;
+
 #ifndef USING_DIRECTIONAL_LIGHT
 	o.lightDir = NormalizePerVertexNormal(o.lightDir);
 #endif
@@ -86,7 +87,7 @@ inline vertexOutput vert(appdata_full v)
 
 	UNITY_TRANSFER_FOG(o, o.pos);
 
-#if _USEHEIGHT_ON
+#if _HEIGHTMAP_ON
 	TANGENT_SPACE_ROTATION;
 	half3 viewDirForParallax = mul(rotation, ObjSpaceViewDir(v.vertex));
 	o.heightuv = viewDirForParallax;
