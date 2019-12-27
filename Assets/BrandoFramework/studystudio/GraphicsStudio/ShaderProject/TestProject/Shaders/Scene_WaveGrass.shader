@@ -7,7 +7,7 @@
 		_SpecColor("镜面反射颜色",Color) = (0.2,0.2,0.2,1)
 		_CutOff("Alpha 裁剪", Range(0,1)) = 0.5
 		[Toggle] _Wave("是否摆动",float) = 0
-		_WavesControl("植被摆动参数",Vector) = (0.1,2,2,30)//"(风速, (Wave size) Z(Wind amount) (可视距离)"
+		_WavesControl("植被摆动参数",Vector) = (0.1,2,2,30)//"(风速, WaveSize, WindAmount,可视距离)"
 		[Toggle] _ForceBake("烘焙",float) = 0
 	}
 
@@ -29,6 +29,7 @@
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwddbase 
 			//实时
+			#pragma multi_compile_instancing
 			#pragma multi_compile __ _REALTIME_ON
 			#pragma multi_compile __ ATMOSPHERICS_FOG
 			#pragma shader_feature _FORCEBAKE_ON
@@ -39,7 +40,7 @@
 
 		float4 frag(vertexOutput i):SV_TARGET
 		{
-			float4 diffuseColor = tex2D(_Diffuse,i.uv) * float4(i.color.rgb,1);
+			float4 diffuseColor = tex2D(_Diffuse,i.uv) * i.color;
 			clip(diffuseColor.a - _CutOff);
 
 			float4 color;
@@ -81,6 +82,7 @@
 			CGPROGRAM
 			#include "Scene_WaveGrassCginc.cginc"
 
+		#pragma multi_compile_instancing
 		#pragma vertex waveVertShawdowCaster
 		#pragma fragment fragShadowCaster
 		#pragma shader_feature _WAVE_ON
@@ -137,7 +139,7 @@
 					resultColor.rgb = _GlobalLightColor.rgb * diffuseColor;
 				#endif
 			#endif
-				resultColor.rgb = resultColor.rgb * _LightStrength;
+				//resultColor.rgb = resultColor.rgb;// * _LightStrength;
 				resultColor.a = i.color.a;
 				UNITY_APPLY_FOG(i.fogCoord, c.rgb);
 				return resultColor;
@@ -206,7 +208,7 @@
 				#endif
 			#endif
 				
-				c.rgb = c.rgb * _LightStrength;
+				//c.rgb = c.rgb * _LightStrength;
 				c.a = i.color.a;
 				UNITY_APPLY_FOG(i.fogCoord, c.rgb);
 				return c;	
