@@ -60,12 +60,7 @@ inline FragmentCommonData SceneBuildingFragmentSetup(vertexOutput vertextO, out 
 	clip(mask.g - _CutOff);
 #endif
 
-#if _EMSSIVE_ON
 	emisScale = mask.b;
-#else
-	emisScale = 1;
-#endif
-
 	//高光遮蔽
 #if _SPECULARMASK_ON
 	specularColor *= mask.r;

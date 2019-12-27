@@ -37,8 +37,6 @@ struct vertexOutput
 
 inline vertexOutput vert(appdata_full v)
 {
-	vertexOutput o;
-
 	UNITY_SETUP_INSTANCE_ID(v);
 #if _ENABLEBONEBAKE_ON
 	float4 normal = float4(v.normal, 0);
@@ -53,6 +51,7 @@ inline vertexOutput vert(appdata_full v)
 	v.tangent = float4(tangent.xyz, v.tangent.w);
 #endif
 
+	vertexOutput o;
 	UNITY_TRANSFER_INSTANCE_ID(v, o);
 	o.pos = UnityObjectToClipPos(v.vertex);
 
@@ -112,11 +111,11 @@ inline UnityLight MyMainLight(half3 lightColor, half3 _dir)
 	return l;
 }
 
-inline half4 caculateAddLight(half3 dir, vertexOutput i, FragmentCommonData s)
-{
-	UNITY_LIGHT_ATTENUATION(atten, i, s.posWorld);
-	UnityLight light = AdditiveLight(dir, atten);
-	UnityIndirect noIndirect = ZeroIndirect();
-	half4 final = BRDF2_Unity_PBS(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, light, noIndirect);
-	return final;
-}
+// inline half4 caculateAddLight(half3 dir, vertexOutput i, FragmentCommonData s)
+// {
+// 	UNITY_LIGHT_ATTENUATION(atten, i, s.posWorld);
+// 	UnityLight light = AdditiveLight(dir, atten);
+// 	UnityIndirect noIndirect = ZeroIndirect();
+// 	half4 final = BRDF2_Unity_PBS(s.diffColor, s.specColor, s.oneMinusReflectivity, s.smoothness, s.normalWorld, -s.eyeVec, light, noIndirect);
+// 	return final;
+// }

@@ -5,7 +5,7 @@
 
 uniform half4 _EmssiveColor;
 uniform half _EmssiveScale;
-uniform half _LightStrength;
+uniform fixed _LightStrength = 1;
 
 inline half4 SceneCaculateLight(vertexOutput i, FragmentCommonData s)
 {

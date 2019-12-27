@@ -27,6 +27,8 @@
 		[Toggle] _ForceBake("强行烘焙", Float) = 0
 		[Enum(CullMode)] _Cull("剔除方式", Float) = 2
 
+		[Header(............Toggle............)]
+		[Toggle] _Realtime("实时灯光", Float) = 0
 	}
 	SubShader
 	{
@@ -55,22 +57,22 @@
 			#pragma shader_feature _ALPHATEST_ON
 			#pragma shader_feature _REFLECTIONPROBE_ON
 
-			float4 frag (vertexOutput i) : SV_Target
+			half4 frag (vertexOutput i) : SV_Target
 			{
 				float3 albedo = 0;
-				float4 resultColor = (0,0,0,1);
+				half3 resultColor = 0;
 				float emisScale = 0;
 			#if _REALTIME_ON
 				FragmentCommonData fragData = SceneBuildingFragmentSetup(i, emisScale);
 				albedo = fragData.diffColor;
 				resultColor = SceneCaculateLight(i,fragData);
-				resultColor += CalcLightMapColor(i, s.diffColor);
+				resultColor += CalcLightMapColor(i, fragData.diffColor);
 			#else
 				FragmentCommonData fragData = SceneBuildingFragmentSetup(i, emisScale);
 				albedo = fragData.diffColor;
 				half shadowMask;
 				half3 lightMapDiffuse = GetLightMapDiffuse(i.uv.zw, shadowMask);
-				resultColor.rgb = CalcBlinnSpecular(fragData.normalWorld, 
+				resultColor = CalcBlinnSpecular(fragData.normalWorld, 
 					-fragData.eyeVec,
 					fragData.diffColor,
 					1 - fragData.smoothness,
@@ -80,7 +82,9 @@
 					1.0, 
 					0.0);
 				//对 lightMapDiffuse 保持引用，避免在 编译阶段被优化删除，导致缺少采样器报错
-				resultColor.rgb += lightMapDiffuse*0.00001;
+				
+				resultColor += lightMapDiffuse*0.00001;
+				resultColor = fragData.diffColor;
 			#endif
 			
 			#if _EMSSIVE_ON
@@ -96,11 +100,44 @@
 				#endif
 				resultColor += emissiveColor;
 			#endif
-				resultColor.rgb = resultColor.rgb * _LightStrength;
-				UNITY_APPLY_FOG(i.fogCoord, resultColor);
-				return resultColor;
+			
+				//resultColor.rgb = resultColor.rgb * _LightStrength;
+				half4 finalColor = half4(resultColor * _LightStrength, 1.0h);
+				UNITY_APPLY_FOG(i.fogCoord, finalColor);
+				return finalColor;
 			}
 			ENDCG
+		}
+
+		Pass
+		{
+			Tags { "LightMode" = "ShadowCaster" }
+			Fog { Mode Off }
+			ZWrite On
+			ZTest LEqual
+			Offset 1,1
+
+			CGPROGRAM
+			#include "XGame2.cginc"
+			#pragma vertex shadowVert
+			#pragma fragment shadowFrag
+			#pragma glsl_no_auto_normalization
+			#pragma multi_compile_shadowcaster
+			#pragma shader_feature _ALPHATEST_ON
+			#pragma skip_variants  LIGHTPROBE_SH SHADOWS_CUBE VERTEXLIGHT_ON LIGHTMAP_SHADOW_MIXING
+
+			uniform half _CutOff;
+			uniform sampler2D _MaskTex;
+			half4 shadowFrag(shadowV2f i) : SV_Target
+			{
+			#if _ALPHATEST_ON
+				half3 mask = tex2D(_MaskTex, i.uv);
+				clip(mask.g - _CutOff);
+			#endif
+				SHADOW_CASTER_FRAGMENT(i)
+			}
+			ENDCG
+
 		}
 	}
 }
