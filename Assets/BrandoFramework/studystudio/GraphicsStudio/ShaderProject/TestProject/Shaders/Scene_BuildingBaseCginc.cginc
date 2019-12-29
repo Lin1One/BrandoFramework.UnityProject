@@ -1,7 +1,8 @@
 #ifndef SCENEBUILDING_BASE_SHADER
 #define SCENEBUILDING_BASE_SHADER
 
-#include "Scene_BuildingLightingCginc.cginc"
+#include "Scene_BuildingFragData.cginc"
+#include "LightMapCginc.cginc"
 
 uniform half4 _EmssiveColor;
 uniform half _EmssiveScale;

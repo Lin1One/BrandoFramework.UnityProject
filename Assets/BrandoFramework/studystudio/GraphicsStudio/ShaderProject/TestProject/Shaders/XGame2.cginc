@@ -203,12 +203,7 @@ inline half BRDFSpecularTerm(half NoL, half NoH, half HoL, half roughness)
 	return specularTerm * NoL;
 }
 
-inline half3 CalcSpeculorColorFromMetalic(inout half3 albedo, half metalic)
-{
-	half tmp = 0.220916301;
-	half3 specColor = lerp(tmp.xxx, albedo, metalic);
-	return specColor;
-}
+
 
 inline half EnvBRDFApproxNonmetal(half Roughness, half NoV)
 {

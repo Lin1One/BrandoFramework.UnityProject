@@ -1,9 +1,5 @@
-#include "UnityCG.cginc"
-#include "Lighting.cginc"
-#include "AutoLight.cginc"
-#include "UnityStandardCore.cginc"
-#include "XGame2.cginc"
 #include "LightMapCginc.cginc"
+#include "StandardLighting.cginc"
 
 uniform half _Metalic;
 
