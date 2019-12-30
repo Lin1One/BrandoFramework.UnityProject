@@ -1,9 +1,5 @@
-
 #ifndef _LIGHTMAP_CGINC
 #define _LIGHTMAP_CGINC
-#include "UnityCG.cginc"
-#include "Lighting.cginc"
-#include "AutoLight.cginc"
 
 uniform float4 _ShadowColor;
 uniform float4 _LightMapWeight;
