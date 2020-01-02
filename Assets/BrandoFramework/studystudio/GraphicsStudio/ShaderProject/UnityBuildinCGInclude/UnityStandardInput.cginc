@@ -57,10 +57,10 @@ struct VertexInput
     float4 vertex   : POSITION;//位置坐标
     half3 normal    : NORMAL;//法线向量
     float2 uv0      : TEXCOORD0;//一级纹理坐标
-    float2 uv1      : TEXCOORD1;//二级纹理坐标
+    float2 uv1      : TEXCOORD1;//二级纹理坐标 静态光照UV（Bake GI）
 //若DYNAMICLIGHTMAP_ON或者UNITY_PASS_META选项为开，则还定义一个三级纹理
 #if defined(DYNAMICLIGHTMAP_ON) || defined(UNITY_PASS_META)
-    float2 uv2      : TEXCOORD2;//三级纹理
+    float2 uv2      : TEXCOORD2;//三级纹理 动态光照UV（Precompute Realtime GI）
 #endif
 #ifdef _TANGENT_TO_WORLD
     half4 tangent   : TANGENT;//切线向量
@@ -116,6 +116,8 @@ half Alpha(float2 uv)
 #endif
 }
 
+// 遮罩的意义是利用Occlusion Map以及Occlusion Strength（SM3.0）来控制物体表面接收间接光照的强度。
+// Occlusion Map一般是一张灰度图
 half Occlusion(float2 uv)
 {
 #if (SHADER_TARGET < 30)

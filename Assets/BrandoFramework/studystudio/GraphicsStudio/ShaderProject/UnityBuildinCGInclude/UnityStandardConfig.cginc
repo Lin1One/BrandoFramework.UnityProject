@@ -18,7 +18,9 @@
 #endif
 
 // "platform caps" defines: they are controlled from TierSettings (Editor will determine values and pass them to compiler)
+// 指定反射探针盒投影是否启用。
 // UNITY_SPECCUBE_BOX_PROJECTION:                   TierSettings.reflectionProbeBoxProjection
+// 指定反射探针混合是否启用。
 // UNITY_SPECCUBE_BLENDING:                         TierSettings.reflectionProbeBlending
 // UNITY_ENABLE_DETAIL_NORMALMAP:                   TierSettings.detailNormalMap
 // UNITY_USE_DITHER_MASK_FOR_ALPHABLENDED_SHADOWS:  TierSettings.semitransparentShadows

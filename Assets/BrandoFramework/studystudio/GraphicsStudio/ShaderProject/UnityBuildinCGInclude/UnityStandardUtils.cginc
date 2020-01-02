@@ -8,11 +8,13 @@
 
 half SpecularStrength(half3 specular)
 {
+    //返回镜面反射颜色的R通道。
     #if (SHADER_TARGET < 30)
         // SM2.0: instruction count limitation
         // SM2.0: simplified SpecularStrength
         return specular.r; // Red channel - because most metals are either monocrhome or with redish/yellowish tint
     #else
+    //返回镜面反射颜色RGB三个通道中最大的通道值。
         return max (max (specular.r, specular.g), specular.b);
     #endif
 }

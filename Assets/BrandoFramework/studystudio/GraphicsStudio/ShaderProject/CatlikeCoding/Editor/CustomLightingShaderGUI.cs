@@ -99,6 +99,7 @@ public class CustomLightingShaderGUI : ShaderGUI
         DoMetallic();
         DoSmoothness();
         DoNormals();
+        DoParallax();
         DoOcclusion();
         DoEmission();
         DoDetailMask();
@@ -169,6 +170,18 @@ public class CustomLightingShaderGUI : ShaderGUI
         if (EditorGUI.EndChangeCheck())
         {
             SetKeyword("_NORMAL_MAP", map.textureValue);
+        }
+    }
+
+    void DoParallax()
+    {
+        MaterialProperty map = FindProperty("_ParallaxMap");
+        EditorGUI.BeginChangeCheck();
+        editor.TexturePropertySingleLine(MakeLabel(map, "Parallax (G)"), map,
+            map.textureValue ? FindProperty("_ParallaxStrength") : null);
+        if (EditorGUI.EndChangeCheck())
+        {
+            SetKeyword("_PARALLAX_MAP", map.textureValue);
         }
     }
 

@@ -240,6 +240,7 @@ inline float3 WorldSpaceViewDir( in float4 localPos )
 }
 
 // Computes object space view direction
+//将相机位置转换到对象空间，减去所提供的顶点位置，得到定义在对象空间中的顶点指向相机的向量
 inline float3 ObjSpaceViewDir( in float4 v )
 {
     float3 objSpaceCameraPos = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos.xyz, 1)).xyz;
