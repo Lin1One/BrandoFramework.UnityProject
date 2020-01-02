@@ -1,6 +1,8 @@
 ﻿#ifndef STANDARD_VERT
 #define STANDARD_VERT
 
+#include "UnityStandardCore.cginc"
+
 sampler2D _NormalMap;
 struct vertexOutput
 {
