@@ -153,6 +153,7 @@ inline float3 UnityObjectToViewPos( in float3 pos )
 {
     return mul(UNITY_MATRIX_V, mul(unity_ObjectToWorld, float4(pos, 1.0))).xyz;
 }
+//将一个点从物体空间转化到视口空间
 inline float3 UnityObjectToViewPos(float4 pos) // overload for float4; avoids "implicit truncation" warning for existing shaders
 {
     return UnityObjectToViewPos(pos.xyz);
@@ -204,6 +205,8 @@ inline float3 UnityWorldSpaceLightDir( in float3 worldPos )
 
 // Computes world space light direction, from object space position
 // *Legacy* Please use UnityWorldSpaceLightDir instead
+// 仅用于前向渲染中（ForwardBase）,输入一个模型空间中的顶点位置，
+// 返回世界空间中从该点到光源的光照方向，没有被归一化
 inline float3 WorldSpaceLightDir( in float4 localPos )
 {
     float3 worldPos = mul(unity_ObjectToWorld, localPos).xyz;
@@ -211,6 +214,7 @@ inline float3 WorldSpaceLightDir( in float4 localPos )
 }
 
 // Computes object space light direction
+//从给定物体空间顶点位置，计算到光的世界空间方向(非标准化)
 inline float3 ObjSpaceLightDir( in float4 v )
 {
     float3 objSpaceLightPos = mul(unity_WorldToObject, _WorldSpaceLightPos0).xyz;
@@ -233,6 +237,7 @@ inline float3 UnityWorldSpaceViewDir( in float3 worldPos )
 
 // Computes world space view direction, from object space position
 // *Legacy* Please use UnityWorldSpaceViewDir instead
+//输入一个模型空间中的顶点位置，返回世界空间中从该点到摄像机的观察方向
 inline float3 WorldSpaceViewDir( in float4 localPos )
 {
     float3 worldPos = mul(unity_ObjectToWorld, localPos).xyz;
@@ -240,7 +245,7 @@ inline float3 WorldSpaceViewDir( in float4 localPos )
 }
 
 // Computes object space view direction
-//将相机位置转换到对象空间，减去所提供的顶点位置，得到定义在对象空间中的顶点指向相机的向量
+//输入一个模型空间中的顶点位置，返回模型空间中从该点到摄像机的观察方向
 inline float3 ObjSpaceViewDir( in float4 v )
 {
     float3 objSpaceCameraPos = mul(unity_WorldToObject, float4(_WorldSpaceCameraPos.xyz, 1)).xyz;
@@ -333,6 +338,7 @@ float3 ShadeVertexLightsFull (float4 vertex, float3 normal, int lightCount, bool
     return lightColor;
 }
 
+//从四个顶点光源和环境中计算照明，给定对象空间位置和法线
 float3 ShadeVertexLights (float4 vertex, float3 normal)
 {
     return ShadeVertexLightsFull (vertex, normal, 4, false);
@@ -484,6 +490,7 @@ inline fixed4 VertexLight( v2f_vertex_lit i, sampler2D mainTex )
 
 
 // Calculates UV offset for parallax bump mapping
+// 计算视差映射的UV偏移量
 inline float2 ParallaxOffset( half h, half height, half3 viewDir )
 {
     h = h * height - height/2.0;
@@ -493,6 +500,7 @@ inline float2 ParallaxOffset( half h, half height, half3 viewDir )
 }
 
 // Converts color to luminance (grayscale)
+//转化颜色变为亮度（灰度）
 inline half Luminance(half3 rgb)
 {
     return dot(rgb, unity_ColorSpaceLuminance.rgb);
@@ -576,6 +584,7 @@ inline half3 DecodeLightmap( fixed4 color, half4 decodeInstructions)
 
 half4 unity_Lightmap_HDR;
 
+//从Unity lightmap (RGBM或dLDR,依赖于平台)解码颜色
 inline half3 DecodeLightmap( fixed4 color )
 {
     return DecodeLightmap( color, unity_Lightmap_HDR );
@@ -613,6 +622,7 @@ inline half3 DecodeDirectionalLightmap (half3 color, fixed4 dirTex, half3 normal
 }
 
 // Encoding/decoding [0..1) floats into 8 bit/channel RGBA. Note that 1.0 will not be encoded properly.
+// 编码[0,1]范围float数到8 bit/channel 的RGBA颜色，用于低精度渲染目标的存储
 inline float4 EncodeFloatRGBA( float v )
 {
     float4 kEncodeMul = float4(1.0, 255.0, 65025.0, 16581375.0);
@@ -622,6 +632,7 @@ inline float4 EncodeFloatRGBA( float v )
     enc -= enc.yzww * kEncodeBit;
     return enc;
 }
+//将RGBA颜色转译为float
 inline float DecodeFloatRGBA( float4 enc )
 {
     float4 kDecodeDot = float4(1.0, 1/255.0, 1/65025.0, 1/16581375.0);
@@ -629,6 +640,7 @@ inline float DecodeFloatRGBA( float4 enc )
 }
 
 // Encoding/decoding [0..1) floats into 8 bit/channel RG. Note that 1.0 will not be encoded properly.
+// 将[0,1]范围内的float转化为float2
 inline float2 EncodeFloatRG( float v )
 {
     float2 kEncodeMul = float2(1.0, 255.0);
@@ -638,6 +650,7 @@ inline float2 EncodeFloatRG( float v )
     enc.x -= enc.y * kEncodeBit;
     return enc;
 }
+//解码一个预先编码的RG浮点数
 inline float DecodeFloatRG( float2 enc )
 {
     float2 kDecodeDot = float2(1.0, 1/255.0);
@@ -646,6 +659,7 @@ inline float DecodeFloatRG( float2 enc )
 
 
 // Encoding/decoding view space normals into 2D 0..1 vector
+// 将视图空间法线编码为两个0-1范围的数字
 inline float2 EncodeViewNormalStereo( float3 n )
 {
     float kScale = 1.7777;
@@ -655,6 +669,8 @@ inline float2 EncodeViewNormalStereo( float3 n )
     enc = enc*0.5+0.5;
     return enc;
 }
+
+//从enc4.xy中解码视图空间法线
 inline float3 DecodeViewNormalStereo( float4 enc4 )
 {
     float kScale = 1.7777;
@@ -824,6 +840,8 @@ inline float4 ComputeNonStereoScreenPos(float4 pos) {
     return o;
 }
 
+//计算纹理坐标来做一个屏幕空间的纹理样本。
+// 输入是裁切空间位置。
 inline float4 ComputeScreenPos(float4 pos) {
     float4 o = ComputeNonStereoScreenPos(pos);
 #if defined(UNITY_SINGLE_PASS_STEREO)
@@ -832,6 +850,8 @@ inline float4 ComputeScreenPos(float4 pos) {
     return o;
 }
 
+//计算纹理坐标，以采样一个GrabPass文本。
+// 输入是剪辑空间位置
 inline float4 ComputeGrabScreenPos (float4 pos) {
     #if UNITY_UV_STARTS_AT_TOP
     float scale = -1.0;
@@ -922,9 +942,8 @@ float4 UnityClipSpaceShadowCasterPos(float3 vertex, float3 normal)
     return UnityClipSpaceShadowCasterPos(float4(vertex, 1), normal);
 }
 
-
+//线性阴影偏差
 float4 UnityApplyLinearShadowBias(float4 clipPos)
-
 {
     // For point lights that support depth cube map, the bias is applied in the fragment shader sampling the shadow map.
     // This is because the legacy behaviour for point light shadow map cannot be implemented by offseting the vertex position
@@ -951,12 +970,19 @@ float4 UnityApplyLinearShadowBias(float4 clipPos)
 
 #if defined(SHADOWS_CUBE) && !defined(SHADOWS_CUBE_IN_DEPTH_TEX)
     // Rendering into point light (cubemap) shadows
-    #define V2F_SHADOW_CASTER_NOPOS float3 vec : TEXCOORD0;
-    #define TRANSFER_SHADOW_CASTER_NOPOS_LEGACY(o,opos) o.vec = mul(unity_ObjectToWorld, v.vertex).xyz - _LightPositionRange.xyz; opos = UnityObjectToClipPos(v.vertex);
-    #define TRANSFER_SHADOW_CASTER_NOPOS(o,opos) o.vec = mul(unity_ObjectToWorld, v.vertex).xyz - _LightPositionRange.xyz; opos = UnityObjectToClipPos(v.vertex);
-    #define SHADOW_CASTER_FRAGMENT(i) return UnityEncodeCubeShadowDepth ((length(i.vec) + unity_LightShadowBias.x) * _LightPositionRange.w);
+    #define V2F_SHADOW_CASTER_NOPOS 
+        float3 vec : TEXCOORD0;
+    #define TRANSFER_SHADOW_CASTER_NOPOS_LEGACY(o,opos) 
+        o.vec = mul(unity_ObjectToWorld, v.vertex).xyz - _LightPositionRange.xyz; 
+        opos = UnityObjectToClipPos(v.vertex);
+    #define TRANSFER_SHADOW_CASTER_NOPOS(o,opos) 
+        o.vec = mul(unity_ObjectToWorld, v.vertex).xyz - _LightPositionRange.xyz; 
+        opos = UnityObjectToClipPos(v.vertex);
+    #define SHADOW_CASTER_FRAGMENT(i) 
+        return UnityEncodeCubeShadowDepth ((length(i.vec) + unity_LightShadowBias.x) * _LightPositionRange.w);
 
 #else
+    //定向或聚光阴影渲染
     // Rendering into directional or spot light shadows
     #define V2F_SHADOW_CASTER_NOPOS
     // Let embedding code know that V2F_SHADOW_CASTER_NOPOS is empty; so that it can workaround
@@ -968,20 +994,28 @@ float4 UnityApplyLinearShadowBias(float4 clipPos)
     #define TRANSFER_SHADOW_CASTER_NOPOS(o,opos) \
         opos = UnityClipSpaceShadowCasterPos(v.vertex, v.normal); \
         opos = UnityApplyLinearShadowBias(opos);
-    #define SHADOW_CASTER_FRAGMENT(i) return 0;
+    #define SHADOW_CASTER_FRAGMENT(i) 
+        return 0;
 #endif
 
 // Declare all data needed for shadow caster pass output (any shadow directions/depths/distances as needed),
 // plus clip space position.
-#define V2F_SHADOW_CASTER V2F_SHADOW_CASTER_NOPOS UNITY_POSITION(pos)
+// 声明阴影投射器通过输出所需的所有数据（所需的任何阴影方向/深度/距离），
+// 以及剪辑空间位置。
+#define V2F_SHADOW_CASTER 
+    V2F_SHADOW_CASTER_NOPOS 
+    UNITY_POSITION(pos)
 
 // Vertex shader part, with support for normal offset shadows. Requires
 // position and normal to be present in the vertex input.
-#define TRANSFER_SHADOW_CASTER_NORMALOFFSET(o) TRANSFER_SHADOW_CASTER_NOPOS(o,o.pos)
+#define TRANSFER_SHADOW_CASTER_NORMALOFFSET(o) 
+    TRANSFER_SHADOW_CASTER_NOPOS(o,o.pos)
 
 // Vertex shader part, legacy. No support for normal offset shadows - because
 // that would require vertex normals, which might not be present in user-written shaders.
-#define TRANSFER_SHADOW_CASTER(o) TRANSFER_SHADOW_CASTER_NOPOS_LEGACY(o,o.pos)
+// 顶点着色器部分，旧版。 不支持法线偏移阴影-因为这将需要顶点法线，在用户编写的着色器中可能不存在。
+#define TRANSFER_SHADOW_CASTER(o) 
+    TRANSFER_SHADOW_CASTER_NOPOS_LEGACY(o,o.pos)
 
 
 // ------------------------------------------------------------------
@@ -1062,7 +1096,8 @@ float4 UnityApplyLinearShadowBias(float4 clipPos)
         // 移动平台和Shader Model 2.0：计算每顶点的雾效因子
         // mobile or SM2.0: calculate fog factor per-vertex
         #define UNITY_TRANSFER_FOG(o,outpos) 
-            UNITY_CALC_FOG_FACTOR((outpos).z); o.fogCoord.x = unityFogFactor
+            UNITY_CALC_FOG_FACTOR((outpos).z); 
+            o.fogCoord.x = unityFogFactor
         #define UNITY_TRANSFER_FOG_COMBINED_WITH_TSPACE(o,outpos) UNITY_CALC_FOG_FACTOR((outpos).z); o.tSpace1.y = tangentSign; o.tSpace2.y = unityFogFactor
         #define UNITY_TRANSFER_FOG_COMBINED_WITH_WORLD_POS(o,outpos) UNITY_CALC_FOG_FACTOR((outpos).z); o.worldPos.w = unityFogFactor
         #define UNITY_TRANSFER_FOG_COMBINED_WITH_EYE_VEC(o,outpos) UNITY_CALC_FOG_FACTOR((outpos).z); o.eyeVec.w = unityFogFactor

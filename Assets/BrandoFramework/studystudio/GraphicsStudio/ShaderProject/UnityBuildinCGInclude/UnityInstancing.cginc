@@ -315,7 +315,9 @@
     {
         return UnityObjectToClipPosInstanced(pos.xyz);
     }
-    #define UnityObjectToClipPos UnityObjectToClipPosInstanced
+    //将一个点从物体空间转化到摄像机裁剪空间的坐标
+    #define UnityObjectToClipPos 
+        UnityObjectToClipPosInstanced
 
 #else // UNITY_INSTANCING_ENABLED
 
