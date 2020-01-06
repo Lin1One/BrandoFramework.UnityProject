@@ -86,6 +86,7 @@ inline void ResetUnityGI(out UnityGI outGI)
 }
 
 // Unity的全局光照Base版
+// 函数依次实现的是阴影遮罩，SH计算（非静态GI非动态GI），静态GI，动态GI。
 inline UnityGI UnityGI_Base(UnityGIInput data, half occlusion, half3 normalWorld)
 {
     //【1】实例化一个UnityGI类型的结构体
@@ -202,11 +203,13 @@ inline half3 UnityGI_IndirectSpecular(UnityGIInput data, half occlusion, half3 n
     return UnityGI_IndirectSpecular(data, occlusion, glossIn);
 }
 
+//无反射版本
 inline UnityGI UnityGlobalIllumination (UnityGIInput data, half occlusion, half3 normalWorld)
 {
     return UnityGI_Base(data, occlusion, normalWorld);
 }
 
+//环境反射版本
 inline UnityGI UnityGlobalIllumination (UnityGIInput data, half occlusion, half3 normalWorld, Unity_GlossyEnvironmentData glossIn)
 {
     UnityGI o_gi = UnityGI_Base(data, occlusion, normalWorld);
@@ -216,6 +219,7 @@ inline UnityGI UnityGlobalIllumination (UnityGIInput data, half occlusion, half3
 
 //
 // Old UnityGlobalIllumination signatures. Kept only for backward compatibility and will be removed soon
+// 旧 API ，将弃用
 //
 
 inline UnityGI UnityGlobalIllumination (UnityGIInput data, half occlusion, half smoothness, half3 normalWorld, bool reflections)

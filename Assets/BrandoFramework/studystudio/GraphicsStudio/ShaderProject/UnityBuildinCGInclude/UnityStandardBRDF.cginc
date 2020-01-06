@@ -9,6 +9,7 @@
 // Helper to convert smoothness to roughness
 //-----------------------------------------------------------------------------
 
+//用于将感性粗糙度计算为学术意义上的粗糙度
 float PerceptualRoughnessToRoughness(float perceptualRoughness)
 {
     return perceptualRoughness * perceptualRoughness;
@@ -27,6 +28,7 @@ half SmoothnessToRoughness(half smoothness)
 }
 
 //由光滑度获得粗糙度
+//用于计算感性粗糙度，smoothness即材质的光滑度贴图/参数。
 float SmoothnessToPerceptualRoughness(float smoothness)
 {
     return (1 - smoothness);
@@ -77,12 +79,22 @@ inline half4 Pow5 (half4 x)
     return x*x * x*x * x;
 }
 
+// ------------------------------------ 菲涅尔反射F -------------------------------------
 //Fresnel Schlicks近似式
+// 菲涅尔反射F
+// Schlick菲涅尔反射的公式为：
+// F=F0+(1-F0)*(1-（H*V))^5
+// F0：光线垂直入射时的表面反射率
+// H：半角向量
+// V：视线
+// 此处输入的参数cosA，为saturate(dot(H,V))的值，也可能是abs(dot(H,V))。
 inline half3 FresnelTerm (half3 F0, half cosA)
 {
     half t = Pow5 (1 - cosA);   // ala Schlick interpoliation
     return F0 + (1-F0) * t;
 }
+
+//F0到F90之间的线性插值
 inline half3 FresnelLerp (half3 F0, half3 F90, half cosA)
 {
     half t = Pow5 (1 - cosA);   // ala Schlick interpoliation
@@ -107,6 +119,9 @@ half DisneyDiffuse(half NdotV, half NdotL, half LdotH, half perceptualRoughness)
     return lightScatter * viewScatter;
 }
 
+
+// ------------------------------------ 遮挡可见性项V -------------------------------------
+
 // NOTE: Visibility term here is the full form from Torrance-Sparrow model, it includes Geometric term: V = G / (N.L * N.V)
 // This way it is easier to swap Geometric terms and more room for optimizations (except maybe in case of CookTorrance geom term)
 
@@ -121,14 +136,23 @@ inline half SmithVisibilityTerm (half NdotL, half NdotV, half k)
 
 // Smith-Schlick derived for Beckmann
 //Schlick-Beckman GSF
+// SmithBeckmann 公式
+//SmithBeckmannVisibilityTerm函数计算了k的值，并调用SmithVisibilityTerm函数进一步计算
+//SmithBeckmann公式的分子在SmithVisibilityTerm中的 gL&gV 计算中与
+// V=G/(4(n⋅l)(n⋅v))中的(n⋅l)(n⋅v)消项。
 inline half SmithBeckmannVisibilityTerm (half NdotL, half NdotV, half roughness)
 {
     half c = 0.797884560802865h; // c = sqrt(2 / Pi)
     half k = roughness * c;
+    // *0.25是先抵消V=G/(4(n⋅l)(n⋅v))中的4。
     return SmithVisibilityTerm (NdotL, NdotV, k) * 0.25f; // * 0.25 is the 1/4 of the visibility term
 }
 
 // Ref: http://jcgt.org/published/0003/02/03/paper.pdf
+// 遮挡可见性项V,在Unity中V项即是公式中的G项,为了简化运算，使得V=G/(4(n⋅l)(n⋅v))
+// Torrance-Sparrow 微表面模型的公式：f(l,v)= D(h) F(v,h) G(l,v,h)/(4(n⋅l)(n⋅v))
+//Smith-Joint GGX 公式
+// Smith-Joint的近似公式（UE4使用了同样的公式）
 inline float SmithJointGGXVisibilityTerm (float NdotL, float NdotV, float roughness)
 {
 #if 0
@@ -162,11 +186,13 @@ inline float SmithJointGGXVisibilityTerm (float NdotL, float NdotV, float roughn
 #endif
 }
 
+// ------------------------------------ 微表面分布项D -------------------------------------
 inline float GGXTerm (float NdotH, float roughness)
 {
     //此功能不适合在移动设备上运行，因此 ε 小于 0.5
     float a2 = roughness * roughness;
     float d = (NdotH * a2 - NdotH) * NdotH + 1.0f; // 2 mad
+    //UNITY_INV_PI =1 / UNITY_PI
     return UNITY_INV_PI * a2 / (d * d + 1e-7f); // This function is not intended to be running on Mobile,
                                             // therefore epsilon is smaller than what can be represented by half
 }
@@ -183,6 +209,7 @@ inline half PerceptualRoughnessToSpecPower (half perceptualRoughness)
 // BlinnPhong normalized as normal distribution function (NDF)
 // for use in micro-facet model: spec=D*G*F
 // eq. 19 in https://dl.dropboxusercontent.com/u/55891920/papers/mm_brdf.pdf
+// BlinnPhong的D项实现
 inline half NDFBlinnPhongNormalizedTerm (half NdotH, half n)
 {
     // norm = (n+2)/(2*pi)
@@ -229,7 +256,19 @@ inline float3 Unity_SafeNormalize(float3 inVec)
 // Main Physically Based BRDF
 // Derived from Disney work and based on Torrance-Sparrow micro-facet model
 // 源自迪士尼PBR 工作流，基于Torrance-Sparrow微面模型
-//
+
+// Torrance-Sparrow 微表面模型的公式：
+// f(l,v)=D(h)F(v,h)G(l,v,h)/(4(n⋅l)(n⋅v))
+// BRDF公式：
+// BRDF = kD / pi + kS * (D * V * F) / 4
+
+// D——微表面分布项
+// V——遮挡可见性项
+// F——菲涅尔反射项
+// kD——漫反射系数
+// kS——镜面反射系数
+// Note：V(Visibility)项即G(l,v,h)/(4(n⋅l)(n⋅v))的集合。
+
 //   BRDF = kD / pi + kS * (D * V * F) / 4
 //   I = BRDF * NdotL
 //
@@ -248,7 +287,9 @@ half4 BRDF1_Unity_PBS (
     UnityLight light,   //Unity中光源参数
     UnityIndirect gi)   //漫反射颜色diffuse和镜面反射颜色specular的光线反射结构体，表示间接光照信息
 {
+    //1.计算感性粗糙度
     float perceptualRoughness = SmoothnessToPerceptualRoughness (smoothness);
+    //2.计算半角向量。
     float3 halfDir = Unity_SafeNormalize (float3(light.dir) + viewDir);
 
 // NdotV should not be negative for visible pixels, but it can happen due to perspective projection and normal mapping
@@ -262,7 +303,7 @@ half4 BRDF1_Unity_PBS (
 // 但此操作添加少量的ALU（逻辑运算单元），用户可能不想要它。 
 // 另一种方法是简单地使用NdotV的绝对值（不太正确，但也可以）。
 // 按照define来控制。 如果ALU在您的平台上很重要，请将其设置为0。
-// 对于具有 SmithJoint 可见性功能的GGX，此校正很有趣，因为在这种情况下，由于粗糙表面的高光边缘，伪像更加可见
+// 这种校正对于使用Smith-Joint GGX能见度函数是很有用的，因为会导致粗糙表面的高光边缘异常会更明显。
 // 编辑：默认情况下，由于与SpeedTree中使用的双面照明不兼容，因此默认情况下暂时禁用此代码。
 #define UNITY_HANDLE_CORRECTLY_NEGATIVE_NDOTV 0
 
@@ -279,15 +320,20 @@ half4 BRDF1_Unity_PBS (
     half nv = abs(dot(normal, viewDir));    // This abs allow to limit artifact
 #endif
 
+    //1.计算NdotL/NdotH/LdotV/LdotH用于后续计算
     float nl = saturate(dot(normal, light.dir));
     float nh = saturate(dot(normal, halfDir));
     half lv = saturate(dot(light.dir, viewDir));
     half lh = saturate(dot(light.dir, halfDir));
 
     // Diffuse term
-    // 漫反射项
+    // 2.漫反射项
+    // Unity中的diffuseTerm 计算，并没有除π，反而乘了NdotL
+    // BRDF = kD / pi + kS * (D * V * F) / 4
     half diffuseTerm = DisneyDiffuse(nv, nl, lh, perceptualRoughness) * nl;
 
+
+    //Part3 1.计算高光项的一部分，菲涅尔项最后再添加。如果镜面反射高光关闭，那么镜面反射项为0。
     // 镜面反射项
     // Specular term
     // HACK: theoretically we should divide diffuseTerm by Pi and not multiply specularTerm!
@@ -298,6 +344,8 @@ half4 BRDF1_Unity_PBS (
      //1）将使着色器看起来比旧版着色器暗得多
      //2）在引擎方面，“非重要”灯在注入周围环境SH的情况下也必须由Pi划分
      // roughness 平方
+
+     //3.计算粗糙度，使用PerceptualRoughnessToRoughness函数将感性粗糙度转换到学术意义上的粗糙度
     float roughness = PerceptualRoughnessToRoughness(perceptualRoughness);
 #if UNITY_BRDF_GGX
     // GGX with roughtness to 0 would mean no specular at all, using max(roughness, 0.002) here to match HDrenderloop roughtness remapping.
@@ -308,6 +356,7 @@ half4 BRDF1_Unity_PBS (
     float D = GGXTerm (nh, roughness);
 #else
     // Legacy
+    // V项和D项使用Smith-Beckmann和Blinn-Phong公式实现。
     half V = SmithBeckmannVisibilityTerm (nl, nv, roughness);
     half D = NDFBlinnPhongNormalizedTerm (nh, PerceptualRoughnessToSpecPower(perceptualRoughness));
 #endif
@@ -316,6 +365,7 @@ half4 BRDF1_Unity_PBS (
     // Torrance-Sparrow model, Fresnel is applied later
     float specularTerm = V*D * UNITY_PI; 
 
+//2.如果开启了颜色空间GAMMA校正，那么这里会进行一次计算。
 #ifdef UNITY_COLORSPACE_GAMMA
         specularTerm = sqrt(max(1e-4h, specularTerm));
 #endif
@@ -326,6 +376,8 @@ half4 BRDF1_Unity_PBS (
     specularTerm = 0.0;
 #endif
 
+//3.计算surfaceReduction参数。Unity在注释中给出了它的公式,
+//  但并没有查到计算他的目的，在这里它用于间接光照的计算。
     // surfaceReduction = Int D(NdotH) * NdotH * Id(NdotL>0) dH = 1/(roughness^2+1)
     half surfaceReduction;
 #ifdef UNITY_COLORSPACE_GAMMA
@@ -334,10 +386,16 @@ half4 BRDF1_Unity_PBS (
         surfaceReduction = 1.0 / (roughness*roughness + 1.0);           // fade \in [0.5;1]
 #endif
 
+    //4.为了提供真正的Lambert照明，如果SpecColor的各个通道值均为0，那么就是全漫反射。
     // To provide true Lambert lighting, we need to be able to kill specular completely.
     specularTerm *= any(specColor) ? 1.0 : 0.0;
 
     half grazingTerm = saturate(smoothness + (1-oneMinusReflectivity));
+
+    //5.最后的color输出，分为三个部分：漫反射+镜面反射+表面衰减。
+    // 漫反射：输入的漫反射颜色（纹理）*GI的漫反射颜色（间接光照）+输入的漫反射颜色（纹理）*光照颜色（直接光照）*漫反射项
+    // 镜面反射：镜面反射项（V项和D项）*光照颜色（直接光照）*菲涅尔项（F项）
+    // 表面衰减：表面衰减系数*GI镜面反射（间接光照）*菲涅尔插值
     half3 color =   diffColor * (gi.diffuse + light.color * diffuseTerm) + 
                     specularTerm * light.color * FresnelTerm (specColor, lh) + 
                     surfaceReduction * gi.specular * FresnelLerp (specColor, grazingTerm, nv);

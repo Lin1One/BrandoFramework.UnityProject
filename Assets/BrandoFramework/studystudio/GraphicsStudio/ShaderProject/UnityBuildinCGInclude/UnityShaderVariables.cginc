@@ -30,6 +30,7 @@
 #define UNITY_MATRIX_VP unity_MatrixVP
 #define UNITY_MATRIX_M unity_ObjectToWorld
 
+//环境光颜色
 #define UNITY_LIGHTMODEL_AMBIENT (glstate_lightmodel_ambient * 2)
 
 // ----------------------------------------------------------------------------
@@ -43,19 +44,21 @@ CBUFFER_START(UnityPerCamera)
     float4 unity_DeltaTime; // dt, 1/dt, smoothdt, 1/smoothdt
 
 #if !defined(USING_STEREO_MATRICES)
-    float3 _WorldSpaceCameraPos;
+    float3 _WorldSpaceCameraPos;//世界空间相机坐标
 #endif
 
-    // x = 1 or -1 (-1 if projection is flipped)
-    // y = near plane
-    // z = far plane
-    // w = 1/far plane
+    //投影参数
+    // x = 1,如果投影翻转则x = -1 || x = 1 or -1 (-1 if projection is flipped) 
+    // camera近裁剪平面 || y = near plane
+    // camera远裁剪平面 || z = far plane
+    // 1/远裁剪平面 || w = 1/far plane
     float4 _ProjectionParams;
 
-    // x = width
-    // y = height
-    // z = 1 + 1.0/width
-    // w = 1 + 1.0/height
+    // x = width 屏幕宽度
+    // y = height 屏幕高度
+    // z = 1 + 1.0/width 1 + 1.0/屏幕宽度
+    // w = 1 + 1.0/height 1 + 1.0/height屏幕高度
+    // 指像素数
     float4 _ScreenParams;
 
     // Values used to linearize the Z buffer (http://www.humus.name/temp/Linearize%20depth.txt)
@@ -70,10 +73,10 @@ CBUFFER_START(UnityPerCamera)
     // w = 1/far
     float4 _ZBufferParams;
 
-    // x = orthographic camera's width
-    // y = orthographic camera's height
+    // x = 正交相机的宽度 orthographic camera's width 
+    // y = 正交相机的高度 orthographic camera's height
     // z = unused
-    // w = 1.0 if camera is ortho, 0.0 if perspective
+    // w = 在相机为正交投影时为1.0，透视投影时为0.0.|| 1.0 if camera is ortho, 0.0 if perspective
     float4 unity_OrthoParams;
 #if defined(STEREO_CUBEMAP_RENDER_ON)
     //x-component is the half stereo separation value, which a positive for right eye and negative for left eye. The y,z,w components are unused.
@@ -96,46 +99,52 @@ CBUFFER_START(UnityPerCameraRare)
 #endif
 CBUFFER_END
 
-
-
-// ----------------------------------------------------------------------------
+// ----------------------------------------光照参数------------------------------------
 
 CBUFFER_START(UnityLighting)
 
     #ifdef USING_DIRECTIONAL_LIGHT
-    half4 _WorldSpaceLightPos0;
+        half4 _WorldSpaceLightPos0;
     #else
-    float4 _WorldSpaceLightPos0;
+        float4 _WorldSpaceLightPos0;
     #endif
 
     // xyz = pos
     // w = 1/range 
     float4 _LightPositionRange; 
 
-    // for point light projection: 
+
+    // 点光源投射参数 for point light projection: 
     // x = zfar / (znear - zfar)
     // y = (znear * zfar) / (znear - zfar)
     // z= shadow bias
     // w= shadow scale bias
     float4 _LightProjectionParams; 
 
+    //世界空间四个顶点光源的position的x，y,z坐标，衰减
     float4 unity_4LightPosX0;
     float4 unity_4LightPosY0;
     float4 unity_4LightPosZ0;
     half4 unity_4LightAtten0;
 
+    //点光源的颜色
     half4 unity_LightColor[8];
 
-
+    // view space的点光源位置，其值为(position,1)。
+    //如果为directional light 则其值为方向(-direction,0)
     float4 unity_LightPosition[8]; // view-space vertex light positions (position,1), or (-direction,0) for directional lights.
+
     // x = cos(spotAngle/2) or -1 for non-spot
     // y = 1/cos(spotAngle/4) or 1 for non-spot
     // z = quadratic attenuation
     // w = range*range
     half4 unity_LightAtten[8];
+
+    //view space 的spot light的方向，如果无spot light则其值为(0,0,1,0)
     float4 unity_SpotDirection[8]; // view-space spot light directions, or (0,0,1,0) for non-spot
 
     // SH lighting environment
+    // 球谐光照参数
     half4 unity_SHAr;
     half4 unity_SHAg;
     half4 unity_SHAb;
@@ -154,7 +163,7 @@ CBUFFER_START(UnityLightingOld)
 CBUFFER_END
 
 
-// ----------------------------------------------------------------------------
+// -----------------------------------------阴影参数-----------------------------------
 
 CBUFFER_START(UnityShadows)
     float4 unity_ShadowSplitSpheres[4];
@@ -162,12 +171,13 @@ CBUFFER_START(UnityShadows)
     float4 unity_LightShadowBias;
     float4 _LightSplitsNear;
     float4 _LightSplitsFar;
+    // position点从世界坐标转到阴影空间，通常用来计算阴影坐标Shadow coordinate
     float4x4 unity_WorldToShadow[4];
     half4 _LightShadowData;                 //阴影数据
     float4 unity_ShadowFadeCenterAndType;
 CBUFFER_END
 
-// ----------------------------------------------------------------------------
+// ------------------------------------每次绘制参数----------------------------------------
 
 CBUFFER_START(UnityPerDraw)
     float4x4 unity_ObjectToWorld;
@@ -217,10 +227,10 @@ CBUFFER_START(UnityPerDrawRare)
 CBUFFER_END
 
 
-// ----------------------------------------------------------------------------
+// --------------------------------------- 每帧参数 -------------------------------------
 
 CBUFFER_START(UnityPerFrame)
-
+    //环境光颜色
     fixed4 glstate_lightmodel_ambient;
     fixed4 unity_AmbientSky;
     fixed4 unity_AmbientEquator;
@@ -272,10 +282,12 @@ CBUFFER_START(UnityLightmaps)
 CBUFFER_END
 
 
-// ----------------------------------------------------------------------------
+// ------------------------------------反射探针参数----------------------------------------
 // Reflection Probes
 
+//声明了一个TextureCube类型的对象。
 UNITY_DECLARE_TEXCUBE(unity_SpecCube0);
+//声明了一个TextureCube类型的对象（无Sampler）。
 UNITY_DECLARE_TEXCUBE_NOSAMPLER(unity_SpecCube1);
 
 CBUFFER_START(UnityReflectionProbes)

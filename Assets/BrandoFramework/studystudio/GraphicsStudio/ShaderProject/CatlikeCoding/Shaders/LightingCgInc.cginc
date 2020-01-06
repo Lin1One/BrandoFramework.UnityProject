@@ -22,6 +22,9 @@ sampler2D _MetallicMap;
 float _Metallic;
 float _Smoothness;
 
+sampler2D _ParallaxMap;
+float _ParallaxStrength;
+
 sampler2D _OcclusionMap;
 float _OcclusionStrength;
 
@@ -65,6 +68,10 @@ struct Interpolators {
 	#if defined(LIGHTMAP_ON)
 		float2 lightmapUV : TEXCOORD6;
 	#endif
+	#if defined(_PARALLAX_MAP)
+		float3 tangentViewDir : TEXCOORD8;
+	#endif
+
 };
 
 float GetDetailMask (Interpolators i) {
@@ -124,6 +131,40 @@ float GetSmoothness (Interpolators i) {
 		smoothness = tex2D(_MetallicMap, i.uv.xy).a;
 	#endif
 	return smoothness * _Smoothness;
+}
+
+float GetParallaxHeight (float2 uv) {
+	return tex2D(_ParallaxMap, uv).g;
+}
+
+float2 ParallaxOffset (float2 uv, float2 viewDir) {
+	float height = GetParallaxHeight(uv);
+	height -= 0.5;
+	height *= _ParallaxStrength;
+	return viewDir * height;
+}
+
+float2 ParallaxRaymarching (float2 uv, float2 viewDir) {
+	float2 uvOffset = 0;
+	return uvOffset;
+}
+
+void ApplyParallax (inout Interpolators i) {
+	#if defined(_PARALLAX_MAP)
+		i.tangentViewDir = normalize(i.tangentViewDir);
+		#if !defined(PARALLAX_OFFSET_LIMITING)
+			#if !defined(PARALLAX_BIAS)
+				#define PARALLAX_BIAS 0.42
+			#endif
+			i.tangentViewDir.xy /= (i.tangentViewDir.z + PARALLAX_BIAS);
+		#endif
+		#if !defined(PARALLAX_FUNCTION)
+			#define PARALLAX_FUNCTION ParallaxOffset
+		#endif
+		float2 uvOffset = PARALLAX_FUNCTION(i.uv.xy, i.tangentViewDir.xy);
+		i.uv.xy += uvOffset;
+		i.uv.zw += uvOffset * (_DetailTex_ST.xy / _MainTex_ST.xy);
+	#endif
 }
 
 float GetOcclusion (Interpolators i) {
@@ -190,6 +231,13 @@ Interpolators MyVertexProgram (VertexData v) {
 	UNITY_TRANSFER_SHADOW(i,v.uv1);
 
 	ComputeVertexLightColor(i);
+
+	#if defined (_PARALLAX_MAP)
+		float3x3 objectToTangent = float3x3(v.tangent.xyz,
+			cross(v.normal, v.tangent.xyz) * v.tangent.w,
+			v.normal);
+		i.tangentViewDir = mul(objectToTangent, ObjSpaceViewDir(v.vertex));
+	#endif
 	return i;
 }
 
@@ -347,6 +395,8 @@ struct FragmentOutput {
 };
 
 FragmentOutput MyFragmentProgram (Interpolators i) {
+	UNITY_SETUP_INSTANCE_ID(i);
+	ApplyParallax(i);
 	float alpha = GetAlpha(i);
 	#if defined(_RENDERING_CUTOUT)
 		clip(alpha - _Cutoff);

@@ -314,6 +314,7 @@ inline UnityGI FragmentGI (FragmentCommonData s, half occlusion, half4 i_ambient
         d.lightmapUV = 0;
     #endif
 
+    //反射探针的相关计算
     d.probeHDR[0] = unity_SpecCube0_HDR;
     d.probeHDR[1] = unity_SpecCube1_HDR;
     #if defined(UNITY_SPECCUBE_BLENDING) || defined(UNITY_SPECCUBE_BOX_PROJECTION)
@@ -330,6 +331,7 @@ inline UnityGI FragmentGI (FragmentCommonData s, half occlusion, half4 i_ambient
     //【3】根据填充好的UnityGIInput结构体对象，调用一下UnityGlobalIllumination函数
     if(reflections)
     {
+        //计算反射的环境数据，包括镜面照明和天空等
         Unity_GlossyEnvironmentData g = UnityGlossyEnvironmentSetup(s.smoothness, -s.eyeVec, s.normalWorld, s.specColor);
         // Replace the reflUVW if it has been compute in Vertex shader. Note: the compiler will optimize the calcul in UnityGlossyEnvironmentSetup itself
         #if UNITY_STANDARD_SIMPLE
@@ -377,13 +379,13 @@ inline half4 VertexGIForward(VertexInput v, float3 posWorld, half3 normalWorld)
     half4 ambientOrLightmapUV = 0;
     //【2】对ambientOrLightmapUV变量的四个分量赋值
     // Static lightmaps
-    #ifdef LIGHTMAP_ON
+    #ifdef LIGHTMAP_ON //烘焙GI（Bake GI）
         //【2-1】若没有定义LIGHTMAP_OFF（关闭光照贴图）宏，也就是此情况下启用静态的光照贴图，则计算对应的光照贴图坐标
         ambientOrLightmapUV.xy = v.uv1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
         ambientOrLightmapUV.zw = 0;
     // Sample light probe for Dynamic objects only (no static or dynamic lightmaps)
     // 不使用光照贴图，计算顶点光照颜色
-    #elif UNITY_SHOULD_SAMPLE_SH
+    #elif UNITY_SHOULD_SAMPLE_SH //SH(球谐函数) 在存在GI的情况下是不进行计算的
         #ifdef VERTEXLIGHT_ON
             // Approximated illumination from non-important point lights
             //在正向基础渲染通道中使用，根据4个不同的点光源计算出漫反射光照参数的rgb值
@@ -396,10 +398,11 @@ inline half4 VertexGIForward(VertexInput v, float3 posWorld, half3 normalWorld)
         ambientOrLightmapUV.rgb = ShadeSHPerVertex (normalWorld, ambientOrLightmapUV.rgb);
     #endif
 
-    #ifdef DYNAMICLIGHTMAP_ON
+    #ifdef DYNAMICLIGHTMAP_ON //预计算实时GI（PRGI，Precompute Realtime GI）
         ambientOrLightmapUV.zw = v.uv2.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
     #endif
-
+    //在启用光照贴图的情况下，其xyzw分量用来存储光照贴图的UV。
+    //在不启用光照贴图的情况下，其rgb(xyz)分量用来保存SH计算的颜色。
     return ambientOrLightmapUV;
 }
 
@@ -408,7 +411,7 @@ inline half4 VertexGIForward(VertexInput v, float3 posWorld, half3 normalWorld)
 // 基础前向渲染通道（方向光，自发光，LightMap）
 struct VertexOutputForwardBase
 {
-    UNITY_POSITION(pos);
+    UNITY_POSITION(pos);            //float4 pos : SV_POSITION
     float4 tex                            : TEXCOORD0;
     float4 eyeVec                         : TEXCOORD1;    // eyeVec.xyz | fogCoord
     float4 tangentToWorldAndPackedData[3] : TEXCOORD2;    // [3x3:tangentToWorld | 1x3:viewDirForParallax or worldPos]
@@ -420,8 +423,8 @@ struct VertexOutputForwardBase
     float3 posWorld                     : TEXCOORD8;
 #endif
 
-    UNITY_VERTEX_INPUT_INSTANCE_ID
-    UNITY_VERTEX_OUTPUT_STEREO
+    UNITY_VERTEX_INPUT_INSTANCE_ID      //为顶点实例化一个ID
+    UNITY_VERTEX_OUTPUT_STEREO          //声明该顶点是否位于视线域中,来判断这个顶点是否输出到片段着色器
 };
 
 //  用途：正向渲染基础通道的顶点着色函数
@@ -435,10 +438,14 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
     VertexOutputForwardBase o;
     //用Unity内置的宏初始化参数，将给定类型的名称变量初始化为零
     UNITY_INITIALIZE_OUTPUT(VertexOutputForwardBase, o);
-    UNITY_TRANSFER_INSTANCE_ID(v, o);
+    //o.instanceID = UNITY_GET_INSTANCE_ID(input)
+    UNITY_TRANSFER_INSTANCE_ID(v, o);   
     UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
 
     //【2】通过物体坐标系到世界坐标系的变换矩阵乘以物体的顶点位置,得到对象在世界坐标系中的位置
+    // 根据Shader Mode的不同来将其存储在posWorld（SM3.0）
+    // tangentToWorldAndPackedData[3]的w分量用来存储视差视线
+    // （SM2.0）中。tangentToWorldAndPackedData[3]的w分量存储世界坐标
     float4 posWorld = mul(unity_ObjectToWorld, v.vertex);
     #if UNITY_REQUIRE_FRAG_WORLDPOS
         #if UNITY_PACK_WORLDPOS_WITH_TANGENT
@@ -461,9 +468,8 @@ VertexOutputForwardBase vertForwardBase (VertexInput v)
     
     //【7】计算物体在世界空间中的法线坐标
     float3 normalWorld = UnityObjectToWorldNormal(v.normal);
-    //【8】进行世界空间中的切线相关参数的计算与赋值
+    //【8】进行世界空间中的切线相关参数的计算与赋值,切线空间变换到世界空间矩阵
     #ifdef _TANGENT_TO_WORLD
-        //若定义了_TANGENT_TO_WORLD
         float4 tangentWorld = float4(UnityObjectToWorldDir(v.tangent.xyz), v.tangent.w);
         float3x3 tangentToWorld = CreateTangentToWorldPerVertex(normalWorld, tangentWorld.xyz, tangentWorld.w);
         o.tangentToWorldAndPackedData[0].xyz = tangentToWorld[0];
@@ -501,7 +507,7 @@ half4 fragForwardBaseInternal (VertexOutputForwardBase i)
     UNITY_APPLY_DITHER_CROSSFADE(i.pos.xy);
     //定义并初始化类型为FragmentCommonData的变量s 
     FRAGMENT_SETUP(s)
-
+    //设置实例化数据（实例ID，变化矩阵）
     UNITY_SETUP_INSTANCE_ID(i);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i);
 
