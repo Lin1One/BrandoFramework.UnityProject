@@ -11,10 +11,20 @@
     #error "Please include UnityShaderUtilities.cginc first."
 #endif
 
-#if SHADER_TARGET >= 35 && (defined(SHADER_API_D3D11) || defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE) || defined(SHADER_API_XBOXONE) || defined(SHADER_API_PSSL) || defined(SHADER_API_VULKAN) || (defined(SHADER_API_METAL) && defined(UNITY_COMPILER_HLSLCC)))
+#if SHADER_TARGET >= 35 &&  
+    (
+        defined(SHADER_API_D3D11) || 
+        defined(SHADER_API_GLES3) || 
+        defined(SHADER_API_GLCORE) || 
+        defined(SHADER_API_XBOXONE) || 
+        defined(SHADER_API_PSSL) || 
+        defined(SHADER_API_VULKAN) || 
+        (defined(SHADER_API_METAL) && defined(UNITY_COMPILER_HLSLCC))
+    )
     #define UNITY_SUPPORT_INSTANCING
 #endif
 
+//Switch 支持 Instancing
 #if defined(SHADER_API_SWITCH)
     #define UNITY_SUPPORT_INSTANCING
 #endif
@@ -35,22 +45,37 @@
     #define UNITY_SUPPORT_STEREO_INSTANCING
 #endif
 
-#if defined(SHADER_API_D3D11) || defined(SHADER_API_GLCORE) || defined(SHADER_API_GLES3) || defined(SHADER_API_VULKAN) || defined(SHADER_API_XBOXONE) || defined(SHADER_API_PSSL) || defined(SHADER_API_METAL) && defined(UNITY_COMPILER_HLSLCC) || defined(SHADER_API_SWITCH)
-    #define UNITY_INSTANCING_AOS
+#if defined(SHADER_API_D3D11) || 
+    defined(SHADER_API_GLCORE) || 
+    defined(SHADER_API_GLES3) || 
+    defined(SHADER_API_VULKAN) || 
+    defined(SHADER_API_XBOXONE) || 
+    defined(SHADER_API_PSSL) || 
+    defined(SHADER_API_METAL) && 
+    defined(UNITY_COMPILER_HLSLCC) || 
+    defined(SHADER_API_SWITCH)
+        #define UNITY_INSTANCING_AOS
 #endif
 
 // These platforms support dynamically adjusting the instancing CB size according to the current batch.
-#if defined(SHADER_API_D3D11) || defined(SHADER_API_GLCORE) || defined(SHADER_API_GLES3) || defined(SHADER_API_METAL) || defined(SHADER_API_PSSL)
+//这些平台支持根据当前批次动态调整实例化CBuffer大小。
+#if defined(SHADER_API_D3D11) || 
+    defined(SHADER_API_GLCORE) || 
+    defined(SHADER_API_GLES3) || 
+    defined(SHADER_API_METAL) || 
+    defined(SHADER_API_PSSL)
     #define UNITY_INSTANCING_SUPPORT_FLEXIBLE_ARRAY_SIZE
 #endif
 
 // Switch shader compilation defines SHADER_API_GLCORE but in 2018.1 and below we don't support flexible arrays.
+//Switch 平台的着色器编译定义了SHADER_API_GLCORE，但在2018.1及以下版本中，我们不支持灵活的数组。
 #if defined(SHADER_API_SWITCH)
     #undef UNITY_INSTANCING_AOS
     #undef UNITY_INSTANCING_SUPPORT_FLEXIBLE_ARRAY_SIZE
 #endif
 
-#if defined(SHADER_TARGET_SURFACE_ANALYSIS) && defined(UNITY_SUPPORT_INSTANCING)
+#if defined(SHADER_TARGET_SURFACE_ANALYSIS) && 
+    defined(UNITY_SUPPORT_INSTANCING)
     #undef UNITY_SUPPORT_INSTANCING
 #endif
 
@@ -58,7 +83,7 @@
 // instancing paths
 // - UNITY_INSTANCING_ENABLED               Defined if instancing path is taken.
 // - UNITY_PROCEDURAL_INSTANCING_ENABLED    Defined if procedural instancing path is taken.
-// - UNITY_STEREO_INSTANCING_ENABLED        Defined if stereo instancing path is taken.
+// - UNITY_STEREO_INSTANCING_ENABLED        Defined if stereo instancing path is taken. XR 渲染实例化
 #if defined(UNITY_SUPPORT_INSTANCING) && defined(INSTANCING_ON)
     #define UNITY_INSTANCING_ENABLED
 #endif
@@ -69,8 +94,14 @@
     #define UNITY_STEREO_INSTANCING_ENABLED
 #endif
 
-#if defined(SHADER_API_GLES3) || defined(SHADER_API_GLCORE) || defined(SHADER_API_METAL) || defined(SHADER_API_VULKAN)
+//在常量缓冲区定义实例化数组
+#if defined(SHADER_API_GLES3) || 
+    defined(SHADER_API_GLCORE) || 
+    defined(SHADER_API_METAL) || 
+    defined(SHADER_API_VULKAN)
     // These platforms have constant buffers disabled normally, but not here (see CBUFFER_START/CBUFFER_END in HLSLSupport.cginc).
+    // 这些平台的常量缓冲区通常已禁用，
+    // 但此处未禁用（请参阅HLSLSupport.cginc中的CBUFFER_START / CBUFFER_END）。
     #define UNITY_INSTANCING_CBUFFER_SCOPE_BEGIN(name)  
         cbuffer name {
     #define UNITY_INSTANCING_CBUFFER_SCOPE_END          
@@ -97,6 +128,7 @@
     //一个可以直接访问的全局实例ID变量。
     static uint unity_InstanceID;
 
+    //声明实例ID 常量缓冲区
     // Don't make UnityDrawCallInfo an actual CB on GL
     #if !defined(SHADER_API_GLES3) && !defined(SHADER_API_GLCORE)
         UNITY_INSTANCING_CBUFFER_SCOPE_BEGIN(UnityDrawCallInfo)
@@ -109,6 +141,7 @@
         UNITY_INSTANCING_CBUFFER_SCOPE_END
     #endif
 
+    //定义默认顶点输入实例ID 宏
     #ifdef SHADER_API_PSSL
         #define DEFAULT_UNITY_VERTEX_INPUT_INSTANCE_ID 
             uint instanceID;    //声明实例ID
@@ -133,6 +166,7 @@
 
 ////////////////////////////////////////////////////////
 // basic stereo instancing setups
+// XR 相关
 //   在顶点着色器输出结构中，声明视线区域。
 // - UNITY_VERTEX_OUTPUT_STEREO             Declare stereo target eye field in vertex shader output struct.
 //   分配视线区域眼。
@@ -203,6 +237,7 @@
     defined(UNITY_STEREO_INSTANCING_ENABLED)
     void UnitySetupInstanceID(uint inputInstanceID)
     {
+        //XR
         #ifdef UNITY_STEREO_INSTANCING_ENABLED
             // stereo eye index is automatically figured out from the instance ID
             //从实例ID中自动找出stereo eye索引
@@ -245,38 +280,56 @@
 
 ////////////////////////////////////////////////////////
 // instanced property arrays
+// 实例化参数数组
 #if defined(UNITY_INSTANCING_ENABLED)
 
+//定义实例化数组尺寸
     #ifdef UNITY_FORCE_MAX_INSTANCE_COUNT
-        #define UNITY_INSTANCED_ARRAY_SIZE  UNITY_FORCE_MAX_INSTANCE_COUNT
+        #define UNITY_INSTANCED_ARRAY_SIZE  
+            UNITY_FORCE_MAX_INSTANCE_COUNT
+    //根据当前批次动态调整实例化CBuffer大小。
     #elif defined(UNITY_INSTANCING_SUPPORT_FLEXIBLE_ARRAY_SIZE)
         #define UNITY_INSTANCED_ARRAY_SIZE  2 // minimum array size that ensures dynamic indexing
     #elif defined(UNITY_MAX_INSTANCE_COUNT)
-        #define UNITY_INSTANCED_ARRAY_SIZE  UNITY_MAX_INSTANCE_COUNT
+        #define UNITY_INSTANCED_ARRAY_SIZE  
+            UNITY_MAX_INSTANCE_COUNT
     #else
         #define UNITY_INSTANCED_ARRAY_SIZE  500
     #endif
 
+//定义实例化数据结构宏
     #ifdef UNITY_INSTANCING_AOS
-        #define UNITY_INSTANCING_BUFFER_START(buf)      UNITY_INSTANCING_CBUFFER_SCOPE_BEGIN(UnityInstancing_##buf) struct {
-        #define UNITY_INSTANCING_BUFFER_END(arr)        } arr##Array[UNITY_INSTANCED_ARRAY_SIZE]; UNITY_INSTANCING_CBUFFER_SCOPE_END
-        #define UNITY_DEFINE_INSTANCED_PROP(type, var)  type var;
-        #define UNITY_ACCESS_INSTANCED_PROP(arr, var)   arr##Array[unity_InstanceID].var
+        #define UNITY_INSTANCING_BUFFER_START(buf)      
+            UNITY_INSTANCING_CBUFFER_SCOPE_BEGIN(UnityInstancing_##buf) struct {
+        #define UNITY_INSTANCING_BUFFER_END(arr)        
+            } arr##Array[UNITY_INSTANCED_ARRAY_SIZE]; 
+            UNITY_INSTANCING_CBUFFER_SCOPE_END
+        #define UNITY_DEFINE_INSTANCED_PROP(type, var)  //定义
+            type var;
+        #define UNITY_ACCESS_INSTANCED_PROP(arr, var)   //访问
+            arr##Array[unity_InstanceID].var
     #else
-        #define UNITY_INSTANCING_BUFFER_START(buf)      UNITY_INSTANCING_CBUFFER_SCOPE_BEGIN(UnityInstancing_##buf)
-        #define UNITY_INSTANCING_BUFFER_END(arr)        UNITY_INSTANCING_CBUFFER_SCOPE_END
-        #define UNITY_DEFINE_INSTANCED_PROP(type, var)  type var[UNITY_INSTANCED_ARRAY_SIZE];
-        #define UNITY_ACCESS_INSTANCED_PROP(arr, var)   var[unity_InstanceID]
+        #define UNITY_INSTANCING_BUFFER_START(buf)      
+            UNITY_INSTANCING_CBUFFER_SCOPE_BEGIN(UnityInstancing_##buf)
+        #define UNITY_INSTANCING_BUFFER_END(arr)        
+            UNITY_INSTANCING_CBUFFER_SCOPE_END
+        #define UNITY_DEFINE_INSTANCED_PROP(type, var)  
+            type var[UNITY_INSTANCED_ARRAY_SIZE];
+        #define UNITY_ACCESS_INSTANCED_PROP(arr, var)   
+            var[unity_InstanceID]
     #endif
 
     // Put worldToObject array to a separate CB if UNITY_ASSUME_UNIFORM_SCALING is defined. Most of the time it will not be used.
+    // 如果定义了UNITY_ASSUME_UNIFORM_SCALING，则将worldToObject数组放置到单独的CB中。 
+    // 大多数时候将不会使用它。
     #ifdef UNITY_ASSUME_UNIFORM_SCALING
         #define UNITY_WORLDTOOBJECTARRAY_CB 1
     #else
         #define UNITY_WORLDTOOBJECTARRAY_CB 0
     #endif
 
-    #if defined(UNITY_INSTANCED_LOD_FADE) && (defined(LOD_FADE_PERCENTAGE) || defined(LOD_FADE_CROSSFADE))
+    #if defined(UNITY_INSTANCED_LOD_FADE) && 
+        (defined(LOD_FADE_PERCENTAGE) || defined(LOD_FADE_CROSSFADE))
         #define UNITY_USE_LODFADEARRAY
     #endif
 
@@ -296,11 +349,14 @@
         #endif
     UNITY_INSTANCING_BUFFER_END(unity_Builtins1)
 
-    #define unity_ObjectToWorld     UNITY_ACCESS_INSTANCED_PROP(unity_Builtins0, unity_ObjectToWorldArray)
+    #define unity_ObjectToWorld     
+        UNITY_ACCESS_INSTANCED_PROP(unity_Builtins0, unity_ObjectToWorldArray)
 
-    #define MERGE_UNITY_BUILTINS_INDEX(X) unity_Builtins##X
+    #define MERGE_UNITY_BUILTINS_INDEX(X) 
+        unity_Builtins##X
 
-    #define unity_WorldToObject     UNITY_ACCESS_INSTANCED_PROP(MERGE_UNITY_BUILTINS_INDEX(UNITY_WORLDTOOBJECTARRAY_CB), unity_WorldToObjectArray)
+    #define unity_WorldToObject     
+        UNITY_ACCESS_INSTANCED_PROP(MERGE_UNITY_BUILTINS_INDEX(UNITY_WORLDTOOBJECTARRAY_CB), unity_WorldToObjectArray)
 
     #ifdef UNITY_USE_LODFADEARRAY
         // the quantized fade value (unity_LODFade.y) is automatically used for cross-fading instances
@@ -325,14 +381,19 @@
     #ifdef UNITY_PROCEDURAL_INSTANCING_ENABLED
         #define UNITY_INSTANCING_BUFFER_START(buf)
         #define UNITY_INSTANCING_BUFFER_END(arr)
-        #define UNITY_DEFINE_INSTANCED_PROP(type, var)      static type var;
+        #define UNITY_DEFINE_INSTANCED_PROP(type, var)      
+            static type var;
     #else
-        #define UNITY_INSTANCING_BUFFER_START(buf)          CBUFFER_START(buf)
-        #define UNITY_INSTANCING_BUFFER_END(arr)            CBUFFER_END
-        #define UNITY_DEFINE_INSTANCED_PROP(type, var)      type var;
+        #define UNITY_INSTANCING_BUFFER_START(buf)          
+            CBUFFER_START(buf)
+        #define UNITY_INSTANCING_BUFFER_END(arr)            
+            CBUFFER_END
+        #define UNITY_DEFINE_INSTANCED_PROP(type, var)      
+            type var;
     #endif
 
-    #define UNITY_ACCESS_INSTANCED_PROP(arr, var)           var
+    #define UNITY_ACCESS_INSTANCED_PROP(arr, var)           
+        var
 
 #endif // UNITY_INSTANCING_ENABLED
 
