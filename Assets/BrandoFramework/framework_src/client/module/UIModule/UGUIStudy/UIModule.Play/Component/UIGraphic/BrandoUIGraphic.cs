@@ -21,7 +21,7 @@ namespace Client.UI
             useLegacyMeshGeneration = true;
         }
 
-        #region  Transform
+        #region  RectTransform
 
         [NonSerialized]
         private RectTransform m_RectTransform;
@@ -77,6 +77,7 @@ namespace Client.UI
 #if UNITY_EDITOR
             BrandoGraphicRebuildTracker.UnTrackGraphic(this);
 #endif
+            //从 Canvas 中注销
             BrandoUIGraphicRegistry.UnregisterGraphicForCanvas(canvas, this);
             BrandoCanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
 
@@ -86,6 +87,23 @@ namespace Client.UI
             LayoutRebuilder.MarkLayoutForRebuild(rectTransform);
             base.OnDisable();
         }
+
+        protected override void Reset()
+        {
+            SetAllDirty();
+        }
+
+#if UNITY_EDITOR
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+            SetAllDirty();
+        }
+#endif
+
+        #endregion
+
+        #region Transform 变化事件
 
         /// <summary>
         /// Trans外观尺寸变化
@@ -108,7 +126,7 @@ namespace Client.UI
         }
 
         /// <summary>
-        /// 父物体改变前调
+        /// 父物体改变前
         /// </summary>
         protected override void OnBeforeTransformParentChanged()
         {
@@ -134,23 +152,9 @@ namespace Client.UI
             SetAllDirty();
         }
 
-        protected override void Reset()
-        {
-            SetAllDirty();
-        }
-
-#if UNITY_EDITOR
-        protected override void OnValidate()
-        {
-            base.OnValidate();
-            SetAllDirty();
-        }
-
-#endif
-
         #endregion
 
-        #region Raycast
+        #region Raycast 射线
 
         [SerializeField]
         private bool m_RaycastTarget = true;
@@ -198,7 +202,7 @@ namespace Client.UI
                 t.GetComponents(components);
                 for (var i = 0; i < components.Count; i++)
                 {
-                    //遇到子 Canvas 停止遍历
+                    //遇到该组件为 Canvas 时停止遍历
                     var canvas = components[i] as Canvas;
                     if (canvas != null && canvas.overrideSorting)
                     {
@@ -214,7 +218,7 @@ namespace Client.UI
 
                     var raycastValid = true;
 
-                    //Canvas 组
+                    //Canvas 组（实现 ICanvasRaycastFilter）
                     var group = components[i] as CanvasGroup;
                     if (group != null)
                     {
@@ -251,8 +255,7 @@ namespace Client.UI
         #region Cull
 
         /// <summary>
-        /// This method must be called when CanvasRenderer.cull
-        /// is modified.
+        /// This method must be called when CanvasRenderer.cull is modified.
         /// 画布渲染器剔除修改回调
         /// </summary>
         /// <remarks>
@@ -280,6 +283,7 @@ namespace Client.UI
         /// <remarks>
         /// In the situation where the Graphic is used in a hierarchy with multiple Canvases, 
         /// the Canvas closest to the root will be used.
+        /// 在具有多个画布的层次结构中使用该图形的情况下，将使用最接近的画布。
         /// </remarks>
         public Canvas canvas
         {
@@ -317,6 +321,7 @@ namespace Client.UI
             if (list.Count > 0)
             {
                 // Find the first active and enabled canvas.
+                // 最近的 active 的 Canvas
                 for (int i = 0; i < list.Count; ++i)
                 {
                     if (list[i].isActiveAndEnabled)
@@ -346,6 +351,7 @@ namespace Client.UI
         ///  Graphic - 5
         ///
         /// This value is used to determine draw and event ordering.
+        /// 深度
         /// </example>
         public int depth
         {
@@ -421,6 +427,76 @@ namespace Client.UI
         /// </summary>
         protected bool useLegacyMeshGeneration { get; set; }
 
+        /// <summary>
+        /// Call to update the geometry of the Graphic onto the CanvasRenderer.
+        /// 更新图形的几何信息到 CanvasRenderer
+        /// </summary>
+        protected virtual void UpdateGeometry()
+        {
+            if (useLegacyMeshGeneration)
+                DoLegacyMeshGeneration();
+            else
+                DoMeshGeneration();
+        }
+
+        //遗留网格生成
+        private void DoLegacyMeshGeneration()
+        {
+            if (rectTransform != null &&
+                rectTransform.rect.width >= 0 &&
+                rectTransform.rect.height >= 0)
+            {
+#pragma warning disable 618
+                OnPopulateMesh(workerMesh);
+#pragma warning restore 618
+            }
+            else
+            {
+                workerMesh.Clear();
+            }
+            var components = ListPool<Component>.Get();
+            GetComponents(typeof(IMeshModifier), components);
+            for (var i = 0; i < components.Count; i++)
+            {
+#pragma warning disable 618
+                ((IMeshModifier)components[i]).ModifyMesh(workerMesh);
+#pragma warning restore 618
+            }
+            ListPool<Component>.Release(components);
+            canvasRenderer.SetMesh(workerMesh);
+        }
+
+        /// <summary>
+        /// 网格生成
+        /// </summary>
+        private void DoMeshGeneration()
+        {
+            if (rectTransform != null &&
+                rectTransform.rect.width >= 0 &&
+                rectTransform.rect.height >= 0)
+            {
+                //计算初始网格
+                OnPopulateMesh(s_VertexHelper);
+            }
+            else
+            {
+                s_VertexHelper.Clear();
+            }
+
+            //网格修改
+            var components = ListPool<Component>.Get();
+            GetComponents(typeof(IMeshModifier), components);
+
+            for (var i = 0; i < components.Count; i++)
+                ((IMeshModifier)components[i]).ModifyMesh(s_VertexHelper);
+
+            ListPool<Component>.Release(components);
+
+            s_VertexHelper.FillMesh(workerMesh);
+            canvasRenderer.SetMesh(workerMesh);
+        }
+
+
         [Obsolete("Use OnPopulateMesh(VertexHelper vh) instead.", false)]
         /// <summary>
         /// Callback function when a UI element needs to generate vertices. 
@@ -461,7 +537,7 @@ namespace Client.UI
 
         #endregion
 
-        #region 材质
+        #region 材质信息
 
         protected static Material s_DefaultUI = null;
         /// <summary>
@@ -515,6 +591,10 @@ namespace Client.UI
         /// a different material to the CanvasRenderer than the one set by Graphic.material. 
         /// This is useful if you want to modify the user 
         /// set material in a non destructive manner.
+        /// 这是实际发送到CanvasRenderer的材料。
+        /// 默认情况下，它与[[Graphic.material]]相同。
+        /// 扩展Graphic时，可以覆盖它以向CanvasRenderer发送不同于Graphic.material设置的材质。
+         ///如果要以非破坏性的方式修改用户设置的材料，这很有用。
         /// </remarks>
         public virtual Material materialForRendering
         {
@@ -532,6 +612,20 @@ namespace Client.UI
                 ListPool<Component>.Release(components);
                 return currentMat;
             }
+        }
+
+        /// <summary>
+        /// Call to update the Material of the graphic onto the CanvasRenderer.
+        /// 更新图形的材质信息到 CanvasRenderer
+        /// </summary>
+        protected virtual void UpdateMaterial()
+        {
+            if (!IsActive())
+                return;
+
+            canvasRenderer.materialCount = 1;
+            canvasRenderer.SetMaterial(materialForRendering, 0);
+            canvasRenderer.SetTexture(mainTexture);
         }
 
         #endregion
@@ -580,7 +674,11 @@ namespace Client.UI
         ///<param name="ignoreTimeScale">Should ignore Time.scale?</param>
         ///<param name="useAlpha">Should also Tween the alpha channel?</param>
         /// <param name="useRGB">Should the color or the alpha be used to tween</param>
-        public virtual void CrossFadeColor(Color targetColor, float duration, bool ignoreTimeScale, bool useAlpha, bool useRGB)
+        public virtual void CrossFadeColor(Color targetColor, 
+            float duration, 
+            bool ignoreTimeScale, 
+            bool useAlpha, 
+            bool useRGB)
         {
             if (canvasRenderer == null || (!useRGB && !useAlpha))
                 return;
@@ -603,13 +701,6 @@ namespace Client.UI
             //m_ColorTweenRunner.StartTween(colorTween);
         }
 
-        static private Color CreateColorFromAlpha(float alpha)
-        {
-            var alphaColor = Color.black;
-            alphaColor.a = alpha;
-            return alphaColor;
-        }
-
         ///<summary>
         ///Tweens the alpha of the CanvasRenderer color associated with this Graphic.
         ///</summary>
@@ -621,9 +712,16 @@ namespace Client.UI
             CrossFadeColor(CreateColorFromAlpha(alpha), duration, ignoreTimeScale, true, false);
         }
 
+        static private Color CreateColorFromAlpha(float alpha)
+        {
+            var alphaColor = Color.black;
+            alphaColor.a = alpha;
+            return alphaColor;
+        }
+
         #endregion
 
-        #region Texture
+        #region 贴图信息
 
         protected static Texture2D s_WhiteTexture = null;
         /// <summary>
@@ -695,7 +793,7 @@ namespace Client.UI
 
         #region 脏渲染
 
-        #region 标记
+        #region 脏数据标记，及回调
         /// <summary>
         /// 顶点是否修改
         /// </summary>s
@@ -864,89 +962,6 @@ namespace Client.UI
                     }
                     break;
             }
-        }
-
-        /// <summary>
-        /// Call to update the geometry of the Graphic onto the CanvasRenderer.
-        /// 更新图形的几何信息到 CanvasRenderer
-        /// </summary>
-        protected virtual void UpdateGeometry()
-        {
-            if (useLegacyMeshGeneration)
-                DoLegacyMeshGeneration();
-            else
-                DoMeshGeneration();
-        }
-
-        //遗留网格生成
-        private void DoLegacyMeshGeneration()
-        {
-            if (rectTransform != null &&
-                rectTransform.rect.width >= 0 &&
-                rectTransform.rect.height >= 0)
-            {
-#pragma warning disable 618
-                OnPopulateMesh(workerMesh);
-#pragma warning restore 618
-            }
-            else
-            {
-                workerMesh.Clear();
-            }
-            var components = ListPool<Component>.Get();
-            GetComponents(typeof(IMeshModifier), components);
-            for (var i = 0; i < components.Count; i++)
-            {
-#pragma warning disable 618
-                ((IMeshModifier)components[i]).ModifyMesh(workerMesh);
-#pragma warning restore 618
-            }
-            ListPool<Component>.Release(components);
-            canvasRenderer.SetMesh(workerMesh);
-        }
-
-        /// <summary>
-        /// 网格生成
-        /// </summary>
-        private void DoMeshGeneration()
-        {
-            if (rectTransform != null &&
-                rectTransform.rect.width >= 0 && 
-                rectTransform.rect.height >= 0)
-            {
-                //计算初始网格
-                OnPopulateMesh(s_VertexHelper);
-            } 
-            else
-            {
-                s_VertexHelper.Clear(); 
-            }
-
-            //网格修改
-            var components = ListPool<Component>.Get();
-            GetComponents(typeof(IMeshModifier), components);
-
-            for (var i = 0; i < components.Count; i++)
-                ((IMeshModifier)components[i]).ModifyMesh(s_VertexHelper);
-
-            ListPool<Component>.Release(components);
-
-            s_VertexHelper.FillMesh(workerMesh);
-            canvasRenderer.SetMesh(workerMesh);
-        }
-
-        /// <summary>
-        /// Call to update the Material of the graphic onto the CanvasRenderer.
-        /// 更新图形的材质信息到 CanvasRenderer
-        /// </summary>
-        protected virtual void UpdateMaterial()
-        {
-            if (!IsActive())
-                return;
-
-            canvasRenderer.materialCount = 1;
-            canvasRenderer.SetMaterial(materialForRendering, 0);
-            canvasRenderer.SetTexture(mainTexture);
         }
 
 #if UNITY_EDITOR

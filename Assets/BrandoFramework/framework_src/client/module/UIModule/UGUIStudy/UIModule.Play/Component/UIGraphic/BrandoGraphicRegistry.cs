@@ -32,6 +32,18 @@ namespace Client.UI
 #pragma warning restore 168
         }
 
+        private static readonly List<BrandoUIGraphic> s_EmptyList =
+            new List<BrandoUIGraphic>();
+
+        public static IList<BrandoUIGraphic> GetGraphicsForCanvas(Canvas canvas)
+        {
+            IndexedSet<BrandoUIGraphic> graphics;
+            if (instance.m_Graphics.TryGetValue(canvas, out graphics))
+                return graphics;
+
+            return s_EmptyList;
+        }
+
         #region 注册，注销
         public static void RegisterGraphicForCanvas(Canvas c, BrandoUIGraphic graphic)
         {
@@ -52,6 +64,11 @@ namespace Client.UI
             instance.m_Graphics.Add(c, graphics);
         }
 
+        /// <summary>
+        /// 注销在该 Canvas 中的图形
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="graphic"></param>
         public static void UnregisterGraphicForCanvas(Canvas c, BrandoUIGraphic graphic)
         {
             if (c == null)
@@ -64,18 +81,7 @@ namespace Client.UI
             }
         }
 
-        private static readonly List<BrandoUIGraphic> s_EmptyList = 
-            new List<BrandoUIGraphic>();
-
         #endregion
 
-        public static IList<BrandoUIGraphic> GetGraphicsForCanvas(Canvas canvas)
-        {
-            IndexedSet<BrandoUIGraphic> graphics;
-            if (instance.m_Graphics.TryGetValue(canvas, out graphics))
-                return graphics;
-
-            return s_EmptyList;
-        }
     }
 }

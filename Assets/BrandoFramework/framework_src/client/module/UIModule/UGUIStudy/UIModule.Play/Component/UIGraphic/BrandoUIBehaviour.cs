@@ -58,6 +58,7 @@ namespace Client.UI
 
         /// <summary>
         /// Called when the state of the parent Canvas is changed.
+        /// 所在 Canvas 改变回调
         /// </summary>
         protected virtual void OnCanvasHierarchyChanged()
         {}
