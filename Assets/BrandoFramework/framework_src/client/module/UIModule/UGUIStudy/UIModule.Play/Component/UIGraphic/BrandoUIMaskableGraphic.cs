@@ -15,6 +15,10 @@ namespace Client.UI
         /// Canvas Rect 四个角
         /// </summary>
         readonly Vector3[] m_Corners = new Vector3[4];
+
+        /// <summary>
+        /// Canvas 矩形
+        /// </summary>
         private Rect rootCanvasRect
         {
             get
@@ -96,15 +100,58 @@ namespace Client.UI
         }
         #endregion
 
-        #region IClippable 接口 裁切
+        #region IClippable 接口 （用于 2DMask 组件）
 
-        #region Cull
+        //计算裁切
+        public void RecalculateClipping()
+        {
+            UpdateClipParent();
+        }
+
+        private void UpdateClipParent()
+        {
+            var newParent = (maskable && IsActive()) ?
+                MaskUtilities.GetRectMaskForClippable(this) : null;
+
+            // if the new parent is different OR is now inactive
+            // 移出旧遮罩父物体的控制
+            if (m_ParentMask != null &&
+                (newParent != m_ParentMask || !newParent.IsActive()))
+            {
+                m_ParentMask.RemoveClippable(this);
+                UpdateCull(false);
+            }
+
+            if (newParent != null && newParent.IsActive())
+            {
+                newParent.AddClippable(this);
+            }
+            m_ParentMask = newParent;
+        }
+
+        /// <summary>
+        /// 设置 Clip 区域，由 canvasRenderer 实现，通过 shader clip 方法实现
+        /// </summary> 
+        /// <param name="clipRect"></param>
+        /// <param name="validRect"></param>
+        public virtual void SetClipRect(Rect clipRect, bool validRect)
+        {
+            if (validRect)
+            {
+                //核心步骤：设置 Renderer 状态
+                canvasRenderer.EnableRectClipping(clipRect);
+            }
+            else
+            {
+                canvasRenderer.DisableRectClipping();
+            }
+        }
 
         [Serializable]
         public class CullStateChangedEvent : UnityEvent<bool> { }
 
         /// <summary>
-        /// 剔除状态
+        /// 剔除状态改变回调
         /// </summary>
         [SerializeField]
         private CullStateChangedEvent m_OnCullStateChanged = new CullStateChangedEvent();
@@ -123,7 +170,7 @@ namespace Client.UI
 
         /// <summary>
         /// Interface for elements that can be clipped if they are under an IClipper
-        /// UI 图像元素在 clipper 下将被剔除
+        /// UI 图像元素在 clipper （Mask2D）下将被剔除
         /// </summary>
         public virtual void Cull(Rect clipRect, bool validRect)
         {
@@ -143,54 +190,9 @@ namespace Client.UI
                 OnCullingChanged();
             }
         }
-
         #endregion
 
-        #region Clip
-        //计算裁切
-        public void RecalculateClipping()
-        {
-            UpdateClipParent();
-        }
-
-        private void UpdateClipParent()
-        {
-            var newParent = (maskable && IsActive()) ? 
-                MaskUtilities.GetRectMaskForClippable(this) : null;
-
-            // if the new parent is different OR is now inactive
-            // 移出旧遮罩父物体的控制
-            if (m_ParentMask != null &&
-                (newParent != m_ParentMask || !newParent.IsActive()))
-            {
-                m_ParentMask.RemoveClippable(this);
-                UpdateCull(false);
-            }
-
-            if (newParent != null && newParent.IsActive())
-            {
-                newParent.AddClippable(this);
-            }
-            m_ParentMask = newParent;
-        }
-
-        public virtual void SetClipRect(Rect clipRect, bool validRect)
-        {
-            if (validRect)
-            {
-                canvasRenderer.EnableRectClipping(clipRect);
-            }
-            else
-            {
-                canvasRenderer.DisableRectClipping();
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-        #region IMaskable 接口 遮罩
+        #region IMaskable 接口 （用于 Mask 组件）
 
         /// <summary>
         /// 遮罩材质
@@ -245,6 +247,7 @@ namespace Client.UI
         /// <summary>
         /// Perform material modification in this function.
         /// 获取修改后的材质
+        /// 默认的实现为替换材质，根据是否父物体为 Mask 组件，修改 Stencil 值，通过shader 的模板功能实现遮罩
         /// </summary>
         public virtual Material GetModifiedMaterial(Material baseMaterial)
         {

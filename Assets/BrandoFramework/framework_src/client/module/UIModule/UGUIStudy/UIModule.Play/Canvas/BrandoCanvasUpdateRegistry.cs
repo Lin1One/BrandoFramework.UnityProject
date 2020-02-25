@@ -152,7 +152,7 @@ namespace Client.UI
         {
             CleanInvalidItems();
 
-            //布局重建
+            //布局重建 （ LayoutRebuilder 实现）
             m_PerformingLayoutUpdate = true;
             m_LayoutRebuildQueue.Sort(s_SortLayoutFunction);
             for (int i = 0; i <= (int)CanvasUpdateStep.PostLayout; i++)
@@ -179,9 +179,10 @@ namespace Client.UI
             m_PerformingLayoutUpdate = false;
 
             // now layout is complete do culling...
+            // 剔除
             ClipperRegistry.instance.Cull();
 
-            //图像重建
+            //图形重建 UIGraphic 实现
             m_PerformingGraphicUpdate = true;
             for (var i = (int)CanvasUpdateStep.PreRender; i < (int)CanvasUpdateStep.MaxUpdateValue; i++)
             {
@@ -275,6 +276,7 @@ namespace Client.UI
         //布局排序委托
         private static readonly Comparison<ICanvasElement> s_SortLayoutFunction = SortLayoutList;
 
+        //默认Layout 排序，按父物体较多的物体较先调整 Layout
         private static int SortLayoutList(ICanvasElement x, ICanvasElement y)
         {
             Transform t1 = x.transform;
