@@ -28,6 +28,36 @@ namespace Client.UI
         /// </summary>
         public static List<BrandoUISelectable> allSelectables { get { return s_List; } }
 
+        [FormerlySerializedAs("highlightGraphic")]
+        [FormerlySerializedAs("m_HighlightGraphic")]
+        [SerializeField]
+        private BrandoUIGraphic m_TargetGraphic;
+        /// <summary>
+        /// Graphic that will be transitioned upon.
+        /// </summary>
+        public BrandoUIGraphic targetGraphic
+        {
+            get
+            {
+                return m_TargetGraphic;
+            }
+            set
+            {
+                if (SetPropertyUtility.SetClass(ref m_TargetGraphic, value))
+                    OnSetProperty();
+            }
+        }
+
+        /// <summary>
+        /// Convenience function that converts the referenced Graphic to a Image, if possible.
+        /// </summary>
+        public BrandoUIImage image
+        {
+            get { return m_TargetGraphic as BrandoUIImage; }
+            set { m_TargetGraphic = value; }
+        }
+
+
         protected BrandoUISelectable()
         { }
 
@@ -98,7 +128,7 @@ namespace Client.UI
 
         #endregion
 
-        #region Navigation
+        #region UI导航 Navigation
         /// <summary>
         /// 导航信息
         /// </summary>
@@ -423,9 +453,47 @@ namespace Client.UI
             }
         }
 
-        #endregion 
+        #endregion
 
-        #region Transition
+        #region UI图形交互状态，及过渡 Transition
+
+        /// <summary>
+        /// 是否可交互
+        /// </summary>
+        [Tooltip("Can the Selectable be interacted with?")]
+        [SerializeField]
+        private bool m_Interactable = true;
+
+        private bool m_GroupsAllowInteraction = true;
+
+        /// <summary>
+        /// Is this object interactable.
+        /// </summary>
+        public bool interactable
+        {
+            get { return m_Interactable; }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Interactable, value))
+                {
+                    if (!m_Interactable && BrandoEventSystem.current != null && 
+                        BrandoEventSystem.current.currentSelectedGameObject == gameObject)
+                        BrandoEventSystem.current.SetSelectedGameObject(null);
+                    if (m_Interactable)
+                        UpdateSelectionState(null);
+                    OnSetProperty();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Is the object interactable.
+        /// </summary>
+        public virtual bool IsInteractable()
+        {
+            return m_GroupsAllowInteraction && m_Interactable;
+        }
+
         /// <summary>
         /// 过渡方式枚举
         /// </summary>
@@ -437,7 +505,7 @@ namespace Client.UI
             None,
 
             /// <summary>
-            /// Use an color tint transition.
+            /// Use an color tint transition.染色过渡
             /// </summary>
             ColorTint,
 
@@ -459,26 +527,6 @@ namespace Client.UI
         [SerializeField]
         private Transition m_Transition = Transition.ColorTint;
 
-        // Colors used for a color tint 
-        [FormerlySerializedAs("colors")]
-        [SerializeField]
-        private ColorBlock m_Colors = ColorBlock.defaultColorBlock;
-
-        // Sprites used for a Image swap-based transition.
-        [FormerlySerializedAs("spriteState")]
-        [SerializeField]
-        private SpriteState m_SpriteState;
-
-        [FormerlySerializedAs("animationTriggers")]
-        [SerializeField]
-        private AnimationTriggers m_AnimationTriggers = new AnimationTriggers();
-
-        // Graphic that will be colored.
-        [FormerlySerializedAs("highlightGraphic")]
-        [FormerlySerializedAs("m_HighlightGraphic")]
-        [SerializeField]
-        private BrandoUIGraphic m_TargetGraphic;
-
         /// <summary>
         /// The type of transition that will be applied to the targetGraphic when the state changes.
         /// </summary>
@@ -494,6 +542,11 @@ namespace Client.UI
                     OnSetProperty();
             }
         }
+
+        // Colors used for a color tint 
+        [FormerlySerializedAs("colors")]
+        [SerializeField]
+        private ColorBlock m_Colors = ColorBlock.defaultColorBlock;
 
         /// <summary>
         /// The ColorBlock for this selectable object.
@@ -511,13 +564,33 @@ namespace Client.UI
             }
         }
 
+        // Sprites used for a Image swap-based transition.
+        [FormerlySerializedAs("spriteState")]
+        [SerializeField]
+        private SpriteState m_SpriteState;
+
         /// <summary>
         /// The SpriteState for this selectable object.
         /// </summary>
         /// <remarks>
         /// Modifications will not be visible if transition is not SpriteSwap.
         /// </remarks>
-        public SpriteState spriteState { get { return m_SpriteState; } set { if (SetPropertyUtility.SetStruct(ref m_SpriteState, value)) OnSetProperty(); } }
+        public SpriteState spriteState
+        {
+            get
+            {
+                return m_SpriteState;
+            }
+            set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_SpriteState, value))
+                    OnSetProperty();
+            }
+        }
+
+        [FormerlySerializedAs("animationTriggers")]
+        [SerializeField]
+        private AnimationTriggers m_AnimationTriggers = new AnimationTriggers();
 
         /// <summary>
         /// The AnimationTriggers for this selectable object.
@@ -525,20 +598,17 @@ namespace Client.UI
         /// <remarks>
         /// Modifications will not be visible if transition is not Animation.
         /// </remarks>
-        public AnimationTriggers animationTriggers { get { return m_AnimationTriggers; } set { if (SetPropertyUtility.SetClass(ref m_AnimationTriggers, value)) OnSetProperty(); } }
-
-        /// <summary>
-        /// Graphic that will be transitioned upon.
-        /// </summary>
-        public BrandoUIGraphic targetGraphic { get { return m_TargetGraphic; } set { if (SetPropertyUtility.SetClass(ref m_TargetGraphic, value)) OnSetProperty(); } }
-
-        /// <summary>
-        /// Convenience function that converts the referenced Graphic to a Image, if possible.
-        /// </summary>
-        public BrandoUIImage image
+        public AnimationTriggers animationTriggers
         {
-            get { return m_TargetGraphic as BrandoUIImage; }
-            set { m_TargetGraphic = value; }
+            get
+            {
+                return m_AnimationTriggers;
+            }
+            set
+            {
+                if (SetPropertyUtility.SetClass(ref m_AnimationTriggers, value))
+                    OnSetProperty();
+            }
         }
 
         /// <summary>
@@ -549,6 +619,11 @@ namespace Client.UI
             get { return GetComponent<Animator>(); }
         }
 
+        /// <summary>
+        /// 颜色过渡 Tween
+        /// </summary>
+        /// <param name="targetColor"></param>
+        /// <param name="instant"></param>
         void StartColorTween(Color targetColor, bool instant)
         {
             if (m_TargetGraphic == null)
@@ -577,21 +652,10 @@ namespace Client.UI
 
             animator.SetTrigger(triggername);
         }
-        #endregion
-
-        #region 交互状态
-
-        /// <summary>
-        /// 是否可交互
-        /// </summary>
-        [Tooltip("Can the Selectable be interacted with?")]
-        [SerializeField]
-        private bool m_Interactable = true;
-
-        private bool m_GroupsAllowInteraction = true;
 
         /// <summary>
         /// An enumeration of selected states of objects
+        /// 选择状态
         /// </summary>
         protected enum SelectionState
         {
@@ -644,34 +708,6 @@ namespace Client.UI
                     break;
             }
         }
-
-        /// <summary>
-        /// Is this object interactable.
-        /// </summary>
-        public bool interactable
-        {
-            get { return m_Interactable; }
-            set
-            {
-                if (SetPropertyUtility.SetStruct(ref m_Interactable, value))
-                {
-                    if (!m_Interactable && BrandoEventSystem.current != null && BrandoEventSystem.current.currentSelectedGameObject == gameObject)
-                        BrandoEventSystem.current.SetSelectedGameObject(null);
-                    if (m_Interactable)
-                        UpdateSelectionState(null);
-                    OnSetProperty();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Is the object interactable.
-        /// </summary>
-        public virtual bool IsInteractable()
-        {
-            return m_GroupsAllowInteraction && m_Interactable;
-        }
-
 
         /// <summary>
         /// Transition the Selectable to the entered state.
@@ -809,7 +845,7 @@ namespace Client.UI
         private bool hasSelection { get; set; }
         #endregion
 
-        #region 交互行为
+        #region 交互事件接口实现
 
         // Change the button to the correct state
         private void EvaluateAndTransitionToSelectionState(BaseEventData eventData)

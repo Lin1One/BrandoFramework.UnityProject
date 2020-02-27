@@ -1,5 +1,6 @@
 namespace Client.UI.EventSystem
 {
+    //交互事件处理器接口
     public interface IEventSystemHandler
     {
     }

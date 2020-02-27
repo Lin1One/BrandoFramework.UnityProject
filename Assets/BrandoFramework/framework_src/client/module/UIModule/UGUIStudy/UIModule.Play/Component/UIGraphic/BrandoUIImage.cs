@@ -102,6 +102,7 @@ namespace Client.UI
         private Sprite m_OverrideSprite;
         /// <summary>
         /// 重载 sprite ，当 overrideSprite 设置为空，则显示为原始 sprite 
+        /// 在有多张图变化时使用，如按钮高亮 sprite
         /// </summary>
         public Sprite overrideSprite
         {
@@ -153,7 +154,7 @@ namespace Client.UI
         }
 
         /// <summary>
-        /// 渲染材质
+        /// 渲染主贴图
         /// </summary>
         public override Texture mainTexture
         {
@@ -274,7 +275,7 @@ namespace Client.UI
 
         #endregion
 
-        #region 图片网格
+        #region 网格信息
 
         /// <summary>
         /// Update the UI renderer mesh.
@@ -1093,6 +1094,74 @@ namespace Client.UI
 
         #region 图片展示样式
 
+            #region 图片展示样式枚举
+        /// <summary>
+        /// 填充类型
+        /// </summary>
+        public enum Type
+        {
+            Simple,
+            Sliced,
+            Tiled,
+            Filled
+        }
+
+        /// <summary>
+        /// 填充效果
+        /// </summary>
+        public enum FillMethod
+        {
+            Horizontal,
+            Vertical,
+            Radial90,
+            Radial180,
+            Radial360,
+        }
+
+        /// <summary>
+        /// 填充水平方向
+        /// </summary>
+        public enum OriginHorizontal
+        {
+            Left,
+            Right,
+        }
+
+        /// <summary>
+        /// 填充竖直方向
+        /// </summary>
+        public enum OriginVertical
+        {
+            Bottom,
+            Top,
+        }
+
+        public enum Origin90
+        {
+            BottomLeft,
+            TopLeft,
+            TopRight,
+            BottomRight,
+        }
+
+        public enum Origin180
+        {
+            Bottom,
+            Left,
+            Top,
+            Right,
+        }
+
+        public enum Origin360
+        {
+            Bottom,
+            Right,
+            Top,
+            Left,
+        }
+
+        #endregion
+
         [SerializeField]
         private Type m_Type = Type.Simple;
         public Type type
@@ -1124,7 +1193,7 @@ namespace Client.UI
             }
         }
 
-        #region Fill
+            #region Fill
 
         [SerializeField]
         private bool m_FillCenter = true;
@@ -1228,9 +1297,12 @@ namespace Client.UI
         #region Atlas 管理
 
         // Whether this is being tracked for Atlas Binding.
-        // 追踪
+        // 定位在图集中的sprite
         private bool m_Tracked = false;
 
+        /// <summary>
+        /// 追踪sprite
+        /// </summary>
         private void TrackSprite()
         {
             if (activeSprite != null && activeSprite.texture == null)
@@ -1244,6 +1316,9 @@ namespace Client.UI
         // which will be rebuild 
         // if sprite atlas manager registered a Sprite Atlas that
         // will give this image new texture
+        /// <summary>
+        ///  当新的图集加载，则检测图集是否包含与该 Image 所使用 sprite 
+        /// </summary>
         static List<BrandoUIImage> m_TrackedTexturelessImages = new List<BrandoUIImage>();
         static bool s_Initialized;
 
@@ -1252,7 +1327,7 @@ namespace Client.UI
             for (var i = m_TrackedTexturelessImages.Count - 1; i >= 0; i--)
             {
                 var g = m_TrackedTexturelessImages[i];
-                if (spriteAtlas.CanBindTo(g.activeSprite))
+                if (spriteAtlas.CanBindTo(g.activeSprite))//判断该sprite 是否在这个图集中
                 {
                     g.SetAllDirty();
                     m_TrackedTexturelessImages.RemoveAt(i);
@@ -1278,75 +1353,8 @@ namespace Client.UI
 
         #endregion
 
-        #region 图片展示样式枚举
-        /// <summary>
-        /// 填充类型
-        /// </summary>
-        public enum Type
-        {
-            Simple,
-            Sliced,
-            Tiled,
-            Filled
-        }
-
-        /// <summary>
-        /// 填充效果
-        /// </summary>
-        public enum FillMethod
-        {
-            Horizontal,
-            Vertical,
-            Radial90,
-            Radial180,
-            Radial360,
-        }
-
-        /// <summary>
-        /// 填充水平方向
-        /// </summary>
-        public enum OriginHorizontal
-        {
-            Left,
-            Right,
-        }
-
-        /// <summary>
-        /// 填充竖直方向
-        /// </summary>
-        public enum OriginVertical
-        {
-            Bottom,
-            Top,
-        }
-
-        public enum Origin90
-        {
-            BottomLeft,
-            TopLeft,
-            TopRight,
-            BottomRight,
-        }
-
-        public enum Origin180
-        {
-            Bottom,
-            Left,
-            Top,
-            Right,
-        }
-
-        public enum Origin360
-        {
-            Bottom,
-            Right,
-            Top,
-            Left,
-        }
-
-        #endregion
-
         #region ILayoutElement 接口
+
         public virtual float minWidth { get { return 0; } }
 
         /// <summary>
@@ -1401,6 +1409,7 @@ namespace Client.UI
 
         /// <summary>
         /// The alpha threshold specifies the minimum alpha a pixel must have for the event to considered a "hit" on the Image.
+        /// 可被射线命中的最小 alpha 阈值
         /// </summary>
         /// <remarks>
         /// Alpha values less than the threshold will cause raycast events to pass through the Image. An value of 1 would cause only fully opaque pixels to register raycast events on the Image. The alpha tested is retrieved from the image sprite only, while the alpha of the Image [[UI.Graphic.color]] is disregarded.

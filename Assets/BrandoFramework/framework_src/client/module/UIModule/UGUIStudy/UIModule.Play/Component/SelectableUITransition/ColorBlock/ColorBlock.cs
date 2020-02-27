@@ -4,6 +4,9 @@ using UnityEngine.Serialization;
 
 namespace Client.UI
 {
+    /// <summary>
+    /// 色块，用于交互UI图形在多种交互情景下的不同颜色表现
+    /// </summary>
     [Serializable]
     public struct ColorBlock
     {
