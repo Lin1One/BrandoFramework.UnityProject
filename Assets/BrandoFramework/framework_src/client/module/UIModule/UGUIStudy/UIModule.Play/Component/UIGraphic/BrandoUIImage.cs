@@ -217,9 +217,12 @@ namespace Client.UI
         /// <param name="spriteSize"></param>
         private void PreserveSpriteAspectRatio(ref Rect rect, Vector2 spriteSize)
         {
+            //原图宽高比
             var spriteRatio = spriteSize.x / spriteSize.y;
+            //目标绘制区域宽高比
             var rectRatio = rect.width / rect.height;
 
+            //原图更宽则按宽调整高度大小，以及重新计算坐标位置，反之则按高度调整
             if (spriteRatio > rectRatio)
             {
                 var oldHeight = rect.height;
@@ -234,44 +237,6 @@ namespace Client.UI
             }
         }
 
-        /// Image's dimensions used for drawing.
-        /// X = left, Y = bottom, Z = right, W = top.
-        /// 获取图片绘制尺寸
-        private Vector4 GetDrawingDimensions(bool shouldPreserveAspect)
-        {
-            var padding = activeSprite == null ? Vector4.zero :
-                UnityEngine.Sprites.DataUtility.GetPadding(activeSprite);
-
-            //sprite 宽高
-            var size = activeSprite == null ? Vector2.zero :
-                new Vector2(activeSprite.rect.width, activeSprite.rect.height);
-
-            Rect r = GetPixelAdjustedRect();
-
-            int spriteW = Mathf.RoundToInt(size.x);
-            int spriteH = Mathf.RoundToInt(size.y);
-
-            var v = new Vector4(
-                padding.x / spriteW,
-                padding.y / spriteH,
-                (spriteW - padding.z) / spriteW,
-                (spriteH - padding.w) / spriteH);
-
-            // 是否保持纵横比 && 尺寸是否大于 0
-            if (shouldPreserveAspect && size.sqrMagnitude > 0.0f)
-            {
-                PreserveSpriteAspectRatio(ref r, size);
-            }
-
-            v = new Vector4(
-                r.x + r.width * v.x,
-                r.y + r.height * v.y,
-                r.x + r.width * v.z,
-                r.y + r.height * v.w
-            );
-
-            return v;
-        }
 
         #endregion
 
@@ -309,8 +274,50 @@ namespace Client.UI
             }
         }
 
+        /// Image's dimensions used for drawing.
+        /// shouldPreserveAspect为是否按精灵的原比例显示
+        /// 获取图片绘制区域顶点 X = left, Y = bottom, Z = right, W = top.
+        private Vector4 GetDrawingDimensions(bool shouldPreserveAspect)
+        {
+            //当前精灵的填充内边框（left,bottom,right,top)，一般情况下都是（0，0，0，0）
+            var padding = activeSprite == null ? Vector4.zero :
+                UnityEngine.Sprites.DataUtility.GetPadding(activeSprite);
+
+            //当前精灵的大小（包含了边框的大小）
+            //sprite 宽高
+            var size = activeSprite == null ? Vector2.zero :
+                new Vector2(activeSprite.rect.width, activeSprite.rect.height);
+
+            //目标绘制区域的坐标及大小（x,y为该UI相对于轴心的坐标，width，height为UI宽高）
+            Rect r = GetPixelAdjustedRect();
+
+            int spriteW = Mathf.RoundToInt(size.x);
+            int spriteH = Mathf.RoundToInt(size.y);
+
+            var v = new Vector4(
+                padding.x / spriteW,
+                padding.y / spriteH,
+                (spriteW - padding.z) / spriteW,
+                (spriteH - padding.w) / spriteH);
+
+            // 是否保持纵横比 && 尺寸是否大于 0
+            if (shouldPreserveAspect && size.sqrMagnitude > 0.0f)
+            {
+                PreserveSpriteAspectRatio(ref r, size);
+            }
+
+            v = new Vector4(
+                r.x + r.width * v.x,
+                r.y + r.height * v.y,
+                r.x + r.width * v.z,
+                r.y + r.height * v.w
+            );
+
+            return v;
+        }
+
         /// <summary>
-        /// 生成单一图片网格
+        /// 生成单一图片网格 quad Mesh
         /// </summary>
         /// <param name="vh"></param>
         /// <param name="lPreserveAspect"></param>
@@ -332,7 +339,7 @@ namespace Client.UI
         }
 
         /// <summary>
-        /// 生成 sprite 
+        /// 根据Sprite 网格生成 UI 顶点
         /// </summary>
         /// <param name="vh"></param>
         /// <param name="lPreserveAspect"></param>
@@ -382,7 +389,7 @@ namespace Client.UI
         static readonly Vector2[] s_UVScratch = new Vector2[4];
 
         /// <summary>
-        /// 生成裁切 sprite
+        /// 生成裁切 sprite （9 个quad）
         /// </summary>
         /// <param name="toFill"></param>
         private void GenerateSlicedSprite(VertexHelper toFill)

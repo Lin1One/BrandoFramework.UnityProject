@@ -83,7 +83,7 @@ namespace Client.UI.EventSystem
                 }
             }
 
-            //输入监听
+            //切换输入模块完成，处理输入
             if (!changedModule && m_CurrentInputModule != null)
             {
                 m_CurrentInputModule.Process();
@@ -124,16 +124,6 @@ namespace Client.UI.EventSystem
             }
         }
 
-        public override string ToString()
-        {
-            var sb = new StringBuilder();
-            sb.AppendLine("<b>Selected:</b>" + currentSelectedGameObject);
-            sb.AppendLine();
-            sb.AppendLine();
-            sb.AppendLine(m_CurrentInputModule != null ? m_CurrentInputModule.ToString() : "No module");
-            return sb.ToString();
-        }
-
         #endregion
 
         #region InputModule
@@ -142,13 +132,16 @@ namespace Client.UI.EventSystem
 
         private BaseInputModule m_CurrentInputModule;
 
+        /// <summary>
+        /// 当前输入模块 Input Module
+        /// </summary>
         public BaseInputModule currentInputModule
         {
             get { return m_CurrentInputModule; }
         }
 
         /// <summary>
-        /// 更新所有输入模块
+        /// 更新所有输入模块（有新的输入模块 Enable 或 Disable 时被调用）
         /// </summary>
         public void UpdateModules()
         {
@@ -162,7 +155,6 @@ namespace Client.UI.EventSystem
                 m_SystemInputModules.RemoveAt(i);
             }
         }
-
 
         [SerializeField]
         private int m_DragThreshold = 5;
@@ -345,5 +337,15 @@ namespace Client.UI.EventSystem
             set { m_sendNavigationEvents = value; }
         }
         #endregion
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("<b>Selected:</b>" + currentSelectedGameObject);
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine(m_CurrentInputModule != null ? m_CurrentInputModule.ToString() : "No module");
+            return sb.ToString();
+        }
     }
 }

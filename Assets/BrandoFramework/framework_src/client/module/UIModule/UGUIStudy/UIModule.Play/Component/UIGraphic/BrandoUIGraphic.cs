@@ -751,6 +751,7 @@ namespace Client.UI
         /// <summary>
         /// Returns a pixel perfect Rect closest to the Graphic RectTransform.
         /// 获取相对于图形 RectTransform 像素精确的矩形
+        /// 目标绘制区域的坐标及大小（x,y为该UI相对于轴心的坐标，width，height为UI宽高）
         /// </summary>
         /// <remarks>
         /// 仅当 Canvas is in Screen Space 情况生效
