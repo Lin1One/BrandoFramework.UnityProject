@@ -20,7 +20,7 @@ namespace Client.DataTable.Editor
     public class YuExcel_SimpleClassHandler : IYuExcelFieldHandler
     {
         public ScriptType ScriptType { get; }
-        public ExcelFieldType FieldType => ExcelFieldType.SimpleObj;
+        public FieldTypeEnum FieldType => FieldTypeEnum.SimpleObj;
 
         public string GetCodeStr(string languageType, ExcelFieldInfo fieldInfo)
         {
@@ -143,41 +143,41 @@ namespace Client.DataTable.Editor
                 {
                     switch (defineInfo.FieldType)
                     {
-                        case ExcelFieldType.Ignore:
+                        case FieldTypeEnum.Ignore:
                             break;
-                        case ExcelFieldType.String:
+                        case FieldTypeEnum.String:
                             appender.AppendLine($"instance.{defineInfo.EnglishId} = array[{index}];");
                             break;
-                        case ExcelFieldType.Bool:
+                        case FieldTypeEnum.Bool:
                             break;
-                        case ExcelFieldType.Byte:
+                        case FieldTypeEnum.Byte:
                             break;
-                        case ExcelFieldType.Short:
+                        case FieldTypeEnum.Short:
                             break;
-                        case ExcelFieldType.Int:
+                        case FieldTypeEnum.Int:
                             appender.AppendLine($"instance.{defineInfo.EnglishId} = Convert.ToInt32(array[{index}]);");
                             break;
-                        case ExcelFieldType.Long:
+                        case FieldTypeEnum.Long:
                             break;
-                        case ExcelFieldType.Float:
+                        case FieldTypeEnum.Float:
                             break;
-                        case ExcelFieldType.Enum:
+                        case FieldTypeEnum.Enum:
                             break;
-                        case ExcelFieldType.StringArray:
+                        case FieldTypeEnum.StringArray:
                             break;
-                        case ExcelFieldType.ByteArray:
+                        case FieldTypeEnum.ByteArray:
                             break;
-                        case ExcelFieldType.ShortArray:
+                        case FieldTypeEnum.ShortArray:
                             break;
-                        case ExcelFieldType.IntArray:
+                        case FieldTypeEnum.IntArray:
                             break;
-                        case ExcelFieldType.FloatArray:
+                        case FieldTypeEnum.FloatArray:
                             break;
-                        case ExcelFieldType.LongArray:
+                        case FieldTypeEnum.LongArray:
                             break;
-                        case ExcelFieldType.ParamsPropertyClass:
+                        case FieldTypeEnum.ParamsPropertyClass:
                             break;
-                        case ExcelFieldType.SimpleObj:
+                        case FieldTypeEnum.SimpleObj:
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -195,7 +195,7 @@ namespace Client.DataTable.Editor
             /// <summary>
             /// 字段数据类型。
             /// </summary>
-            public ExcelFieldType FieldType;
+            public FieldTypeEnum FieldType;
 
             /// <summary>
             /// 字段中文Id（注释）
@@ -212,7 +212,7 @@ namespace Client.DataTable.Editor
                 var array = text.Split('|');
                 ChineseId = array[0].Split('=')[1];
                 EnglishId = array[1].Split('=')[1];
-                FieldType = array[2].Split('=')[1].AsEnum<ExcelFieldType>();
+                FieldType = array[2].Split('=')[1].AsEnum<FieldTypeEnum>();
             }
         }
 

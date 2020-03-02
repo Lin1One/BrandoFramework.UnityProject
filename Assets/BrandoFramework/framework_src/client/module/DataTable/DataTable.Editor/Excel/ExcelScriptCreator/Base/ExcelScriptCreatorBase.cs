@@ -147,30 +147,30 @@ namespace Client.DataTable.Editor
         /// <summary>
         /// 获取字段类型
         /// </summary>
-        private ExcelFieldType GetFieldDefine(string fieldDefineStr)
+        private FieldTypeEnum GetFieldDefine(string fieldDefineStr)
         {
             if (string.IsNullOrEmpty(fieldDefineStr) || fieldDefineStr == IGNORE_STR)
             {
-                return ExcelFieldType.Ignore;
+                return FieldTypeEnum.Ignore;
             }
 
             if (fieldDefineStr.StartsWith(CLASS_PARAMS_PROPERTYOBJ))
             {
-                return ExcelFieldType.ParamsPropertyClass;
+                return FieldTypeEnum.ParamsPropertyClass;
             }
 
             if (fieldDefineStr.StartsWith(CLASS_SIMPLEOBJ))
             {
-                return ExcelFieldType.SimpleObj;
+                return FieldTypeEnum.SimpleObj;
             }
 
             if (fieldDefineStr.Contains(ARRAY_STR))
             {
                 var arrayTypeStr = fieldDefineStr.Split('=')[0];
-                return arrayTypeStr.AsEnum<ExcelFieldType>();
+                return arrayTypeStr.AsEnum<FieldTypeEnum>();
             }
 
-            var filedType = fieldDefineStr.AsEnum<ExcelFieldType>();
+            var filedType = fieldDefineStr.AsEnum<FieldTypeEnum>();
             return filedType;
         }
 

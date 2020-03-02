@@ -26,7 +26,7 @@ namespace Client.DataTable.Editor
         /// <summary>
         /// 数据结构字符串。
         /// </summary>
-        public ExcelFieldType FieldType { get; }
+        public FieldTypeEnum FieldType { get; }
 
         /// <summary>
         /// 字段嵌套类描述（指令）。
@@ -53,7 +53,7 @@ namespace Client.DataTable.Editor
         (
             string englishName,
             string chineseName,
-            ExcelFieldType fieldType,
+            FieldTypeEnum fieldType,
             char arraySplit,
             int index,
             string sheetClassId,
@@ -75,38 +75,38 @@ namespace Client.DataTable.Editor
             {
                 switch (FieldType)
                 {
-                    case ExcelFieldType.Int:
+                    case FieldTypeEnum.Int:
                         return "int";
-                    case ExcelFieldType.Float:
+                    case FieldTypeEnum.Float:
                         return "float";
-                    case ExcelFieldType.String:
+                    case FieldTypeEnum.String:
                         return "string";
-                    case ExcelFieldType.IntArray:
+                    case FieldTypeEnum.IntArray:
                         return "List<int>";
-                    case ExcelFieldType.FloatArray:
+                    case FieldTypeEnum.FloatArray:
                         return "List<float>";
-                    case ExcelFieldType.StringArray:
+                    case FieldTypeEnum.StringArray:
                         return "List<string>";
-                    case ExcelFieldType.Byte:
+                    case FieldTypeEnum.Byte:
                         return "byte";
-                    case ExcelFieldType.Short:
+                    case FieldTypeEnum.Short:
                         return "short";
-                    case ExcelFieldType.Long:
+                    case FieldTypeEnum.Long:
                         return "long";
-                    case ExcelFieldType.Enum:
+                    case FieldTypeEnum.Enum:
                         break;
-                    case ExcelFieldType.ByteArray:
+                    case FieldTypeEnum.ByteArray:
                         return "List<byte>";
-                    case ExcelFieldType.ShortArray:
+                    case FieldTypeEnum.ShortArray:
                         return "List<short>";
-                    case ExcelFieldType.LongArray:
+                    case FieldTypeEnum.LongArray:
                         return "List<long>";
-                    case ExcelFieldType.ParamsPropertyClass:
+                    case FieldTypeEnum.ParamsPropertyClass:
                     //return $"{CurrentU3DApp.LocAppId}_ExcelWithinClass_{EnglishName}";
                         return $"ExcelWithinClass_{EnglishName}";
-                    case ExcelFieldType.Bool:
+                    case FieldTypeEnum.Bool:
                         return "bool";
-                    case ExcelFieldType.SimpleObj:
+                    case FieldTypeEnum.SimpleObj:
                     //return $"List<{CurrentU3DApp.LocAppId}_ExcelWithinClass_{EnglishName}>";
                         return $"List<ExcelWithinClass_{EnglishName}>";
                     default:
@@ -125,17 +125,17 @@ namespace Client.DataTable.Editor
             {
                 switch (FieldType)
                 {
-                    case ExcelFieldType.Int:
+                    case FieldTypeEnum.Int:
                         return "number";
-                    case ExcelFieldType.Float:
+                    case FieldTypeEnum.Float:
                         return "number";
-                    case ExcelFieldType.String:
+                    case FieldTypeEnum.String:
                         return "string";
-                    case ExcelFieldType.IntArray:
+                    case FieldTypeEnum.IntArray:
                         return "number[]";
-                    case ExcelFieldType.FloatArray:
+                    case FieldTypeEnum.FloatArray:
                         return "number[]";
-                    case ExcelFieldType.StringArray:
+                    case FieldTypeEnum.StringArray:
                         return "string[]";
                     default:
                         return "";

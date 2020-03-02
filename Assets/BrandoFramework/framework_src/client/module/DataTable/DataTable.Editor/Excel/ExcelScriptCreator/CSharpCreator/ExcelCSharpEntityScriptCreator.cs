@@ -49,7 +49,7 @@ namespace Client.DataTable.Editor
         {
             Appender.AppendUsingNamespace(
                 "System",
-                typeof(ExcelFieldType).Namespace,
+                typeof(FieldTypeEnum).Namespace,
                 "System.Collections.Generic",
                 "System.Linq",
                 typeof(SerializeUtility).Namespace,
@@ -107,7 +107,7 @@ namespace Client.DataTable.Editor
 
             foreach (var fieldInfo in excelFieldInfos)
             {
-                if (fieldInfo.FieldType == ExcelFieldType.Ignore)
+                if (fieldInfo.FieldType == FieldTypeEnum.Ignore)
                 {
                     continue;
                 }
@@ -146,7 +146,7 @@ namespace Client.DataTable.Editor
             Appender.ToRight();
             foreach (var info in SheetInfo.FieldInfos)
             {
-                if (info.FieldType == ExcelFieldType.Ignore)
+                if (info.FieldType == FieldTypeEnum.Ignore)
                 {
                     continue;
                 }
@@ -154,7 +154,7 @@ namespace Client.DataTable.Editor
                 var handler = YuU3dExcelFieldHandlerFactory.GetFieldHandler(info.FieldType,
                     ScriptType.Csharp);
                 var csEntityStr = handler.GetCodeStr(
-                    ExcelDataConstant.CsLanguageType, info);
+                    DataTableConstant.CsLanguageType, info);
                 Appender.AppendLine(csEntityStr);
             }
 
@@ -211,7 +211,7 @@ namespace Client.DataTable.Editor
 
             foreach (var fieldInfo in SheetInfo.FieldInfos)
             {
-                if (fieldInfo.FieldType == ExcelFieldType.Ignore)
+                if (fieldInfo.FieldType == FieldTypeEnum.Ignore)
                 {
                     continue;
                 }

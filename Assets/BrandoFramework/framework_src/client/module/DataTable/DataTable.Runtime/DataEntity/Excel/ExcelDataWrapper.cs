@@ -13,10 +13,11 @@ namespace Client.DataTable
 {
     public class ExcelDataWrapper<T> where T : IExcelEntity<T>
     {
-        public static bool isLoaded;
+        public static Dictionary<int, bool> SplitDataLoadState;
+
+        public static bool isAllLoaded;
         public static bool isAsyncLoading;
         public static Action<List<T>> onLoaded;
-
         public static List<T> Entitys{ get;set;}
     }
 }

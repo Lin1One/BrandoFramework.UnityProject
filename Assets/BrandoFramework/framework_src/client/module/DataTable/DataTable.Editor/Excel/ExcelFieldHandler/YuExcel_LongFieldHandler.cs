@@ -13,7 +13,7 @@ namespace Client.DataTable.Editor
     public class YuExcel_LongFieldHandler : IYuExcelFieldHandler
     {
         public ScriptType ScriptType { get; }
-        public ExcelFieldType FieldType => ExcelFieldType.Long;
+        public FieldTypeEnum FieldType => FieldTypeEnum.Long;
         public string GetCodeStr(string languageType, ExcelFieldInfo fieldInfo)
         {
             var codeStr = string.Empty;

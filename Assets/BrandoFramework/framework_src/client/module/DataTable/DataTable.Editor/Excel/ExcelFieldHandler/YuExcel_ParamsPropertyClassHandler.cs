@@ -20,7 +20,7 @@ namespace Client.DataTable.Editor
     public class YuExcel_ParamsPropertyClassHandler : IYuExcelFieldHandler
     {
         public ScriptType ScriptType { get; }
-        public ExcelFieldType FieldType => ExcelFieldType.ParamsPropertyClass;
+        public FieldTypeEnum FieldType => FieldTypeEnum.ParamsPropertyClass;
 
         public string GetCodeStr(string languageType, ExcelFieldInfo fieldInfo)
         {
@@ -85,42 +85,42 @@ namespace Client.DataTable.Editor
                 IOUtility.WriteAllText(ScriptPath, content);
             }
 
-            private string GetSimpleObjSwitchTypeStr(ExcelFieldType fieldType)
+            private string GetSimpleObjSwitchTypeStr(FieldTypeEnum fieldType)
             {
                 string result = string.Empty;
 
                 switch (fieldType)
                 {
-                    case ExcelFieldType.String:
+                    case FieldTypeEnum.String:
                         break;
-                    case ExcelFieldType.Byte:
+                    case FieldTypeEnum.Byte:
                         break;
-                    case ExcelFieldType.Short:
+                    case FieldTypeEnum.Short:
                         break;
-                    case ExcelFieldType.Int:
+                    case FieldTypeEnum.Int:
                         result = "Convert.ToInt32(value)";
                         break;
-                    case ExcelFieldType.Long:
+                    case FieldTypeEnum.Long:
                         break;
-                    case ExcelFieldType.Float:
+                    case FieldTypeEnum.Float:
                         break;
-                    case ExcelFieldType.Enum:
+                    case FieldTypeEnum.Enum:
                         break;
-                    case ExcelFieldType.StringArray:
+                    case FieldTypeEnum.StringArray:
                         break;
-                    case ExcelFieldType.ByteArray:
+                    case FieldTypeEnum.ByteArray:
                         break;
-                    case ExcelFieldType.ShortArray:
+                    case FieldTypeEnum.ShortArray:
                         break;
-                    case ExcelFieldType.IntArray:
+                    case FieldTypeEnum.IntArray:
                         break;
-                    case ExcelFieldType.FloatArray:
+                    case FieldTypeEnum.FloatArray:
                         break;
-                    case ExcelFieldType.LongArray:
+                    case FieldTypeEnum.LongArray:
                         break;
-                    case ExcelFieldType.ParamsPropertyClass:
+                    case FieldTypeEnum.ParamsPropertyClass:
                         break;
-                    case ExcelFieldType.SimpleObj:
+                    case FieldTypeEnum.SimpleObj:
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(fieldType), fieldType, null);
@@ -207,7 +207,7 @@ namespace Client.DataTable.Editor
         {
             public char FirstSplit;
             public char SecondSplit;
-            public ExcelFieldType FieldType;
+            public FieldTypeEnum FieldType;
 
             /// <summary>
             /// 表中原有的字段英文Id。
@@ -233,7 +233,7 @@ namespace Client.DataTable.Editor
                 var firstArray = firstLine.Split('|');
                 FirstSplit = firstArray[0][firstArray[0].Length - 1];
                 SecondSplit = firstArray[1][firstArray[1].Length - 1];
-                FieldType = firstArray[2].Split('=')[1].AsEnum<ExcelFieldType>();
+                FieldType = firstArray[2].Split('=')[1].AsEnum<FieldTypeEnum>();
 
                 // 第二行为字段名重映射，如果没有找到重映射则直接使用该字段在表中的原始值。
                 var secondLine = array[1];

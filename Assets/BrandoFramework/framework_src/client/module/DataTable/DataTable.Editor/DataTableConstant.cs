@@ -11,7 +11,7 @@ namespace Client.DataTable
     /// <summary>
     /// excel相关工作流常量。
     /// </summary>
-    public static class ExcelDataConstant
+    public static class DataTableConstant
     {
         /// <summary>
         /// 分隔符字符串数组。

@@ -50,59 +50,59 @@ namespace Client.DataTable.Editor
 
         #region Excel字段类型
 
-        public static string GetFieldTypeStr(ExcelFieldType fieldType)
+        public static string GetFieldTypeStr(FieldTypeEnum fieldType)
         {
             string typeStr = string.Empty;
 
             switch (fieldType)
             {
-                case ExcelFieldType.String:
+                case FieldTypeEnum.String:
                     typeStr = "string";
                     break;
-                case ExcelFieldType.Byte:
+                case FieldTypeEnum.Byte:
                     typeStr = "byte";
                     break;
-                case ExcelFieldType.Short:
+                case FieldTypeEnum.Short:
                     typeStr = "short";
                     break;
-                case ExcelFieldType.Int:
+                case FieldTypeEnum.Int:
                     typeStr = "int";
                     break;
-                case ExcelFieldType.Long:
+                case FieldTypeEnum.Long:
                     typeStr = "long";
                     break;
-                case ExcelFieldType.Float:
+                case FieldTypeEnum.Float:
                     typeStr = "float";
                     break;
-                case ExcelFieldType.Enum:
+                case FieldTypeEnum.Enum:
 
                     break;
-                case ExcelFieldType.StringArray:
+                case FieldTypeEnum.StringArray:
                     typeStr = "List<string>";
                     break;
-                case ExcelFieldType.ByteArray:
+                case FieldTypeEnum.ByteArray:
                     typeStr = "List<byte>";
                     break;
-                case ExcelFieldType.ShortArray:
+                case FieldTypeEnum.ShortArray:
                     typeStr = "List<short>";
                     break;
-                case ExcelFieldType.IntArray:
+                case FieldTypeEnum.IntArray:
                     typeStr = "List<int>";
                     break;
-                case ExcelFieldType.FloatArray:
+                case FieldTypeEnum.FloatArray:
                     typeStr = "List<float>";
                     break;
-                case ExcelFieldType.LongArray:
+                case FieldTypeEnum.LongArray:
                     typeStr = "List<long>";
                     break;
-                case ExcelFieldType.ParamsPropertyClass:
+                case FieldTypeEnum.ParamsPropertyClass:
                     break;
-                case ExcelFieldType.Ignore:
+                case FieldTypeEnum.Ignore:
                     break;
-                case ExcelFieldType.Bool:
+                case FieldTypeEnum.Bool:
                     typeStr = "bool";
                     break;
-                case ExcelFieldType.SimpleObj:
+                case FieldTypeEnum.SimpleObj:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(fieldType), fieldType, null);
@@ -165,12 +165,12 @@ namespace Client.DataTable.Editor
                             // 如果目标单元格为空则填入默认的“0”字符串。
                             if (row.GetCell(colIndex) == null || row.GetCell(colIndex).ToString() == "")
                             {
-                                sb.Append("0" + ExcelDataConstant.SeparatorStr);
+                                sb.Append("0" + DataTableConstant.SeparatorStr);
                             }
                             else
                             {
                                 var cellStr = row.GetCell(colIndex).ToString();
-                                sb.Append(cellStr + ExcelDataConstant.SeparatorStr);
+                                sb.Append(cellStr + DataTableConstant.SeparatorStr);
                             }
                         }
                         catch (Exception ex)
@@ -183,7 +183,7 @@ namespace Client.DataTable.Editor
                     // 移除最后添加的分割字符串，默认为[__]。
                     var lineStr = sb.ToString();
                     var cutedLineStr = lineStr.Substring(0,
-                        lineStr.Length - ExcelDataConstant.SeparatorStr.Length);
+                        lineStr.Length - DataTableConstant.SeparatorStr.Length);
                     strList.Add(cutedLineStr);
                 }
 

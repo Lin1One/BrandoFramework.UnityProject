@@ -15,10 +15,10 @@ namespace Client.DataTable.Editor
 {
     public static class YuU3dExcelFieldHandlerFactory
     {
-        private static Dictionary<ExcelFieldType, List<IYuExcelFieldHandler>> handlers;
+        private static Dictionary<FieldTypeEnum, List<IYuExcelFieldHandler>> handlers;
 
-        private static Dictionary<ExcelFieldType, List<IYuExcelFieldHandler>> Handlers
-            => handlers ?? (handlers = new Dictionary<ExcelFieldType, List<IYuExcelFieldHandler>>());
+        private static Dictionary<FieldTypeEnum, List<IYuExcelFieldHandler>> Handlers
+            => handlers ?? (handlers = new Dictionary<FieldTypeEnum, List<IYuExcelFieldHandler>>());
 
         static YuU3dExcelFieldHandlerFactory()
         {
@@ -44,7 +44,7 @@ namespace Client.DataTable.Editor
             }
         }
 
-        public static IYuExcelFieldHandler GetFieldHandler(ExcelFieldType fieldType,
+        public static IYuExcelFieldHandler GetFieldHandler(FieldTypeEnum fieldType,
             ScriptType scriptType)
         {
             if (!Handlers.ContainsKey(fieldType))

@@ -68,6 +68,20 @@ namespace Client.DataTable
             return datas[index];
         }
 
+//        public T GetRecordAtIndex<T>(int index) where T : IExcelEntity<T>, new()
+//        {
+//            List<T> datas;
+//            TryGetData(out datas);
+//            if (index >= datas.Count)
+//            {
+//#if UNITY_EDITOR
+//                Debug.LogError($"目标数据索引超出数据表{typeof(T).Name}的最大数量！");
+//#endif
+//                return default(T);
+//            }
+//            return datas[index];
+//        }
+
         public T GetRecordFirst<T>(Predicate<T> func) where T : IExcelEntity<T>, new()
         {
             if (func == null)
@@ -110,6 +124,8 @@ namespace Client.DataTable
             return gotData;
         }
 
+        
+
         private void TryGetDataAsync<T>(Action<List<T>> onLoaded) where T : IExcelEntity<T>
         {
             var assetId = typeof(T).Name.ToLower();
@@ -123,7 +139,7 @@ namespace Client.DataTable
             var bytes = textAsset.bytes;
 
             ExcelDataWrapper<T>.onLoaded = onLoaded;
-            ExcelDataWrapper<T>.isLoaded = false;
+            ExcelDataWrapper<T>.isAllLoaded = false;
             Injector.Instance.Get<IU3DEventModule>().WatchUnityEvent(
                 UnityEventType.Update, CheckLoadEnd<T>);
 
@@ -131,14 +147,14 @@ namespace Client.DataTable
             Task.Run(() =>
             {
                 ExcelDataWrapper<T>.Entitys = Serializer.DeSerialize<List<T>>(bytes);
-                ExcelDataWrapper<T>.isLoaded = true;
+                ExcelDataWrapper<T>.isAllLoaded = true;
                 ExcelDataWrapper<T>.isAsyncLoading = false;
             });
         }
 
         private static void CheckLoadEnd<T>() where T : IExcelEntity<T>
         {
-            if (ExcelDataWrapper<T>.isLoaded)
+            if (ExcelDataWrapper<T>.isAllLoaded)
             {
                 Injector.Instance.Get<IU3DEventModule>().RemoveUnityEvent(
                     UnityEventType.Update, CheckLoadEnd<T>);

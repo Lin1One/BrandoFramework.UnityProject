@@ -15,9 +15,9 @@ namespace Client.DataTable.Editor
     {
         public ScriptType ScriptType { get; }
 
-        public ExcelFieldType FieldType
+        public FieldTypeEnum FieldType
         {
-            get { return ExcelFieldType.StringArray; }
+            get { return FieldTypeEnum.StringArray; }
         }
 
         public string GetCodeStr(string languageType, ExcelFieldInfo fieldInfo)

@@ -29,7 +29,7 @@ namespace Client.DataTable.Editor
         /// <summary>
         /// 可处理的目标数据结构字符串。
         /// </summary>
-        ExcelFieldType FieldType { get; }
+        FieldTypeEnum FieldType { get; }
 
         /// <summary>
         /// 获得指定编程语言的代码文本。

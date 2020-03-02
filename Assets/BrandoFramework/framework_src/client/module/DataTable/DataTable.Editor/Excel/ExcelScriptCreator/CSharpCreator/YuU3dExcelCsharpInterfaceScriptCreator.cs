@@ -53,7 +53,7 @@ namespace Client.DataTable.Editor
 
             foreach (var fieldInfo in fieldInfos)
             {
-                if (fieldInfo.FieldType == ExcelFieldType.Ignore)
+                if (fieldInfo.FieldType == FieldTypeEnum.Ignore)
                 {
                     continue;
                 }

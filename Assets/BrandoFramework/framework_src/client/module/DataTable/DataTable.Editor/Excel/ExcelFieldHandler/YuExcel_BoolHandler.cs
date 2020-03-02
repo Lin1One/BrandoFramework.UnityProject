@@ -15,7 +15,7 @@ namespace Client.DataTable.Editor
     public class YuExcel_BoolHandler : IYuExcelFieldHandler
     {
         public ScriptType ScriptType { get; }
-        public ExcelFieldType FieldType => ExcelFieldType.Bool;
+        public FieldTypeEnum FieldType => FieldTypeEnum.Bool;
 
         public string GetCodeStr(string languageType, ExcelFieldInfo fieldInfo)
         {
