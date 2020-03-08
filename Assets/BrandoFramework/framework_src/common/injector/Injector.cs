@@ -124,6 +124,14 @@ namespace Common
             return instance;
         }
 
+        public object Get(Type absType) 
+        {
+            var obj = GetInstanceByReflection(absType);
+            //var obj = GetAtNotReflectionEnable<TAbs>();
+            var instance = obj;
+            return instance;
+        }
+
         protected object GetInstanceByReflection(Type absType)
         {
             var implType = GetImplType(absType);

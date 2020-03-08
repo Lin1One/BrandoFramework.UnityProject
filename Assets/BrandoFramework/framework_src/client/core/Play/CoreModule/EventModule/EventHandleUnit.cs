@@ -7,97 +7,62 @@ namespace Client.Core
 {
     /// <summary>
     /// 事件处理单元
-    /// 管理某个事件业务类型中事件的管理
+    /// 负责管理某个事件业务类型中事件
     /// </summary>
     public class EventHandleUnit
     {
         /// <summary>
-        /// 带有数据参数的事件处理器调用者字典。
+        /// 事件处理器调用者字典。
         /// </summary>
-        private readonly Dictionary<string, ITallyEventHandlerCaller<object>> m_UseDataEventCallers
-        = new Dictionary<string, ITallyEventHandlerCaller<object>>();
+        private readonly Dictionary<string, IEventHandlerList> EventCallers
+            = new Dictionary<string, IEventHandlerList>();
 
-        /// <summary>
-        /// 无需数据的事件处理器调用者字典。
-        /// </summary>
-        private readonly Dictionary<string, ITallyEventHandlerCaller> m_NotDataEventCallers
-        = new Dictionary<string, ITallyEventHandlerCaller>();
-
-        #region 观察事件
-
-        /// <summary>
-        /// 观察一个需要数据的事件。
-        /// </summary>
-        /// <param name="eventId">Event identifier.</param>
-        /// <param name="action">Action.</param>
-        /// <param name="executeCount">Execute count.</param>
-        public int WatchEvent(string eventId, Action<object> action, int executeCount = -1)
+        public int WatchEvent(string eventId, Action action)
         {
-            if (m_UseDataEventCallers.ContainsKey(eventId))
+            if (EventCallers.ContainsKey(eventId))
             {
-                var caller = m_UseDataEventCallers[eventId];
-                var handlerId = caller.AddHandler(action, executeCount);
+                var caller = EventCallers[eventId];
+                var handlerId = caller.AddHandler(action);
                 return handlerId;
             }
             else
             {
-                var newCaller = new TallyEventHandlerCaller<object>();
-                m_UseDataEventCallers.Add(eventId, newCaller);
-                var handlerId = newCaller.AddHandler(action, executeCount);
+                var newCaller = new EventHandlerList();
+                EventCallers.Add(eventId, newCaller);
+                var handlerId = newCaller.AddHandler(action);
                 return handlerId;
             }
         }
 
-        /// <summary>
-        /// 观察一个无需数据的事件。
-        /// </summary>
-        /// <param name="eventId">Event identifier.</param>
-        /// <param name="action">Action.</param>
-        /// <param name="executeCount">Execute count.</param>
-        public int WatchEvent(string eventId, Action action, int executeCount = -1)
+
+        public int WatchEvent(string eventId, Action<object> action)
         {
-            if (m_NotDataEventCallers.ContainsKey(eventId))
+            if (EventCallers.ContainsKey(eventId))
             {
-                var caller = m_NotDataEventCallers[eventId];
-                var handlerId = caller.AddHandler(action, executeCount);
+                var caller = EventCallers[eventId];
+                var handlerId = caller.AddHandler(action);
                 return handlerId;
             }
             else
             {
-                var newCaller = new TallyEventHandlerCaller();
-                m_NotDataEventCallers.Add(eventId, newCaller);
-                var handlerId = newCaller.AddHandler(action, executeCount);
+                var newCaller = new EventHandlerList();
+                EventCallers.Add(eventId, newCaller);
+                var handlerId = newCaller.AddHandler(action);
                 return handlerId;
             }
         }
 
-        #endregion
-
-        #region 移除事件处理
-
-        private void RemoveUseDataEvent(string eventName)
-        {
-            if (!m_UseDataEventCallers.ContainsKey(eventName)) return;
-
-            m_UseDataEventCallers.Remove(eventName);
-        }
-
-        private void RemoveNotDataEvent(string eventName)
-        {
-            if (!m_NotDataEventCallers.ContainsKey(eventName)) return;
-
-            m_NotDataEventCallers.Remove(eventName);
-        }
 
         public void RemoveEvent(string eventName)
         {
-            RemoveUseDataEvent(eventName);
-            RemoveNotDataEvent(eventName);
+            if (!EventCallers.ContainsKey(eventName)) return;
+
+            EventCallers.Remove(eventName);
         }
 
-        private void RemoveSpecifiedHandlerAtNotData(string eventName, int handlerId)
+        public void RemoveHandler(string eventName, int handlerId)
         {
-            if (!m_NotDataEventCallers.ContainsKey(eventName))
+            if (!EventCallers.ContainsKey(eventName))
             {
 #if UNITY_EDITOR
                 Debug.LogWarning(
@@ -106,99 +71,221 @@ namespace Client.Core
             }
             else
             {
-                var caller = m_NotDataEventCallers[eventName];
+                var caller = EventCallers[eventName];
                 caller.RemoveHandler(handlerId);
                 if (caller.EventHanlderCount == 0)
                 {
-                    m_NotDataEventCallers.Remove(eventName);
+                    EventCallers.Remove(eventName);
                 }
             }
-        }
-
-        private void RemoveSpecifiedHandlerAtUseData(string eventName, int handlerId)
-        {
-            if (!m_UseDataEventCallers.ContainsKey(eventName))
-            {
-#if UNITY_EDITOR
-                Debug.LogWarning(
-                    $"尝试移除不存在的有数据事件处理器，事件名为{eventName}");
-#endif
-            }
-            else
-            {
-                var caller = m_UseDataEventCallers[eventName];
-                caller.RemoveHandler(handlerId);
-                if (caller.EventHanlderCount == 0)
-                {
-                    m_UseDataEventCallers.Remove(eventName);
-                }
-            }
-        }
-
-        public void RemoveSpecifiedHandler(string eventName, int handlerId)
-        {
-            RemoveSpecifiedHandlerAtNotData(eventName, handlerId);
-            RemoveSpecifiedHandlerAtUseData(eventName, handlerId);
-        }
-
-        #endregion
-
-        #region 事件执行
-
-        /// <summary>
-        /// 事件调用者唤起次数。
-        /// </summary>
-        private int m_ExecuteCallCount;
-
-        /// <summary>
-        /// 触发事件调用者清理的唤起次数阈值。
-        /// </summary>
-        private const int ON_CLEAN_MAX = 10;
-
-        private void ClearZero()
-        {
-            m_UseDataEventCallers.Values.ToList().ForEach(c => c.ClearZero());
-            m_NotDataEventCallers.Values.ToList().ForEach(c => c.ClearZero());
-        }
-
-        private void TryCleanZero()
-        {
-            m_ExecuteCallCount++;
-            if (m_ExecuteCallCount <= ON_CLEAN_MAX) return;
-
-            ClearZero();
-            m_ExecuteCallCount = 0;
         }
 
         public void ExecuteEvent(string eventId, object data)
         {
-            if (!m_UseDataEventCallers.ContainsKey(eventId) &&
-                !m_NotDataEventCallers.ContainsKey(eventId))
+            if (!EventCallers.ContainsKey(eventId))
             {
 #if UNITY_EDITOR
                 Debug.LogWarning(string.Format("没有发现目标事件{0}", eventId));
 #endif
                 return;
             }
-
-            if (m_UseDataEventCallers.ContainsKey(eventId))
+            if (EventCallers.ContainsKey(eventId))
             {
-                var caller = m_UseDataEventCallers[eventId];
+                var caller = EventCallers[eventId];
                 caller.CallEventHanlder(data);
-                TryCleanZero();
-            }
-
-            if (m_NotDataEventCallers.ContainsKey(eventId))
-            {
-                var caller = m_NotDataEventCallers[eventId];
-                caller.CallEventHanlder();
-                TryCleanZero();
             }
         }
-
-
-        #endregion
     }
+
+//    /// <summary>
+//    /// 事件处理单元
+//    /// 负责管理某个事件业务类型中事件
+//    /// </summary>
+//    public class EventHandleUnit<T1,T2>
+//    {
+//        private readonly Dictionary<string, IEventHandlerList<T1, T2>> eventCallers
+//            = new Dictionary<string, IEventHandlerList<T1, T2>>();
+
+//        /// <summary>
+//        /// 观察事件。
+//        /// </summary>
+//        /// <param name="eventId">Event identifier.</param>
+//        /// <param name="action">Action.</param>
+//        /// <param name="executeCount">Execute count.</param>
+//        public int WatchEvent(string eventId, Action<T1, T2> action, int executeCount = -1)
+//        {
+//            if (eventCallers.ContainsKey(eventId))
+//            {
+//                var caller = eventCallers[eventId];
+//                var handlerId = caller.AddHandler(action);
+//                return handlerId;
+//            }
+//            else
+//            {
+//                var newCaller = new EventHandlerList<T1, T2>();
+//                eventCallers.Add(eventId, newCaller);
+//                var handlerId = newCaller.AddHandler(action);
+//                return handlerId;
+//            }
+//        }
+
+
+//        public void RemoveSpecifiedHandler(string eventName, int handlerId)
+//        {
+//            if (!eventCallers.ContainsKey(eventName))
+//            {
+//#if UNITY_EDITOR
+//                Debug.LogWarning(
+//                    $"尝试移除不存在的无数据事件处理器，事件名为{eventName}");
+//#endif
+//            }
+//            else
+//            {
+//                var caller = eventCallers[eventName];
+//                caller.RemoveHandler(handlerId);
+//                if (caller.EventHanlderCount == 0)
+//                {
+//                    eventCallers.Remove(eventName);
+//                }
+//            }
+//        }
+
+//        public void ExecuteEvent(string eventId, T1 data1, T2 data2)
+//        {
+//            if (!eventCallers.ContainsKey(eventId))
+//            {
+//#if UNITY_EDITOR
+//                Debug.LogWarning(string.Format("没有发现目标事件{0}", eventId));
+//#endif
+//                return;
+//            }
+
+//            if (eventCallers.ContainsKey(eventId))
+//            {
+//                var caller = eventCallers[eventId];
+//                caller.CallEventHanlder(data1, data2);
+//            }
+//        }
+
+//    }
+
+//    /// <summary>
+//    /// 事件处理单元
+//    /// 负责管理某个事件业务类型中事件
+//    /// </summary>
+//    public class EventHandleUnit<T1>
+//    {
+//        /// <summary>
+//        /// 无需数据的事件处理器调用者字典。
+//        /// </summary>
+//        private readonly Dictionary<string, IEventHandlerList<T1>> eventCallers
+//            = new Dictionary<string, IEventHandlerList<T1>>();
+
+//        #region 观察事件
+
+//        /// <summary>
+//        /// 观察一个需要数据的事件。
+//        /// </summary>
+//        /// <param name="eventId">Event identifier.</param>
+//        /// <param name="action">Action.</param>
+//        /// <param name="executeCount">Execute count.</param>
+//        public int WatchEvent(string eventId, Action<T1> action, int executeCount = -1)
+//        {
+//            if (eventCallers.ContainsKey(eventId))
+//            {
+//                var caller = eventCallers[eventId];
+//                var handlerId = caller.AddHandler(action, executeCount);
+//                return handlerId;
+//            }
+//            else
+//            {
+//                var newCaller = new EventHandlerList<T1>();
+//                eventCallers.Add(eventId, newCaller);
+//                var handlerId = newCaller.AddHandler(action, executeCount);
+//                return handlerId;
+//            }
+//        }
+
+//        #endregion
+
+//        #region 移除事件处理
+
+//        public void RemoveEvent(string eventName)
+//        {
+//            if (!eventCallers.ContainsKey(eventName)) return;
+
+//            eventCallers.Remove(eventName);
+//        }
+
+//        public void RemoveHandler(string eventName, int handlerId)
+//        {
+//            if (!eventCallers.ContainsKey(eventName))
+//            {
+//#if UNITY_EDITOR
+//                Debug.LogWarning(
+//                    $"尝试移除不存在的无数据事件处理器，事件名为{eventName}");
+//#endif
+//            }
+//            else
+//            {
+//                var caller = eventCallers[eventName];
+//                caller.RemoveHandler(handlerId);
+//                if (caller.EventHanlderCount == 0)
+//                {
+//                    eventCallers.Remove(eventName);
+//                }
+//            }
+//        }
+
+//        #endregion
+
+//        #region 事件执行
+
+//        public void ExecuteEvent(string eventId, T1 data)
+//        {
+//            //!m_UseDataEventCallers.ContainsKey(eventId) &&
+//            if (!eventCallers.ContainsKey(eventId))
+//            {
+//#if UNITY_EDITOR
+//                Debug.LogWarning(string.Format("没有发现目标事件{0}", eventId));
+//#endif
+//                return;
+//            }
+
+//            if (eventCallers.ContainsKey(eventId))
+//            {
+//                var caller = eventCallers[eventId];
+//                caller.CallEventHanlder(data);
+//            }
+//        }
+
+//        ///// <summary>
+//        ///// 事件调用者唤起次数。
+//        ///// </summary>
+//        //private int m_ExecuteCallCount;
+
+//        ///// <summary>
+//        ///// 触发事件调用者清理的唤起次数阈值。
+//        ///// </summary>
+//        //private const int ON_CLEAN_MAX = 10;
+
+//        //private void ClearZero()
+//        //{
+//        //    //m_UseDataEventCallers.Values.ToList().ForEach(c => c.ClearZero());
+//        //    m_NotDataEventCallers.Values.ToList().ForEach(c => c.ClearZero());
+//        //}
+
+//        //private void TryCleanZero()
+//        //{
+//        //    m_ExecuteCallCount++;
+//        //    if (m_ExecuteCallCount <= ON_CLEAN_MAX) return;
+
+//        //    ClearZero();
+//        //    m_ExecuteCallCount = 0;
+//        //}
+
+//        #endregion
+    //}
 }
 
 

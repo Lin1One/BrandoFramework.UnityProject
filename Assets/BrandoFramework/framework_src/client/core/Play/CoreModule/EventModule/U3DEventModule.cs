@@ -14,20 +14,29 @@ namespace Client.Core
     {
         private readonly UnityEventComponent eventComponent;
 
-        private readonly EventDespatcher eventApiCore = new EventDespatcher();
+        private readonly EventDispatcher eventDispatcher = new EventDispatcher();
 
         public U3DEventModule()
         {
             //创建 UnityComponent 以监听 Update 周期函数
             eventComponent = YuU3dInjector.MonoInjectorInstance.GetMono<UnityEventComponent>();
-            WatchUnityEvent(UnityEventType.Update, eventApiCore.ExecuteEvent);
+        }
+
+        public void InitModule()
+        {
+            WatchUnityEvent(UnityEventType.Update, eventDispatcher.ExecuteEvent);
+        }
+
+        public void ApplyConfig(IModuleConfig config)
+        {
+            EventModuleConfig eventModuelConfig = config as EventModuleConfig;
         }
 
         #region Unity事件
 
-        public void WatchUnityEvent(UnityEventType type, Action action, int executeCount = -1)
+        public void WatchUnityEvent(UnityEventType type, Action action)
         {
-            eventComponent.WatchUnityEvent(type, action, executeCount);
+            eventComponent.WatchUnityEvent(type, action);
         }
 
         public void RemoveUnityEvent(UnityEventType type, Action action)
@@ -39,34 +48,69 @@ namespace Client.Core
 
         #region 业务事件
 
-        public int WatchEvent(EventCode eventCode, Action action, int executeCount = -1)
+        public int WatchEvent(EventCode eventCode, Action action)
         {
-            return eventApiCore.WatchEvent(eventCode, action, executeCount);
+            return eventDispatcher.WatchEvent(eventCode, action);
         }
 
-        public int WatchEvent(EventCode eventCode, Action<object> action, int executeCount = -1)
+        public int WatchEvent(EventCode eventCode, Action<object> action)
         {
-            return eventApiCore.WatchEvent(eventCode, action, executeCount);
+            return eventDispatcher.WatchEvent(eventCode, action);
         }
 
-        public void TriggerEvent(EventCode eventCode, Action onCompelted = null, object data = null)
+        public int WatchEvent<T1>(EventCode eventCode, Action<T1> action)
         {
-            eventApiCore.TriggerEvent(eventCode, onCompelted, data);
+            return eventDispatcher.WatchEvent(eventCode, action);
         }
 
-        public void TriggerEventSync(EventCode eventCode, Action onCompelted = null, object data = null)
+        public int WatchEvent<T1, T2>(EventCode eventCode, Action<T1, T2> action)
         {
-            eventApiCore.TriggerEventSync(eventCode, onCompelted, data);
+            return eventDispatcher.WatchEvent(eventCode, action);
+        }
+
+        public void TriggerEvent(EventCode eventCode, Action onCompelted = null)
+        {
+            eventDispatcher.TriggerEvent(eventCode, onCompelted);
+        }
+
+        public void TriggerEvent(EventCode eventCode, object eventData, Action onCompelted = null)
+        {
+            eventDispatcher.TriggerEvent(eventCode, eventData, onCompelted);
+        }
+
+        //public void TriggerEvent<T1>(EventCode eventCode, T1 eventData1, Action onCompelted = null)
+        //{
+        //    eventDispatcher.TriggerEvent(eventCode, eventData1, onCompelted);
+        //}
+
+        //public void TriggerEvent<T1, T2>(EventCode eventCode, T1 eventData1, T2 eventData2, Action onCompelted = null)
+        //{
+        //    eventDispatcher.TriggerEvent(eventCode, eventData1, eventData2,onCompelted);
+        //}
+
+        public void TriggerEventSync(EventCode eventCode, object data = null, Action onCompelted = null)
+        {
+            eventDispatcher.TriggerEventSync(eventCode, onCompelted, data);
+        }
+
+        public void TriggerEventSync<T1>(EventCode eventCode, T1 data, Action onCompelted = null)
+        {
+            eventDispatcher.TriggerEventSync(eventCode, data, onCompelted);
+        }
+
+        public void TriggerEventSync<T1, T2>(EventCode eventCode, T1 data1, T2 data2, Action onCompelted = null)
+        {
+            eventDispatcher.TriggerEventSync(eventCode, data1, data2,onCompelted);
         }
 
         public void RemoveAllHandlers(EventCode eventCode)
         {
-            eventApiCore.RemoveAllHandler(eventCode);
+            eventDispatcher.RemoveAllHandler(eventCode);
         }
 
         public void RemoveEventHandler(EventCode eventCode, int handlerId)
         {
-            eventApiCore.RemoveHandlerById(eventCode, handlerId);
+            eventDispatcher.RemoveHandlerById(eventCode, handlerId);
         }
         #endregion
 

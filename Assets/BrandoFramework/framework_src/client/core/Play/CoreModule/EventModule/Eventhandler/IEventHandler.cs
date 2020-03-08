@@ -9,54 +9,42 @@ namespace Client.Core
     /// </summary>
     public interface IEventHandler
     {
-        /// <summary>
-        /// 处理事件
-        /// </summary>
-        void HandleEvent();
+        void HandleEvent(object data);
 
-        /// <summary>
-        /// 判断委托是否匹配
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        bool CheckMatch(Action action);
+        bool CheckMatch(Delegate action);
 
-        /// <summary>
-        /// 全局唯一的事件处理器Id，用于脚本层移除指定的事件处理器。
-        /// </summary>
-        /// <value>The identifier.</value>
         int Id { get; }
     }
 
     #endregion
 
-    #region 泛型
+    //#region 泛型
 
-    /// <summary>
-    /// 事件处理器接口（泛型数据）
-    /// </summary>
-    /// <typeparam name="TData"></typeparam>
-    public interface IEventHandler<TData>
-    {
-        /// <summary>
-        /// 处理事件
-        /// </summary>
-        /// <param name="eventData"></param>
-        void HandleEvent(TData eventData);
+    ///// <summary>
+    ///// 事件处理器接口（泛型数据）
+    ///// </summary>
+    ///// <typeparam name="TData"></typeparam>
+    //public interface IEventHandler<TData>
+    //{
+    //    void HandleEvent(TData eventData);
 
-        /// <summary>
-        /// 判断是否是指定委托
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        bool CheckMatch(Action<TData> action);
+    //    bool CheckMatch(Action<TData> action);
 
-        /// <summary>
-        /// 全局唯一的事件处理器Id，用于脚本层移除指定的事件处理器。
-        /// </summary>
-        /// <value>The identifier.</value>
-        int Id { get; }
-    }
+    //    int Id { get; }
+    //}
 
-    #endregion
+    ///// <summary>
+    ///// 事件处理器接口（泛型数据）
+    ///// </summary>
+    ///// <typeparam name="TData"></typeparam>
+    //public interface IEventHandler<T1,T2>
+    //{
+    //    void HandleEvent(T1 eventData1, T2 eventData2);
+
+    //    bool CheckMatch(Action<T1, T2> action);
+
+    //    int Id { get; }
+    //}
+
+    //#endregion
 }

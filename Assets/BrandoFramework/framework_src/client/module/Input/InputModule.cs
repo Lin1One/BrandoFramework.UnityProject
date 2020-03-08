@@ -18,10 +18,9 @@ namespace Client.InputModule
         {
             inputComponent = YuU3dInjector.MonoInjectorInstance.GetMono<InputComponent>();
             inputDataProcesser = Injector.Instance.Get<IInputProcesser>();
-            Init();
         }
 
-        public void Init()
+        public void InitModule()
         {
             inputComponent.InputProcess = InputProcess;
         }

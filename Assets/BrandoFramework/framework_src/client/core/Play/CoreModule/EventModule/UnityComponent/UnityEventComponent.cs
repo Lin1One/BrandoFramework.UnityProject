@@ -6,8 +6,9 @@ namespace Client.Core.UnityComponent
 {
     public class UnityEventComponent : AbsSingletonMonoComponent<UnityEventComponent>
     {
-        private readonly Dictionary<UnityEventType, ITallyEventHandlerCaller>
-            eventCallers = new Dictionary<UnityEventType, ITallyEventHandlerCaller>();
+        //每一个事件类型，对应一个事件处理的调用器
+        private readonly Dictionary<UnityEventType, IEventHandlerList>
+            eventCallers = new Dictionary<UnityEventType, IEventHandlerList>();
 
         private void InvokeEventCaller(UnityEventType type)
         {
@@ -16,10 +17,10 @@ namespace Client.Core.UnityComponent
                 return;
             }
 
-            eventCallers[type].CallEventHanlder();
+            eventCallers[type].CallEventHanlder(null);
         }
 
-        #region App生命周期事件
+        #region 生命周期事件
 
         private void OnApplicationQuit()
         {
@@ -35,10 +36,6 @@ namespace Client.Core.UnityComponent
         {
             InvokeEventCaller(UnityEventType.AppPause);
         }
-
-        #endregion
-
-        #region 帧循环事件
 
         private void FixedUpdate()
         {
@@ -64,23 +61,18 @@ namespace Client.Core.UnityComponent
 
         #region Unity事件API
 
-        public void WatchUnityEvent
-        (
-            UnityEventType type,
-            Action action,
-            int executeCount = -1
-        )
+        public void WatchUnityEvent(UnityEventType type, Action action)
         {
             if (!eventCallers.ContainsKey(type))
             {
-                var newCaller = new TallyEventHandlerCaller();
-                newCaller.AddHandler(action, executeCount);
+                var newCaller = new EventHandlerList();
+                newCaller.AddHandler(action);
                 eventCallers.Add(type, newCaller);
             }
             else
             {
                 var caller = eventCallers[type];
-                caller.AddHandler(action, executeCount);
+                caller.AddHandler(action);
             }
         }
 

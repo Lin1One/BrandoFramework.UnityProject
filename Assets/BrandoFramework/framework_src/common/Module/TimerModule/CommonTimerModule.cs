@@ -33,9 +33,9 @@ namespace Common
             }
         }
 
-        public void Init()
+        public void InitModule()
         {
-
+            throw new NotImplementedException();
         }
 
         public void Dispose()
@@ -95,5 +95,6 @@ namespace Common
         {
             TimerPool.Restore(timer);
         }
+
     }
 }

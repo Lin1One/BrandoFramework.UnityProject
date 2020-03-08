@@ -50,7 +50,7 @@ namespace Client.Core
 
         #endregion
 
-        public void Init()
+        public void InitModule()
         {
         }
 

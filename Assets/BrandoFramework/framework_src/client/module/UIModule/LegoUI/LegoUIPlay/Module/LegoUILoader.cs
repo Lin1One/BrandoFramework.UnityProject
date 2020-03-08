@@ -242,7 +242,7 @@ namespace Client.LegoUI
             buildTask.UiBuildCallback?.Invoke(view);
 
             //触发界面创建完成事件
-            U3DEventModule.TriggerEvent(ProjectCoreEventCode.View_Created, null, view);
+            U3DEventModule.TriggerEvent(ProjectCoreEventCode.View_Created, view , null);
             view.ShowDefault();
         }
 

@@ -72,7 +72,6 @@ namespace Client.LegoUI
 
         #region 摇杆核心逻辑
 
-
         protected float radius = 0f;
 
         public override void OnDrag(PointerEventData eventData)
@@ -82,7 +81,7 @@ namespace Client.LegoUI
             // 抛出摇杆被拖动事件
             EventModule.TriggerEvent(ProjectCoreEventCode.Input_DragRocker);
             var contentPostion = content.anchoredPosition;
-            EventModule.TriggerEvent(ProjectCoreEventCode.Input_RockerMove, null, contentPostion);
+            EventModule.TriggerEvent(ProjectCoreEventCode.Input_RockerMove, contentPostion,null);
 
             if (contentPostion.magnitude > radius)
             {

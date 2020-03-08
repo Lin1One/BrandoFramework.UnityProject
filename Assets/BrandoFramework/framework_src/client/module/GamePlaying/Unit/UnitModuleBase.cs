@@ -57,7 +57,7 @@ namespace Client.GamePlaying.Unit
             activeUnits = new Dictionary<UnitType, Dictionary<long, UnitEntityBase>>();
         }
 
-        public void Init()
+        public void InitModule()
         {
             unitRoot = GameObject.Find(unitRootGameobjectName);
             if (unitRoot == null)

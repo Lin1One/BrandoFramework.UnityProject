@@ -63,7 +63,7 @@ namespace Client.LegoUI
             )
             => uILoader.WaitUi(id, callback, uiLayeredCanvas, isBindRxModelOnBuild: isBindNexRxModelOnBuild);
 
-        public void Init()
+        public void InitModule()
         {
             throw new NotImplementedException();
         }

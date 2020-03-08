@@ -11,6 +11,10 @@ namespace Client.Scene
 {
     public class SceneModuleBase : ISceneModule
     {
+        public void InitModule()
+        {
+        }
+
         public Transform SceneRoot => throw new System.NotImplementedException();
 
         public Transform CameraRoot => throw new System.NotImplementedException();

@@ -3,28 +3,24 @@ using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-// ReSharper disable FieldCanBeMadeReadOnly.Global
-// ReSharper disable ConvertToConstant.Global
-// ReSharper disable UnassignedField.Global
-
 namespace Client
 {
     /// <summary>
-    /// 应用集合运行时设置。
-    /// 该类用于提供所有App公用的基础设置项。
+    /// 启动器配置。
+    /// 该类用于提供App初始的基础设置项
+    /// 在启动器中模块映射结束后对模块参数进行初始化
     /// 1. 模块实例名。
     /// 2. 第三方模块账号信息。
     /// 3. 各类模块器地址。
     /// </summary>
     [Serializable]
-    public class YuAppsRunSetting
+    public class BootstrapConfig
     {
         #region 网络配置
 
-
         [FoldoutGroup("网络配置")]
         [LabelText("Socket类型")]
-        public YuSocketType SocketType;
+        public SocketType SocketType;
 
         /// <summary>
         /// 心跳发送频率。
@@ -105,7 +101,7 @@ namespace Client
 
     }
     [Serializable]
-    public enum YuSocketType : byte
+    public enum SocketType : byte
     {
         /// <summary>
         /// 原生Socket。

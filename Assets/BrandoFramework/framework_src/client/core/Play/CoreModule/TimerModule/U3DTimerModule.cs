@@ -16,10 +16,9 @@ namespace Client.Core
     /// </summary>
     [Singleton]
     public class U3DTimerModule : ITimerModule
-    { 
-        public void Init()
+    {
+        public void InitModule()
         {
-
         }
 
         private IGenericObjectPool<U3dTimer> timerPool;

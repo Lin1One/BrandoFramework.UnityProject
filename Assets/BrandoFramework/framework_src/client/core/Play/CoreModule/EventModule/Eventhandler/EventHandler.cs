@@ -3,132 +3,88 @@ using System;
 
 namespace Client.Core
 {
-    #region 非泛型
-
-    /// <summary>
-    /// 无需目标数据的可计数的事件处理器。
-    /// </summary>
-    public class EventHandler : ITallyEventHandler
+    public class EventHandler : IEventHandler
     {
-        #region 字段
-
-        /// <summary>
-        /// 事件执行委托。
-        /// </summary>
-        private Action EventAction { get;  set; }
-
-        /// <summary>
-        /// 事件的剩余可执行次数。
-        /// </summary>
-        /// <value>The residue count.</value>
-        public int ResidueCount { get; private set; }
-
-        /// <summary>
-        /// 事件处理器的身份Id。
-        /// </summary>
-        /// <value>The identifier.</value>
+        private Delegate EventAction { get;  set; }
         public int Id { get; private set; }
 
-        #endregion
 
-        public EventHandler(int residueNum, Action action)
+        public EventHandler(Delegate action)
         {
-            ResidueCount = residueNum;
             EventAction = action;
             Id = TallyEventHandlerCounter.GetEventHandlerId();
         }
 
-        /// <summary>
-        /// 处理事件。
-        /// 1. 如果剩余次数为0或者事件处理委托为空则退出。
-        /// 2. 剩余次数大于0则执行并减一剩余次数。
-        /// 3. 剩余次数小于0则直接执行（无限执行）。
-        /// </summary>
-        public void HandleEvent()
+        public void HandleEvent(object data)
         {
-            if (EventAction == null || ResidueCount == 0) return;
-
-            if (ResidueCount < 0)
+            if (EventAction == null) return;
+            if(data == null)
             {
-                EventAction();
-                return;
+                var action = EventAction as Action;
+                action();
             }
             else
             {
-                ResidueCount--;
-                EventAction();
+                var action = EventAction as Action<object>;
+                action(data);
             }
         }
 
-        public bool CheckMatch(Action action)
+        public bool CheckMatch(Delegate action)
         {
             return action == EventAction;
         }
     }
 
-    #endregion
+    //public sealed class EventHandler<TData> : IEventHandler<TData>
+    //{
 
-    #region 泛型
+    //    private Action<TData> EventAction { get; set; }
 
-    /// <summary>
-    /// 需要目标数据的可计数的事件处理器。
-    /// </summary>
-    public sealed class EventHandler<TData> : ITallyEventHandler<TData>
-    {
-        /// <summary>
-        /// 事件执行委托。
-        /// </summary>
-        /// <value>The event action.</value>
-        private Action<TData> EventAction { get; set; }
+    //    public int Id { get; private set; }
 
-        /// <summary>
-        /// 事件的剩余可执行次数。
-        /// </summary>
-        /// <value>The residue count.</value>
-        public int ResidueCount { get; private set; }
+    //    public EventHandler(Action<TData> action)
+    //    {
+    //        EventAction = action;
+    //        Id = TallyEventHandlerCounter.GetEventHandlerId();
+    //    }
 
-        /// <summary>
-        /// 事件处理器的身份Id。
-        /// </summary>
-        /// <value>The identifier.</value>
-        public int Id { get; private set; }
+    //    public void HandleEvent(TData eventData)
+    //    {
+    //        if (EventAction == null) return;
+    //        EventAction(eventData);
+    //    }
 
-        public EventHandler(int residueCount, Action<TData> action)
-        {
-            ResidueCount = residueCount;
-            EventAction = action;
-            Id = TallyEventHandlerCounter.GetEventHandlerId();
-        }
+    //    public bool CheckMatch(Action<TData> action)
+    //    {
+    //        return action == EventAction;
+    //    }
+    //}
 
-        /// <summary>
-        /// 处理事件。
-        /// 1. 如果剩余次数为0或者事件处理委托为空则退出。
-        /// 2. 剩余次数大于0则执行并减一剩余次数。
-        /// 3. 剩余次数小于0则直接执行（无限执行）。
-        /// </summary>
-        public void HandleEvent(TData eventData)
-        {
-            if (EventAction == null || ResidueCount == 0) return;
+    //public sealed class EventHandler<T1,T2> : IEventHandler<T1,T2>
+    //{
 
-            if (ResidueCount < 0)
-            {
-                EventAction(eventData);
-                return;
-            }
-            else
-            {
-                ResidueCount--;
-                EventAction(eventData);
-            }
-        }
+    //    private Action<T1, T2> EventAction { get; set; }
 
-        public bool CheckMatch(Action<TData> action)
-        {
-            return action == EventAction;
-        }
-    }
+    //    public int Id { get; private set; }
 
-    #endregion
+    //    public EventHandler(Action<T1, T2> action)
+    //    {
+    //        EventAction = action;
+    //        Id = TallyEventHandlerCounter.GetEventHandlerId();
+    //    }
+
+    //    public void HandleEvent(T1 eventData1, T2 eventData2)
+    //    {
+    //        if (EventAction == null) return;
+    //        EventAction(eventData1, eventData2);
+    //    }
+
+    //    public bool CheckMatch(Action<T1, T2> action)
+    //    {
+    //        return action == EventAction;
+    //    }
+    //}
 
 }
 

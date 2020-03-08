@@ -44,13 +44,6 @@ namespace DraftBorad
             }
             Debug.Log(canvas.GetComponent<Canvas>().overrideSorting);
         }
-
-        //[LabelText("11")]
-        //public TableDataBoard<TestProject_ExcelEntity_Test> datas;
-
-        [LabelText("22")]
-        [TableList]
-        public List<TestProject_ExcelEntity_Test> data;
     }
 }
 

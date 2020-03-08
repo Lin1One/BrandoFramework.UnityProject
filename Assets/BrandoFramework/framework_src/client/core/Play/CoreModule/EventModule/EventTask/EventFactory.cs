@@ -48,8 +48,5 @@ namespace Client.Core
         public static readonly IGenericObjectPool<EventTask> EventTaskPool
         = new GenericObjectPool<EventTask>(() => new EventTask(), 10);
 
-
-
-
     }
 }

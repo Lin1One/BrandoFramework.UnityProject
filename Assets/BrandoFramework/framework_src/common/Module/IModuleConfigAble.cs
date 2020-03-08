@@ -7,9 +7,9 @@
 
 namespace Common
 {
-    public interface IModule
+    public interface IModuleConfigAble
     {
-        void InitModule();
+        void ApplyConfig(IModuleConfig config);
     }
 }
 
