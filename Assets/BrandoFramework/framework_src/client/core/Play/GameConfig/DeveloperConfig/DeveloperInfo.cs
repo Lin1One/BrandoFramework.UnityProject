@@ -8,14 +8,14 @@
 using Common.PrefsData;
 using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 
 namespace Client.Core
 {
-    [YuDatiDetailHelpDesc("开发者信息")]
-    [DatiInEditor]
+    [DatiDetailHelpDesc("开发者信息")]
+    [DatiOnlyInEditor]
     public class DeveloperInfoDati: GenericSingleDati<DeveloperInfo, DeveloperInfoDati>
     {
-
     }
 
     [Serializable]

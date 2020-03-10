@@ -11,7 +11,7 @@ using System;
 namespace Common
 {
     /// <summary>
-    /// 编辑器上下文的计时器模块。
+    /// 通用计时器模块。
     /// </summary>
     [Singleton]
     public class CommonTimerModule : ITimerModule
@@ -35,7 +35,7 @@ namespace Common
 
         public void InitModule()
         {
-            throw new NotImplementedException();
+           
         }
 
         public void Dispose()

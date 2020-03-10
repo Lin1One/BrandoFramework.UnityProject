@@ -17,8 +17,7 @@ using UnityEngine;
 namespace Client.Assets.Editor
 {
     [Serializable]
-    [YuDatiDesc(YuDatiSaveType.Single, typeof(AssetBundleEditorDati),
-        "应用配置及资料/AssetBundle/打包配置")]
+    [DatiDesc(DatiSaveType.Single, "应用配置及资料/AssetBundle/打包配置")]
     public class AssetBundleEditorDati : GenericSingleDati<AssetBundleEditor,AssetBundleEditorDati>
     {
         #region 注册ProjectChange事件

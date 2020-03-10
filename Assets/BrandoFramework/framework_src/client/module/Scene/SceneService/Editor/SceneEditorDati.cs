@@ -14,8 +14,7 @@ using UnityEngine.SceneManagement;
 namespace Client.Scene.Editor
 {
     [Serializable]
-    [YuDatiDesc(YuDatiSaveType.Single, typeof(SceneEditorDati),
-        "应用配置及资料/场景编辑")]
+    [DatiDesc(DatiSaveType.Single, "应用配置及资料/场景编辑")]
     public class SceneEditorDati : GenericSingleDati<SceneEditor, SceneEditorDati>
     {
         public override void OnEnable()

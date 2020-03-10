@@ -12,8 +12,8 @@ using System;
 namespace Client.DataTable.Editor
 {
     [Serializable]
-    [DatiInEditor]
-    [YuDatiDesc(YuDatiSaveType.Single, typeof(DataTableEditorDati), "Excel工具")]
+    [DatiOnlyInEditor]
+    [DatiDesc(DatiSaveType.Single,"Excel工具")]
     public class DataTableEditorDati : GenericSingleDati<DataTableEditor,DataTableEditorDati>
     {
     }

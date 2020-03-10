@@ -20,7 +20,7 @@ namespace Common.PrefsData
     /// <typeparam name="TActual"></typeparam>
     /// <typeparam name="TImpl"></typeparam>
     [Serializable]
-    [YuDatiSuffix(".txt")]
+    [DatiSuffix(".txt")]
     public abstract class GenericDatiInJson<TActual, TImpl> : GenericDati<TActual, TImpl>
         where TActual : class, new()
         where TImpl : class

@@ -19,7 +19,7 @@ using System;
 namespace Client.LegoUI
 {
     [Serializable]
-    [YuDatiDesc(YuDatiSaveType.Multi, typeof(YuU3dAppLegoUISettingDati), "应用配置及资料/乐高UI")]
+    [DatiDesc(DatiSaveType.Multi, "应用配置及资料/乐高UI")]
     public class YuU3dAppLegoUISettingDati : GenericMultiDati<YuU3dAppLegoUISetting,
         YuU3dAppLegoUISettingDati>
     {

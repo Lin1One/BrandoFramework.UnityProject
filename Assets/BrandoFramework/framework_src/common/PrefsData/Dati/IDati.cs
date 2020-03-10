@@ -13,8 +13,7 @@ namespace Common.PrefsData
 
     }
 
-    public interface IDati<out T> : /*IYuDati<T>*/ IDati
-        where T : class, new()
+    public interface IDati<out T> : IDati where T : class, new()
     {
     }
 

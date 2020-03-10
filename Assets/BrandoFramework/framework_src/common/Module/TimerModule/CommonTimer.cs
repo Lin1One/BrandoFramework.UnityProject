@@ -100,7 +100,7 @@ namespace Common
             if (DelayStartTime < 0)
             {
                 RequireInvokeDelayStart = false;
-                //                Debug.Log($"计时器{UniqueId}无需延时启动，将立即启动！");
+                //Debug.Log($"计时器{UniqueId}无需延时启动，将立即启动！");
                 OnStart?.Invoke(this);
                 Tick();
                 return;
@@ -123,7 +123,7 @@ namespace Common
         private void Tick()
         {
             TickRunTime += TimerDispatcher.INTERVAL;
-            //            Debug.Log($"计时器{UniqueId}周期运行时间为{TickRunTime}！");
+            //Debug.Log($"计时器{UniqueId}周期运行时间为{TickRunTime}！");
             if (TickRunTime <= Frequency)
             {
                 return;

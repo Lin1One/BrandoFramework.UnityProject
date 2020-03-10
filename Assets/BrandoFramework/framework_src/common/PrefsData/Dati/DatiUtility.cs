@@ -6,7 +6,6 @@
 
 #endregion
 
-using Common;
 using Common.Utility;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -25,21 +24,10 @@ namespace Common.PrefsData
         /// <returns></returns>
         public static string GetSuffix(Type type)
         {
-            var suffixAttr = type.GetAttribute<YuDatiSuffixAttribute>() ?? 
-                type.BaseType.GetAttribute<YuDatiSuffixAttribute>();
+            var suffixAttr = type.GetAttribute<DatiSuffixAttribute>() ?? 
+                type.BaseType.GetAttribute<DatiSuffixAttribute>();
             var suffix = suffixAttr == null ? ".bytes" : suffixAttr.Suffix;
             return suffix;
-        }
-
-        /// <summary>
-        /// 获取资料文件环境文件类型
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        public static string GetDatiEnvironmentDirType(Type type)
-        {
-            var hasInEditorAttr = type.HasAttribute<DatiInEditorAttribute>();
-            return hasInEditorAttr ? "Editor" : "Play";
         }
 
         public static string GetSaveDir(Type type) =>
@@ -53,7 +41,7 @@ namespace Common.PrefsData
         public static string GetSingleScriptObjectPath(Type type)
         {
             var path = $"Assets/DatiFile/{GetDatiEnvironmentDirType(type)}/{type.Name}" +
-                       $"/{type.Name}_ScriptObjectAsset.asset";
+                       $"/{type.Name}.asset";
             return path;
         }
 
@@ -62,7 +50,7 @@ namespace Common.PrefsData
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static string GetSingleOriginPath(Type type)
+        public static string GetSingleSerializeDataPath(Type type)
         {
             var suffix = GetSuffix(type);
             var path = Application.dataPath + $"/DatiFile/{GetDatiEnvironmentDirType(type)}/" +
@@ -91,6 +79,17 @@ namespace Common.PrefsData
 
                 return path;
             }
+        }
+
+        /// <summary>
+        /// 获取资料文件环境文件类型,以确定输出文件夹位置
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static string GetDatiEnvironmentDirType(Type type)
+        {
+            var hasInEditorAttr = type.HasAttribute<DatiOnlyInEditorAttribute>();
+            return hasInEditorAttr ? "Editor" : "Play";
         }
 
         /// <summary>

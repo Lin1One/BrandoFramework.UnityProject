@@ -22,10 +22,7 @@ namespace Common.PrefsData
 
         #region 单例资料加载
 
-
-        private static Dictionary<Type, object> singles;
-        private static Dictionary<Type, object> Singles => 
-            singles ?? (singles = new Dictionary<Type, object>());
+        private static GenericSingleDati<TActual, TImpl> instance;
 
         /// <summary>
         /// 获取单例配置数据
@@ -37,20 +34,16 @@ namespace Common.PrefsData
         public static GenericSingleDati<TActual, TImpl> GetSingleDati()
         {
             var implType = typeof(TImpl);
-            if (Singles.ContainsKey(implType))
+            if (instance != null)
             {
-                var existInstance = Singles[implType];
-                if(existInstance != null)
-                {
-                    return (GenericSingleDati<TActual, TImpl>)existInstance;
-                }
-                Singles.Remove(implType);
+                return instance;
             }
 
-            GenericSingleDati<TActual, TImpl> instance = null;
+            //获取 ScriptableObject Asset 文件路径
             var assetFilePath = DatiUtility.GetSingleScriptObjectPath(implType);
 
 #if UNITY_EDITOR
+            //在编辑器下，直接加载 Asset 文件
             if (YuUnityUtility.IsEditorMode)
             {
                 if (File.Exists(assetFilePath))
@@ -60,16 +53,14 @@ namespace Common.PrefsData
                 }
             }
 #endif
-
+            // Asset 文件加载失败或在运行时，加载序列化文件
             if (instance == null)
             {
-                var originPath = DatiUtility.GetSingleOriginPath(implType);
+                var originPath = DatiUtility.GetSingleSerializeDataPath(implType);
                 instance = YuUnityUtility.IsEditorMode
                     ? LoadSingleOriginAtEditor(implType, originPath, assetFilePath)
                     : LoadSingleOriginAtPlay(implType, originPath);
             }
-
-            Singles.Add(implType, instance);
             instance.LoadDetailHelp();
             return instance;
         }
@@ -83,13 +74,14 @@ namespace Common.PrefsData
         private static GenericSingleDati<TActual, TImpl> LoadSingleOriginAtPlay(Type implType,
             string originPath)
         {
+            var newScriptInstance = (GenericSingleDati<TActual, TImpl>)CreateInstance(implType);
             if (!File.Exists(originPath))
             {
                 Debug.LogError($"具体资源文件{originPath}不存在！");
                 return null;
             }
 
-            var newScriptInstance = (GenericSingleDati<TActual, TImpl>)CreateInstance(implType);
+            
             var actualObj = newScriptInstance.DeSerialize(originPath);
             newScriptInstance.ActualSerializableObject = actualObj;
             return newScriptInstance;
@@ -99,7 +91,6 @@ namespace Common.PrefsData
             string originPath, string scriptPath)
         {
             var newScriptInstance = (GenericSingleDati<TActual, TImpl>)CreateInstance(implType);
-
             if (File.Exists(originPath))
             {
                 var actualObj = newScriptInstance.DeSerialize(originPath);
@@ -107,7 +98,7 @@ namespace Common.PrefsData
             }
             else
             {
-                ////newScriptInstance.ActualSerializableObject = YuDatiFactory.GetActualDataObject<TActual>();
+                //newScriptInstance.ActualSerializableObject = DatiFactory.GetActualDataObject<TActual>();
             }
 
 #if UNITY_EDITOR
@@ -128,7 +119,7 @@ namespace Common.PrefsData
         public override void Save()
         {
             var type = GetType();
-            var originPath = DatiUtility.GetSingleOriginPath(type);
+            var originPath = DatiUtility.GetSingleSerializeDataPath(type);
 
             Serialize(originPath);
             Debug.Log($"目标路径{originPath}的资料文件已更新！");

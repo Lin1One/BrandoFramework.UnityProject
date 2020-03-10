@@ -81,7 +81,7 @@ namespace Common.EditorWindow
 
         private void CreateDati(object data)
         {
-            var datiDesc = (YuDatiDescAttribute)data;
+            var datiDesc = (DatiDescAttribute)data;
             //switch (datiDesc.DatiSaveType)
             //{
             //    case YuDatiSaveType.Single:

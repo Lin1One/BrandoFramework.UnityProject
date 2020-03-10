@@ -20,6 +20,24 @@ namespace Common.PrefsData
     [Serializable]
     public abstract class Dati : ScriptableObject, IDati
     {
+        public static Dati CreateDati(Type type)
+        {
+            var newScriptInstance = (Dati)CreateInstance(type);
+            return newScriptInstance;
+        }
+
+        public virtual void OnActive()
+        {
+        }
+
+        public virtual void OnEnable()
+        {
+        }
+
+        public virtual void OnClose()
+        {
+        }
+
         #region 可关闭的详细说明
 
         [NonSerialized]
@@ -51,7 +69,7 @@ namespace Common.PrefsData
 
         protected void LoadDetailHelp()
         {
-            var detailHelperAttr = GetType().GetAttribute<YuDatiDetailHelpDescAttribute>();
+            var detailHelperAttr = GetType().GetAttribute<DatiDetailHelpDescAttribute>();
             if (detailHelperAttr == null)
             {
                 return;
@@ -62,23 +80,6 @@ namespace Common.PrefsData
 
         #endregion
 
-        public static Dati CreateDati(Type type)
-        {
-            var newScriptInstance = (Dati)CreateInstance(type);
-            return newScriptInstance;
-        }
-
-        public virtual void OnActive()
-        {
-        }
-
-        public virtual void OnEnable()
-        {
-        }
-
-        public virtual void OnClose()
-        {
-        }
     }
 
 }

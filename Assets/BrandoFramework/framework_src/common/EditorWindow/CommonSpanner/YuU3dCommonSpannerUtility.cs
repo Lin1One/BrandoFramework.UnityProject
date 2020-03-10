@@ -79,9 +79,9 @@ namespace Common.EditorWindow
         //    }
         //}
 
-        private static List<YuDatiDescAttribute> singleDescs;
+        private static List<DatiDescAttribute> singleDescs;
 
-        public static List<YuDatiDescAttribute> SingleDescs
+        public static List<DatiDescAttribute> SingleDescs
         {
             get
             {

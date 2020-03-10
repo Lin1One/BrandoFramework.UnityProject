@@ -3,11 +3,10 @@ using System.Collections.Generic;
 
 namespace Common
 {
-
     /// <summary>
     /// 基础泛型对象池。
     /// </summary>
-    public class GenericObjectPool<T> : IGenericObjectPool<T> where T : class
+    public class GenericObjectPool<T> : IGenericObjectPool<T> where T : class 
     {
         /// <summary>
         /// 当前还未使用处于空闲状态的实例列表。
@@ -21,9 +20,9 @@ namespace Common
 
         private readonly Func<T> createFunc;
         private readonly Action<T> onCreated;
-        private readonly string key;
         private readonly Action<T> destroy;
         private readonly int initCount;
+        private readonly string key;
 
         /// <summary>
         /// 构建一个对象池。
@@ -90,8 +89,10 @@ namespace Common
                 return false;
             }
 
+            //T 可能为 C# 核心库类型，所以对 T 不做 IReset 限制
             var reset = t as IReset;
             reset?.Reset();
+
             DispatchedObjects.Remove(t);
             AvaliableObjects.Add(t);
             return true;

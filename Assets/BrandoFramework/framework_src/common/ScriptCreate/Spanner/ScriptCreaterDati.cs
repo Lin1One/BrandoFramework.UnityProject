@@ -17,7 +17,7 @@ using System;
 
 namespace Common.ScriptCreate
 {
-    [DatiInEditor]
+    [DatiOnlyInEditor]
     [Serializable]
     public class ScriptCreaterDati: GenericSingleDati<YuScriptCreater, ScriptCreaterDati>
     {

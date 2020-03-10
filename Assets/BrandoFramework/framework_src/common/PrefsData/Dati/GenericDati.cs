@@ -49,8 +49,8 @@ namespace Common.PrefsData
         [Button("保存资料文件", ButtonSizes.Medium)]
         public abstract void Save();
 
-        private bool CheckIsMulti() =>
-            GetType().GetAttribute<YuDatiDescAttribute>()?.DatiSaveType != YuDatiSaveType.Multi;
+        //private bool CheckIsMulti() =>
+        //    GetType().GetAttribute<YuDatiDescAttribute>()?.DatiSaveType != YuDatiSaveType.Multi;
 
 #endif
 
