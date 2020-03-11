@@ -90,7 +90,7 @@ namespace Client.Assets.Editor
                 currentAssetbundleSetting.SetBuildAtTargetBuildType(dir, buildType);
                 if (buildType == AssetBundleBuildType.BuildAtDirTree) // 清理所有子目录的打包配置
                 {
-                    var sonDirs = IOUtility.FirstSonDirs(dir);
+                    var sonDirs = IOUtility.GetAllDir(dir, null, true, false);
                     foreach (var sonDir in sonDirs)
                     {
                         currentAssetbundleSetting.CleanBuildSettingAtDir(sonDir);
@@ -513,14 +513,14 @@ namespace Client.Assets.Editor
         }
 
         private static List<string> FirstSonDirs => 
-            IOUtility.FirstSonDirs(Unity3DEditorUtility.GetSelectDir());
+            IOUtility.GetAllDir(Unity3DEditorUtility.GetSelectDir(), null, true, false);
 
         private static List<string> AllSonDirs
         {
             get
             {
                 var selectDir = Unity3DEditorUtility.GetSelectDir();
-                var sonDirs = IOUtility.GetAllSonDirNotSelf(selectDir);
+                var sonDirs = IOUtility.GetAllDir(selectDir,null,false,false);
                 sonDirs.RemoveAt(0);
                 return sonDirs;
             }

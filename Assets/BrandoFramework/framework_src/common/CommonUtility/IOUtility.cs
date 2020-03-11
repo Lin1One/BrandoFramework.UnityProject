@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine;
 
 namespace Common.Utility
 {
@@ -15,6 +14,70 @@ namespace Common.Utility
     public static class IOUtility
     {
         #region 目录操作
+
+        /// <summary>
+        /// 获得目标目录的所有子目录及自身。
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <param name="selectFunc"></param>
+        /// <returns></returns>
+        public static List<string> GetAllDir(string dir, Func<string, bool> selectFunc = null, 
+            bool onlyTopDir = false, bool includeRoot = true)
+        {
+            //  新建返回结果列表并添加自身。
+            var dirs = new List<string>();
+            if (includeRoot) dirs.Add(dir);
+            GetAllDirs(dir, dirs, onlyTopDir);
+            if (selectFunc != null)
+            {
+                dirs = dirs.Where(selectFunc).ToList();
+            }
+
+            return dirs;
+        }
+
+        /// <summary>
+        /// 获得指定目录下所有子目录。
+        /// </summary>
+        /// <param name="dir">目标目录。</param>
+        /// <param name="dirs">存放结果列表。</param>
+        /// <returns></returns>
+        private static void GetAllDirs(string dir, List<string> dirs, bool onlyTopDir = false)
+        {
+            if (string.IsNullOrEmpty(dir))
+            {
+                //Debug.LogError("目标目录为空！");
+                return;
+            }
+
+            if (!Directory.Exists(dir))
+            {
+                //Debug.LogError($"目标字符串{dir}不是一个有效目录");
+                return;
+            }
+
+            var sonDirs = onlyTopDir ? Directory.GetDirectories(dir, "*", SearchOption.TopDirectoryOnly) :
+                 Directory.GetDirectories(dir);
+                
+            if (sonDirs.Length <= 0) return;
+            foreach (var sonDir in sonDirs)
+            {
+                var tempDir = string.Empty;
+                if (!sonDir.EndsWith("/"))
+                {
+                    tempDir = sonDir + "/";
+                }
+
+                tempDir = tempDir.Replace("\\", "/");
+                dirs.Add(tempDir);
+                if(!onlyTopDir)
+                {
+                    GetAllDirs(tempDir, dirs);
+                }
+                
+            }
+        }
+
 
         /// <summary>
         /// 获得指定目录下的所有子目录中同名目录列表。
@@ -30,7 +93,7 @@ namespace Common.Utility
 
             foreach (var targetDir in targetDirs)
             {
-                var dirs = GetAllSonDirNotSelf(targetDir);
+                var dirs = GetAllDir(targetDir,null,false,false);
 
                 foreach (var d in dirs)
                 {
@@ -57,106 +120,6 @@ namespace Common.Utility
         }
 
         /// <summary>
-        /// 获得指定目录下所有子目录并过滤指定条件目录。
-        /// 不包含目标目录自身。
-        /// </summary>
-        /// <param name="dir">目标目录。</param>
-        /// <param name="selectFunc">过滤委托。</param>
-        /// <returns></returns>
-        public static List<string> GetAllSonDirNotSelf(string dir, Func<string, bool> selectFunc = null)
-        {
-            //  新建返回结果列表并添加自身。
-            var dirs = new List<string> { dir };
-            GetAllDirs(dir, dirs);
-            if (selectFunc != null)
-            {
-                dirs = dirs.Where(selectFunc).ToList();
-            }
-
-            dirs.RemoveAt(0); // 移除目标目录自身。
-            return dirs;
-        }
-
-        /// <summary>
-        /// 获得目标目录的所有子目录及自身。
-        /// </summary>
-        /// <param name="dir"></param>
-        /// <param name="selectFunc"></param>
-        /// <returns></returns>
-        public static List<string> GetAllDir(string dir, Func<string, bool> selectFunc = null)
-        {
-            //  新建返回结果列表并添加自身。
-            var dirs = new List<string> { dir };
-            GetAllDirs(dir, dirs);
-            if (selectFunc != null)
-            {
-                dirs = dirs.Where(selectFunc).ToList();
-            }
-
-            return dirs;
-        }
-
-        /// <summary>
-        /// 获得指定目录的所有子目录。
-        /// </summary>
-        /// <param name="dir"></param>
-        /// <returns></returns>
-        public static List<string> FirstSonDirs(string dir)
-        {
-            var dirs = new List<string>();
-            var sonDirs = Directory.GetDirectories(dir);
-            foreach (var sonDir in sonDirs)
-            {
-                var tempDir = string.Empty;
-                if (!sonDir.EndsWith("/"))
-                {
-                    tempDir = sonDir + "/";
-                }
-
-                tempDir = tempDir.Replace("\\", "/");
-                dirs.Add(tempDir);
-            }
-
-            return dirs;
-        }
-
-        /// <summary>
-        /// 获得指定目录下所有子目录并过滤指定条件目录。
-        /// </summary>
-        /// <param name="dir">目标目录。</param>
-        /// <returns></returns>
-        private static void GetAllDirs(string dir, List<string> dirs)
-        {
-            if (string.IsNullOrEmpty(dir))
-            {
-                Debug.LogError("目标目录为空！");
-                return;
-            }
-
-            if (!Directory.Exists(dir))
-            {
-                Debug.LogError($"目标字符串{dir}不是一个有效目录");
-                return;
-            }
-
-            if (Directory.GetDirectories(dir).Length <= 0) return;
-
-            var sonDirs = Directory.GetDirectories(dir);
-            foreach (var sonDir in sonDirs)
-            {
-                var tempDir = string.Empty;
-                if (!sonDir.EndsWith("/"))
-                {
-                    tempDir = sonDir + "/";
-                }
-
-                tempDir = tempDir.Replace("\\", "/");
-                dirs.Add(tempDir);
-                GetAllDirs(tempDir, dirs);
-            }
-        }
-
-        /// <summary>
         /// 确保指定的目录或路径上的所有目录的存在性。
         /// </summary>
         /// <param name="targetPath"></param>
@@ -164,7 +127,7 @@ namespace Common.Utility
         {
             var lastIndex = targetPath.LastIndexOf("/", StringComparison.Ordinal);
             var lastDir = targetPath.Substring(0, lastIndex);
-            TryCreateDirectory(lastDir);
+            CreateDirectory(lastDir);
         }
 
         /// <summary>
@@ -173,7 +136,7 @@ namespace Common.Utility
         /// <param name="targetDir">目标目录。</param>
         /// <param name="isHide">是否隐藏刚创建的目录。</param>
         /// <returns></returns>
-        public static void TryCreateDirectory(string targetDir, bool isHide = false)
+        public static void CreateDirectory(string targetDir, bool isHide = false)
         {
             if (Directory.Exists(targetDir)) return;
 
@@ -194,7 +157,7 @@ namespace Common.Utility
         }
 
         /// <summary>
-        /// 克隆目标目录及其下所有子目录的目录树结构到目标目录。
+        /// 克隆目标目录及其下所有子目录的目录树结构到目标目录(不包括文件)
         /// </summary>
         /// <param name="leftDir">目录一。</param>
         /// <param name="rightDir">目录二。</param>
@@ -204,7 +167,7 @@ namespace Common.Utility
             foreach (var dir in dirs)
             {
                 var newDir = dir.Replace(leftDir, rightDir);
-                TryCreateDirectory(newDir);
+                CreateDirectory(newDir);
             }
         }
 
@@ -247,7 +210,7 @@ namespace Common.Utility
         /// 如果目录不存在则操作取消。
         /// </summary>
         /// <param name="dir">目标目录</param>
-        public static void TryDeleteDirectory(string dir)
+        public static void DeleteDirectory(string dir)
         {
             if (!Directory.Exists(dir)) return;
 
@@ -260,48 +223,6 @@ namespace Common.Utility
         #region 文件操作
 
         /// <summary>
-        /// 获得目标目录下所有文件的文件信息列表。
-        /// 仅目录自身下文件，不包含子目录。
-        /// </summary>
-        /// <param name="dir"></param>
-        /// <returns></returns>
-        public static List<FileInfo> GetFileInfosAtDir(string dir)
-        {
-            if (!Directory.Exists(dir))
-            {
-                return null;
-            }
-
-            var di = new DirectoryInfo(dir);
-            var fileInfos = di.GetFiles().ToList();
-            return fileInfos;
-        }
-
-        /// <summary>
-        /// 获得目标目录下所有文件的文件信息列表。
-        /// 包含子目录
-        /// </summary>
-        /// <param name="dir"></param>
-        /// <returns></returns>
-        public static List<FileInfo> GetAllFileInfosAtDir(string dir)
-        {
-            if (!Directory.Exists(dir))
-            {
-                return null;
-            }
-
-            var di = new DirectoryInfo(dir);
-            List<FileInfo> fileInfos = di.GetFiles().ToList();
-            var childDirInfos = di.GetDirectories().ToList();
-            foreach(var childDir in childDirInfos)
-            {
-                fileInfos.AddRange(GetAllFileInfosAtDir(childDir.FullName));
-            }
-            return fileInfos;
-        }
-
-
-        /// <summary>
         /// 将指定文件移动到目标目录中。
         /// 如果目标目录不存在将会自动创建新目录。
         /// </summary>
@@ -311,6 +232,18 @@ namespace Common.Utility
         {
             EnsureDirExist(targetPath);
             File.Move(sourcePath, targetPath);
+        }
+
+        /// <summary>
+        /// 如果指定的路径上有文件存在则删除。
+        /// </summary>
+        /// <param name="path">目标路径。</param>
+        public static void DeleteFile(string path)
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
         }
 
         /// <summary>
@@ -351,7 +284,7 @@ namespace Common.Utility
         {
             if (!File.Exists(sourcePath))
             {
-                Debug.Log($"源路径{sourcePath}文件不存在！");
+                //Debug.Log($"源路径{sourcePath}文件不存在！");
                 return;
             }
 
@@ -373,16 +306,28 @@ namespace Common.Utility
             File.Copy(sourcePath, newPath);
         }
 
-        /// <summary>
-        /// 如果指定的路径上有文件存在则删除。
-        /// </summary>
-        /// <param name="path">目标路径。</param>
-        public static void TryDeleteFile(string path)
+        public static void Rename(string sourcePath, string targetPath)
         {
-            if (File.Exists(path))
+            var fielInfo = new FileInfo(sourcePath);
+            fielInfo.MoveTo(Path.Combine(sourcePath, targetPath));
+        }
+
+        /// <summary>
+        /// 获得目标目录下所有文件的文件信息列表。
+        /// </summary>
+        /// <param name="dir"></param>
+        /// <returns></returns>
+        public static List<FileInfo> GetFileInfosAtDir(string dir, bool allFile = false)
+        {
+            if (!Directory.Exists(dir))
             {
-                File.Delete(path);
+                return null;
             }
+
+            var di = new DirectoryInfo(dir);
+            var fileInfos = allFile ? di.GetFiles("*", SearchOption.AllDirectories).ToList() :
+                di.GetFiles().ToList();
+            return fileInfos;
         }
 
         /// <summary>
@@ -393,12 +338,12 @@ namespace Common.Utility
         {
             if (!Directory.Exists(dir))
             {
-                Debug.LogError($"给定的字符串{dir}不是一个有效目录！");
+                //Debug.LogError($"给定的字符串{dir}不是一个有效目录！");
                 return;
             }
 
             var paths = GetPathsContainSonDir(dir);
-            paths.ForEach(TryDeleteFile);
+            paths.ForEach(DeleteFile);
         }
 
         /// <summary>
@@ -407,51 +352,40 @@ namespace Common.Utility
         /// </summary>
         /// <param name="path">目标路径。</param>
         /// <param name="content">要写入的文本内容。</param>
-        public static void WriteAllText(string path, string content)
+        public static void WriteAllText(string path, string content,bool forceWrite = true)
         {
             EnsureDirExist(path);
             if (File.Exists(path))
             {
+                if (!forceWrite)
+                {//Debug.Log($"目标路径{path}已存在文件，创建取消！");
+                    return;
+                }
                 File.Delete(path);
             }
 
             File.WriteAllText(path, content);
         }
 
-        /// <summary>
-        /// 尝试在指定的路径上创建文本文件并写入指定内容。
-        /// 该方法会自动创建对应的目录树结构。
-        /// 如果目标路径已存在文件则创建取消。
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="content"></param>
-        public static void TryWriteAllText(string path, string content)
+        public static void WriteAllBytes(string path, byte[] bytes, bool forceWrite = false)
         {
             EnsureDirExist(path);
             if (File.Exists(path))
             {
-                Debug.Log($"目标路径{path}已存在文件，创建取消！");
-                return;
-            }
-
-            File.WriteAllText(path, content);
-        }
-
-        public static void SerializeAndWriteBytes(string path, object obj, bool isDeleteExist = false)
-        {
-            //var bytes = YuSerializeUtility.Serialize(obj);
-            //WriteAllBytes(path, bytes, isDeleteExist);
-        }
-
-        public static void WriteAllBytes(string path, byte[] bytes, bool isDeleteExist = false)
-        {
-            EnsureDirExist(path);
-            if (File.Exists(path) && isDeleteExist)
-            {
+                if (!forceWrite)
+                {
+                    return;
+                }
                 File.Delete(path);
             }
 
             File.WriteAllBytes(path, bytes);
+        }
+
+        public static void SerializeAndWriteBytes(string path, object obj, bool isDeleteExist = false)
+        {
+            var bytes = SerializeUtility.Serialize(obj);
+            WriteAllBytes(path, bytes, isDeleteExist);
         }
 
         /// <summary>
@@ -475,8 +409,8 @@ namespace Common.Utility
 
         private static FileStream fs;
         private static Action<byte[]> readCallback;
-        private static List<byte> buffer;
 
+        private static List<byte> buffer;
         private static List<byte> Buffer => buffer ?? (buffer = new List<byte>(1024 * 1024));
 
         public static void ReadFileAsync(string path, Action<byte[]> callback)
@@ -670,7 +604,7 @@ namespace Common.Utility
         {
             if (!Directory.Exists(dir))
             {
-                TryCreateDirectory(dir);
+                CreateDirectory(dir);
             }
 
             var pathDictionary = new Dictionary<string, string>();
@@ -681,7 +615,7 @@ namespace Common.Utility
                 var fileName = Path.GetFileNameWithoutExtension(path);
                 if (fileName != null && pathDictionary.ContainsKey(fileName))
                 {
-                    Debug.LogWarning($"目标目录及其子目录下存在同名文件，文件名为：{fileName}");
+                    //Debug.LogWarning($"目标目录及其子目录下存在同名文件，文件名为：{fileName}");
                     continue;
                 }
 
@@ -695,11 +629,5 @@ namespace Common.Utility
         }
 
         #endregion
-
-        public static void Rename(string sourcePath, string targetPath)
-        {
-            var fielInfo = new FileInfo(sourcePath);
-            fielInfo.MoveTo(Path.Combine(sourcePath, targetPath));
-        }
     }
 }

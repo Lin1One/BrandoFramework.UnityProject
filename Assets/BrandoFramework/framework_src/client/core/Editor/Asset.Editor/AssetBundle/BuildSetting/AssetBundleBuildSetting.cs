@@ -79,7 +79,7 @@ namespace Client.Assets.Editor
 
             var dirId = IOUtility.GetSomeDirPath(Dir, 3);
             AtSizeSetting.SizeInfo = new AssetBundleBuildSizeInfo();
-            var fileInfos = IOUtility.GetAllFileInfosAtDir(Dir)
+            var fileInfos = IOUtility.GetFileInfosAtDir(Dir,true)
                 .Where(d => YuAssetBundleUtility.EndCheck(IgnoreRule, d.FullName))
                 .Where(d => YuAssetBundleUtility.ContainCheck(IgnoreRule, d.FullName)).ToList();
             long maxSize = AtSizeSetting.PackageSize * 1024;
