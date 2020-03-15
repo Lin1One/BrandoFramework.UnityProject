@@ -1,5 +1,5 @@
+using Client.Utility;
 using Common;
-using Common.Utility;
 using UnityEngine;
 
 #region Head

@@ -1,5 +1,6 @@
 ﻿using Client.Assets;
 using Client.Core;
+using Client.Utility;
 using Common;
 using Common.Utility;
 using System;
@@ -141,7 +142,7 @@ namespace Client.LegoUI
                     return newModel;
                 }
 
-                var instance = JsonUtility.FromJson(textAsset.text, type);
+                var instance = UnityEngine.JsonUtility.FromJson(textAsset.text, type);
                 return instance;
             }
 

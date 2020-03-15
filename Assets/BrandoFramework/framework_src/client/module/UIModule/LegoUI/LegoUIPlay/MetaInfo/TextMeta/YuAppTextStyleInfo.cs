@@ -47,7 +47,7 @@ namespace Client.LegoUI
                     {
                         var resId = "Setting/YuTextStyle/" + curAppID + "TextStyleInfo";
                         var textAsset = Resources.Load<TextAsset>(resId);
-                        currentAppTextStyle = JsonUtility.FromJson<YuAppTextStyleInfo>(textAsset.text);
+                        currentAppTextStyle = UnityEngine.JsonUtility.FromJson<YuAppTextStyleInfo>(textAsset.text);
                     }
                     return currentAppTextStyle;
                 }
@@ -75,7 +75,7 @@ namespace Client.LegoUI
                 AppTextStyleInfoDic[appID];
             string fullPath = GetAppTextStyleSettingTxtPath(
                 appID);
-            var jsContent = JsonUtility.ToJson(currentAppTextStyle);
+            var jsContent = UnityEngine.JsonUtility.ToJson(currentAppTextStyle);
             ////jsContent = EditorAPIInvoker.PrettifyJsonString(jsContent);
             IOUtility.WriteAllText(fullPath, jsContent);
         }

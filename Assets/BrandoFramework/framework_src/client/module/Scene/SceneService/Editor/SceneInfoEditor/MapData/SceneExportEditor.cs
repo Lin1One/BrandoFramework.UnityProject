@@ -369,8 +369,8 @@ namespace GameWorld.Editor
             //AssetDatabase.CreateAsset(info, fullPaht);
 
             string fullPath = string.Format("{0}/{1}/{2}.json", s_mapDataPath, s_curMapName, s_curMapName);
-            YuJsonUtility.WriteAsJson(fullPath, currentSceneInfo);
-            YuJsonUtility.WriteAsJson(mapSizeInfoFilePath, allMapSizeInfo);
+            Common.Utility.JsonUtility.WriteAsJson(fullPath, currentSceneInfo);
+            Common.Utility.JsonUtility.WriteAsJson(mapSizeInfoFilePath, allMapSizeInfo);
             AssetDatabase.Refresh();
         }
 

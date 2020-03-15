@@ -12,6 +12,7 @@
 
 #endregion
 
+using Client.Utility;
 using Common;
 using Common.Utility;
 using System;

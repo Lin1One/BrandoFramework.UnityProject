@@ -7,6 +7,7 @@
 #endregion
 
 using Client.Core;
+using Client.Utility;
 using Common;
 using Common.Utility;
 using System;

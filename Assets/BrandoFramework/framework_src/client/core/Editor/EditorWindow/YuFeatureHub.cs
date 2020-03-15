@@ -4,7 +4,7 @@ using Client.GamePlaying.AI;
 using Client.Scene.Editor;
 using Common;
 using Common.EditorWindow;
-using Common.ScriptCreate;
+using Client.ScriptCreate;
 using DraftBorad;
 using Sirenix.OdinInspector.Editor;
 using Sirenix.Utilities.Editor;

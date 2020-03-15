@@ -210,15 +210,15 @@ namespace GameWorld
             if (m_mapInfo == null)
             {
                 var mapInfoStr = File.ReadAllText(m_assetId);
-//                var text = YuJsonUtility..Load<TextAsset>(m_assetId);
-//                if (text == null)
-//                {
-//#if UNITY_EDITOR
-//                    Debug.LogError(string.Format("读取mapInfo文件失败：{0}", m_assetId));
-//#endif
-//                    return false;
-//                }
-                m_mapInfo = YuJsonUtility.FromJson<SceneInfo>(mapInfoStr);
+                //                var text = YuJsonUtility..Load<TextAsset>(m_assetId);
+                //                if (text == null)
+                //                {
+                //#if UNITY_EDITOR
+                //                    Debug.LogError(string.Format("读取mapInfo文件失败：{0}", m_assetId));
+                //#endif
+                //                    return false;
+                //                }
+                m_mapInfo = Common.Utility.JsonUtility.FromJson<SceneInfo>(mapInfoStr);
                 if (m_mapInfo == null)
                 {
                     return false;

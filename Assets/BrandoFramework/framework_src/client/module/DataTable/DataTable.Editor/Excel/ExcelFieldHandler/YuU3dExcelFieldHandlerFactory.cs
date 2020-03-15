@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.ScriptCreate;
+using Client.ScriptCreate;
 using Common.Utility;
 using System;
 using System.Collections.Generic;

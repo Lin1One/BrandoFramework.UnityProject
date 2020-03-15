@@ -901,7 +901,7 @@ namespace Client.Scene.Editor
         private void SaveSceneAnalysisInfo()
         {
             string fullPath = string.Format("{0}/{1}/{2}.json", SceneInfoStorePath, CurrentSceneInfo.mapName, CurrentSceneInfo.mapName);
-            YuJsonUtility.WriteAsJson(fullPath, CurrentSceneInfo);
+            Common.Utility.JsonUtility.WriteAsJson(fullPath, CurrentSceneInfo);
             ////YuJsonUtility.WriteAsJson(mapSizeInfoFilePath, allMapSizeInfo);
             AssetDatabase.Refresh();
         }

@@ -8,6 +8,7 @@
 
 #endregion
 
+using Client.Utility;
 using Common.Utility;
 using Sirenix.OdinInspector;
 using UnityEngine;

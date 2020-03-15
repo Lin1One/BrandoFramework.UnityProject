@@ -14,7 +14,7 @@
 
 using Client.LegoUI;
 using Common;
-using Common.Editor;
+using Client.Core.Editor;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;

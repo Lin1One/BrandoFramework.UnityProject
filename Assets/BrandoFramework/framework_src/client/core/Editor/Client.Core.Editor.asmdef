@@ -5,9 +5,7 @@
         "OdinPlay",
         "Framework.Common",
         "TestBorad",
-        "Client.Module",
         "Common.Editor",
-        "Client.DataTable.Editor",
         "Client.Core.Play"
     ],
     "optionalUnityReferences": [],

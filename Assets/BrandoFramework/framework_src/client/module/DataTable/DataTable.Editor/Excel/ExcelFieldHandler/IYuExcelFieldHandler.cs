@@ -8,7 +8,7 @@
 
 
 
-using Common.ScriptCreate;
+using Client.ScriptCreate;
 
 namespace Client.DataTable.Editor
 

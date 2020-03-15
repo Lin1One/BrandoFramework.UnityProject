@@ -6,7 +6,8 @@
         "Framework.Common",
         "framework_module_serializer",
         "OdinEditor",
-        "Client.Module"
+        "Client.Module",
+        "Client.Core.Editor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],

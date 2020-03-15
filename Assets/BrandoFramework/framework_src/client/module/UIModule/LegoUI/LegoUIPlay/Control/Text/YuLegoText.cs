@@ -6,7 +6,7 @@
 
 #endregion
 
-using Common.Utility;
+using Client.Utility;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +14,6 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using YuU3dPlay;
 
 namespace Client.LegoUI
 {

@@ -8,6 +8,7 @@
 
 using Client.Assets;
 using Client.Core;
+using Client.Utility;
 using Common;
 using Common.Utility;
 using System.Collections.Generic;
@@ -102,7 +103,7 @@ namespace Client.LegoUI
                     }
 
                     var text = textAsset.text;
-                    meta = JsonUtility.FromJson<LegoUIMeta>(text);
+                    meta = UnityEngine.JsonUtility.FromJson<LegoUIMeta>(text);
                     uiMetaDict.Add(uiId, meta);
                     AssetModule.ReleaseAsset(uiId);
                 }
@@ -146,7 +147,7 @@ namespace Client.LegoUI
 
             var path = metaPathDict[uiId];
             var content = File.ReadAllText(path);
-            var uiMeta = JsonUtility.FromJson<LegoUIMeta>(content);
+            var uiMeta = UnityEngine.JsonUtility.FromJson<LegoUIMeta>(content);
             uiMeta.Reset();
             var bytes = SerializeUtility.Serialize(uiMeta);
             var newMeta = SerializeUtility.DeSerialize<LegoUIMeta>(bytes);

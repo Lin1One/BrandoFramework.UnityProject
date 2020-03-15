@@ -72,7 +72,7 @@ namespace Client.Core
         private void InitDependInfo()
         {
             var path = _pathHelper.GetAppBundleDependInfoPath();
-            _appDependInfo = SerializeUtility.Get<AppBundleDependInfo>(path);
+            _appDependInfo = SerializeUtility.DeSerialize<AppBundleDependInfo>(path);
         }
 
         public BundleDependInfo GetDependInfo(string bundleId) => AppDependInfo.GetDependInfo(bundleId);

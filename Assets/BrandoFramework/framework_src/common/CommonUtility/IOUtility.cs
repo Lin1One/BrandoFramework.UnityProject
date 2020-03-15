@@ -300,7 +300,7 @@ namespace Common.Utility
             }
 
             if (!isDelete) return;
-            if (YuMd5Utility.CompareTwoFileMd5(sourcePath, newPath)) return;
+            if (Md5Utility.CompareTwoFileMd5(sourcePath, newPath)) return;
 
             File.Delete(newPath);
             File.Copy(sourcePath, newPath);

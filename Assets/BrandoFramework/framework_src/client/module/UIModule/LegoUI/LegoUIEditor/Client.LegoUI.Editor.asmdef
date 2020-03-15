@@ -4,7 +4,8 @@
         "Client.LegoUI",
         "Common.Editor",
         "Client.Core.Play",
-        "Framework.Common"
+        "Framework.Common",
+        "Client.Core.Editor"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
