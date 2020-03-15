@@ -29,8 +29,13 @@ namespace Client.LegoUI
     /// 乐高UI实例加载器。
     /// </summary>
     [Singleton]
-    public class YuLegoUILoader
+    public class LegoUILoader
     {
+        public LegoUILoader()
+        {
+            InitAllCanvas();
+        }
+
         #region 字段
 
         #region 依赖注入引用
@@ -38,42 +43,54 @@ namespace Client.LegoUI
         private IYuU3dInjector injector;
 
         private IYuU3dInjector m_Injector =>
-            injector ?? (injector = Injector.Instance.As<IYuU3dInjector>());
+            injector ?? (injector = YuU3dInjector.MonoInjectorInstance.As<IYuU3dInjector>());
 
         private LegoBuilder legoBuilder;
-
+        /// <summary>
+        /// LegoUI 构建器，负责在帧循环中完成构建任务，并调用回调
+        /// </summary>
         private LegoBuilder LegoBuilder =>
             legoBuilder ? legoBuilder : (legoBuilder = m_Injector.GetMono<LegoBuilder>());
 
         private LegoMetaHelper metaHelper;
-
+        /// <summary>
+        /// UI LegoMeta 助手，负责获取特定 UI 的元数据
+        /// </summary>
         private LegoMetaHelper MetaHelper =>
             metaHelper ?? (metaHelper = m_Injector.Get<LegoMetaHelper>());
 
-        private YuLegoUICodeInstanceLoader codeLoader;
+        private LegoUICodeInstanceLoader codeLoader;
+        /// <summary>
+        /// UI 脚本获取器，负责获取 UI 对应脚本（LegoView，Components，Logicer，反射创建）
+        /// </summary>
+        private LegoUICodeInstanceLoader CodeLoader =>
+            codeLoader ?? (codeLoader = m_Injector.Get<LegoUICodeInstanceLoader>());
 
-        private YuLegoUICodeInstanceLoader CodeLoader =>
-            codeLoader ?? (codeLoader = m_Injector.Get<YuLegoUICodeInstanceLoader>());
+        private LegoRxModelLoader modelLoader;
+        /// <summary>
+        /// UI 数据模型加载器，负责获取 UI 对应的数据模型（反射创建实例/读取 Json）
+        /// </summary>
+        private LegoRxModelLoader ModelLoader => modelLoader ?? (modelLoader = m_Injector.Get<LegoRxModelLoader>());
 
-        //UI 数据模型管理器
-        private YuLegoRxModelLoader modelLoader;
-        private YuLegoRxModelLoader ModelLoader => modelLoader ?? (modelLoader = m_Injector.Get<YuLegoRxModelLoader>());
+        private LegoUIPipelineLoader pipelineLoader;
+        /// <summary>
+        /// UI 生命周期处理脚本加载器，负责获取 UI 对应的生命周期处理脚本实例（反射创建实例）
+        /// </summary>
+        private LegoUIPipelineLoader PipelineLoader =>
+            pipelineLoader ?? (pipelineLoader = m_Injector.Get<LegoUIPipelineLoader>());
 
-        //UI 生命周期管理器
-        private YuLegoUIPipelineLoader pipelineLoader;
-
-        private YuLegoUIPipelineLoader PipelineLoader =>
-            pipelineLoader ?? (pipelineLoader = m_Injector.Get<YuLegoUIPipelineLoader>());
-
-        //UI 数据模型绑定器
+        
         private LegoBinder legoBinder;
-
+        /// <summary>
+        /// UI 数据模型绑定器，负责绑定数据模型与 UI 类型实例中的各控件
+        /// </summary>
         private LegoBinder LegoBinder =>
             legoBinder ?? (legoBinder = m_Injector.Get<LegoBinder>());
 
-        //UI 位置挂载器
         private LegoUIMounter legoUIMounter;
-
+        /// <summary>
+        /// UI 深度管理器，负责UI界面在 Canvas 中的深度控制
+        /// </summary>
         private LegoUIMounter LegoUIMounter =>
             legoUIMounter ?? (legoUIMounter = m_Injector.Get<LegoUIMounter>());
 
@@ -93,11 +110,12 @@ namespace Client.LegoUI
         private readonly Dictionary<string, Queue<ILegoComponent>> componentCache
             = new Dictionary<string, Queue<ILegoComponent>>();
 
-        private readonly Dictionary<string, IYuLegoLogicer> uiViewLogicerDic // UI逻辑类实例字典
-            = new Dictionary<string, IYuLegoLogicer>();
+        private readonly Dictionary<string, IViewLogic> uiViewLogicerDic // UI逻辑类实例字典
+            = new Dictionary<string, IViewLogic>();
 
-        private readonly Dictionary<string, List<IYuLegoLogicer>> uiComponentLogicerListsDic // UI逻辑类实例(用于同一组件有多个实例)
-            = new Dictionary<string, List<IYuLegoLogicer>>();
+        // UI逻辑类实例(用于同一组件有多个实例)
+        private readonly Dictionary<string, List<IViewLogic>> uiComponentLogicerListsDic 
+            = new Dictionary<string, List<IViewLogic>>();
 
         private const string LEGO_VIEW = "legoview";
         private const string LEGO_COMPONENT = "legocomponent";
@@ -110,8 +128,7 @@ namespace Client.LegoUI
 
         private readonly List<ILegoUI> tempUis = new List<ILegoUI>();
 
-        public void WaitUi(
-            string id,
+        public void WaitUi( string id,
             Action<ILegoUI> onloaded,
             LegoViewType uiLayeredCanvas = LegoViewType.DynamicBackground,
             int speed = -1,
@@ -197,10 +214,11 @@ namespace Client.LegoUI
         {
             var uiRect = buildTask.RootRect;
             //            loadingTaskIds.Remove(lowerId);
-            var view = CodeLoader.GetView(uiRect);
+            ILegoView view = CodeLoader.GetView(uiRect);
             views.Add(lowerId, view);
             var uiMeta = MetaHelper.GetMeta(uiRect);
 
+            //绑定子组件
             tempUis.Clear();
             foreach (var sonRef in uiMeta.ComponentRefs)
             {
@@ -214,11 +232,11 @@ namespace Client.LegoUI
                 tempUis.Add(component);
             }
 
-            //数据模型设置
+            //数据模型与 UI 类型实例绑定
             var rxModel = (IYuLegoUIRxModel) ModelLoader.LoadModel(bigId);
             SetViewRxModel(rxModel, view);
 
-            //UI 实体脚本初始化
+            //UI 实体Rect，周期管理类型，子组件与 UI 脚本类型实例绑定
             var pipelineHandlers = PipelineLoader.GetHandlers(bigId);
             if (buildTask.IsInBackground)
             {
@@ -235,7 +253,7 @@ namespace Client.LegoUI
             // 修正界面的Z轴深度
             AddViewToDepthViews(view, uiMeta.ViewType); 
 
-            //数据模型数据与 UI 实体绑定
+            //数据模型数据与 UI 脚本类型实例绑定
             LegoBinder.Binding(view, uiMeta, rxModel);
 
             //构建完成回调
@@ -246,6 +264,11 @@ namespace Client.LegoUI
             view.ShowDefault();
         }
 
+        /// <summary>
+        /// 绑定数据模型与脚本
+        /// </summary>
+        /// <param name="rxModel"></param>
+        /// <param name="view"></param>
         private void SetViewRxModel(IYuLegoUIRxModel rxModel, ILegoUI view)
         {
             rxModel.InitRxModel();
@@ -256,8 +279,7 @@ namespace Client.LegoUI
 
         #region 加载 Component
 
-        private void WaitComponent(
-            string id,
+        private void WaitComponent( string id,
             Action<ILegoUI> uiLoadCallback,
             int buildSpeed,
             LegoViewType uiLayeredCanvas = LegoViewType.DynamicBackground,
@@ -460,30 +482,30 @@ namespace Client.LegoUI
 
         private void OnBuilded(LegoBuildTask buildTask)
         {
-            ////var bigId = buildTask.RootRect.name;
-            ////var lowerId = YuBigAssetIdMap.GetLowerId(bigId);
+            var bigId = buildTask.RootRect.name;
+            var lowerId = bigId;//// YuBigAssetIdMap.GetLowerId(bigId);
 
-            ////if (lowerId.StartsWith(LEGO_VIEW))
-            ////{
-            ////    OnViewBuilded(lowerId, bigId, buildTask);
-            ////}
-            ////else if (lowerId.StartsWith(LEGO_COMPONENT))
-            ////{
-            ////    if (buildTask.ComponentMountMeta != null)
-            ////    {
-            ////        OnSonComponentLoaded(lowerId, buildTask);
-            ////    }
-            ////    else
-            ////    {
-            ////        OnSingleComponentLoaded(lowerId, buildTask);
-            ////    }
-            ////}
-            ////else
-            ////{
-            ////    SetComponentPosition(buildTask, null);
-            ////}
+            if (lowerId.StartsWith(LEGO_VIEW))
+            {
+                OnViewBuilded(lowerId, bigId, buildTask);
+            }
+            else if (lowerId.StartsWith(LEGO_COMPONENT))
+            {
+                if (buildTask.ComponentMountMeta != null)
+                {
+                    OnSonComponentLoaded(lowerId, buildTask);
+                }
+                else
+                {
+                    OnSingleComponentLoaded(lowerId, buildTask);
+                }
+            }
+            else
+            {
+                SetComponentPosition(buildTask, null);
+            }
 
-            ////TryStartNextTask();
+            TryStartNextTask();
         }
 
         #endregion
@@ -506,9 +528,22 @@ namespace Client.LegoUI
 
         #region 界面组件 Logicer
 
+        public IViewLogic GetLogicer(string id)
+        {
+            string pageId = id.ToLower();
+            IViewLogic logicer = null;
+            if (uiViewLogicerDic.TryGetValue(pageId, out logicer))
+            {
+                return logicer;
+            }
+
+            Debug.LogError($"{id} 逻辑脚本尚未创建实例");
+            return null;
+        }
+
         private void TryInvokeViewUILogicer(ILegoUI ui)
         {
-            var logicer = CodeLoader.GetLogicer(ui.UIRect.name);
+            var logicer = CodeLoader.GetLogic(ui.UIRect.name);
             if (logicer == null)
             {
                 return;
@@ -522,7 +557,7 @@ namespace Client.LegoUI
 
         private void TryInvokeComponentUILogicer(ILegoUI ui)
         {
-            var logicer = CodeLoader.GetLogicer(ui.UIRect.name);
+            var logicer = CodeLoader.GetLogic(ui.UIRect.name);
             if (logicer == null)
             {
                 return;
@@ -533,30 +568,17 @@ namespace Client.LegoUI
             logicer.Init(ctx);
             if (!uiComponentLogicerListsDic.ContainsKey(ui.UIRect.name))
             {
-                uiComponentLogicerListsDic.Add(ui.UIRect.name, new List<IYuLegoLogicer>());
+                uiComponentLogicerListsDic.Add(ui.UIRect.name, new List<IViewLogic>());
             }
 
             uiComponentLogicerListsDic[ui.UIRect.name].Add(logicer);
         }
 
-        public IYuLegoLogicer GetLogicer(string id)
-        {
-            string pageId = id.ToLower();
-            IYuLegoLogicer logicer = null;
-            if (uiViewLogicerDic.TryGetValue(pageId, out logicer))
-            {
-                return logicer;
-            }
-
-            Debug.LogError($"{id} 逻辑脚本尚未创建实例");
-            return null;
-        }
-
         #region UI业务处理上下文对象池
 
-        private IGenericObjectPool<IYuLegoLogicContext> contextPool;
+        private IGenericObjectPool<IViewLogicContext> contextPool;
 
-        private IGenericObjectPool<IYuLegoLogicContext> ContextPool
+        private IGenericObjectPool<IViewLogicContext> ContextPool
         {
             get
             {
@@ -565,15 +587,15 @@ namespace Client.LegoUI
                     return contextPool;
                 }
 
-                contextPool = new GenericObjectPool<IYuLegoLogicContext>(
-                    () => new YuLegoLogicContext(), 10);
+                contextPool = new GenericObjectPool<IViewLogicContext>(
+                    () => new ViewLogicContext(), 10);
                 return contextPool;
             }
         }
 
-        private IYuLegoLogicContext TakeContext() => ContextPool.Take();
+        private IViewLogicContext TakeContext() => ContextPool.Take();
 
-        private void RestoreContext(IYuLegoLogicContext ctx) => ContextPool.Restore(ctx);
+        private void RestoreContext(IViewLogicContext ctx) => ContextPool.Restore(ctx);
 
         #endregion
 
@@ -581,42 +603,10 @@ namespace Client.LegoUI
 
         #region 界面深度控制
 
-        private readonly Dictionary<LegoViewType, LinkedList<ILegoView>> viewDepthDict
-            = new Dictionary<LegoViewType, LinkedList<ILegoView>>();
-
-        private const float DEPTH_Z_ADD = 100.0f;
-
-        private float GetLastDepthAtViewType(LegoViewType viewType)
-        {
-            if (!viewDepthDict.ContainsKey(viewType))
-            {
-                return 0.0f;
-            }
-
-            var depthViews = viewDepthDict[viewType];
-            if (depthViews.Count == 0)
-            {
-                return 0.0f;
-            }
-
-            var last = depthViews.Last.Value;
-            return last.DepthZ;
-        }
-
         private void AddViewToDepthViews(ILegoView view, LegoViewType viewType)
         {
             var layer = LegoUIMounter.uiLayers[viewType];
             layer.PushView(view);
-
-            //if (!viewDepthDict.ContainsKey(viewType))
-            //{
-            //    viewDepthDict.Add(viewType, new LinkedList<IYuLegoView>());
-            //}
-
-            //var depthViews = viewDepthDict[viewType];
-            //var lastDepth = GetLastDepthAtViewType(viewType);
-            //view.DepthZ = lastDepth - DEPTH_Z_ADD;
-            //depthViews.AddLast(view);
         }
 
         #region 分层Canvas
@@ -624,25 +614,23 @@ namespace Client.LegoUI
         private readonly Dictionary<LegoViewType, RectTransform> mountPointDict
             = new Dictionary<LegoViewType, RectTransform>();
 
-        private const string CANVAS_ROOT_PATH = "Yu/UI/";
+        private const string CANVAS_ROOT_PATH = "GameRoot/UIRoot/";
         private RectTransform componentPoolRect;
 
         private static readonly List<string> canvasPaths
             = new List<string>
             {
-                "LayeredCanvas/StaticBackground",
-                "LayeredCanvas/DynamicBackground",
-                "LayeredCanvas/StaticMiddle",
-                "LayeredCanvas/DynamicMiddle",
-                "LayeredCanvas/StaticTop",
-                "LayeredCanvas/DynamicTop",
+                "UICanvas/StaticBackground",
+                "UICanvas/DynamicBackground",
+                "UICanvas/StaticMiddle",
+                "UICanvas/DynamicMiddle",
+                "UICanvas/StaticTop",
+                "UICanvas/DynamicTop",
             };
 
-        public YuLegoUILoader()
-        {
-            InitAllCanvas();
-        }
-
+        /// <summary>
+        /// 初始化 Canvas
+        /// </summary>
         private void InitAllCanvas()
         {
             var uiRoot = GameObject.Find(CANVAS_ROOT_PATH).transform;
@@ -652,7 +640,7 @@ namespace Client.LegoUI
                 var mountType = (LegoViewType) i;
                 var path = canvasPaths[i];
                 var canvas = uiRoot.Find(path);
-                var mountPoint = canvas.Find("UIRoot").GetComponent<RectTransform>();
+                var mountPoint = canvas.GetComponent<RectTransform>();
                 mountPointDict.Add(mountType, mountPoint);
             }
 
@@ -664,10 +652,7 @@ namespace Client.LegoUI
             controlPoolCanvas.SetActive(false);
             // 隐藏开发用canvas
             var developCanvas = uiRoot.Find("DevelopCanvas").gameObject;
-            if (developCanvas != null)
-            {
-                developCanvas.SetActive(false);
-            }
+            developCanvas.SetActive(false);
 
             componentPoolRect = uiRoot.Find("ComponentCacheCanvas").GetComponent<RectTransform>();
             componentPoolRect.gameObject.SetActive(false);

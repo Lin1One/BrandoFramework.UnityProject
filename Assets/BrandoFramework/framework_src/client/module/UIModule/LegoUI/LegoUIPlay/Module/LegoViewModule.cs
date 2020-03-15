@@ -13,15 +13,24 @@ using System;
 namespace Client.LegoUI
 {
     [Singleton]
-    public class LegoViewModule :IModule,
-        ILegoViewModule
+    public class LegoViewModule :IModule, ILegoViewModule
     {
         //public override string ServiceType => "View";
 
         [Inject]
-        private readonly YuLegoUILoader uILoader;
+        private readonly LegoUILoader uILoader;
         [Inject]
-        private readonly YuLegoRxModelLoader modelLoader;
+        private readonly LegoRxModelLoader modelLoader;
+
+        public void WaitUi(string id,
+            Action<ILegoUI> callback,
+            LegoViewType uiLayeredCanvas = LegoViewType.DynamicBackground,
+            int buildSpped = -1,
+            bool isBindNexRxModelOnBuild = true)
+        {
+            uILoader.WaitUi(id, callback, uiLayeredCanvas, isBindRxModelOnBuild: isBindNexRxModelOnBuild);
+        }
+
 
         /// <summary>
         /// 后台加载 UI 
@@ -44,7 +53,7 @@ namespace Client.LegoUI
             WaitUi(id, callback, isBindNexRxModelOnBuild: false);
         }
 
-        public IYuLegoLogicer GetLogicer(string id)
+        public IViewLogic GetLogicer(string id)
         {
             return uILoader.GetLogicer(id);
         }
@@ -53,19 +62,7 @@ namespace Client.LegoUI
 
         public void Restore(ILegoComponent component) => uILoader.Restore(component);
 
-        public void WaitUi
-            (
-            string id,
-            Action<ILegoUI> callback,
-            LegoViewType uiLayeredCanvas = LegoViewType.DynamicBackground,
-            int buildSpped = -1,
-            bool isBindNexRxModelOnBuild = true
-            )
-            => uILoader.WaitUi(id, callback, uiLayeredCanvas, isBindRxModelOnBuild: isBindNexRxModelOnBuild);
-
         public void InitModule()
-        {
-            throw new NotImplementedException();
-        }
+        {}
     }
 }

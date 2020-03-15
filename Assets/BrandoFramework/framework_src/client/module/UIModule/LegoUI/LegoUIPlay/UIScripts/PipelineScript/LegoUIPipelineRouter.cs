@@ -9,6 +9,7 @@
 
 
 using Common;
+using Common.Utility;
 using System;
 using System.Collections.Generic;
 
@@ -19,7 +20,7 @@ namespace Client.LegoUI
     /// 负责以反射或静态映射的方式缓存、构建所有的UI事件处理器实例。
     /// </summary>
     [Singleton]
-    public class YuLegoUIPipelineLoader
+    public class LegoUIPipelineLoader
     {
         /// <summary>
         /// 当前运行环境中所有应用的UI生命周期事件处理器实例字典。
@@ -56,9 +57,9 @@ namespace Client.LegoUI
 
                 ////foreach (var app in YuU3dAppUtility.AppEntity.RuningApps)
                 ////{
-                ////    var appAsem = YuUnityIOUtility.GetUnityAssembly(app.PlayAsmId);
-                ////    var types = ReflectUtility.GetTypeList<IYuLegoUIPipelineHandler>(false, false, appAsem);
-                ////    uiPipelineTypeDic.Add(app.LocAppId, types);
+                //var appAsem = YuUnityIOUtility.(app.PlayAsmId);
+                //var types = ReflectUtility.GetTypeList<IYuLegoUIPipelineHandler>(false, false, appAsem);
+                //uiPipelineTypeDic.Add(app.LocAppId, types);
                 ////}
 
                 return uiPipelineTypeDic;

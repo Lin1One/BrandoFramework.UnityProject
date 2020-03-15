@@ -3,7 +3,7 @@
     /// <summary>
     /// 乐高UI业务逻辑处理上下文。
     /// </summary>
-    public interface IYuLegoLogicContext
+    public interface IViewLogicContext
     {
         ILegoUI MapUI { get; }
 

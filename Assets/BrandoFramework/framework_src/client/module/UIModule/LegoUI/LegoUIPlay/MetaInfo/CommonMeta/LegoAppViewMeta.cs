@@ -61,18 +61,18 @@ namespace Client.LegoUI
 
         public LegoUIMeta GetUIMeta(string uiId)
         {
-//#if UNITY_EDITOR
-//            if (YuUnityUtility.IsEditorMode)
-//            {
-//                if (uiMetaDict.ContainsKey(uiId))
-//                {
-//                    var uiMeta = uiMetaDict[uiId];
-//                    return uiMeta;
-//                }
-//                return GetUIMetaAtEditor(uiId);
-//            }
-//            else
-//#endif
+#if UNITY_EDITOR
+            if (YuUnityUtility.IsEditorMode)
+            {
+                if (uiMetaDict.ContainsKey(uiId))
+                {
+                    var uiMeta = uiMetaDict[uiId];
+                    return uiMeta;
+                }
+                return GetUIMetaAtEditor(uiId);
+            }
+            else
+#endif
                 return GetUIMetaAtPlay(uiId);
         }
 
@@ -89,6 +89,8 @@ namespace Client.LegoUI
             {
                 try
                 {
+
+                    //读取 Json 形式的 Meta
                     var textAsset = assetModule.Load<TextAsset>(uiId);
 
                     if (textAsset == null)

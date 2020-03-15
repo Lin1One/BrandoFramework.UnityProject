@@ -49,7 +49,7 @@ namespace Client.LegoUI
 
         #region 逻辑处理组件
 
-        IYuLegoLogicer GetLogicer(string id);
+        IViewLogic GetLogicer(string id);
 
 
         #endregion

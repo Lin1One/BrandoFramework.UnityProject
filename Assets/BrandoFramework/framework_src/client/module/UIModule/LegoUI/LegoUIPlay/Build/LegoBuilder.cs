@@ -44,8 +44,11 @@ namespace Client.LegoUI
         /// <summary>
         /// 当前设置的构建速度，该速度为所有乐高构建任务所共享，消耗完毕则会跳出当前帧。
         /// </summary>
-        private int totalBuildSpeed = 50;
+        private int buildWorkPerFrame = 50;
 
+        /// <summary>
+        /// 默认构建速度
+        /// </summary>
         private int taskDefaultSpeed;
 
         private DateTime starTime;
@@ -54,15 +57,25 @@ namespace Client.LegoUI
 
         public RectTransform RootRect { get; private set; }
 
-        private const int BuildCountOut = 500;
+        public Action AllCompleted { get; private set; }
+
+        /// <summary>
+        /// 每帧最多循环次数
+        /// </summary>
+        private const int BuildMaxloopTime = 500;
 
         #endregion
 
-        #region 启动构建
+        public void StartBuild()
+        {
+            buildFrameCount = 0;
+            buildAble = true;
+            starTime = DateTime.Now;
+        }
 
-        public LegoBuildTask CreateTask
-        (
-            string id,
+        #region 构建任务
+
+        public LegoBuildTask CreateTask( string id,
             Action<LegoBuildTask> onBuilded,
             RectTransform parent,
             int buildSpeed = -1,
@@ -78,23 +91,10 @@ namespace Client.LegoUI
             return task;
         }
 
-        public void StartBuild()
-        {
-            buildFrameCount = 0;
-            buildAble = true;
-            starTime = DateTime.Now;
-        }
-
         public void PushSonTask(LegoBuildTask task)
         {
             taskStack.Push(task);
         }
-
-        #endregion
-
-        #region 回调
-
-        public Action AllCompleted { get; private set; }
 
         #endregion
 
@@ -115,18 +115,18 @@ namespace Client.LegoUI
             }
 
             buildFrameCount++;
-            int buildFrameCountOut = 0; 
+            int loopTimeOutCount = 0; 
             while (true)
             {
-                buildFrameCountOut++;
-                if (buildFrameCountOut > BuildCountOut)
+                loopTimeOutCount++;
+                if (loopTimeOutCount > BuildMaxloopTime)
                 {
 #if DEBUG
                     Debug.LogError($"该界面构建帧超时退出！");
 #endif
                     return;
                 }
-
+                //构建任务栈为空
                 if (taskStack.Count == 0)
                 {
                     buildAble = false;
@@ -138,7 +138,7 @@ namespace Client.LegoUI
                     buildFrameCount = 0;
                     return;
                 }
-
+                //获取当前任务，判断是否已完成，未完成则继续构建
                 currentTask = taskStack.Peek();
                 if (currentTask.IsComplete)
                 {
@@ -152,7 +152,7 @@ namespace Client.LegoUI
                 {
                     currentTask.BuildAtUpdate();
                     buildedCount += currentTask.BuildedFrameCount;
-                    if (buildedCount >= totalBuildSpeed)
+                    if (buildedCount >= this.buildWorkPerFrame)
                     {
                         buildedCount = 0;
                         return;
@@ -160,8 +160,7 @@ namespace Client.LegoUI
                 }
                 catch (Exception ex)
                 {
-                    //DestroySelf();
-
+                    DestroySelf();
 #if DEBUG
                     Debug.LogError($"UI{currentTask.TaskMeta.RootMeta.Name}构建失败！");
                     Debug.LogError(ex.Message + ex.StackTrace);
@@ -171,7 +170,7 @@ namespace Client.LegoUI
                     taskStack.Pop();
 
 #if UNITY_EDITOR
-                    //Application.Quit();
+                    Application.Quit();
 #endif
                 }
             }

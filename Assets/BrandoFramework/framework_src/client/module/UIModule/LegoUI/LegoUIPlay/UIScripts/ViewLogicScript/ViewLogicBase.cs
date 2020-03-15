@@ -1,10 +1,8 @@
-﻿using YuU3dPlay;
-
-namespace Client.LegoUI
+﻿namespace Client.LegoUI
 {
-    public abstract class YuAbsLegoLogicer : IYuLegoLogicer
+    public abstract class ViewLogicBase : IViewLogic
     {
-        public IYuLegoLogicContext Context;
+        public IViewLogicContext Context;
 
         #region 快捷属性
 
@@ -13,7 +11,7 @@ namespace Client.LegoUI
 
         #endregion
 
-        public virtual void Init(IYuLegoLogicContext context)
+        public virtual void Init(IViewLogicContext context)
         {
             Context = context;
         }

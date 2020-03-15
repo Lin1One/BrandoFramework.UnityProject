@@ -13,13 +13,16 @@ namespace Client.LegoUI
     /// 负责加载一个项目中所有的数据模型。
     /// </summary>
     [Singleton]
-    public class YuLegoRxModelLoader
+    public class LegoRxModelLoader
     {
-        private Dictionary<string, YuLegoRxModelStorage> appModels
-            = new Dictionary<string, YuLegoRxModelStorage>();
+        //private Dictionary<string, YuLegoRxModelStorage> appModels
+        //    = new Dictionary<string, YuLegoRxModelStorage>();
 
         private readonly YuLegoRxModelStorage currentStorage
             = new YuLegoRxModelStorage();
+
+        private readonly Dictionary<string, object> rxModels
+            = new Dictionary<string, object>();
 
         public object LoadModel(string logicId)
             => currentStorage.LoadModel(logicId);
@@ -29,6 +32,9 @@ namespace Client.LegoUI
 
         private class YuLegoRxModelStorage
         {
+            private readonly Dictionary<string, object> rxModels
+                = new Dictionary<string, object>();
+
             private IAssetModule assetModule;
 
             private IAssetModule AssetModule =>
@@ -78,9 +84,6 @@ namespace Client.LegoUI
                 return newModel;
             }
 
-            private readonly Dictionary<string, object> rxModels
-                = new Dictionary<string, object>();
-
 #if UNITY_EDITOR
 
             private object LoadModelAtEditor(string logicId)
@@ -93,7 +96,7 @@ namespace Client.LegoUI
 
                 var app = ProjectInfoDati.GetActualInstance();
                 var type = GetRxModelType(app.DevelopProjectName, logicId);
-
+                //反射构造数据模型类型
                 var newModel = Activator.CreateInstance(type);
                 rxModels.Add(logicId, newModel);
                 return newModel;

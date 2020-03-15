@@ -8,6 +8,6 @@ namespace Client.LegoUI
 
         ILegoComponent GetComponent(RectTransform uiRect);
 
-        IYuLegoLogicer GetLogicer(string uiRect);
+        IViewLogic GetLogic(string uiRect);
     }
 }

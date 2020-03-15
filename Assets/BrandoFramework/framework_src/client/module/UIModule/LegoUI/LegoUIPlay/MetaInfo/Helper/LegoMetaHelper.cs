@@ -21,28 +21,21 @@ namespace Client.LegoUI
     [Singleton]
     public class LegoMetaHelper
     {
-        #region 元数据初始化
-
-        private readonly Dictionary<string, LegoAppViewMeta> appViewMetaDict
-            = new Dictionary<string, LegoAppViewMeta>();
-
         public LegoMetaHelper()
         {
             LoadCurrentAppMeta();
         }
 
-        #endregion
-
-        #region 元数据加载
-
         private void LoadCurrentAppMeta()
         {
             var appSetting = ProjectInfoDati.GetActualInstance();
-                var appMeta = new LegoAppViewMeta();
-                appViewMetaDict.Add(appSetting.DevelopProjectName, appMeta);
+            var appMeta = new LegoAppViewMeta();
+            appViewMetaDict.Add(appSetting.DevelopProjectName, appMeta);
         }
 
-        #endregion
+        private readonly Dictionary<string, LegoAppViewMeta> appViewMetaDict
+            = new Dictionary<string, LegoAppViewMeta>();
+
 
         #region 获取元数据
 

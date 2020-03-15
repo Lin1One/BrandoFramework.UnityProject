@@ -7,7 +7,6 @@
 #endregion
 
 using Common;
-using Common;
 using System;
 using UnityEngine;
 
@@ -15,6 +14,67 @@ namespace Client.LegoUI
 {
     public class LegoBuildTask : IReset
     {
+        static LegoBuildTask()
+        {
+            InitControlPool();
+            metaHelper = Injector.Instance.Get<LegoMetaHelper>();
+
+            //设置宽高
+            //var legoSetting = YuU3dAppLegoUISettingDati.CurrentActual.DevieceSetting;
+            //viewWidth = legoSetting.ViewWidth;
+            //viewHeight = legoSetting.ViewHeight;
+        }
+
+        #region 静态构造初始化
+
+        private static readonly int viewWidth;
+        private static readonly int viewHeight;
+
+        private static YuLegoRectTransformPool rectPool;
+        private static YuLegoTextPool textPool;
+        private static YuLegoImagePool imagePool;
+        private static YuLegoRawImagePool rawImagePool;
+        private static YuLegoButtonPool buttonPool;
+        private static YuLegoTButtonPool tButtonPool;
+        private static YuLegoTogglePool togglePool;
+        private static YuLegoPlaneTogglePool planeTogglePool;
+        private static YuLegoSliderPool sliderPool;
+        private static YuLegoProgressbarPool progressbarPool;
+        private static YuLegoInputFieldPool inputFieldPool;
+        private static YuLegoDropdownPool dropdownPool;
+        private static YuLegoScrollViewPool scrollViewPool;
+        private static YuLegoRockerPool rockerPool;
+
+        private static readonly LegoMetaHelper metaHelper;
+        private static readonly Color zeroColor = new Color(0f, 0f, 0f, 0f);
+
+        private static void InitControlPool()
+        {
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
+            var injector = Injector.Instance.As<IYuU3dInjector>();
+
+            rectPool = injector.GetMono<YuLegoRectTransformPool>();
+            textPool = injector.GetMono<YuLegoTextPool>();
+            imagePool = injector.GetMono<YuLegoImagePool>();
+            rawImagePool = injector.GetMono<YuLegoRawImagePool>();
+            buttonPool = injector.GetMono<YuLegoButtonPool>();
+            tButtonPool = injector.GetMono<YuLegoTButtonPool>();
+            togglePool = injector.GetMono<YuLegoTogglePool>();
+            planeTogglePool = injector.GetMono<YuLegoPlaneTogglePool>();
+            sliderPool = injector.GetMono<YuLegoSliderPool>();
+            progressbarPool = injector.GetMono<YuLegoProgressbarPool>();
+            inputFieldPool = injector.GetMono<YuLegoInputFieldPool>();
+            dropdownPool = injector.GetMono<YuLegoDropdownPool>();
+            scrollViewPool = injector.GetMono<YuLegoScrollViewPool>();
+            rockerPool = injector.GetMono<YuLegoRockerPool>();
+        }
+
+        #endregion
+
         #region 基础字段
 
         private LegoBuildTaskPool taskPool;
@@ -31,7 +91,7 @@ namespace Client.LegoUI
         public RectTransform ParentRect { get; set; }
 
         /// <summary>
-        /// 当前组件的元数据。
+        /// 当前组件或视图的元数据。
         /// </summary>
         public LegoUIMeta TaskMeta { get; private set; }
 
@@ -143,88 +203,6 @@ namespace Client.LegoUI
 
         public Action<ILegoUI> UiBuildCallback { get; private set; }
 
-        private void OnSonCompleted(RectTransform uiRect)
-        {
-            if (uiRect.name.StartsWith("LegoComponent"))
-            {
-                sonBuildedNum++;
-            }
-            else
-            {
-                containerBuildedNum++;
-            }
-
-            buildAble = true;
-        }
-
-        #endregion
-
-        #region 应用视图宽高
-
-        private static readonly int viewWidth;
-        private static readonly int viewHeight;
-
-        #endregion
-
-        #region 静态构造初始化
-
-        #region 控件池
-
-        private static YuLegoRectTransformPool rectPool;
-        private static YuLegoTextPool textPool;
-        private static YuLegoImagePool imagePool;
-        private static YuLegoRawImagePool rawImagePool;
-        private static YuLegoButtonPool buttonPool;
-        private static YuLegoTButtonPool tButtonPool;
-        private static YuLegoTogglePool togglePool;
-        private static YuLegoPlaneTogglePool planeTogglePool;
-        private static YuLegoSliderPool sliderPool;
-        private static YuLegoProgressbarPool progressbarPool;
-        private static YuLegoInputFieldPool inputFieldPool;
-        private static YuLegoDropdownPool dropdownPool;
-        private static YuLegoScrollViewPool scrollViewPool;
-        private static YuLegoRockerPool rockerPool;
-
-        #endregion
-
-        private static readonly LegoMetaHelper metaHelper;
-        private static readonly Color zeroColor = new Color(0f, 0f, 0f, 0f);
-
-        static LegoBuildTask()
-        {
-            InitControlPool();
-            metaHelper = Injector.Instance.Get<LegoMetaHelper>();
-
-            //var legoSetting = YuU3dAppLegoUISettingDati.CurrentActual.DevieceSetting;
-            //viewWidth = legoSetting.ViewWidth;
-            //viewHeight = legoSetting.ViewHeight;
-        }
-
-        private static void InitControlPool()
-        {
-            if (!Application.isPlaying)
-            {
-                return;
-            }
-
-            var injector = Injector.Instance.As<IYuU3dInjector>();
-
-            rectPool = injector.GetMono<YuLegoRectTransformPool>();
-            textPool = injector.GetMono<YuLegoTextPool>();
-            imagePool = injector.GetMono<YuLegoImagePool>();
-            rawImagePool = injector.GetMono<YuLegoRawImagePool>();
-            buttonPool = injector.GetMono<YuLegoButtonPool>();
-            tButtonPool = injector.GetMono<YuLegoTButtonPool>();
-            togglePool = injector.GetMono<YuLegoTogglePool>();
-            planeTogglePool = injector.GetMono<YuLegoPlaneTogglePool>();
-            sliderPool = injector.GetMono<YuLegoSliderPool>();
-            progressbarPool = injector.GetMono<YuLegoProgressbarPool>();
-            inputFieldPool = injector.GetMono<YuLegoInputFieldPool>();
-            dropdownPool = injector.GetMono<YuLegoDropdownPool>();
-            scrollViewPool = injector.GetMono<YuLegoScrollViewPool>();
-            rockerPool = injector.GetMono<YuLegoRockerPool>();
-        }
-
         #endregion
 
         #region 任务初始化
@@ -296,12 +274,9 @@ namespace Client.LegoUI
 
         #endregion
 
-        public void Init
-        (
-            string id,
+        public void Init ( string id,
             Action<LegoBuildTask> onBuilded,
-            RectTransform parent
-        )
+            RectTransform parent)
         {
             ParentRect = parent;
             TaskMeta = metaHelper.GetMeta(id);
@@ -339,45 +314,6 @@ namespace Client.LegoUI
             // 组件由于复用可能会同时存在多个，因此组件跟对象的最终命名会在组件构建完毕回调中处理。
             RootRect.name = TaskMeta.RootMeta.Name;
         }
-
-        void AddRootButton()
-        {
-            if (!Application.isPlaying)
-            {
-                return;
-            }
-
-            if (RootRect.name.StartsWith(LEGO_CONTAINER))
-            {
-                return;
-            }
-
-            var button = buttonPool.Take();
-            button.SonText.gameObject.SetActive(false);
-            button.RectTransform.SetParent(RootRect);
-            button.RectTransform.name = "Button_Root";
-            button.RectTransform.sizeDelta = new Vector2(viewWidth * 2, viewHeight * 2);
-            button.RectTransform.localPosition = Vector3.zero;
-            button.RectTransform.localScale = Vector3.one;
-            //button.BgImage.Color = zeroColor;
-        }
-
-#if DEBUG
-
-        void AddHelper()
-        {
-            if (RootRect.name.StartsWith("LegoView"))
-            {
-                ////RootRect.gameObject.AddComponent<YuLegoViewHelper>();
-            }
-            else
-            {
-                ////RootRect.gameObject.AddComponent<YuLegoComponentHelper>();
-            }
-        }
-#endif
-
-        #endregion
 
         private void TryMountAtOnce()
         {
@@ -429,29 +365,48 @@ namespace Client.LegoUI
             RootRect.sizeDelta = new Vector2(width, height);
         }
 
-        #region 重置状态
-
-        public void Reset()
+        void AddRootButton()
         {
-            buildAble = false;
-            IsComplete = false;
-            BuildedCount = 0;
-            m_BuildSpeed = 0;
-            buildingControl = null;
-            ComponentMountMeta = null;
-            containerBuildedNum = 0;
-            sonBuildedNum = 0;
-            m_ParentTask = null;
-            UiBuildCallback = null;
-            IsBindRxModelOnBuild = true;
-            IsInBackground = false;
-            ParentRect = null;
+            if (!Application.isPlaying)
+            {
+                return;
+            }
+
+            if (RootRect.name.StartsWith(LEGO_CONTAINER))
+            {
+                return;
+            }
+
+            var button = buttonPool.Take();
+            button.SonText.gameObject.SetActive(false);
+            button.RectTransform.SetParent(RootRect);
+            button.RectTransform.name = "Button_Root";
+            button.RectTransform.sizeDelta = new Vector2(viewWidth * 2, viewHeight * 2);
+            button.RectTransform.localPosition = Vector3.zero;
+            button.RectTransform.localScale = Vector3.one;
+            ////button.BgImage.Color = zeroColor;
         }
+
+#if DEBUG
+
+        void AddHelper()
+        {
+            if (RootRect.name.StartsWith("LegoView"))
+            {
+                ////RootRect.gameObject.AddComponent<YuLegoViewHelper>();
+            }
+            else
+            {
+                ////RootRect.gameObject.AddComponent<YuLegoComponentHelper>();
+            }
+        }
+#endif
 
         #endregion
 
-        #region 帧循环构建
-
+        /// <summary>
+        /// 帧循环构建
+        /// </summary>
         public void BuildAtUpdate()
         {
             BuildedFrameCount = 0;
@@ -487,12 +442,14 @@ namespace Client.LegoUI
                         buildingRectMeta = TaskMeta.NextRect;
                     }
 
+                    
                     if (buildingType == LegoUIType.Component || buildingType == LegoUIType.Container)
                     {
                         PushTask();
                     }
                     else
                     {
+                        //获取控件，变形
                         GetNextControl();
                         ExecuteOneMetamorphose();
                     }
@@ -511,8 +468,6 @@ namespace Client.LegoUI
             }
         }
 
-        #endregion
-
         private bool CheckIsCompleted() // 检查任务是否完成，如果已完成则跳出当前帧。
         {
             if (BuildedCount == willBuildCount && sonBuildedNum == sonNum
@@ -526,87 +481,25 @@ namespace Client.LegoUI
                 m_ParentTask?.OnSonCompleted(RootRect);
                 return true;
             }
-
             return false;
         }
 
-        private void ExecuteOneMetamorphose()
+        private void OnSonCompleted(RectTransform uiRect)
         {
-            buildingControl.Metamorphose(TaskMeta);
-            BuildedCount++;
-            BuildedFrameCount++;
-            if (buildingControl.MetamorphoseStage == LegoMetamorphoseStage.Completed)
+            if (uiRect.name.StartsWith("LegoComponent"))
             {
-                MountControl();
-                buildingControl.GameObject.SetActive(buildingControl.RectMeta.IsDefaultActive);
-                buildingControl = null;
+                sonBuildedNum++;
             }
-        }
-
-        #region 子任务构建及压入
-
-        private void PushSonComponentTask()
-        {
-            buildAble = false; // 暂停任务构建
-            var sonRef = TaskMeta.ComponentRefs[sonBuildedNum];
-            var mountMeta = sonRef.MountPosition;
-            var task = TaskPool.GetTask(sonRef.RefComponent, m_OnBuilded, RootRect);
-            task.SetPushTaskDel(m_PushSonTaskDel)
-                .SetBuildSpeed(m_BuildSpeed)
-                .SetParentRect(RootRect)
-                .SetMountMeta(mountMeta)
-                .SetParentTask(this)
-                .SetBackLoad(IsInBackground)
-                .SetBindRxModel(IsBindRxModelOnBuild);
-
-            m_PushSonTaskDel(task);
-        }
-
-        private void PushContainerTask()
-        {
-            buildAble = false;
-            var containerRef = TaskMeta.ContainerRefs[containerBuildedNum];
-            var mountMeta = containerRef.MountPosition;
-            var task = TaskPool.GetTask(containerRef.ContainerName, m_OnBuilded, RootRect);
-            task.SetPushTaskDel(m_PushSonTaskDel)
-                .SetBuildSpeed(m_BuildSpeed)
-                .SetParentRect(RootRect)
-                .SetMountMeta(mountMeta)
-                .SetParentTask(this)
-                .SetBackLoad(IsInBackground)
-                .SetBindRxModel(IsInBackground);
-            m_PushSonTaskDel(task);
-        }
-
-        private void PushSonTask(string taskId, LegoRectTransformMeta mountMeta, bool isSonComponent)
-        {
-            buildAble = false; // 暂停任务构建
-            var task = TaskPool.GetTask(taskId, m_OnBuilded, RootRect);
-            task.SetPushTaskDel(m_PushSonTaskDel)
-                .SetBuildSpeed(m_BuildSpeed)
-                .SetParentRect(RootRect)
-                .SetMountMeta(mountMeta)
-                .SetParentTask(this)
-                .SetBackLoad(IsInBackground)
-                .SetBindRxModel(isSonComponent && IsBindRxModelOnBuild);
-
-            m_PushSonTaskDel(task);
-        }
-
-        #endregion
-
-        private void PushTask()
-        {
-            switch (buildingType)
+            else
             {
-                case LegoUIType.Component:
-                    PushSonComponentTask();
-                    break;
-                case LegoUIType.Container:
-                    PushContainerTask();
-                    break;
+                containerBuildedNum++;
             }
+
+            buildAble = true;
         }
+
+
+        #region 控件获取，变形，布局
 
         private void GetNextControl()
         {
@@ -682,33 +575,7 @@ namespace Client.LegoUI
             }
         }
 
-        private void MountControl()
-        {
-            var controlRect = buildingControl.RectTransform;
-            controlRect.gameObject.layer = RootRect.gameObject.layer;
-            controlRect.SetParent(RootRect);
-
-            controlRect.localPosition = new Vector3(
-                buildingRectMeta.X,
-                buildingRectMeta.Y,
-                buildingRectMeta.Z
-            );
-
-            controlRect.localScale = new Vector3(
-                buildingRectMeta.ScaleX,
-                buildingRectMeta.ScaleY,
-                buildingRectMeta.ScaleZ
-            );
-        }
-
 #if UNITY_EDITOR
-
-        private T GetControlByDefaultControls<T>() where T : Component, ILegoControl
-        {
-            var control = LegoDefaultControls.GetControl<T>()
-                .GetComponent<T>();
-            return control;
-        }
 
         private void GetNextControlAtEditor()
         {
@@ -768,6 +635,133 @@ namespace Client.LegoUI
             }
         }
 
+        private T GetControlByDefaultControls<T>() where T : Component, ILegoControl
+        {
+            var control = LegoDefaultControls.GetControl<T>()
+                .GetComponent<T>();
+            return control;
+        }
 #endif
+
+        private void ExecuteOneMetamorphose()
+        {
+            buildingControl.Metamorphose(TaskMeta);
+            BuildedCount++;
+            BuildedFrameCount++;
+            if (buildingControl.MetamorphoseStage == LegoMetamorphoseStage.Completed)
+            {
+                MountControl();
+                buildingControl.GameObject.SetActive(buildingControl.RectMeta.IsDefaultActive);
+                buildingControl = null;
+            }
+        }
+
+        private void MountControl()
+        {
+            var controlRect = buildingControl.RectTransform;
+            controlRect.gameObject.layer = RootRect.gameObject.layer;
+            controlRect.SetParent(RootRect);
+
+            controlRect.localPosition = new Vector3(
+                buildingRectMeta.X,
+                buildingRectMeta.Y,
+                buildingRectMeta.Z
+            );
+
+            controlRect.localScale = new Vector3(
+                buildingRectMeta.ScaleX,
+                buildingRectMeta.ScaleY,
+                buildingRectMeta.ScaleZ
+            );
+        }
+
+        #endregion
+
+        #region 子任务构建及压入
+
+        private void PushTask()
+        {
+            switch (buildingType)
+            {
+                case LegoUIType.Component:
+                    PushSonComponentTask();
+                    break;
+                case LegoUIType.Container:
+                    PushContainerTask();
+                    break;
+            }
+        }
+
+        private void PushSonComponentTask()
+        {
+            buildAble = false; // 暂停任务构建
+            var sonRef = TaskMeta.ComponentRefs[sonBuildedNum];
+            var mountMeta = sonRef.MountPosition;
+            var task = TaskPool.GetTask(sonRef.RefComponent, m_OnBuilded, RootRect);
+            task.SetPushTaskDel(m_PushSonTaskDel)
+                .SetBuildSpeed(m_BuildSpeed)
+                .SetParentRect(RootRect)
+                .SetMountMeta(mountMeta)
+                .SetParentTask(this)
+                .SetBackLoad(IsInBackground)
+                .SetBindRxModel(IsBindRxModelOnBuild);
+
+            m_PushSonTaskDel(task);
+        }
+
+        private void PushContainerTask()
+        {
+            buildAble = false;
+            var containerRef = TaskMeta.ContainerRefs[containerBuildedNum];
+            var mountMeta = containerRef.MountPosition;
+            var task = TaskPool.GetTask(containerRef.ContainerName, m_OnBuilded, RootRect);
+            task.SetPushTaskDel(m_PushSonTaskDel)
+                .SetBuildSpeed(m_BuildSpeed)
+                .SetParentRect(RootRect)
+                .SetMountMeta(mountMeta)
+                .SetParentTask(this)
+                .SetBackLoad(IsInBackground)
+                .SetBindRxModel(IsInBackground);
+            m_PushSonTaskDel(task);
+        }
+
+        private void PushSonTask(string taskId, LegoRectTransformMeta mountMeta, bool isSonComponent)
+        {
+            buildAble = false; // 暂停任务构建
+            var task = TaskPool.GetTask(taskId, m_OnBuilded, RootRect);
+            task.SetPushTaskDel(m_PushSonTaskDel)
+                .SetBuildSpeed(m_BuildSpeed)
+                .SetParentRect(RootRect)
+                .SetMountMeta(mountMeta)
+                .SetParentTask(this)
+                .SetBackLoad(IsInBackground)
+                .SetBindRxModel(isSonComponent && IsBindRxModelOnBuild);
+
+            m_PushSonTaskDel(task);
+        }
+
+        #endregion
+
+        #region 重置状态
+
+        public void Reset()
+        {
+            buildAble = false;
+            IsComplete = false;
+            BuildedCount = 0;
+            m_BuildSpeed = 0;
+            buildingControl = null;
+            ComponentMountMeta = null;
+            containerBuildedNum = 0;
+            sonBuildedNum = 0;
+            m_ParentTask = null;
+            UiBuildCallback = null;
+            IsBindRxModelOnBuild = true;
+            IsInBackground = false;
+            ParentRect = null;
+        }
+
+        #endregion
+
     }
 }

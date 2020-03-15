@@ -8,14 +8,12 @@
 
 using UnityEngine;
 
-using YuU3dPlay;
-
 namespace Client.LegoUI
 {
     /// <summary>
     /// 乐高UI程序实例加载器。
     /// </summary>
-    public class YuLegoUICodeInstanceLoader : ILegoUICodeLoader
+    public class LegoUICodeInstanceLoader : ILegoUICodeLoader
     {
 //#pragma warning disable 649
 //        [Inject] private readonly IYuU3dAppEntity appEntity;
@@ -34,9 +32,9 @@ namespace Client.LegoUI
         private IYuCodeInstanceRouter<ILegoComponent> ComponentRouter
             => componentRouter ?? (componentRouter = new YuLegoComponentCodeRouter());
 
-        private IYuCodeInstanceRouter<IYuLegoLogicer> logicerRouter;
+        private IYuCodeInstanceRouter<IViewLogic> logicerRouter;
 
-        private IYuCodeInstanceRouter<IYuLegoLogicer> LogicerRouter
+        private IYuCodeInstanceRouter<IViewLogic> LogicerRouter
             => logicerRouter ?? (logicerRouter = new YuLegoLogicerCodeRouter());
 
         #endregion
@@ -51,7 +49,7 @@ namespace Client.LegoUI
         {
         }
 
-        private class YuLegoLogicerCodeRouter : YuAbsCodeInstanceRouter<IYuLegoLogicer>
+        private class YuLegoLogicerCodeRouter : YuAbsCodeInstanceRouter<IViewLogic>
         {
         }
 
@@ -77,7 +75,7 @@ namespace Client.LegoUI
             return null;
         }
 
-        public IYuLegoLogicer GetLogicer(string uiRect)
+        public IViewLogic GetLogic(string uiRect)
         {
             return null;
             ////var uiId = uiRect.Contains("@")

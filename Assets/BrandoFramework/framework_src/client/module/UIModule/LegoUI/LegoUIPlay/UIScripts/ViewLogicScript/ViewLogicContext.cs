@@ -4,7 +4,7 @@ using YuU3dPlay;
 
 namespace Client.LegoUI
 {
-    public class YuLegoLogicContext : IYuLegoLogicContext, IRelease, IReset
+    public class ViewLogicContext : IViewLogicContext, IRelease, IReset
     {
         public ILegoUI MapUI { get; private set; }
         public void Init(ILegoUI ui)
