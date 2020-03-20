@@ -1,0 +1,17 @@
+{
+    "name": "TestBorad",
+    "references": [
+        "OdinPlay",
+        "OdinEditor",
+        "TestProject.Play",
+        "Client.Core.Play"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": []
+}
