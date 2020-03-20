@@ -43,7 +43,7 @@ namespace Study.LeetCode
         }
 
         //字典保存
-        public int SingleNumber2(int[] nums) 
+        public int SingleNumber1ByDic(int[] nums) 
         {
             Dictionary<int, int> dic = new Dictionary<int, int>();
             for (var i = 0;i < nums.Length;i++)

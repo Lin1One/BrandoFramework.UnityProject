@@ -11,8 +11,6 @@ namespace Study.LeetCode
 {
     public partial class Solution
     {
-
-
         public int SingleNumber2(int[] nums)
         {
             int result = 0;
