@@ -10,7 +10,7 @@ BrandoFramework 是一套在Unity上进行游戏开发的框架代码。
 以核心代码+可组合模块的 Unity 开发框架。 
 
 ### 1.2 DatiFile 文件夹
-Dati 在意大利语里是数据的意思，Dati 类型继承自Unity的 ScriptableObject 类型  
+**Dati** 在意大利语里是数据的意思，Dati 类型继承自Unity的 ScriptableObject 类型  
 用于以可视化的形式编辑和保存各功能模块的配置数据，并在框架的模块设置窗口中展示  
 **Editor** 文件夹保存仅在编辑器环境中读取的Dati文件，不会参与打包。  
 **Play** 文件夹中的Dati文件所对应的Json会在打包时复制到SteamingAssets目录中，并在运行时读取。  
@@ -57,8 +57,8 @@ UI模块 | Editor 代码 根据 PSD 自动生成UI界面，并保存至预制体
 行为树模块| 游戏角色行为控制行为树。
 
 ### 2.3 通用代码 Common
-此处“通用”相对于客户端而言，FrameworkSrc 中，分为 Client，Common，Server，即 Common 在客户端框架及本地 C# 服务器代码中均可用。
-此处为各种工具类脚本如IO，反射，Json，Md5，序列化等 Utility 代码，还有泛型对象池，.net 原生类型的扩展方法。
+此处“通用”相对于客户端而言，FrameworkSrc 中，分为 Client，Common，Server，即 Common 在客户端框架及本地 C# 服务器代码中均可用。  
+此处为各种工具类脚本如IO，反射，Json，Md5，序列化等 Utility 代码，还有泛型对象池，.net 原生类型的扩展方法。  
 
 
 ## 3. Module 详细介绍
@@ -67,7 +67,7 @@ UI模块 | Editor 代码 根据 PSD 自动生成UI界面，并保存至预制体
 ### UIModule
 （待填坑）
 ### SceneModule
-（待填坑）
+（待填坑）  
 
 ## 4. TechnologyStudyStudio 
 此文件夹为个人学习过程中的一些记录，如 .net 源码阅读笔记，Unity 内置的 cginc 阅读笔记，练手写的各种 shader，以及 LeetCode 刷题笔记。
