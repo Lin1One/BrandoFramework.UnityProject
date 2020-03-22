@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae6e2f3ddcbf8aa4095ef2592be04501, type: 3}
+  m_Name: SceneEditorDati
+  m_EditorClassIdentifier: 
+  actualSerializableObject:
+    SceneRoot: {fileID: 0}
+    CurrentSceneInfo:
+      mapId: 0
+      mapName: 
+      xCellCount: 0
+      zCellCount: 0
+      xCellSize: 0
+      zCellSize: 0
+      originPos: {x: 0, y: 0}
+      cells: []
+      layers: []
+      items: []
+      lightmapInfo:
+        lightmapMode: 0
+        dataIndexes: 
+        types: 
+        lightmapTexNames: []
+        lightmapTexPath: []
+      navMeshData:
+        i: 0
+      ConsiderHeightMap: 0
+      heightMapOriX: 0
+      heightMapOriZ: 0
+      heightMapSizeX: 0
+      heightMapSizeZ: 0
+      heightMapMinY: 0
+      heightMapSizeY: 0
+      hasLight: 0
+      lightPos: {x: 0, y: 0, z: 0}
+      lightDir: {x: 0, y: 0, z: 0}
+      lightColor: {r: 0, g: 0, b: 0, a: 0}
+      lightIntensity: 0
+      hasFog: 0
+      fogColor: {r: 0, g: 0, b: 0, a: 0}
+      fogMode: 0
+      fogStart: 0
+      fogEnd: 0
+      fogDensity: 0
+      skyboxMaterial: {fileID: 0}
+    SceneInfoStorePath: 
+    CellEditor:
+      cellInfos: []
+      CurrentCellID: 0
+      CurrentCellItems: []
+      OnlyInCurrentCellItems: []
+      CombineInGroupBy: 0
+      combineAssetFolder: 
+      combineSetting:
+        DoMultiMaterial: 0
+        atlasPadding: 1
+        maxAtlasWidth: 0
+        maxAtlasHeight: 0
+        useMaxAtlasHeightOverride: 0
+        useMaxAtlasWidthOverride: 0
+        resizePowerOfTwoTextures: 0
+        fixOutOfBoundsUVs: 0
+        maxTilingBakeSize: 1024
+        saveAtlasesAsAssets: 0
+        _packingAlgorithm: 0
+        meshBakerTexturePackerForcePowerOfTwo: 1
+        normalizeTexelDensity: 0
+        considerNonTextureProperties: 0
+      cellItemGroups: []
+      CellGameObjectRendererInfos: []
