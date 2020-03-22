@@ -1,13 +1,13 @@
 # BrandoFramework.UnityProject
 **BrandoFramework** 是一套在Unity上进行游戏开发的框架代码。   
-框架代码基于本人在日常学习的总结和归纳，不断完善，目前仍处于不断填坑中。。。  
+框架代码基于本人在日常学习的总结和归纳，持续更新和完善。  
+使用Unity版本为 2018.3  
 
 ## 1. 框架目录结构  
-### 1.1 Framework 文件夹
+### 1.1 BrandoFramework 文件夹
 **FrameworkSrc** 存放框架代码  
 **FrameworkRes** 存放框架所需资源，  如编辑器扩展所需的图标。  
-**TechnologyStudyStudio** 为个人学习过程的一些记录，如 .net 的源码阅读笔记，练手写的 shader，以及 LeetCode 笔记，该部分与框架无关  
-以核心代码+可组合模块的 Unity 开发框架。 
+**TechnologyStudyStudio** 为个人学习过程的一些记录，如 .net 的源码阅读笔记，Shader 编写，以及插件如 UGUI，MeshBaker，StrangeIoC 源码的阅读笔记。 
 
 ### 1.2 DatiFile 文件夹
 **Dati** 在意大利语里是数据的意思，Dati 类型继承自Unity的 ScriptableObject 类型  
@@ -25,7 +25,7 @@
 客户端框架代码位于 FrameworkSrc/Client 文件夹中，框架分为 Core 部分和 Module 部分  
 在 Core 和每个 Module 中都各分为 Editor，Runtime 两部分代码。  
 另外，部分通用代码放在 FrameworkSrc/Common 中。  
-在开发过程中，采取 Core + 可选 Module 的形式，将代码导入工程内。
+在开发过程中，本框架采取 **核心代码 Core + 可选 Module** 的形式，将代码导入工程内。
 
 ### 2.1 框架核心代码 Core
 
