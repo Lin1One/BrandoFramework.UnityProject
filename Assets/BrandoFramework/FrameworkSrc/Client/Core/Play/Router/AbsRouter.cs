@@ -1,8 +1,8 @@
 #region Head
 
-// Author:            Yu
+// Author:            LinYuzhou
 // CreateDate:        2018/8/20 7:46:36
-// Email:             35490136@qq.com
+// Email:             836045613@qq.com
 
 /*
  * 修改日期  ：
@@ -26,7 +26,7 @@ namespace Client
     /// <typeparam name="TKey"></typeparam>
     /// <typeparam name="TInstance"></typeparam>
     [Singleton]
-    public abstract class YuAbsRouter<TKey, TInstance> : IYuRouter<TKey, TInstance>
+    public abstract class AbsRouter<TKey, TInstance> : IRouter<TKey, TInstance>
     {
         protected readonly Dictionary<TKey, TInstance> Instances
             = new Dictionary<TKey, TInstance>();

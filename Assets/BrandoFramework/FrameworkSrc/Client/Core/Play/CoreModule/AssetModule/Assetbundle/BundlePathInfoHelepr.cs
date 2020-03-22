@@ -46,7 +46,7 @@ namespace Client.Core
             string path = null;
             projectConfig = ProjectInfoDati.GetActualInstance();
 
-            if (YuUnityUtility.IsEditorMode)
+            if (UnityModeUtility.IsEditorMode)
             {
                 path = /*projectConfig.Helper.LocalHttpRootDir +*/ $"{projectConfig.DevelopProjectName}_AssetBundleInfo.bytes";
                 var bytes = File.ReadAllBytes(path);
@@ -103,7 +103,7 @@ namespace Client.Core
                 abPathBuilder.Append(bundleName);
             }
 
-            if (YuUnityUtility.IsEditorMode)
+            if (UnityModeUtility.IsEditorMode)
             {
                 if (!File.Exists((abPathBuilder.ToString())))
                 {

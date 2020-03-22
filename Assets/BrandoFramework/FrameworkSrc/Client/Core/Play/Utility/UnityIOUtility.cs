@@ -10,7 +10,7 @@ namespace Client.Utility
     /// <summary>
     /// Unity环境IO工具。
     /// </summary>
-    public static class YuUnityIOUtility
+    public static class UnityIOUtility
     {
         /// <summary>
         /// 传入完整路径计算目标文件相对于当前unity项目Assets目录的相对路径。

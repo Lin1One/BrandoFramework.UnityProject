@@ -1,8 +1,8 @@
 #region Head
 
-// Author:            Yu
+// Author:            LinYuzhou
 // CreateDate:        2018/5/26 9:07:32
-// Email:             Yu@gmail.com||35490136@qq.com
+// Email:             836045613@qq.com
 
 #endregion
 
@@ -14,7 +14,7 @@ namespace Client
     /// </summary>
     /// <typeparam name="TKey">键类型</typeparam>
     /// <typeparam name="TInstance">实例类型</typeparam>
-    public interface IYuRouter<TKey, TInstance>
+    public interface IRouter<TKey, TInstance>
     {
         /// <summary>
         /// 获取一个实例。

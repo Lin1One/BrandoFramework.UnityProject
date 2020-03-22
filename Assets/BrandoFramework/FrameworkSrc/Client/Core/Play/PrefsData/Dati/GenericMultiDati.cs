@@ -233,7 +233,7 @@ namespace Common.PrefsData
                 }
 
 #if UNITY_EDITOR
-                allInstance = YuUnityUtility.IsEditorMode
+                allInstance = UnityModeUtility.IsEditorMode
                     ? GetAllInstanceAtEditor()
                     : GetAllInstanceAtPlay();
 #else

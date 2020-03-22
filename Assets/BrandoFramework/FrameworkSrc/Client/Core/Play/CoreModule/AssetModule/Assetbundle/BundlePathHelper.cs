@@ -21,7 +21,7 @@ namespace Client.Core
 
         public string GetAppBundleDependInfoPath()
         {
-            if (YuUnityUtility.IsEditorMode)
+            if (UnityModeUtility.IsEditorMode)
             {
                 var path = /*_appSetting.Helper.LocalHttpRootDir +*/ $"{typeof(AppBundleDependInfo).Name}.bytes";
                 return path;

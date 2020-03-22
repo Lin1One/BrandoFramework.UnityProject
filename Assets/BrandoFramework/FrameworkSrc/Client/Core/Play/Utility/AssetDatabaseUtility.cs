@@ -81,7 +81,7 @@ namespace Client.Utility
 
         public static List<T> LoadAllAssetsAtPath<T>(string path) where T : Object
         {
-            var assetsPath = YuUnityIOUtility.GetAssetsPath(path);
+            var assetsPath = UnityIOUtility.GetAssetsPath(path);
             var args = new object[] {assetsPath};
             var objs = (object[]) LoadAllAssetsAtPathMethod.Invoke(null, args);
             var assets = objs.OfType<T>().ToList();
@@ -91,7 +91,7 @@ namespace Client.Utility
         public static void CreateAsset(Object asset, string path,
             bool isDeletedExist = false)
         {
-            var fullPath = YuUnityIOUtility.GetFullPath(path);
+            var fullPath = UnityIOUtility.GetFullPath(path);
             if (File.Exists(fullPath) && isDeletedExist)
             {
                 File.Delete(fullPath);
@@ -99,7 +99,7 @@ namespace Client.Utility
             }
 
             IOUtility.EnsureDirExist(fullPath);
-            var assetsPath = YuUnityIOUtility.GetAssetsPath(fullPath);
+            var assetsPath = UnityIOUtility.GetAssetsPath(fullPath);
             var arg = new object[] {asset, assetsPath};
             CreateAssetMethod.Invoke(null, arg);
         }

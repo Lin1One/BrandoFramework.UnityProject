@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Client
 {
@@ -12,17 +11,17 @@ namespace Client
     /// 基于反射构建实例。
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class YuAbsCodeInstanceRouter_AtAndroid<T>
-        : YuAbsCodeInstanceRouter_Base<T>, IYuCodeInstanceRouter<T> where T : class
+    public class AbsCodeInstanceRouter_AtAndroid<T>
+        : AbsCodeInstanceRouter_Base<T>, ICodeInstanceRouter<T> where T : class
     {
 #region 字段及属性
 
-        private Dictionary<string, Dictionary<string, Type>> appTypes;
+        private  Dictionary<string, Type> appTypes;
 
-        private Dictionary<string, Dictionary<string, Type>> AppTypesDict
-            => appTypes ?? (appTypes = new Dictionary<string, Dictionary<string, Type>>());
+        private Dictionary<string, Type> AppTypesDict
+            => appTypes ?? (appTypes = new Dictionary<string, Type>());
 
-        public T GetInstance(string key, string appId = null)
+        public T GetInstance(string key)
         {
             throw new NotImplementedException();
         }

@@ -8,12 +8,11 @@ namespace Client
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [Singleton]
-    public abstract class YuAbsCodeInstanceRouter<T>
-        : IYuCodeInstanceRouter<T> where T : class
+    public abstract class AbsCodeInstanceRouter<T> : ICodeInstanceRouter<T> where T : class
     {
-        private IYuCodeInstanceRouter<T> router;
+        private ICodeInstanceRouter<T> router;
 
-        private IYuCodeInstanceRouter<T> Router
+        private ICodeInstanceRouter<T> Router
         {
             get
             {
@@ -23,25 +22,24 @@ namespace Client
                 }
 
 #if UNITY_EDITOR
-                router = new YuAbsCodeInstanceRouter_AtEditor<T>();
+                router = new AbsCodeInstanceRouter_AtEditor<T>();
 #elif UNITY_ANDROID
                 router = new YuAbsCodeInstanceRouter_AtAndroid<T>();
 #else 
                 router = new YuAbsCodeInstanceRouter_AtPlay<T>();
 #endif
-
                 return router;
             }
         }
 
-        public  T GetInstance(string key, string appId = null)
+        public  T GetInstance(string key)
         {
-            return Router.GetInstance(key, appId);
+            return Router.GetInstance(key);
         }
 
-        public void RedirectInstance(string key, T instance, string appId = null)
+        public void RedirectInstance(string key, T instance)
         {
-            Router.RedirectInstance(key, instance, appId);
+            Router.RedirectInstance(key, instance);
         }
     }
 }

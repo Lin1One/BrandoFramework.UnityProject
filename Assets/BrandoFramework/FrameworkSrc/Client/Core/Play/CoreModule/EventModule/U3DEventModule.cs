@@ -19,7 +19,7 @@ namespace Client.Core
         public U3DEventModule()
         {
             //创建 UnityComponent 以监听 Update 周期函数
-            eventComponent = YuU3dInjector.MonoInjectorInstance.GetMono<UnityEventComponent>();
+            eventComponent = U3dInjector.MonoInjectorInstance.GetMono<UnityEventComponent>();
         }
 
         public void InitModule()

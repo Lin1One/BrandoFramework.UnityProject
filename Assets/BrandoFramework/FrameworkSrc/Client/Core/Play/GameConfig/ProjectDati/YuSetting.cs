@@ -14,7 +14,7 @@ namespace Common.Setting
     /// <summary>
     /// Yu整体解决方案自身配置。
     /// </summary>
-    public class YuSetting : YuAbsSingleSetting<YuSetting>
+    public class YuSetting : AbsSingleSetting<YuSetting>
     {
         [LabelText("解决方案跟目录路径")]
         [SerializeField]
@@ -85,7 +85,7 @@ namespace Common.Setting
                     return assemblyIds;
                 }
 
-                if (!YuUnityUtility.HasYuSrc)
+                if (!UnityModeUtility.HasYuSrc)
                 {
                     var asmDefinePaths = IOUtility.GetPathsContainSonDir(Instance.YuRootFullDir + "YuDLL/")
                         .Where(p => p.EndsWith(".dll"));

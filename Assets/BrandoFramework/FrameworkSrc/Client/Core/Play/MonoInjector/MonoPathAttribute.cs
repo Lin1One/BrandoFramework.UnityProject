@@ -20,7 +20,7 @@ namespace Client
     /// 继承自MonoBehavior的类可以通过该特性标明自己的挂载路径。
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class YuMonoPathAttribute : Attribute
+    public class MonoPathAttribute : Attribute
     {
         /// <summary>
         /// mono游戏对象挂载的父路径。
@@ -32,7 +32,7 @@ namespace Client
         /// </summary>
         public string SelfName { get; }
 
-        public YuMonoPathAttribute(string parentPath, string selfName)
+        public MonoPathAttribute(string parentPath, string selfName)
         {
             ParentPath = parentPath;
             SelfName = selfName;

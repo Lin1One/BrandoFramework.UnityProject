@@ -41,7 +41,7 @@ namespace Common.PrefsData
 
     #region 可持久化保存对象泛型基类
 
-    public abstract class YuAbsSingleSetting<T>
+    public abstract class AbsSingleSetting<T>
         where T : class, new()
     {
         private static T instance;
@@ -57,7 +57,7 @@ namespace Common.PrefsData
 
                 var isEditorSetting = typeof(T).HasAttribute<YuEditorSettingAttribute>();
 
-                if (YuUnityUtility.IsEditorMode)
+                if (UnityModeUtility.IsEditorMode)
                 {
                     if (isEditorSetting)
                     {

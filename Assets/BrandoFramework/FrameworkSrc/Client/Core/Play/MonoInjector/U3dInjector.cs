@@ -22,7 +22,7 @@ using UnityEngine;
 
 namespace Common
 {
-    public interface IYuU3dInjector : IInjector
+    public interface IU3dInjector : IInjector
     {
         TMono GetMono<TMono>(string path = null, GameObject parent = null)
             where TMono : MonoBehaviour;
@@ -30,16 +30,16 @@ namespace Common
         TModule GetModule<TModule>() where TModule : class, IModule;
     }
 
-    public class YuU3dInjector : Injector, IYuU3dInjector
+    public class U3dInjector : Injector, IU3dInjector
     {
-        private static YuU3dInjector monoInjectorInstance;
-        public static YuU3dInjector MonoInjectorInstance
+        private static U3dInjector monoInjectorInstance;
+        public static U3dInjector MonoInjectorInstance
         {
             get
             {
                 if (monoInjectorInstance == null)
                 {
-                    monoInjectorInstance = new YuU3dInjector();
+                    monoInjectorInstance = new U3dInjector();
                 }
                 return monoInjectorInstance;
             }
@@ -253,7 +253,7 @@ namespace Common
 
             if (path == null)
             {
-                var pathAtt = type.GetAttribute<YuMonoPathAttribute>();
+                var pathAtt = type.GetAttribute<MonoPathAttribute>();
                 if (pathAtt != null)
                 {
                     if (pathAtt.SelfName != null)

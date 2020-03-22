@@ -63,7 +63,7 @@ namespace Common.PrefsData
         {
             var suffix = GetSuffix(implType);
 
-            if (YuUnityUtility.IsEditorMode)
+            if (UnityModeUtility.IsEditorMode)
             {
                 var path = Application.dataPath + $"/DatiFile/{GetDatiEnvironmentDirType(implType)}/" +
                            $"{implType.Name}/{id}{suffix}";

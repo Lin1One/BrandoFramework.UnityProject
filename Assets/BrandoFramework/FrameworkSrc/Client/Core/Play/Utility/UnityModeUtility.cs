@@ -7,7 +7,7 @@ namespace Client.Utility
     /// <summary>
     /// unity工具，提供公用的常用API。
     /// </summary>
-    public static class YuUnityUtility
+    public static class UnityModeUtility
     {
         /// <summary>
         /// 当前是否处于编辑器下。

@@ -3,10 +3,13 @@ using UnityEngine;
 
 namespace Client.Core
 {
-    public partial class YuAppHelper
+    public partial class GameProjectHelper
     {
         private string rootFullPath;
 
+        /// <summary>
+        /// 游戏项目根目录
+        /// </summary>
         public string RootFullPath
         {
             get

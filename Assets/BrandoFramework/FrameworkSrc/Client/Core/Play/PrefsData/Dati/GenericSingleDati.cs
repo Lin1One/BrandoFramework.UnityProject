@@ -45,7 +45,7 @@ namespace Common.PrefsData
 
 #if UNITY_EDITOR
             //在编辑器下，直接加载 Asset 文件
-            if (YuUnityUtility.IsEditorMode)
+            if (UnityModeUtility.IsEditorMode)
             {
                 if (File.Exists(assetFilePath))
                 {
@@ -58,7 +58,7 @@ namespace Common.PrefsData
             if (instance == null)
             {
                 var originPath = DatiUtility.GetSingleSerializeDataPath(implType);
-                instance = YuUnityUtility.IsEditorMode
+                instance = UnityModeUtility.IsEditorMode
                     ? LoadSingleOriginAtEditor(implType, originPath, assetFilePath)
                     : LoadSingleOriginAtPlay(implType, originPath);
             }

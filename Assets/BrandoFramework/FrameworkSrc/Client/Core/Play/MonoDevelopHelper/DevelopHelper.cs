@@ -16,7 +16,7 @@ namespace Client
     /// 精简化处理是指将运行时无需使用的脚本从预制件上剥离以便提高运行时性能。
     /// </summary>
     [ExecuteInEditMode]
-    public class YuDevelopHelper : MonoBehaviour
+    public class DevelopHelper : MonoBehaviour
     {
     }
 }
