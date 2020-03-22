@@ -61,14 +61,6 @@ UI模块 Editor  | 根据 PSD 自动生成UI界面，并保存至预制体，或
 此处为各种工具类脚本如IO，反射，Json，Md5，序列化等 Utility 代码，还有泛型对象池，.net 原生类型的扩展方法。  
 
 
-## 3. Module 详细介绍
-### TableDataModule
-（待填坑）
-### UIModule
-（待填坑）
-### SceneModule
-（待填坑）  
-
-## 4. TechnologyStudyStudio 
+## 3. TechnologyStudyStudio 
 此文件夹为个人学习过程中的一些记录，如 .net 源码阅读笔记，Unity 内置的 cginc 阅读笔记，练手写的各种 shader，以及 LeetCode 刷题笔记。
 该部分与框架无关。（其实:)就是懒得开多一个项目hhh)
