@@ -35,7 +35,7 @@ namespace Client.Assets.Editor
 
         [TabGroup("项目 Assetbundle 信息")]
         [HideLabel]
-        public YuU3dAppAssetBundleInfo AssetbundleInfo;
+        public AppAssetBundleInfo AssetbundleInfo;
 
         [TabGroup("打包目录配置")]
         [HideLabel]
@@ -64,7 +64,7 @@ namespace Client.Assets.Editor
 
         public AssetBundleBuildSetting GetSetting(string path)
         {
-            path = YuUnityIOUtility.GetAssetsPath(path);
+            path = UnityIOUtility.GetAssetsPath(path);
             var setting = BundleSettings.Find(s => s.Dir == path);
             return setting;
         }

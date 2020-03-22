@@ -75,7 +75,7 @@ namespace Client.Assets.Editor
                 return;
             }
 
-            var dirs = Unity3DEditorUtility.GetSelectDirs();
+            var dirs = UnityEditorUtility.GetSelectDirs();
             foreach (var dir in dirs)
             {
                 if (!dir.StartsWith(projectInfo.CurrentProjectAssetDatabaseDirPath))
@@ -252,13 +252,13 @@ namespace Client.Assets.Editor
 
         private static void SetMeshImporterMat(Material mat)
         {
-            var mainDir = Unity3DEditorUtility.GetSelectDir();
+            var mainDir = UnityEditorUtility.GetSelectDir();
             var dirs = IOUtility.GetAllDir(mainDir);
             if (dirs != null)
             {
                 foreach (var dir in dirs)
                 {
-                    var fullDir = YuUnityIOUtility.GetFullPath(dir);
+                    var fullDir = UnityIOUtility.GetFullPath(dir);
                     //Debug.LogError(dir);
 
                     var fullpaths = Directory.GetFiles(fullDir);
@@ -283,7 +283,7 @@ namespace Client.Assets.Editor
             {
                 return;
             }
-            var path = YuUnityIOUtility.GetAssetsPath(fullPath);
+            var path = UnityIOUtility.GetAssetsPath(fullPath);
 
             var obj = AssetDatabase.LoadAssetAtPath<GameObject>(path);
             if (obj == null)
@@ -420,7 +420,7 @@ namespace Client.Assets.Editor
 
         private static void SetTargetDirsBundleIdAndSelectBuild(bool isBuild, bool isSaveSetting)
         {
-            var selectDir = Unity3DEditorUtility.GetSelectDir();
+            var selectDir = UnityEditorUtility.GetSelectDir();
             //var targetApp = Unity3DEditorUtility.TryGetLocAppAtDir(selectDir);
             //if (targetApp == null)
             //{
@@ -510,13 +510,13 @@ namespace Client.Assets.Editor
         }
 
         private static List<string> FirstSonDirs => 
-            IOUtility.GetAllDir(Unity3DEditorUtility.GetSelectDir(), null, true, false);
+            IOUtility.GetAllDir(UnityEditorUtility.GetSelectDir(), null, true, false);
 
         private static List<string> AllSonDirs
         {
             get
             {
-                var selectDir = Unity3DEditorUtility.GetSelectDir();
+                var selectDir = UnityEditorUtility.GetSelectDir();
                 var sonDirs = IOUtility.GetAllDir(selectDir,null,false,false);
                 sonDirs.RemoveAt(0);
                 return sonDirs;

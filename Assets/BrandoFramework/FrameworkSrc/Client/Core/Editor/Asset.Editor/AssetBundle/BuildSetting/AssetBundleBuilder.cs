@@ -43,7 +43,7 @@ namespace Client.Assets.Editor
                     continue;
                 }
 
-                var assetsPath = YuUnityIOUtility.GetAssetsPath(assetPath);
+                var assetsPath = UnityIOUtility.GetAssetsPath(assetPath);
                 var importer = AssetImporter.GetAtPath(assetsPath);
                 if (importer == null)
                 {
@@ -153,7 +153,7 @@ namespace Client.Assets.Editor
             IOUtility.EnsureDirExist(assetBundleOutPutDir);
             BuildPipeline.BuildAssetBundles(assetBundleOutPutDir,
                 BuildAssetBundleOptions.ChunkBasedCompression, EditorUserBuildSettings.activeBuildTarget);
-            Unity3DEditorUtility.DisplayTooptx($"应用{currentApp.DevelopProjectName}的AssertBundle打包已完成！");
+            UnityEditorUtility.DisplayTooptx($"应用{currentApp.DevelopProjectName}的AssertBundle打包已完成！");
             AssetDatabase.Refresh();
         }
 
@@ -316,7 +316,7 @@ namespace Client.Assets.Editor
                 }
 
                 //appBundleInfo.AddMap(assetLowerId, finalBundleId);
-                var assetsPath = YuUnityIOUtility.GetAssetsPath(path);
+                var assetsPath = UnityIOUtility.GetAssetsPath(path);
                 var importer = AssetImporter.GetAtPath(assetsPath);
                 if (importer == null)
                 {
@@ -357,7 +357,7 @@ namespace Client.Assets.Editor
                 }
 
                 ////appBundleInfo.AddMap(assetLowerId, finalBundleId);
-                var assetsPath = YuUnityIOUtility.GetAssetsPath(path);
+                var assetsPath = UnityIOUtility.GetAssetsPath(path);
                 var importer = AssetImporter.GetAtPath(assetsPath);
                 if (importer == null)
                 {

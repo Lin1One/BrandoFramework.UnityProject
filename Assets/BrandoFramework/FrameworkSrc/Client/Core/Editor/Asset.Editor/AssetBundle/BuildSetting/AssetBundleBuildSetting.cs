@@ -189,7 +189,7 @@ namespace Client.Assets.Editor
         {
             if (BuildType != AssetBundleBuildType.BuildAtList)
             {
-                Unity3DEditorUtility.DisplayError("当前目录的打包方式不是BuildAtList,请先修改打包方式！");
+                UnityEditorUtility.DisplayError("当前目录的打包方式不是BuildAtList,请先修改打包方式！");
                 return;
             }
 
@@ -208,7 +208,7 @@ namespace Client.Assets.Editor
             var newBundleId = dirId + "_" + BundleNodes.Count;
             if (BundleNodes.Find(n => n.BundleId == newBundleId) != null)
             {
-                Unity3DEditorUtility.DisplayError($"目标Bundle名已存在！");
+                UnityEditorUtility.DisplayError($"目标Bundle名已存在！");
                 newBaseNode = new AssetBundleBuildBaseNode();
             }
             else
