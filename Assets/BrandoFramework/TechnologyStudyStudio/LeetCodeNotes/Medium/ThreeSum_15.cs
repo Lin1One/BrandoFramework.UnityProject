@@ -17,6 +17,63 @@ namespace Study.LeetCode
         //   [-1, -1, 2]
         // ]
 
+        public IList<IList<int>> ThreeSum0322(int[] nums)
+        {
+            List<IList<int>> results = new List<IList<int>>();
+            Array.Sort(nums);
+            if (nums == null) return results;
+            for (var i = 0;i< nums.Length - 2;i++)
+            {
+                if (nums[i] > 0)
+                {
+                    break;
+                }
+                if (i > 0 && nums[i] == nums[i - 1])
+                {
+                    continue; // 去重
+                }
+                int start = i + 1;
+                int end = nums.Length - 1;
+
+                while(start < end)
+                {
+                    if(nums[i]+ nums[start]+ nums[end] > 0)
+                    {
+                        end--;
+                    }
+                    else if (nums[i] + nums[start] + nums[end] < 0)
+                    {
+                        start++;
+                    }
+                    else
+                    {
+                        IList<int> result = new List<int>();
+                        result.Add(nums[i]);
+                        result.Add(nums[start]);
+                        result.Add(nums[end]);
+                        results.Add(result);
+                        while (start < end && nums[start] == nums[start + 1])
+                        {
+                            start++; // 去重
+                        }
+                        while (start < end && nums[end] == nums[end - 1])
+                        {
+                            end--; // 去重
+                        }
+                        start++;
+                        end--;
+                    }
+                }
+            }
+            return results;
+        }
+
+
+
+
+
+
+
 
         //排序，双指针
         // 首先对数组进行排序，排序后固定一个数nums[i]，

@@ -13,6 +13,48 @@ namespace Study.LeetCode
         // 例如，给定数组 nums = [-1，2，1，-4], 和 target = 1.
         // 与 target 最接近的三个数的和为 2. (-1 + 2 + 1 = 2).
 
+        public int ThreeSumClosest0322(int[] nums, int target)
+        {
+            Array.Sort(nums);
+            if(nums == null)
+            {
+                return 0;
+            }
+            int sum = 0;
+            int closetSum = int.MaxValue;
+            for (var i = 0;i<nums.Length - 2 ;i++)
+            {
+                if(i > 0 && nums[i] == nums[i -1] )
+                {
+                    continue;
+                }
+                int start = i + 1;
+                int end = nums.Length - 1;
+                while(start < end)
+                {
+                    sum = nums[i] + nums[start] + nums[end];
+                    if (Math.Abs(target - sum) < Math.Abs(target - closetSum))
+                    {
+                        closetSum = sum;
+                    }
+                    if (sum > target )
+                    {
+                        end--;
+                    }
+                    else if(sum < target)
+                    {
+                        start++;
+                    }
+                    else
+                    {
+                        return closetSum;
+                    }
+                }
+            }
+            return closetSum;
+
+        }
+
         public int ThreeSumClosest(int[] nums, int target) 
         {
             Array.Sort(nums);

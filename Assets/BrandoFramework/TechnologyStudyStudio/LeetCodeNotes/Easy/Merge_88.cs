@@ -27,6 +27,31 @@ namespace Study.LeetCode
 
         // 输出: [1,2,2,3,5,6]
 
+        public void Merge0321(int[] nums1, int m, int[] nums2, int n)
+        {
+            int numCount = m + n - 1;
+            int ptr1 = m - 1;
+            int ptr2 = n - 1;
+            while(ptr1 > -1 && ptr2 > -1)
+            {
+                int numInArray1 = nums1[ptr1];
+                int numInArray2 = nums2[ptr2];
+                if (numInArray1 > numInArray2)
+                {
+                    nums1[numCount] = numInArray1;
+                    --m;
+                }
+                else
+                {
+                    nums1[numCount] = numInArray2;
+                    --n;
+                }
+                numCount--;
+            }
+            Array.Copy(nums2, 0, nums1, 0, ptr2 + 1);
+        }
+
+
         // 方法一 : 合并后排序
         // 最朴素的解法就是将两个数组合并之后再排序。
         // 这是由于这种方法没有利用两个数组本身已经有序这一点。

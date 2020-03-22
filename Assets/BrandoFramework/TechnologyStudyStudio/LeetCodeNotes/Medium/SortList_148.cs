@@ -18,9 +18,41 @@ namespace Study.LeetCode
         // 输入: -1->5->3->4->0
         // 输出: -1->0->3->4->5
 
-        public ListNode SortList(ListNode head) 
+        public ListNode SortList0321(ListNode head) 
         {
-            return null;
+            if (head == null || head.next == null)
+            {
+                return head;
+            }
+            ListNode slowNode = head;
+            ListNode fastNode = head.next;
+            while(fastNode != null && fastNode.next != null)
+            {
+                slowNode = slowNode.next;
+                fastNode = fastNode.next.next;
+            }
+            var temp = slowNode.next;
+            slowNode.next = null;
+            ListNode newLeftNode = SortList0321(head);
+            ListNode newRightNode = SortList0321(temp);
+            ListNode result = new ListNode(0);
+            ListNode curNode = result;
+            while (newLeftNode != null && newRightNode != null)
+            {
+                if(newLeftNode.val > newRightNode.val)
+                {
+                    curNode.next = newRightNode;
+                    newRightNode = newRightNode.next;
+                }
+                else
+                {
+                    curNode.next = newLeftNode;
+                    newLeftNode = newLeftNode.next;
+                }
+                curNode = curNode.next;
+            }
+            curNode.next = newLeftNode == null ? newRightNode : newLeftNode;
+            return result.next;
         }
 
 
