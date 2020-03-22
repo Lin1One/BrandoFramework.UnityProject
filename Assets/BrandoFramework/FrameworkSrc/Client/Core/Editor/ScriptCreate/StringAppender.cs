@@ -269,8 +269,8 @@ namespace Common
 
         public void AppCsNoteHeader
         (
-            string coderName = "Yu",
-            string coderEmail = "Yu@gmail.com || 35490136@qq.com"
+            string coderName = "LinYuzhou",
+            string coderEmail = "836045613@qq.com"
         )
         {
             AppendLine("#region Head");

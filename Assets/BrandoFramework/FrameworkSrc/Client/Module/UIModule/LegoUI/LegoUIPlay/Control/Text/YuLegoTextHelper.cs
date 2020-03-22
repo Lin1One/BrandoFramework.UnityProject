@@ -10,7 +10,7 @@ namespace Client.LegoUI
 #if DEBUG
     [ExecuteInEditMode]
 #endif
-    public class YuLegoTextHelper : YuDevelopHelper
+    public class YuLegoTextHelper : DevelopHelper
     {
         [BoxGroup("精灵过渡状态样式Id")]
         [LabelText("普通样式Id")]

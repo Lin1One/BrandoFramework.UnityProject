@@ -671,7 +671,7 @@ namespace Client.LegoUI
             if (!fontCaches.ContainsKey(fontId))
             {
 #if UNITY_EDITOR
-                if (YuUnityUtility.IsEditorMode)
+                if (UnityModeUtility.IsEditorMode)
                 {
                     //AssetModule.Load<Font>(fontId);
 

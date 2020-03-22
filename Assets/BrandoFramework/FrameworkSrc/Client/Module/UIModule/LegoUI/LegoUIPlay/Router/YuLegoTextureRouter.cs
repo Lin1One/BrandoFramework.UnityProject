@@ -31,7 +31,7 @@ namespace Client.LegoUI
         public void WaitTexture(string id, Action<Texture> callback)
         {
 #if UNITY_EDITOR
-            if (YuUnityUtility.IsEditorMode)
+            if (UnityModeUtility.IsEditorMode)
             {
                 var tex = GetTexture_AtEditor(id);
                 callback?.Invoke(tex);

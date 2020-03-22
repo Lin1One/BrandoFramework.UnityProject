@@ -16,7 +16,7 @@ namespace Client.InputModule
         private readonly IInputProcesser inputDataProcesser;
         public InputModule()
         {
-            inputComponent = YuU3dInjector.MonoInjectorInstance.GetMono<InputComponent>();
+            inputComponent = U3dInjector.MonoInjectorInstance.GetMono<InputComponent>();
             inputDataProcesser = Injector.Instance.Get<IInputProcesser>();
         }
 

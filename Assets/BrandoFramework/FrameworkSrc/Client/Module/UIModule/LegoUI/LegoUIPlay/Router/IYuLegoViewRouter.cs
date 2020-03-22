@@ -9,7 +9,7 @@
 
 namespace Client.LegoUI
 {
-    public interface IYuLegoViewRouter : IYuCodeInstanceRouter<ILegoView>
+    public interface IYuLegoViewRouter : ICodeInstanceRouter<ILegoView>
     {
     }
 }

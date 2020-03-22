@@ -30,12 +30,12 @@ namespace Client.LegoUI
             }
 
             var jpgFullPath = /*LocU3DApp.Helper.OriginRawImageDir + rawImageSrc+*/ ".jpg";
-            var jpgAssetsPath = YuUnityIOUtility.GetAssetsPath(jpgFullPath);
+            var jpgAssetsPath = UnityIOUtility.GetAssetsPath(jpgFullPath);
             var texture2D = AssetDatabaseUtility.LoadAssetAtPath<Texture2D>(jpgAssetsPath);
             if (texture2D == null)
             {
                 var pngFullPath = /*LocU3DApp.Helper.OriginRawImageDir + rawImageSrc + */".png";
-                var pngAssetsPath = YuUnityIOUtility.GetAssetsPath(pngFullPath);
+                var pngAssetsPath = UnityIOUtility.GetAssetsPath(pngFullPath);
                 texture2D = AssetDatabaseUtility.LoadAssetAtPath<Texture2D>(pngAssetsPath);
             }
 

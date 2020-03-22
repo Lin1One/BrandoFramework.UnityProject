@@ -24,7 +24,7 @@ namespace Client.LegoUI.Editor
     {
         #region 字段
 
-        private readonly YuAppHelper appHelper;
+        private readonly GameProjectHelper appHelper;
         private readonly LegoUIMeta uiMeta = new LegoUIMeta();
         private readonly HashSet<string> componetIds = new HashSet<string>();
         private RectTransform rootRect;

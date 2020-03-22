@@ -63,7 +63,7 @@ namespace Client.LegoUI
         public LegoUIMeta GetUIMeta(string uiId)
         {
 #if UNITY_EDITOR
-            if (YuUnityUtility.IsEditorMode)
+            if (UnityModeUtility.IsEditorMode)
             {
                 if (uiMetaDict.ContainsKey(uiId))
                 {

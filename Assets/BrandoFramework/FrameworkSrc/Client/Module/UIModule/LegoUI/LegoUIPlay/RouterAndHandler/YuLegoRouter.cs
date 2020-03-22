@@ -2,7 +2,7 @@
 
 // Author:            Yu
 // CreateDate:        2018/8/29 7:24:19
-// Email:             35490136@qq.com
+// Email:             836045613@qq.com
 
 /*
  * 修改日期  ：
@@ -23,16 +23,16 @@ namespace Client.LegoUI
     /// </summary>
     public class YuLegoRouter
     {
-        private readonly YuAbsRouter<string, Func<ILegoComponent>> ComponentRouter
+        private readonly AbsRouter<string, Func<ILegoComponent>> ComponentRouter
             = new YuLegoComponentRouter();
 
-        private readonly YuAbsRouter<string, Func<ILegoView>> ViewRouter
+        private readonly AbsRouter<string, Func<ILegoView>> ViewRouter
             = new YuLegoViewRouter();
 
-        private readonly YuAbsRouter<string, Func<IYuLegoUIRxModel>> RxModelRouter
+        private readonly AbsRouter<string, Func<IYuLegoUIRxModel>> RxModelRouter
             = new YuLegoUIRxModelRouter();
 
-        private readonly YuAbsRouter<string, Func<IYuLegoScrollViewRxModel>> ScrollViewRxModelRouter;
+        private readonly AbsRouter<string, Func<IYuLegoScrollViewRxModel>> ScrollViewRxModelRouter;
 
         #region 视图、组件、模型获取API
 
@@ -84,19 +84,19 @@ namespace Client.LegoUI
 
         #region 内部路由器实现类
 
-        private class YuLegoComponentRouter : YuAbsRouter<string, Func<ILegoComponent>>
+        private class YuLegoComponentRouter : AbsRouter<string, Func<ILegoComponent>>
         {
         }
 
-        private class YuLegoViewRouter : YuAbsRouter<string, Func<ILegoView>>
+        private class YuLegoViewRouter : AbsRouter<string, Func<ILegoView>>
         {
         }
 
-        private class YuLegoUIRxModelRouter : YuAbsRouter<string, Func<IYuLegoUIRxModel>>
+        private class YuLegoUIRxModelRouter : AbsRouter<string, Func<IYuLegoUIRxModel>>
         {
         }
 
-        private class YuLegoScrollViewRouter : YuAbsRouter<string, Func<object>>
+        private class YuLegoScrollViewRouter : AbsRouter<string, Func<object>>
         {
         }
 

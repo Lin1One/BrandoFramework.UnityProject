@@ -16,7 +16,7 @@ namespace Client.LegoUI
     /// <summary>
     /// 乐高控件池。
     /// </summary>
-    [YuMonoPath("UIRoot/ControlPoolCanvas/", null)]
+    [MonoPathAttribute("UIRoot/ControlPoolCanvas/", null)]
     [Singleton]
     public class YuLegoControlPool<T> :
         MonoBehaviour

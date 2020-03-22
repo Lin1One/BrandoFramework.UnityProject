@@ -1,16 +1,3 @@
-#region Head
-
-// Author:            Yu
-// CreateDate:        2019/1/14 9:46:02
-// Email:             35490136@qq.com
-
-/*
- * 修改日期  ：
- * 修改人    ：
- * 修改内容  ：
-*/
-
-#endregion
 
 using Client.Utility;
 using Sirenix.OdinInspector;

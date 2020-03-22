@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace Client.LegoUI
 {
-    public class YuLegoViewHelper : YuDevelopHelper
+    public class YuLegoViewHelper : DevelopHelper
     {
         [LabelText("UI挂载层级")] public LegoViewType ViewType;
 

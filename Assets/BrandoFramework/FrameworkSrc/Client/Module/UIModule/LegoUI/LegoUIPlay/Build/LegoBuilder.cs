@@ -16,7 +16,7 @@ using UnityEngine;
 namespace Client.LegoUI
 {
     [Singleton]
-    [YuMonoPath("Other/", null)]
+    [MonoPathAttribute("Other/", null)]
     public class LegoBuilder : MonoBehaviour
     {
         #region 构建任务栈

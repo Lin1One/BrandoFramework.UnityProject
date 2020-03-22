@@ -172,7 +172,7 @@ namespace Client.LegoUI
                     return RxTypeDict[appId];
                 }
 
-                var appAsm = YuUnityIOUtility.GetUnityAssembly(appId + "Play");
+                var appAsm = UnityIOUtility.GetUnityAssembly(appId + "Play");
                 var typeDic = ReflectUtility.GetTypeDictionary<IYuLegoUIRxModel>(appAsm);
                 var typeDic2 = ReflectUtility.GetTypeDictionary<IYuLegoScrollViewRxModel>(appAsm);
                 typeDic.Combin(typeDic2);

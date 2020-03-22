@@ -17,7 +17,7 @@ namespace Client.LegoUI
 #if DEBUG
     [ExecuteInEditMode]
 #endif
-    public class YuLegoSoundHelper : YuDevelopHelper
+    public class YuLegoSoundHelper : DevelopHelper
     {
         [LabelText("按钮点击音效Id")]
         public string AudioClipId;

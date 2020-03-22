@@ -13,8 +13,8 @@ namespace Client.LegoUI.Editor
 {
     public class YuLegoPipelineHandlerScriptCreator
     {
-        protected readonly YuStringAppender Appender
-            = new YuStringAppender();
+        protected readonly StringAppender Appender
+            = new StringAppender();
         //private YuU3dAppSetting u3DAppSetting;
         private RectTransform uiRect;
         private UIPipelineType pipelineType;

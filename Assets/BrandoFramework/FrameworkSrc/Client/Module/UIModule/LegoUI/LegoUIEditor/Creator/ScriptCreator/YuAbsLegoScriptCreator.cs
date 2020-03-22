@@ -12,8 +12,8 @@ namespace Client.LegoUI.Editor
 {
     public abstract class YuAbsLegoScriptCreator
     {
-        protected readonly YuStringAppender Appender
-            = new YuStringAppender();
+        protected readonly StringAppender Appender
+            = new StringAppender();
 
         protected LegoUIMeta UiMeta { get; private set; }
         //protected YuU3dAppSetting U3DAppSetting { get; }

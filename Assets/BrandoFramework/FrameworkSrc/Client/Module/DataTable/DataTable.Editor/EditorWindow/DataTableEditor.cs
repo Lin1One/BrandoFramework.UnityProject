@@ -71,7 +71,7 @@ namespace Client.DataTable.Editor
         [Button("导出Excel脚本")]
         private void ExportScript()
         {
-            Injector.Instance.Get<YuU3dExcelCsharpInterfaceScriptCreator>().
+            Injector.Instance.Get<ExcelCsharpInterfaceScriptCreator>().
                 CreateScript(this);
             var scriptFileName = Injector.Instance.Get<ExcelCSharpEntityScriptCreator>().
                 CreateScript(this);
@@ -134,7 +134,7 @@ namespace Client.DataTable.Editor
 
         private void ExportExcelDatas(Type excelEntityType, string excelFilePath)
         {
-            var dataRowStrs = ExcelUtility.GetSheetStrs(excelFilePath);
+            var dataRowStrs = ExcelUtilty.GetSheetStrs(excelFilePath);
 
             var initEntitysMethod = excelEntityType.GetMethod("InitEntitys");
             var instance = Activator.CreateInstance(excelEntityType);
@@ -149,7 +149,7 @@ namespace Client.DataTable.Editor
 
         private void ExportExcelDatas(IExcelEntity entity, string excelFilePath)
         {
-            var dataRowStrs = ExcelUtility.GetSheetStrs(excelFilePath);
+            var dataRowStrs = ExcelUtilty.GetSheetStrs(excelFilePath);
             var dataList = entity.InitEntitys(dataRowStrs);
             var DataBytes = Injector.Instance.Get<ISerializer>().Serialize(dataList);
             var exportFilePath = ExportDir + "/" + entity.TypeName() + DataFileExtention;

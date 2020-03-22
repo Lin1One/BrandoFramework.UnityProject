@@ -22,34 +22,34 @@ namespace Client.LegoUI
 
         #region 实例路由器
 
-        private IYuCodeInstanceRouter<ILegoView> viewRouter;
+        private ICodeInstanceRouter<ILegoView> viewRouter;
 
-        private IYuCodeInstanceRouter<ILegoView> ViewRouter
+        private ICodeInstanceRouter<ILegoView> ViewRouter
             => viewRouter ?? (viewRouter = new YuLegoViewCodeRouter());
 
-        private IYuCodeInstanceRouter<ILegoComponent> componentRouter;
+        private ICodeInstanceRouter<ILegoComponent> componentRouter;
 
-        private IYuCodeInstanceRouter<ILegoComponent> ComponentRouter
+        private ICodeInstanceRouter<ILegoComponent> ComponentRouter
             => componentRouter ?? (componentRouter = new YuLegoComponentCodeRouter());
 
-        private IYuCodeInstanceRouter<IViewLogic> logicerRouter;
+        private ICodeInstanceRouter<IViewLogic> logicerRouter;
 
-        private IYuCodeInstanceRouter<IViewLogic> LogicerRouter
+        private ICodeInstanceRouter<IViewLogic> LogicerRouter
             => logicerRouter ?? (logicerRouter = new YuLegoLogicerCodeRouter());
 
         #endregion
 
         #region 私有路由器类
 
-        private class YuLegoViewCodeRouter : YuAbsCodeInstanceRouter<ILegoView>
+        private class YuLegoViewCodeRouter : AbsCodeInstanceRouter<ILegoView>
         {
         }
 
-        private class YuLegoComponentCodeRouter : YuAbsCodeInstanceRouter<ILegoComponent>
+        private class YuLegoComponentCodeRouter : AbsCodeInstanceRouter<ILegoComponent>
         {
         }
 
-        private class YuLegoLogicerCodeRouter : YuAbsCodeInstanceRouter<IViewLogic>
+        private class YuLegoLogicerCodeRouter : AbsCodeInstanceRouter<IViewLogic>
         {
         }
 

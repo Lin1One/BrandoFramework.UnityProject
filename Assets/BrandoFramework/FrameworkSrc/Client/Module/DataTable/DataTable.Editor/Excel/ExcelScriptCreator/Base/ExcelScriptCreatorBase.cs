@@ -29,7 +29,7 @@ namespace Client.DataTable.Editor
         protected ExcelSheetInfo SheetInfo { get; private set; }
         public abstract ScriptType ScriptType { get; }
         public abstract string ScriptName { get; }
-        protected YuStringAppender Appender { get; } = new YuStringAppender();
+        protected StringAppender Appender { get; } = new StringAppender();
 
         public string CreateScript(ExcelScriptExportSetting exportSetting)
         {

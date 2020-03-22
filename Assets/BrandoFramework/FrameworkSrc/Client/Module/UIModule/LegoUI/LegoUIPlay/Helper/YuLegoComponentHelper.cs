@@ -20,7 +20,7 @@ namespace Client.LegoUI
 #if DEBUG
     [ExecuteInEditMode]
 #endif
-    public class YuLegoComponentHelper : YuDevelopHelper
+    public class YuLegoComponentHelper : DevelopHelper
     {
         [LabelText("组件Id")] public string Id;
         [LabelText("组件的业务逻辑Id")] public string LogicId;

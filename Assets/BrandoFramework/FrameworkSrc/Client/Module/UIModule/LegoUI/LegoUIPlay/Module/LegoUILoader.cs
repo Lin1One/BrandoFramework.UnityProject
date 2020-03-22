@@ -2,7 +2,7 @@
 
 // Author:            Yu
 // CreateDate:        2018/11/8 6:19:20
-// Email:             35490136@qq.com
+// Email:             836045613@qq.com
 
 /*
  * 修改日期  ：
@@ -40,10 +40,10 @@ namespace Client.LegoUI
 
         #region 依赖注入引用
 
-        private IYuU3dInjector injector;
+        private IU3dInjector injector;
 
-        private IYuU3dInjector m_Injector =>
-            injector ?? (injector = YuU3dInjector.MonoInjectorInstance.As<IYuU3dInjector>());
+        private IU3dInjector m_Injector =>
+            injector ?? (injector = U3dInjector.MonoInjectorInstance.As<IU3dInjector>());
 
         private LegoBuilder legoBuilder;
         /// <summary>

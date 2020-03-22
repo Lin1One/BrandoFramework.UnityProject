@@ -2,7 +2,7 @@
 
 // Author:            Yu
 // CreateDate:        2019/1/10 15:08:21
-// Email:             35490136@qq.com
+// Email:             836045613@qq.com
 
 /*
  * 修改日期  ：
@@ -26,7 +26,7 @@ using YuU3dPlay;
 namespace Client.LegoUI
 {
     [Singleton]
-    public class YuLegoSpriteRouter : IYuSpriteRouter
+    public class YuLegoSpriteRouter : ISpriteRouter
     {
 #if UNITY_EDITOR 
 

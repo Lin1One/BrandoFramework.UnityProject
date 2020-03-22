@@ -8,7 +8,7 @@ namespace Client.LegoUI
     /// <summary>
     /// 应用图片资源使用情况记录及配置。
     /// </summary>
-    public class YuLegoGlobalPicRefSetting : YuAbsSingleSetting<YuU3dAppLegoUISetting>
+    public class YuLegoGlobalPicRefSetting : AbsSingleSetting<YuU3dAppLegoUISetting>
     {
         [LabelText("所有应用图片资源使用数据 ")] public List<YuLegoAppPicRefSetting> AppPicRefs;
 

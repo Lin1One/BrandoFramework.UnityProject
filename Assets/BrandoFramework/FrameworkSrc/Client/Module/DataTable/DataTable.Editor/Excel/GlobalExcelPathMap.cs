@@ -21,7 +21,7 @@ using System.Collections.Generic;
 namespace Client.DataTable.Editor
 {
     [Serializable]
-    public class GlobalExcelPathMap : YuAbsSingleSetting<GlobalExcelPathMap>
+    public class GlobalExcelPathMap : AbsSingleSetting<GlobalExcelPathMap>
     {
         public List<DataClassToExcelFileMap> AppExcelSourcePathMaps;
 

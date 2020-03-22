@@ -1335,9 +1335,9 @@ namespace Client.LegoUI
             }
         }
 
-        private IYuSpriteRouter spriteRouter;
+        private ISpriteRouter spriteRouter;
 
-        private IYuSpriteRouter SpriteRouter
+        private ISpriteRouter SpriteRouter
         {
             get
             {
@@ -1346,7 +1346,7 @@ namespace Client.LegoUI
                     return spriteRouter;
                 }
 
-                spriteRouter = Injector.Instance.Get<IYuSpriteRouter>();
+                spriteRouter = Injector.Instance.Get<ISpriteRouter>();
                 return spriteRouter;
             }
         }

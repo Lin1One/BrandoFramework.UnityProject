@@ -55,7 +55,7 @@ namespace Client.LegoUI
                 return;
             }
 
-            var injector = Injector.Instance.As<IYuU3dInjector>();
+            var injector = Injector.Instance.As<IU3dInjector>();
 
             rectPool = injector.GetMono<YuLegoRectTransformPool>();
             textPool = injector.GetMono<YuLegoTextPool>();

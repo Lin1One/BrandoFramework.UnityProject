@@ -19,7 +19,7 @@ namespace Client.DataTable.Editor
     public class ExcelCSharpEntityScriptCreator : ExcelScriptCreatorBase
     {
         public override ScriptType ScriptType => ScriptType.Csharp;
-        public override string ScriptName => ExcelUtility.EntityScriptName(projectInfo, SheetInfo);
+        public override string ScriptName => ExcelUtilty.EntityScriptName(projectInfo, SheetInfo);
         protected override void AppendScript()
         {
             AppendHead();
@@ -92,7 +92,7 @@ namespace Client.DataTable.Editor
                     break;
             }
             Appender.AppendLine($"public class {ScriptName}");
-            var interfaceName = ExcelUtility.EntityInterfaceName(projectInfo,SheetInfo);
+            var interfaceName = ExcelUtilty.EntityInterfaceName(projectInfo,SheetInfo);
             Appender.AppendLine($"    : {interfaceName}, IExcelEntity<{ScriptName}>");
             Appender.AppendLeftBracketsAndToRight();
         }
@@ -151,7 +151,7 @@ namespace Client.DataTable.Editor
                     continue;
                 }
 
-                var handler = YuU3dExcelFieldHandlerFactory.GetFieldHandler(info.FieldType,
+                var handler = ExcelFieldHandlerFactory.GetFieldHandler(info.FieldType,
                     ScriptType.Csharp);
                 var csEntityStr = handler.GetCodeStr(
                     DataTableConstant.CsLanguageType, info);

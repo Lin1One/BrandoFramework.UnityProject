@@ -9,8 +9,8 @@ namespace Client.LegoUI.Editor
     /// </summary>
     public class YuLegoRxModelScriptCreator
     {
-        private readonly YuStringAppender appender
-            = new YuStringAppender();
+        private readonly StringAppender appender
+            = new StringAppender();
         private readonly LegoUIMeta uiMeta;
         //private readonly YuU3dAppSetting u3DAppSetting;
         private readonly RectTransform uiRect;
