@@ -31,7 +31,7 @@ namespace Client.Core
     [Singleton]
     public class BundlePathInfoHelepr : IBundlePathInfoHelepr
     {
-        private YuAppAssetBundleInfo projectAssetToBundleMap;
+        private ProjectAssetsToBundleMapInfo projectAssetToBundleMap;
 
         private string abSteamingPath => $"{Application.streamingAssetsPath}/AssetBundle/";
 
@@ -50,7 +50,7 @@ namespace Client.Core
             {
                 path = /*projectConfig.Helper.LocalHttpRootDir +*/ $"{projectConfig.DevelopProjectName}_AssetBundleInfo.bytes";
                 var bytes = File.ReadAllBytes(path);
-                projectAssetToBundleMap = SerializeUtility.DeSerialize<YuAppAssetBundleInfo>(bytes);
+                projectAssetToBundleMap = SerializeUtility.DeSerialize<ProjectAssetsToBundleMapInfo>(bytes);
             }
         }
 
@@ -58,7 +58,7 @@ namespace Client.Core
         {
             try
             {
-                var info = SerializeUtility.DeSerialize<YuAppAssetBundleInfo>(bytes);
+                var info = SerializeUtility.DeSerialize<ProjectAssetsToBundleMapInfo>(bytes);
                 if (info != null)
                 {
                     projectAssetToBundleMap = info;

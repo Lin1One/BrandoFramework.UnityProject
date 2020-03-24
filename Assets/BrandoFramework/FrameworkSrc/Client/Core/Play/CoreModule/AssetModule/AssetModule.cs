@@ -70,7 +70,7 @@ namespace Client.Core
         private string GetAssetPath(string assetId)
         {
             var assetInfo = AssetInfoHelper.GetAssetInfo(assetId);
-            var path = assetInfo?.GetEditorPath(projectInfo.CurrentProjectAssetDatabaseDirPath);
+            var path = assetInfo?.GetEditorPath(projectInfo.ProjectAssetDatabaseDir);
             return path;
         }
 

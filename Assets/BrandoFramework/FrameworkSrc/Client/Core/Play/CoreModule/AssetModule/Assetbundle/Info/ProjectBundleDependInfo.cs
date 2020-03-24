@@ -15,7 +15,7 @@ using UnityEngine;
 namespace Client.Core
 {
     [Serializable]
-    public class AppBundleDependInfo
+    public class ProjectBundleDependInfo
     {
         #region 可视化支持
 
@@ -43,11 +43,11 @@ namespace Client.Core
         public Dictionary<string, BundleDependInfo> AllDependInfos { get; }
             = new Dictionary<string, BundleDependInfo>();
 
-        public static AppBundleDependInfo Create(string manifestPath)
+        public static ProjectBundleDependInfo Create(string manifestPath)
         {
             var bundle = AssetBundle.LoadFromFile(manifestPath);
             var manifest = bundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
-            var appDependInfo = new AppBundleDependInfo();
+            var appDependInfo = new ProjectBundleDependInfo();
             var allBundleIds = manifest.GetAllAssetBundles();
 
             foreach (var bundleId in allBundleIds)

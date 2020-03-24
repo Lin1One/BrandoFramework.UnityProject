@@ -1,4 +1,6 @@
 
+using Client.Core;
+using Client.Core.Editor;
 using Client.Utility;
 using Sirenix.OdinInspector;
 using System;
@@ -22,7 +24,7 @@ namespace Client.Assets.Editor
 
         [TabGroup("项目 Assetbundle 信息")]
         [HideLabel]
-        public AppAssetBundleInfo AssetbundleInfo;
+        public ProjectAssetBundleInfoEditor AssetbundleInfo;
 
         [TabGroup("打包目录配置")]
         [HideLabel]
@@ -30,55 +32,52 @@ namespace Client.Assets.Editor
 
         [TabGroup("打包目录配置")]
         [LabelText("配置项列表")]
-        public List<AssetBundleBuildSetting> BundleSettings
+        public List<AssetBundleBuildSetting> BundleDirSettings
              = new List<AssetBundleBuildSetting>();
         //Todo：目录打包宏
         #endregion
 
-        #region 方法
-
         private void AddSetting(string dir)
         {
-            var existSetting = BundleSettings.Find(s => s.Dir == dir);
+            var existSetting = BundleDirSettings.Find(s => s.Dir == dir);
             if (existSetting != null)
             {
                 return;
             }
-
             var setting = new AssetBundleBuildSetting { Dir = dir };
-            BundleSettings.Add(setting);
+            BundleDirSettings.Add(setting);
         }
 
         public AssetBundleBuildSetting GetSetting(string path)
         {
             path = UnityIOUtility.GetAssetsPath(path);
-            var setting = BundleSettings.Find(s => s.Dir == path);
+            var setting = BundleDirSettings.Find(s => s.Dir == path);
             return setting;
         }
 
         private void OrderByDirId()
         {
-            BundleSettings = BundleSettings.OrderBy(s => s.Dir).ToList();
+            BundleDirSettings = BundleDirSettings.OrderBy(s => s.Dir).ToList();
         }
 
         public void SetBuildAtTargetBuildType(string dir, AssetBundleBuildType buildType)
         {
-            //var locAppId = YuEditorUtility.GetLocAppIdAtSelectDir();
-            //var appSetting = YuU3dAppSettingDati.TryGetApp(locAppId);
+            var locAppId = UnityEditorUtility.GetLocAppIdAtSelectDir();
+            var appSetting = ProjectInfoDati.GetActualInstance();
 
-            //if (appSetting == null)
-            //{
-            //    Debug.LogError($"目标目录{dir}不是一个应用下的目录！");
-            //    return;
-            //}
+            if (locAppId == null)
+            {
+                Debug.LogError($"目标目录{dir}不是一个应用下的目录！");
+                return;
+            }
 
-            //if (!YuAssetBundleUtility.IsLegalAssetBundleDir(dir, appSetting))
-            //{
-            //    Debug.LogError($"目标目录{dir}不是一个有效的AssetBundle目录！");
-            //    return;
-            //}
+            if (!AssetBundleBuilder.IsLegalAssetBundleDir(dir))
+            {
+                Debug.LogError($"目标目录{dir}不是一个有效的AssetBundle目录！");
+                return;
+            }
 
-            var existSetting = BundleSettings.Find(s => s.Dir == dir);
+            var existSetting = BundleDirSettings.Find(s => s.Dir == dir);
             if (existSetting == null)
             {
                 existSetting = new AssetBundleBuildSetting
@@ -87,8 +86,8 @@ namespace Client.Assets.Editor
                     Dir = dir,
                     //LocAppId = Unity3DEditorUtility.GetLocAppIdAtSelectDir()
                 };
-                BundleSettings.Add(existSetting);
-                BundleSettings = BundleSettings.OrderBy(s => s.Dir).ToList();
+                BundleDirSettings.Add(existSetting);
+                BundleDirSettings = BundleDirSettings.OrderBy(s => s.Dir).ToList();
                 Debug.Log($"目录{dir}当前不存在配置数据，已新建配置！");
             }
             else
@@ -108,12 +107,12 @@ namespace Client.Assets.Editor
                     if (importer != null)
                     {
                         importer.assetBundleName = null;
-                        //importer.assetBundleVariant = null;
+                        importer.assetBundleVariant = null;
                     }
                 }
             }
 
-            var existSetting = BundleSettings.Find(s => s.Dir == dir);
+            var existSetting = BundleDirSettings.Find(s => s.Dir == dir);
             if (existSetting == null)
             {
                 Debug.LogError($"目录{dir}当前不存在配置数据，如果确定是一个有效目录，" +
@@ -121,12 +120,8 @@ namespace Client.Assets.Editor
                 return;
             }
 
-            BundleSettings.Remove(existSetting);
+            BundleDirSettings.Remove(existSetting);
             Debug.Log($"所选目录{dir}的打包配置已移除！");
         }
-
-
-        #endregion
-
     }
 }

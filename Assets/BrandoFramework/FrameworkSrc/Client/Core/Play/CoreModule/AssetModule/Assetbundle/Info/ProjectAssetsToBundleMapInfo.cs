@@ -9,7 +9,7 @@ namespace Client.Core
     /// 应用的AssetBundle数据集合。
     /// </summary>
     [Serializable]
-    public class YuAppAssetBundleInfo
+    public class ProjectAssetsToBundleMapInfo
     {
         [ReadOnly]
         [LabelText("当前应用ID")] public string LocAppId;

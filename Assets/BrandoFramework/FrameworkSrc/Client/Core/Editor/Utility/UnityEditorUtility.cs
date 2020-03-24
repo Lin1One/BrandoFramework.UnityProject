@@ -1,4 +1,5 @@
 ﻿using Client.Utility;
+using Common;
 using Common.Utility;
 using System.Collections.Generic;
 using System.IO;
@@ -6,7 +7,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace Common.Editor
+namespace Client.Core.Editor
 {
     /// <summary>
     /// 编辑器常用工具。
@@ -135,47 +136,37 @@ namespace Common.Editor
 
         #region 应用
 
-        //public static string GetLocAppIdAtSelectDir()
-        //{
-        //    var firstDir = GetSelectDirs().First();
-        //    firstDir = Application.dataPath.Replace("Assets", "")
-        //                + firstDir;
+        public static string GetLocAppIdAtSelectDir()
+        {
+            var firstDir = GetSelectDirs().First();
+            firstDir = Application.dataPath.Replace("Assets", "") + firstDir;
 
-        //    var appSettings = YuU3dAppSettingDati.AllActuals;
-        //    foreach (var appSetting in appSettings)
-        //    {
-        //        var appHelper = appSetting.Helper;
-        //        var appRootDir = appHelper.RootFullPath;
-        //        if (firstDir.StartsWith(appRootDir))
-        //        {
-        //            return appSetting.LocAppId;
-        //        }
-        //    }
-
-        //    return null;
-        //}
+            var appSettings = ProjectInfoDati.GetActualInstance();
+            var appRootDir = appSettings.ProjectRootDir;
+            if (firstDir.StartsWith(appRootDir))
+            {
+                return appSettings.DevelopProjectName;
+            }
+            return null;
+        }
 
         /// <summary>
         /// 尝试获取指定目录所在的应用配置。
         /// </summary>
         /// <param name="dir"></param>
         /// <returns></returns>
-        //public static YuU3dAppSetting TryGetLocAppAtDir(string dir)
-        //{
-        //    var fullDir = YuUnityIOUtility.GetFullPath(dir);
-        //    var appSettings = YuU3dAppSettingDati.AllActuals;
-        //    foreach (var appSetting in appSettings)
-        //    {
-        //        var appHelper = appSetting.Helper;
-        //        var appRootDir = appHelper.RootFullPath;
-        //        if (fullDir.StartsWith(appRootDir))
-        //        {
-        //            return appSetting;
-        //        }
-        //    }
+        public static ProjectInfo TryGetLocProjectInfoAtDir(string dir)
+        {
+            var fullDir = UnityIOUtility.GetFullPath(dir);
+            var appSetting = ProjectInfoDati.GetActualInstance();
+            var appRootDir = appSetting.ProjectRootDir;
+            if (fullDir.StartsWith(appRootDir))
+            {
+                return appSetting;
+            }
 
-        //    return null;
-        //}
+            return null;
+        }
 
         #endregion
 

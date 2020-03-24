@@ -7,6 +7,7 @@
 
 #endregion
 
+using Client.Core.Editor;
 using Common;
 using Common.Editor;
 using Common.Utility;
@@ -80,8 +81,8 @@ namespace Client.Assets.Editor
             var dirId = IOUtility.GetSomeDirPath(Dir, 3);
             AtSizeSetting.SizeInfo = new AssetBundleBuildSizeInfo();
             var fileInfos = IOUtility.GetFileInfosAtDir(Dir,true)
-                .Where(d => YuAssetBundleUtility.EndCheck(IgnoreRule, d.FullName))
-                .Where(d => YuAssetBundleUtility.ContainCheck(IgnoreRule, d.FullName)).ToList();
+                .Where(d => AssetBundleBuilder.EndCheck(IgnoreRule, d.FullName))
+                .Where(d => AssetBundleBuilder.ContainCheck(IgnoreRule, d.FullName)).ToList();
             long maxSize = AtSizeSetting.PackageSize * 1024;
             long currentSize = 0;
             var bundleIndex = 0;
@@ -113,7 +114,7 @@ namespace Client.Assets.Editor
 
             AddSubPackage(); // 添加最后一个子包尺寸小于分包限制的剩余资源
             AtSizeSetting.SetSizeTotal(AtSizeSetting.SizeInfo.GetAssetTotal());
-            ////YuU3dAppAssetBundleSettingDati.GetMultiAtId(LocAppId).Save();
+            AssetBundleEditorDati.GetSingleDati().Save();
             return AtSizeSetting.SizeInfo;
 
             void AddSubPackage()
@@ -130,8 +131,8 @@ namespace Client.Assets.Editor
         {
             var paths = IOUtility.GetPaths(Dir);
             var ignoreRule = IgnoreRule;
-            paths = paths.Where(p => YuAssetBundleUtility.EndCheck(IgnoreRule, p))
-                .Where(p => YuAssetBundleUtility.ContainCheck(IgnoreRule, p)).ToList();
+            paths = paths.Where(p => AssetBundleBuilder.EndCheck(IgnoreRule, p))
+                .Where(p => AssetBundleBuilder.ContainCheck(IgnoreRule, p)).ToList();
             var fileIds = paths.Select(Path.GetFileNameWithoutExtension).ToList();
 
             return fileIds;
@@ -166,8 +167,8 @@ namespace Client.Assets.Editor
         public List<string> SelfDirPaths()
         {
             var paths = IOUtility.GetPaths(Dir);
-            paths = paths.Where(p => YuAssetBundleUtility.EndCheck(IgnoreRule, p))
-                .Where(p => YuAssetBundleUtility.ContainCheck(IgnoreRule, p)).ToList();
+            paths = paths.Where(p => AssetBundleBuilder.EndCheck(IgnoreRule, p))
+                .Where(p => AssetBundleBuilder.ContainCheck(IgnoreRule, p)).ToList();
             return paths;
         }
 
@@ -224,7 +225,7 @@ namespace Client.Assets.Editor
         [HorizontalGroup("第一排按钮")]
         private void CleanAllBundleIdAndBuildThisDir()
         {
-            YuAssetBundleUtility.CleanAllAssetBundleId();
+            AssetBundleBuilder.CleanAllAssetBundleId();
             BuildThisDirAndNotClean();
         }
 
@@ -232,7 +233,7 @@ namespace Client.Assets.Editor
         [HorizontalGroup("第一排按钮")]
         private void BuildThisDirAndNotClean()
         {
-            YuAssetBundleUtility.SetBundleIdAndSelectIsBuild(this);
+            AssetBundleBuilder.SetBundleIdAndSelectIsBuild(this);
         }
 
         #endregion

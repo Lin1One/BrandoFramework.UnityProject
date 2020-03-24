@@ -18,7 +18,7 @@ namespace Client.Assets.Editor
     /// 应用AssetBundle文件数据。
     /// </summary>
     [Serializable]
-    public class AppAssetBundleInfo
+    public class ProjectAssetBundleInfoEditor
     {
         [BoxGroup("AssetBundle 依赖关系")]
         [LabelText("AssetBundle名")]

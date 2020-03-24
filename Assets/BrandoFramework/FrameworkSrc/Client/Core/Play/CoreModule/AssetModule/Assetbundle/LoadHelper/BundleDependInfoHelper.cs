@@ -19,6 +19,11 @@ using UnityEngine;
 
 namespace Client.Core
 {
+    public interface IBundleDependInfoHelper
+    {
+        BundleDependInfo GetDependInfo(string bundleId);
+    }
+
     [Singleton]
     [Serializable]
     //[DefaultInjecType(typeof(IBundleDependInfoHelper))]
@@ -32,7 +37,7 @@ namespace Client.Core
 
 #if UNITY_EDITOR
 
-        [HideLabel] public AppBundleDependInfo VisualDependInfo;
+        [HideLabel] public ProjectBundleDependInfo VisualDependInfo;
 
         private void HiddenConstruct(object injector)
         {
@@ -53,9 +58,9 @@ namespace Client.Core
         //[YuInject]
         private readonly BundlePathHelper _pathHelper;
 
-        private AppBundleDependInfo _appDependInfo;
+        private ProjectBundleDependInfo _appDependInfo;
 
-        private AppBundleDependInfo AppDependInfo
+        private ProjectBundleDependInfo AppDependInfo
         {
             get
             {
@@ -72,14 +77,14 @@ namespace Client.Core
         private void InitDependInfo()
         {
             var path = _pathHelper.GetAppBundleDependInfoPath();
-            _appDependInfo = SerializeUtility.DeSerialize<AppBundleDependInfo>(path);
+            _appDependInfo = SerializeUtility.DeSerialize<ProjectBundleDependInfo>(path);
         }
 
         public BundleDependInfo GetDependInfo(string bundleId) => AppDependInfo.GetDependInfo(bundleId);
 
         public void SetBundleDependInfo(byte[] bytes)
         {
-            _appDependInfo = SerializeUtility.DeSerialize<AppBundleDependInfo>(bytes);
+            _appDependInfo = SerializeUtility.DeSerialize<ProjectBundleDependInfo>(bytes);
         }
 
         #endregion

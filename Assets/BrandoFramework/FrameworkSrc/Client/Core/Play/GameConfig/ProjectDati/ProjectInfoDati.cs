@@ -36,7 +36,7 @@ namespace Client.Core
         [LabelWidth(130)]
         [FolderPath]
         [LabelText("AssetdatabaseĿ¼")]
-        public string CurrentProjectAssetDatabaseDirPath;
+        public string ProjectAssetDatabaseDir;
 
         [BoxGroup("Dir")]
         [LabelWidth(130)]

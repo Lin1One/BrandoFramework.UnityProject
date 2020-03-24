@@ -13,6 +13,11 @@ using UnityEngine;
 
 namespace Client.Core
 {
+    public interface IBundlePathHelper
+    {
+
+    }
+
     [Singleton]
     [DefaultInjecType(typeof(IBundlePathHelper))]
     public class BundlePathHelper : IBundlePathHelper
@@ -23,12 +28,12 @@ namespace Client.Core
         {
             if (UnityModeUtility.IsEditorMode)
             {
-                var path = /*_appSetting.Helper.LocalHttpRootDir +*/ $"{typeof(AppBundleDependInfo).Name}.bytes";
+                var path = /*_appSetting.Helper.LocalHttpRootDir +*/ $"{typeof(ProjectBundleDependInfo).Name}.bytes";
                 return path;
             }
             else
             {
-                var path = $"{Application.streamingAssetsPath}/AssetBundle/AppBundleDependInfo.bytes";
+                var path = $"{Application.streamingAssetsPath}/AssetBundle/ProjectBundleDependInfo.bytes";
                 return path;
             }
         }

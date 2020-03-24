@@ -10,8 +10,5 @@
 
 namespace Client.Core
 {
-    public interface IBundleDependInfoHelper
-    {
-        BundleDependInfo GetDependInfo(string bundleId);
-    }
+
 }
