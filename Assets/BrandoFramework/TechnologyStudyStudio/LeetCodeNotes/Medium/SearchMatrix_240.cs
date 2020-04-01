@@ -17,7 +17,7 @@ namespace Study.LeetCode
 
         // 现有矩阵 matrix 如下：
 
-            //[1,1] 2
+        //[1,1] 2
         // [
         //   [1,   4,  7, 11, 15],
         //   [2,   5,  8, 12, 19],
@@ -25,6 +25,32 @@ namespace Study.LeetCode
         //   [10, 13, 14, 17, 24],
         //   [18, 21, 23, 26, 30]
         // ]
+
+        public bool SearchMatrix0402(int[,] matrix, int target)
+        {
+            if (matrix == null)
+            {
+                return false;
+            }
+            int row = matrix.Length - 1;
+            int col = 0;
+            while (row >= 0 && col < matrix.GetLength(2))
+            {
+                if (matrix[row, col] > target)
+                {
+                    row--;
+                }
+                else if (matrix[row, col] < target)
+                {
+                    col++;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public bool SearchMatrix(int[,] matrix, int target) 
         {
@@ -97,18 +123,18 @@ namespace Study.LeetCode
         }
 
 
-        // 方法一：暴力法
-        // 对于每一行我们可以像搜索未排序的一维数组——通过检查每个元素来判断是否有目标值。
 
-        // 算法：
-        // 这个算法并没有做到聪明的事情。
-        // 我们循环数组，依次检查每个元素。
-        // 如果，我们找到了，我们返回 true。
-        // 否则，对于搜索到末尾都没有返回的循环，
-        // 我们返回 false。此算法在所有情况下都是正确的答案，
-        // 因为我们耗尽了整个搜索空间。
-        public bool SearchMatrix(int[][] matrix, int target) 
-        {
+        public bool SearchMatrix(int[][] matrix, int target)
+        {       // 方法一：暴力法
+                // 对于每一行我们可以像搜索未排序的一维数组——通过检查每个元素来判断是否有目标值。
+
+            // 算法：
+            // 这个算法并没有做到聪明的事情。
+            // 我们循环数组，依次检查每个元素。
+            // 如果，我们找到了，我们返回 true。
+            // 否则，对于搜索到末尾都没有返回的循环，
+            // 我们返回 false。此算法在所有情况下都是正确的答案，
+            // 因为我们耗尽了整个搜索空间。
             for (int i = 0; i < matrix.Length; i++) 
             {
                 for (int j = 0; j < matrix[0].Length; j++) 
@@ -122,23 +148,23 @@ namespace Study.LeetCode
             return false;
         }
 
-        // 方法二：二分法搜索
-        // 矩阵已经排过序，就需要使用二分法搜索以加快我们的算法。
 
-        // 算法：
-        // 首先，我们确保矩阵不为空。
-        // 那么，如果我们迭代矩阵对角线，
-        // 从当前元素对列和行搜索，
-        // 我们可以保持从当前 (row,col) 对开始的行和列为已排序。 
-        //因此，我们总是可以二分搜索这些行和列切片。
-        //我们以如下逻辑的方式进行 : 
-        //在对角线上迭代，二分搜索行和列，
-        //直到对角线的迭代元素用完为止（意味着我们可以返回 false ）
-        //或者找到目标（意味着我们可以返回 true ）。
-        //binary search 函数的工作原理和普通的二分搜索一样,
-        //但需要同时搜索二维数组的行和列。
-        public bool SearchMatrix1(int[,] matrix, int target) 
-        {
+        public bool SearchMatrix1(int[,] matrix, int target)
+        {        // 方法二：二分法搜索
+                 // 矩阵已经排过序，就需要使用二分法搜索以加快我们的算法。
+
+            // 算法：
+            // 首先，我们确保矩阵不为空。
+            // 那么，如果我们迭代矩阵对角线，
+            // 从当前元素对列和行搜索，
+            // 我们可以保持从当前 (row,col) 对开始的行和列为已排序。 
+            //因此，我们总是可以二分搜索这些行和列切片。
+            //我们以如下逻辑的方式进行 : 
+            //在对角线上迭代，二分搜索行和列，
+            //直到对角线的迭代元素用完为止（意味着我们可以返回 false ）
+            //或者找到目标（意味着我们可以返回 true ）。
+            //binary search 函数的工作原理和普通的二分搜索一样,
+            //但需要同时搜索二维数组的行和列。
             if (matrix == null || matrix.GetLength(0) == 0) 
             {
                 return false;
@@ -248,7 +274,42 @@ namespace Study.LeetCode
         // 因此我们可以递归地将此算法应用于它们。
 
 
+        public bool SearchMatrix0402(int[][] matrix, int target)
+        {
+            //方法四：
+            //因为矩阵的行和列是排序的（分别从左到右和从上到下），所以在查看任何特定值时，我们可以修剪O(m)O(m)或O(n)O(n)元素。
 
+            //算法：
+            //首先，我们初始化一个指向矩阵左下角的(row，col)指针。然后，直到找到目标并返回 true（或者指针指向矩阵维度之外的(row，col) 为止，
+            //我们执行以下操作：如果当前指向的值大于目标值，则可以 “向上” 移动一行。 
+            //否则，如果当前指向的值小于目标值，则可以移动一列。
+            //不难理解为什么这样做永远不会删减正确的答案；
+            //因为行是从左到右排序的，所以我们知道当前值右侧的每个值都较大。 
+            //因此，如果当前值已经大于目标值，我们知道它右边的每个值会比较大。
+            //也可以对列进行非常类似的论证，因此这种搜索方式将始终在矩阵中找到目标（如果存在）。
+
+
+            // start our "pointer" in the bottom-left
+            int row = matrix.Length - 1;
+            int col = 0;
+
+            while (row >= 0 && col < matrix[0].Length)
+            {
+                if (matrix[row][col] > target)
+                {
+                    row--;
+                }
+                else if (matrix[row][col] < target)
+                {
+                    col++;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
 
