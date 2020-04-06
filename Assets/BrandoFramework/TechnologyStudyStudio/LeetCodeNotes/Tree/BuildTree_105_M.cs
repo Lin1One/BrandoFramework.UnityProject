@@ -104,6 +104,7 @@ namespace Study.LeetCode
             }
             return helper(0, inorder.Length);
         }
+
         public TreeNode helper(int in_left, int in_right) 
         {
             if (in_left == in_right)
@@ -123,7 +124,33 @@ namespace Study.LeetCode
             return root;
         }
 
+        public TreeNode BuildTree0403(int[] preorder, int[] inorder)
+        {
+            return BuildTree0403(preorder, inorder, 0, 0, preorder.Length);
+        }
 
+        public TreeNode BuildTree0403(int[] preorder, int[] inorder, int curNodeIndex, int left, int right)
+        {
+            if (left == right)
+            {
+                return null;
+            }
+            int curNodeInOrderIndex = 0;
+            for (var i = left; i < right; i++)
+            {
+                if (inorder[i] == preorder[curNodeIndex])
+                {
+                    curNodeInOrderIndex = i;
+                }
+            }
+            int leftNodeCount = curNodeInOrderIndex - left;
+            int rightNodeCount = right - curNodeInOrderIndex - 1;
+            TreeNode curNode = new TreeNode(preorder[curNodeIndex]);
+            curNode.left = BuildTree0403(preorder, inorder, curNodeIndex + 1, left, curNodeInOrderIndex);
+            curNode.right = BuildTree0403(preorder, inorder, curNodeIndex + leftNodeCount + 1, curNodeInOrderIndex + 1, right);
+            return curNode;
+
+        }
 
     }
 }
