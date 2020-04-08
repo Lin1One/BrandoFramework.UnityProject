@@ -16,7 +16,6 @@ namespace Study.LeetCode
         //迭代
         public ListNode MergeTwoLists(ListNode l1, ListNode l2) 
         {
-            List<>.in
             ListNode newListNode = new ListNode(0);
             ListNode newListHead = newListNode;
             ListNode firstList = l1;

@@ -24,7 +24,7 @@
 
         private int count;
 
-        public int Count { get => count; private set => count = value; }
+        public int Count { get { return count; } private set { count = value; } }
 
 
         /// <summary>
