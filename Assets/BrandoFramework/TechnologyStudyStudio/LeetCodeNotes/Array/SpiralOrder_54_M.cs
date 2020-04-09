@@ -29,6 +29,56 @@ namespace Study.LeetCode
         // ]
         // 输出: [1,2,3,4,8,12,11,10,9,5,6,7]
 
+        public IList<int> SpiralOrder3(int[][] matrix)
+        {
+            IList<int> result = new List<int>();
+            if (matrix.Length == 0)
+            {
+                return result;
+            }
+            int rowNum = matrix.Length;
+            int colNum = matrix[0].Length;
+            int numCount = rowNum * colNum;
+            int left = 0;
+            int right = colNum - 1;
+            int top = 0;
+            int bottom = rowNum - 1;
+            while(result.Count < numCount)
+            {
+                for(var i = left;i <= right;i++)
+                {
+                    result.Add(matrix[top][i]);
+                }
+                top++;
+                if (result.Count < numCount)
+                {
+                    for(var i = top;i <= bottom;i++)
+                    {
+                        result.Add(matrix[i][right]);
+                    }
+                    right--;
+                }
+                if (result.Count < numCount)
+                {
+                    for (var i = right; i >= left; i--)
+                    {
+                        result.Add(matrix[bottom][i]);
+                    }
+                    bottom--;
+                }
+                if (result.Count < numCount)
+                {
+                    for (var i = bottom; i >= top; i--)
+                    {
+                        result.Add(matrix[i][left]);
+                    }
+                    left++;
+                }
+            }
+            return result;
+        }
+
+
         public IList<int> SpiralOrder(int[][] matrix) 
         {
             IList<int> result = new List<int>();
