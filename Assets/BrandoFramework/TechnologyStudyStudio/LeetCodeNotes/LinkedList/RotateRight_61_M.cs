@@ -43,6 +43,7 @@ namespace Study.LeetCode
                 list = list.next;
                 Count++;
             }
+            //首尾连接
             list.next = head;
 
             k = k % Count;
@@ -54,6 +55,7 @@ namespace Study.LeetCode
                 i++;
             }
             var newHead = newTail.next;
+            //新尾断开
             newTail.next = null;
             return newHead;
         }

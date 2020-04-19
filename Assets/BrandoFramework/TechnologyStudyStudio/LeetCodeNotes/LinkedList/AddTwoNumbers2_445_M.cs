@@ -58,6 +58,7 @@ namespace Study.LeetCode
             {
                 newList.next = AddTwoNode(l1,l2);
             }
+
             if(isUp)
             {
                  return newListHead;

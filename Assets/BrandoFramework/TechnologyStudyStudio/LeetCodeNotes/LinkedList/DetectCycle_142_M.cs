@@ -66,10 +66,10 @@ namespace Study.LeetCode
             return lowNode;
 
         }
-
-        //哈希表保存
+    
         public ListNode detectCycle(ListNode head) 
         {
+            //哈希表保存
             HashSet<ListNode> visited = new HashSet<ListNode>();
             ListNode node = head;
             while (node != null) 

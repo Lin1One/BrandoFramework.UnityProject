@@ -41,8 +41,6 @@ namespace Study.LeetCode
             return newHead;
         }
 
-
-
         //递归
         public ListNode ReverseList1(ListNode head) 
         {
@@ -68,6 +66,18 @@ namespace Study.LeetCode
             return head;
         }
 
+        public ListNode ReverseList1_2(ListNode head)
+        {
+            if(head == null || head.next == null)
+            {
+                return head;
+            }
+            var newHead = ReverseList1_2(head.next);
+            head.next.next = head;
+            head.next = null;
+            return newHead;
+        }
+
         //循环
         public ListNode ReverseList2(ListNode head) 
         {
@@ -84,6 +94,21 @@ namespace Study.LeetCode
                 newHead = oriNext;
             }
             return newHead;
+        }
+
+        //循环2
+        public ListNode ReverseList3(ListNode head)
+        {
+            ListNode prev = null;
+            ListNode curNode = head;
+            while(curNode != null)
+            {
+                var curNext = curNode.next;
+                curNode.next = prev;
+                prev = curNode;
+                curNode = curNext;
+            }
+            return prev;
         }
     }
 }

@@ -32,6 +32,7 @@ namespace Study.LeetCode
             {
                 return head.val == head.next.val;
             }
+
             // 快慢指针
             ListNode slow = head;
             ListNode fast = head;

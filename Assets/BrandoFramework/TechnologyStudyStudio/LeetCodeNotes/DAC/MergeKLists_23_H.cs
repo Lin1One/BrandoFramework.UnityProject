@@ -19,10 +19,11 @@ namespace Study.LeetCode
         // ]
         // 输出: 1->1->2->3->4->4->5->6
 
-        // 逐一合并
+
         public ListNode MergeKLists(ListNode[] lists) 
         {
-            if(lists == null ||lists.Length==0)
+            // 逐一合并
+            if (lists == null ||lists.Length==0)
             {
                 return null;
             }
