@@ -94,9 +94,12 @@ namespace Study.LeetCode
 
         public int UniquePaths3(int m, int n) 
         {
+            //O(n^2) 空间复杂度
             int[,] dp = new int[m,n];
-            for (int i = 0; i < n; i++) dp[0,i] = 1;
-            for (int i = 0; i < m; i++) dp[i,0] = 1;
+            for (int i = 0; i < n; i++)
+                dp[0,i] = 1;
+            for (int i = 0; i < m; i++)
+                dp[i,0] = 1;
             for (int i = 1; i < m; i++) 
             {
                 for (int j = 1; j < n; j++) 
@@ -109,24 +112,28 @@ namespace Study.LeetCode
 
         public int uniquePaths4(int m, int n) 
         {
-                int[] pre = new int[n];
-                int[] cur = new int[n];
-                for (int i = 0; i < 10; i++)
+            //O(2n) 空间复杂度
+            int[] pre = new int[n];
+            int[] cur = new int[n];
+            for(var i = 0;i< n;i++)
+            {
+                pre[i] = 1;
+                cur[i] = 1;
+            }
+            for (int i = 1; i < m;i++)
+            {
+                for (int j = 1; j < n; j++)
                 {
-                    //pre[i]
+                    cur[j] = cur[j-1] + pre[j];
                 }
-                for (int i = 1; i < m;i++)
-                {
-                    for (int j = 1; j < n; j++){
-                        cur[j] = cur[j-1] + pre[j];
-                    }
-                    //pre = cur.clone();
-                }
-                return pre[n-1]; 
+                Array.Copy(cur, pre , n);
+            }
+            return pre[n-1]; 
         }
         
         public int uniquePaths5(int m, int n) 
         {
+            //O(n) 空间复杂度
             int[] cur = new int[n];
             for (int i = 0; i < n; i++)
             {
@@ -136,7 +143,7 @@ namespace Study.LeetCode
             {
                 for (int j = 1; j < n; j++)
                 {
-                    cur[j] += cur[j-1] ;
+                    cur[j] = cur[j] + cur[j-1];
                 }
             }
             return cur[n-1];
