@@ -71,7 +71,29 @@ namespace Study.LeetCode
             return minPathCost[m,n];
         }
 
-
+        public int MinPathSum1(int[][] grid)
+        {
+            if (grid == null || grid.Length == 0)
+            {
+                return 0;
+            }
+            var colCount = grid[0].Length;
+            var curRow = new int[colCount];
+            curRow[0] = grid[0][0];
+            for (var i = 1;i < colCount; i++)
+            {
+                curRow[i] = grid[0][i] + curRow[i - 1];
+            }
+            for(var i = 1;i < grid.Length;i++)
+            {
+                curRow[0] = curRow[0] + grid[i][0];
+                for (var j = 1;j<colCount;j++)
+                {
+                    curRow[j] = Math.Min(curRow[j - 1], curRow[j])+ grid[i][j];
+                }
+            }
+            return curRow[colCount - 1];
+        }
 
     }
 }

@@ -23,23 +23,21 @@ namespace Study.LeetCode
             return 0;
         }
 
-
-        // 我们用一个例子来解释这个方法：
-        // 0 1 1 1 0
-        // 1 1 1 1 1
-        // 0 1 1 1 1
-        // 0 1 1 1 1
-        // 0 0 1 1 1
-        // 我们用 0 初始化另一个矩阵 dp，维数和原始矩阵维数相同；
-        // dp(i,j) 表示的是由 1 组成的最大正方形的边长；
-        // 从 (0,0) 开始，对原始矩阵中的每一个 1，我们将当前元素的值更新为
-        // dp(i, j)=min(dp(i−1, j), dp(i−1, j−1), dp(i, j−1)) + 1
-
-        // 我们还用一个变量记录当前出现的最大边长，这样遍历一次，
-        // 找到最大的正方形边长 maxsqlen，那么结果就是 maxsqlen^2 
-
         public int MaximalSquare1(char[][] matrix) 
         {
+            // 我们用一个例子来解释这个方法：
+            // 0 1 1 1 0
+            // 1 1 1 1 1
+            // 0 1 1 1 1
+            // 0 1 1 1 1
+            // 0 0 1 1 1
+            // 我们用 0 初始化另一个矩阵 dp，维数和原始矩阵维数相同；
+            // dp(i,j) 表示的是由 1 组成的最大正方形的边长；
+            // 从 (0,0) 开始，对原始矩阵中的每一个 1，我们将当前元素的值更新为
+            // dp(i, j)=min(dp(i−1, j), dp(i−1, j−1), dp(i, j−1)) + 1
+
+            // 我们还用一个变量记录当前出现的最大边长，这样遍历一次，
+            // 找到最大的正方形边长 maxsqlen，那么结果就是 maxsqlen^2 
             int rows = matrix.Length;
             int cols = rows > 0 ? matrix[0].Length : 0;
             int[,] dp = new int[rows + 1,cols + 1];
@@ -59,18 +57,17 @@ namespace Study.LeetCode
             return maxsqlen * maxsqlen;
         }
 
-        // 方法三：动态规划优化
-        // 在前面的动态规划解法中，计算 i^{th} 行（row）的 dp 方法中，
-        // 我们只使用了上一个元素和第 (i−1) th行，
-        // 因此我们不需要二维 dp 矩阵，因为一维 dp 足以满足此要求。
-        // 我们扫描一行原始矩阵元素时，
-        // 根据公式：
-        // dp[j]=min(dp[j-1],dp[j],prev)
-        // 更新数组 dp，其中 prev 指的是 dp[j-1]，
-        // 对于每一行，我们重复相同过程并在 dp 矩阵中更新元素。
-
         public int MaximalSquare2(char[][] matrix) 
         {
+            // 方法三：动态规划优化
+            // 在前面的动态规划解法中，计算 i^{th} 行（row）的 dp 方法中，
+            // 我们只使用了上一个元素和第 (i−1) th行，
+            // 因此我们不需要二维 dp 矩阵，因为一维 dp 足以满足此要求。
+            // 我们扫描一行原始矩阵元素时，
+            // 根据公式：
+            // dp[j]=min(dp[j-1],dp[j],prev)
+            // 更新数组 dp，其中 prev 指的是 dp[j-1]，
+            // 对于每一行，我们重复相同过程并在 dp 矩阵中更新元素。
             int rows = matrix.Length;
             int cols = rows > 0 ? matrix[0].Length : 0;
             int[] dp = new int[cols + 1];
