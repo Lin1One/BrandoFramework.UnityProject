@@ -68,24 +68,17 @@ namespace Study.LeetCode
             return results;
         }
 
-
-
-
-
-
-
-
-        //排序，双指针
-        // 首先对数组进行排序，排序后固定一个数nums[i]，
-        // 再使用左右指针指向nums[i]后面的两端，数字分别为nums[L]和nums[R]，
-        // 计算三个数的和sum判断是否满足为 0，满足则添加进结果集
-        // 如果nums[i]大于 0，则三数之和必然无法等于 0，结束循环
-        // 如果nums[i] == nums[i−1]，则说明该数字重复，会导致结果重复，所以应该跳过
-        // 当sum == 00 时，nums[L] == nums[L+1]则会导致结果重复，应该跳过，L++
-        // 当sum == 00 时，nums[R] == nums[R−1]则会导致结果重复，应该跳过，R−−
-        // 时间复杂度：O(n^2)，n为数组长度
         public IList<IList<int>> ThreeSum(int[] nums) 
         {
+            //排序，双指针
+            // 首先对数组进行排序，排序后固定一个数nums[i]，
+            // 再使用左右指针指向nums[i]后面的两端，数字分别为nums[L]和nums[R]，
+            // 计算三个数的和sum判断是否满足为 0，满足则添加进结果集
+            // 如果nums[i]大于 0，则三数之和必然无法等于 0，结束循环
+            // 如果nums[i] == nums[i−1]，则说明该数字重复，会导致结果重复，所以应该跳过
+            // 当sum == 00 时，nums[L] == nums[L+1]则会导致结果重复，应该跳过，L++
+            // 当sum == 00 时，nums[R] == nums[R−1]则会导致结果重复，应该跳过，R−−
+            // 时间复杂度：O(n^2)，n为数组长度
             List<IList<int>> ans = new List<IList<int>>();
             Array.Sort(nums); // 排序
             int len = nums.Length;

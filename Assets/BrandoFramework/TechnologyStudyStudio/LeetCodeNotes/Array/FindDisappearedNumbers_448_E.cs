@@ -62,6 +62,31 @@ namespace Study.LeetCode
             }
             return list;
         }
+
+        public IList<int> FindDisappearedNumbers2(int[] nums)
+        {
+            List<int> result = new List<int>();
+            if(nums == null || nums.Length == 0)
+            {
+                return result;
+            }
+            for(var i = 0;i< nums.Length;i++)
+            {
+                var value = Math.Abs( nums[i]) - 1;
+                if(nums[value] > 0)
+                {
+                    nums[value] *= -1;
+                }
+            }
+            for(var i = 1;i <= nums.Length;i++)
+            {
+                if(nums[i - 1] > 0)
+                {
+                    result.Add(i);
+                }
+            }
+            return result;
+        }
     }
 }
 

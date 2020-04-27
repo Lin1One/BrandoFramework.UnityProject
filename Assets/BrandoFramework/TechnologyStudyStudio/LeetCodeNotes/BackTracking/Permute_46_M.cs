@@ -130,8 +130,10 @@ namespace Study.LeetCode
             }
             for (int i = 0; i < nums.Length; i++) 
             {
-                if (visited[i] == 1) 
+                if (visited[i] == 1)
+                {
                     continue;
+                }
                 visited[i] = 1;
                 tmp.Add(nums[i]);
                 backtrack(res, nums, tmp, visited);
@@ -140,6 +142,31 @@ namespace Study.LeetCode
             }
         }
 
+
+        public IList<IList<int>> Permute4(int[] nums)
+        {
+            List<IList<int>> result = new List<IList<int>>();
+            backtrack(result, nums, new List<int>());
+            return result;
+        }
+        private void backtrack(List<IList<int>> result, int[] nums, List<int> numsList)
+        {
+            if(numsList.Count == nums.Length)
+            {
+                result.Add(new List<int>(numsList
+));
+                return;
+            }
+            for(var i = 0;i< nums.Length;i++)
+            {
+                if(!numsList.Contains(nums[i]))
+                {
+                    numsList.Add(nums[i]);
+                    backtrack(result, nums, numsList);
+                    numsList.Remove(nums[i]);
+                }
+            }
+        }
     }
 }
 

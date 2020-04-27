@@ -52,6 +52,45 @@ namespace Study.LeetCode
                 }
             }
         }
+
+        public IList<IList<int>> PermuteUnique1(int[] nums)
+        {
+            // 排序（升序或者降序都可以），排序是剪枝的前提
+            Array.Sort(nums);
+            var usedNums = new bool[nums.Length];
+            IList<IList<int>> result = new List<IList<int>>();
+            PermuteUnique_Backtrack(nums, new List<int>(), usedNums, result);
+            return result;
+            //时间复杂度：O(N×N!)，这里 N 为数组的长度。
+            //空间复杂度：O(N×N!)。
+        }
+
+        private void PermuteUnique_Backtrack(int[] nums, IList<int> resultItem,bool[] used, IList<IList<int>> result)
+        {
+            if(resultItem.Count == nums.Length)
+            {
+                result.Add(new List<int>(resultItem));
+                return;
+            }
+
+            for(var i = 0;i< nums.Length;i++)
+            {
+                if(used[i])
+                {
+                    continue;
+                }
+                if (i > 0 && nums[i] == nums[i - 1] && used[i - 1])
+                {
+                    continue;
+                }
+                resultItem.Add(nums[i]);
+                used[i] = true;
+                PermuteUnique_Backtrack(nums, resultItem, used,result);
+                used[i] = false;
+                resultItem.RemoveAt(resultItem.Count - 1);
+                
+            }
+        }
     }
 }
 
